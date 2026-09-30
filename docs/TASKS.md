@@ -62,8 +62,9 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *axe (WCAG 2.1 A/AA) runs in CI with no violations. Fixed: control borders 1.2:1 → 5.2:1, placeholder contrast, focus lost when Remove/Reset/Start over buttons disappear, duplicate h1 (preview is now `inert` + `aria-hidden`), added a skip link. Known limit: Chrome's built-in calendar button in the date field shows no focus ring and can't be styled.*
 
 ## Phase 3: Chat skin
-- [ ] **T3.1 IRC parser** (`src/twitch/parse.ts`) that turns raw IRC lines into typed events.
+- [x] **T3.1 IRC parser** (`src/twitch/parse.ts`) that turns raw IRC lines into typed events.
   - Accept: unit tests with real sample lines for PRIVMSG, USERNOTICE (sub, resub, subgift, raid), bits, CLEARMSG, CLEARCHAT and PING.
+  - *Never throws: malformed lines become `unknown`. Name colors must be `#rrggbb` and emote ids `[A-Za-z0-9_]` (both reach CSS/URLs). Emote offsets are code points. Unmapped USERNOTICEs are kept as `kind: "other"` for later.*
 - [ ] **T3.2 Anonymous connection** (`irc.ts`) with PING/PONG, reconnect with backoff, and a "can't connect / check channel name" state.
 - [ ] **T3.3 Chat overlay:** message list, name colors, emotes rendered as `<img>` elements (no innerHTML), theme-styled role badges, long-message wrapping, and a max message count.
 - [ ] **T3.4 Filters:** hide known bots (editable list) and `!commands`, and remove messages on CLEARMSG and CLEARCHAT.
