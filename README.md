@@ -26,6 +26,18 @@ npx playwright install chromium   # one-time, for npm run test:e2e
 cp .env.example .env.local   # fill in values if you use Sentry locally
 ```
 
+Install gitleaks (the pre-commit hook refuses to commit without it):
+- Windows: `winget install --id Gitleaks.Gitleaks`, then open a new terminal
+- macOS: `brew install gitleaks`
+- Linux: download a release binary from the gitleaks GitHub page
+
+### Pre-commit checks
+`npm ci` installs a git hook (husky) that runs on every commit:
+1. gitleaks scans the staged changes and blocks the commit if it finds a secret.
+2. lint-staged runs ESLint and Prettier on the staged files.
+
+Never skip it with `--no-verify`. If a secret does get committed, rotate it first, then purge it from history (see `CLAUDE.md` §3).
+
 ## Environment variables (names only)
 | Name | Where | Purpose |
 |---|---|---|

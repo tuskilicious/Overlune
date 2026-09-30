@@ -9,7 +9,7 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - Accept: `npm run dev` shows a placeholder editor page and `/o/starting` shows a placeholder overlay.
 - [x] **T0.4 Scripts:** `lint`, `typecheck`, `test`, `test:e2e`, `build`, with ESLint and Prettier configured.
   - Accept: all scripts pass on a clean checkout.
-- [ ] **T0.5 Secret scanning:** husky pre-commit running gitleaks and lint-staged. Document installing gitleaks in the README.
+- [x] **T0.5 Secret scanning:** husky pre-commit running gitleaks and lint-staged. Document installing gitleaks in the README.
   - Accept: committing a fake token is blocked.
 - [ ] **T0.6 CI:** `.github/workflows/ci.yml` runs lint, typecheck, test, build, gitleaks and `npm audit --audit-level=high`. Add `dependabot.yml`.
   - Accept: CI is green on a PR.
