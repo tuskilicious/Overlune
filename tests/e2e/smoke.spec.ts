@@ -5,7 +5,7 @@ test("editor placeholder renders", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Overlune" })).toBeVisible();
 });
 
-test("overlay route renders", async ({ page }) => {
+test("starting soon overlay renders", async ({ page }) => {
   await page.goto("/o/starting");
-  await expect(page.getByText("Overlay: starting")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Starting soon" })).toBeVisible();
 });

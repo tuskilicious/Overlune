@@ -1,0 +1,82 @@
+.scene {
+  box-sizing: border-box;
+  width: 1920px;
+  height: 1080px;
+  padding: 64px; /* safe margin, docs/DESIGN.md */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+.scene[data-enter="slide-fade"] .scene-main,
+.scene[data-enter="slide-fade"] .scene-socials {
+  animation: scene-slide-fade var(--enter-ms) ease-out both;
+}
+
+@keyframes scene-slide-fade {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene * {
+    animation: none !important;
+  }
+}
+
+.scene-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 24px;
+}
+
+.scene-logo {
+  max-width: 240px;
+  max-height: 240px;
+  border-radius: var(--radius);
+}
+
+.scene-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 120px;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--primary);
+  overflow-wrap: anywhere;
+}
+
+.scene-subtitle {
+  margin: 0;
+  font-size: 44px;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.scene-socials {
+  list-style: none;
+  margin: 0 auto;
+  padding: 20px 36px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px 48px;
+  font-size: 32px;
+  background: var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+}
+
+.scene-platform {
+  color: var(--accent);
+  font-weight: 600;
+}

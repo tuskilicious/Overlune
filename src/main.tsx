@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import * as Sentry from "@sentry/react";
 import { initSentry } from "./lib/sentry";
 import App from "./App";
+import "./index.css";
 
 // Initialize Sentry before rendering anything.
 initSentry();

@@ -28,7 +28,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
 - [x] **T1.2 Settings v1 schema** (zod) and URL encode/decode (`#1.<lz-string>`).
   - *Every link carries the full settings. Invalid fields fall back one by one and set `ok: false`. `migrations.ts` comes with v2.*
   - Accept: unit tests cover a round trip, invalid input falling back to defaults, a `javascript:` logo URL being rejected, and very long text being truncated.
-- [ ] **T1.3 Starting Soon overlay:** title, subtitle, socials row, and a countdown to a fixed end time with the timezone shown. At zero it shows a custom message.
+- [x] **T1.3 Starting Soon overlay:** title, subtitle, socials row, and a countdown to a fixed end time with the timezone shown. At zero it shows a custom message.
+  - *Passed in OBS 32 (2026-09-30). Streamlabs check left for T1.6. Socials are text only; icons need licensed art (T2).*
   - Accept: reloading the page does not reset the countdown, and a unit test covers the time math.
 - [ ] **T1.4 Overlay error state component,** shown for invalid settings.
 - [ ] **T1.5 Reduced motion:** the `?rm=1` flag and `prefers-reduced-motion` both disable animations.
