@@ -65,7 +65,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
 - [x] **T3.1 IRC parser** (`src/twitch/parse.ts`) that turns raw IRC lines into typed events.
   - Accept: unit tests with real sample lines for PRIVMSG, USERNOTICE (sub, resub, subgift, raid), bits, CLEARMSG, CLEARCHAT and PING.
   - *Never throws: malformed lines become `unknown`. Name colors must be `#rrggbb` and emote ids `[A-Za-z0-9_]` (both reach CSS/URLs). Emote offsets are code points. Unmapped USERNOTICEs are kept as `kind: "other"` for later.*
-- [ ] **T3.2 Anonymous connection** (`irc.ts`) with PING/PONG, reconnect with backoff, and a "can't connect / check channel name" state.
+- [x] **T3.2 Anonymous connection** (`irc.ts`) with PING/PONG, reconnect with backoff, and a "can't connect / check channel name" state.
+  - *`connectChat(channel, { onEvent, onStatus })` returns a stop function. Statuses: `connecting`, `connected` (on ROOMSTATE), `reconnecting`, `error` (4 failures in a row, or no join reply in 10s, which is how Twitch treats a missing channel; it keeps retrying) and `bad-channel` (no socket opened). Backoff 1s→30s with jitter; also reconnects on RECONNECT and after 6 min of silence. Checked live against Twitch. The error screen itself comes with T3.3.*
 - [ ] **T3.3 Chat overlay:** message list, name colors, emotes rendered as `<img>` elements (no innerHTML), theme-styled role badges, long-message wrapping, and a max message count.
 - [ ] **T3.4 Filters:** hide known bots (editable list) and `!commands`, and remove messages on CLEARMSG and CLEARCHAT.
 - [ ] **T3.5 Chat options:** size, font scale, and optional fade-out.
