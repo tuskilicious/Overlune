@@ -29,7 +29,7 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 ## Hosting
 - **Cloudflare Pages** (free). We chose it over GitHub Pages because GitHub Pages cannot set the security headers CLAUDE.md §7 requires.
 - Production is the `main` branch. Staging is the automatic preview deploy for each branch or PR.
-- Headers: `public/_headers`. SPA fallback: `public/_redirects`.
+- Headers: `public/_headers`. SPA fallback: built in (Pages serves `index.html` for unknown paths when there is no `404.html`), so no `_redirects`.
 
 ## Twitch data without login
 - Chat, sub, resub, gift sub, raid and bits events arrive over anonymous IRC: `PRIVMSG` and `USERNOTICE` (which carries `msg-id`), plus the `bits` tag.
@@ -51,7 +51,7 @@ overlune/
 │  ├─ PRD.md  TASKS.md  STACK.md  DESIGN.md  ASSETS.md  OBS-TESTING.md
 │  └─ legal/            privacy.md, terms.md
 ├─ public/
-│  ├─ _headers  _redirects
+│  ├─ _headers
 │  └─ sounds/           licensed alert sounds (recorded in ASSETS.md)
 ├─ src/
 │  ├─ main.tsx  App.tsx  routes.tsx
