@@ -1,0 +1,27 @@
+/* No animation: error states must never flash (docs/DESIGN.md). */
+.overlay-error {
+  align-self: center;
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: 20px 28px;
+  background: var(--surface);
+  color: var(--text);
+  border: var(--border);
+  border-left: 6px solid var(--accent);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 28px;
+  line-height: 1.35;
+  text-align: left;
+}
+
+.overlay-error-title {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.overlay-error-message {
+  margin: 6px 0 0;
+  max-width: 1100px;
+}

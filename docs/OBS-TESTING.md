@@ -22,3 +22,4 @@ Chrome is not enough. OBS and Streamlabs use their own embedded Chromium. Run th
 | Date | Overlay | OBS version | Streamlabs version | Pass/Fail | Notes |
 |---|---|---|---|---|---|
 | 2026-09-30 | Starting Soon (T1.3) | 32 | not tested | Pass | Transparency, Inter font, countdown kept running across scene switch, cache refresh and both source options; "Starting now!" at zero; no dropped frames. Reduced motion pending T1.5; Streamlabs pending T1.6. |
+| 2026-09-30 | Starting Soon error state (T1.4) | 32 | not tested | Pass | Bad-field link: card at top, content kept, no logo. Broken link: card over defaults. Valid link: no card. No flashing across scene switches; no dropped frames. |

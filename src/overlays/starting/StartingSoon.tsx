@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router";
 import { formatCountdown, formatEndTime, secondsLeft } from "../../lib/time";
 import { decode } from "../../settings/url";
+import OverlayError from "../OverlayError";
 import SceneFrame from "../SceneFrame";
 import "./starting.css";
 
@@ -23,13 +24,18 @@ function useSecondsLeft(endsAt: number | null): number | null {
 
 export default function StartingSoon() {
   const { hash } = useLocation();
-  // ok=false (damaged link) gets its error state in T1.4; until then defaults render.
-  const { settings } = useMemo(() => decode(hash), [hash]);
+  // A damaged link still renders (bad fields fall back to defaults) and shows the error card.
+  const { settings, ok } = useMemo(() => decode(hash), [hash]);
   const { title, subtitle, endsAt, tz, doneText } = settings.starting;
   const secs = useSecondsLeft(endsAt);
 
   return (
-    <SceneFrame settings={settings} title={title} subtitle={subtitle}>
+    <SceneFrame
+      settings={settings}
+      title={title}
+      subtitle={subtitle}
+      error={!ok && <OverlayError />}
+    >
       {endsAt !== null && secs !== null && (
         <div className="countdown">
           {secs > 0 ? (

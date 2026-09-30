@@ -32,7 +32,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
 - [x] **T1.3 Starting Soon overlay:** title, subtitle, socials row, and a countdown to a fixed end time with the timezone shown. At zero it shows a custom message.
   - *Passed in OBS 32 (2026-09-30). Streamlabs check left for T1.6. Socials are text only; icons need licensed art (T2).*
   - Accept: reloading the page does not reset the countdown, and a unit test covers the time math.
-- [ ] **T1.4 Overlay error state component,** shown for invalid settings.
+- [x] **T1.4 Overlay error state component,** shown for invalid settings.
+  - *Passed in OBS 32 (2026-09-30). `SceneFrame` takes an `error` slot; chat can reuse `OverlayError` with its own message.*
 - [ ] **T1.5 Reduced motion:** the `?rm=1` flag and `prefers-reduced-motion` both disable animations.
 - [ ] **T1.6 Write `docs/OBS-TESTING.md` results for Starting Soon.** Check it in OBS and Streamlabs: transparency, fonts, countdown after a scene switch, and CPU use.
 - [ ] **T1.7 Playwright smoke test** that renders `/o/starting` with a fixture link and compares a screenshot.
