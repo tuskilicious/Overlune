@@ -88,7 +88,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *Passed in OBS 32 (2026-10-01). `playSound` in `src/alerts/sound.ts` (an `<audio>` element, never throws). Clean Slate plays Kenney Interface Sounds `confirmation_002` (CC0) as `public/sounds/clean-slate.ogg`. New v1 field `alerts.volume` (0–100, default 70; fixture `v1/alerts-volume.json`) with an editor slider. Custom sounds were asked for and skipped for now: an upload needs a backend (v2), and an https sound link would need the CSP `media-src` widened.*
 - [x] **T4.5 Test buttons in the editor** that trigger alerts in the preview. Follows and donations are shown as "coming soon".
   - *Passed in OBS 32 (2026-10-01). New "Preview: Alerts" section (`src/editor/AlertTester.tsx`): five test buttons play samples through the real queue with sound, disabled Follow/Donation "coming soon" buttons, and a "Link to test your alerts in OBS" (`?test=1`) kept apart from the main links with a switch-back warning. `Preview` moved to `src/editor/Preview.tsx`; fixed the alerts preview not being scaled.*
-- [ ] **T4.6 OBS test,** including "Control audio via OBS".
+- [x] **T4.6 OBS test,** including "Control audio via OBS".
+  - *Passed on the PR #29 preview deploy with real headers (2026-10-01): alerts, sound in the Audio Mixer, reload behavior, 10 min stable, CPU ~2%. Automated coverage: `tests/e2e/alerts.spec.ts` and the editor alert tests. Streamlabs deferred to pre-launch (checklist item 9).*
 
 ## Phase 5: Launch
 - [ ] **T5.1 Neon Grid theme.**
