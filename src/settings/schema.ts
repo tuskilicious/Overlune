@@ -56,6 +56,15 @@ export const settingsV1 = z.object({
     .prefault({}),
   brb: z.object({ title: text(60, "Be right back"), subtitle: text(120) }).prefault({}),
   ending: z.object({ title: text(60, "Thanks for watching!"), subtitle: text(120) }).prefault({}),
+  /** Chat overlay (T3.3). `channel` is a Twitch login; "" until the streamer adds it. */
+  chat: z
+    .object({
+      channel: z
+        .string()
+        .regex(/^[A-Za-z0-9_]{0,25}$/, "Channel names use letters, numbers and _")
+        .default(""),
+    })
+    .prefault({}),
   /** "Advanced" overrides on top of the theme (T2.7). Empty means the theme as designed. */
   advanced: z
     .object({

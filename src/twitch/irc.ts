@@ -49,6 +49,16 @@ export function normalizeChannel(raw: string): string | null {
   return /^[a-z0-9_]{1,25}$/.test(c) ? c : null;
 }
 
+/** Editor input → channel name. Accepts a pasted `twitch.tv/name` link, `#name` or `@name`; drops anything else a name can't hold. */
+export function channelFromInput(raw: string): string {
+  const name = raw
+    .trim()
+    .replace(/^(https?:\/\/)?(www\.|m\.)?twitch\.tv\//i, "")
+    .replace(/^[#@]/, "")
+    .split(/[/?#\s]/)[0]!;
+  return name.replace(/[^A-Za-z0-9_]/g, "").slice(0, 25);
+}
+
 /** Connects to one channel's chat and keeps the connection alive. Returns a function that stops it. */
 export function connectChat(rawChannel: string, options: ChatOptions): () => void {
   const {

@@ -1,0 +1,85 @@
+/* Chat box: 400×600, transparent, newest at the bottom (docs/DESIGN.md "Overlay layout rules"). */
+.chat {
+  box-sizing: border-box;
+  width: 400px;
+  height: 600px;
+  padding: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.chat .overlay-error {
+  flex: none;
+  align-self: stretch;
+  padding: 12px 16px;
+  font-size: 18px;
+}
+
+/* Bottom-up: the list fills the rest and old messages slide off the top. */
+.chat-list {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.chat-msg {
+  flex: none;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  overflow-wrap: anywhere; /* long words and links wrap instead of widening the box */
+}
+
+/* Reduced-motion version: index.css turns this off. */
+.chat[data-enter="slide-fade"] .chat-msg {
+  animation: chat-in var(--enter-ms) ease-out both;
+}
+
+@keyframes chat-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.chat-name {
+  font-weight: 700;
+}
+
+.chat-action {
+  font-style: italic;
+}
+
+.chat-badge[data-style="pill"] {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--surface);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: 2px;
+}
+
+.chat-emote {
+  height: 28px;
+  margin: -4px 1px;
+  vertical-align: middle;
+}

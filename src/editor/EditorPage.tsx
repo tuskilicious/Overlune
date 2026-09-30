@@ -11,6 +11,7 @@ import { cleanSlate } from "../themes/clean-slate";
 import { contrast } from "../lib/contrast";
 import { colorTokens, fontIds, themeIds, type ColorToken, type FontId } from "../themes/types";
 import { applyOverrides, themeVars } from "../themes/vars";
+import { channelFromInput } from "../twitch/irc";
 import ObsLinks, { overlays, type OverlayId as Scene } from "./ObsLinks";
 import "./editor.css";
 
@@ -383,6 +384,25 @@ export default function EditorPage() {
                 Add a social
               </button>
             )}
+          </fieldset>
+
+          <fieldset>
+            <legend>Chat</legend>
+            <label>
+              Your Twitch channel name
+              <input
+                value={settings.chat.channel}
+                maxLength={60}
+                autoComplete="off"
+                spellCheck={false}
+                aria-describedby="chat-hint"
+                onChange={(e) => update({ chat: { channel: channelFromInput(e.target.value) } })}
+              />
+            </label>
+            <p id="chat-hint" className="editor-hint">
+              The name in your channel link, e.g. twitch.tv/<strong>yourname</strong>. You can paste
+              the whole link.
+            </p>
           </fieldset>
 
           <fieldset>

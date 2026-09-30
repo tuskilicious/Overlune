@@ -18,6 +18,7 @@ const sample: Settings = {
   },
   brb: { title: "Snack break", subtitle: "Back in 5" },
   ending: { title: "GG!", subtitle: "Raiding a friend" },
+  chat: { channel: "Tuskilicious" },
   advanced: {
     colors: { accent: "#ff2bd6", surface: "#101010" },
     fontHeading: "Orbitron",
@@ -151,4 +152,22 @@ describe("advanced overrides (T2.7)", () => {
     expect(decode(raw({ advanced: { colors: { border: "#000000" } } })).ok).toBe(false);
     expect(decode(raw({ advanced: { fontHeading: "Comic Sans MS" } })).ok).toBe(false);
   });
+});
+
+describe("chat channel (T3.3)", () => {
+  it("defaults to empty, so links made before chat existed still load", () => {
+    const { settings, ok } = decode(raw({ brb: { title: "Hi" } }));
+    expect(ok).toBe(true);
+    expect(settings.chat).toEqual({ channel: "" });
+  });
+
+  it.each(["two words", "#dallas", "a".repeat(26), "<script>", "twitch.tv/dallas"])(
+    "rejects %s and keeps the other fields",
+    (channel) => {
+      const { settings, ok } = decode(raw({ brb: { title: "Kept" }, chat: { channel } }));
+      expect(ok).toBe(false);
+      expect(settings.chat.channel).toBe("");
+      expect(settings.brb.title).toBe("Kept");
+    },
+  );
 });

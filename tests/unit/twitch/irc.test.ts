@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  channelFromInput,
   connectChat,
   IDLE_TIMEOUT_MS,
   IRC_URL,
@@ -184,5 +185,22 @@ describe("normalizeChannel", () => {
     ["twitch.tv/dallas", null],
   ])("%j → %j", (raw, expected) => {
     expect(normalizeChannel(raw)).toBe(expected);
+  });
+});
+
+describe("channelFromInput (editor field)", () => {
+  it.each([
+    ["dallas", "dallas"],
+    ["  #Dallas ", "Dallas"],
+    ["@dallas", "dallas"],
+    ["https://www.twitch.tv/dallas", "dallas"],
+    ["twitch.tv/dallas/videos?x=1", "dallas"],
+    ["m.twitch.tv/dallas", "dallas"],
+    ["dal las", "dal"],
+    ["da-l.las!", "dallas"],
+    ["a".repeat(40), "a".repeat(25)],
+    ["", ""],
+  ])("%j → %j", (raw, expected) => {
+    expect(channelFromInput(raw)).toBe(expected);
   });
 });

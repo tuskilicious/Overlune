@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import type { Settings } from "../settings/schema";
 import { encode } from "../settings/url";
 
-/** Every overlay the editor makes, with the Browser Source size to enter in OBS. Chat and alerts add rows here. */
+/** The full-screen scenes, with the Browser Source size to enter in OBS. */
 export const overlays = {
   starting: { name: "Starting Soon", width: 1920, height: 1080 },
   brb: { name: "Be Right Back", width: 1920, height: 1080 },
@@ -11,8 +11,12 @@ export const overlays = {
 
 export type OverlayId = keyof typeof overlays;
 
-function LinkRow({ id, link }: { id: OverlayId; link: string }) {
-  const { name, width, height } = overlays[id];
+/** Every overlay that gets a link: the scenes plus chat. Alerts add a row here. */
+const links = { ...overlays, chat: { name: "Chat", width: 400, height: 600 } } as const;
+type LinkId = keyof typeof links;
+
+function LinkRow({ id, link }: { id: LinkId; link: string }) {
+  const { name, width, height } = links[id];
   const input = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState("");
 
@@ -57,7 +61,7 @@ export default function ObsLinks({ settings }: { settings: Settings }) {
         height shown.
       </p>
       <ul>
-        {(Object.keys(overlays) as OverlayId[]).map((id) => (
+        {(Object.keys(links) as LinkId[]).map((id) => (
           <LinkRow key={id} id={id} link={`${location.origin}/o/${id}#${hash}`} />
         ))}
       </ul>

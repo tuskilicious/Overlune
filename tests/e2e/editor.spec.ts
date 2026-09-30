@@ -160,8 +160,18 @@ test("the preview runs the real overlay, countdown included", async ({ page }) =
 
 test("each overlay link shows the size to enter in OBS", async ({ page }) => {
   const rows = page.getByRole("region", { name: "Links to paste into OBS" }).getByRole("listitem");
-  await expect(rows).toHaveCount(3);
-  for (const row of await rows.all()) await expect(row).toContainText("Width 1920 · Height 1080");
+  await expect(rows).toHaveCount(4);
+  for (const row of (await rows.all()).slice(0, 3))
+    await expect(row).toContainText("Width 1920 · Height 1080");
+  await expect(rows.nth(3)).toContainText("Chat · Width 400 · Height 600");
+});
+
+test("a pasted Twitch link becomes the channel name in the chat link", async ({ page }) => {
+  const field = page.getByLabel("Your Twitch channel name");
+  await field.fill("https://www.twitch.tv/Some_Streamer");
+  await expect(field).toHaveValue("Some_Streamer");
+  const link = await page.getByRole("textbox", { name: /^Chat/ }).inputValue();
+  expect(link).toMatch(/\/o\/chat#1\./);
 });
 
 test("an old link loads back into the editor", async ({ page, context }) => {
