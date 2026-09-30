@@ -20,7 +20,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
 - [x] **T0.8 Sentry:** separate staging and production environments, `sendDefaultPii: false`, and a `beforeSend` that strips URL fragments.
   - *Verified 2026-09-30: test event reached Sentry (EU, `development`) with no settings fragment. Cloudflare env vars moved to T0.7 (no Pages project yet).*
   - Accept: a test error appears in Sentry without the settings fragment.
-- [ ] **T0.9 Owner setup:** turn on 2FA for GitHub, Cloudflare and Sentry, and enable GitHub secret scanning with push protection. *Owner does this.*
+- [x] **T0.9 Owner setup:** turn on 2FA for GitHub, Cloudflare and Sentry, and enable GitHub secret scanning with push protection. *Owner does this.*
+  - *Done 2026-09-30: 2FA on GitHub, Cloudflare and Sentry. Secret scanning + push protection confirmed on the repo.*
 
 ## Phase 1: Week 1, one scene working in OBS
 - [x] **T1.1 Theme types + Clean Slate theme** per `docs/DESIGN.md`. Self-host fonts and record them in `docs/ASSETS.md`.
