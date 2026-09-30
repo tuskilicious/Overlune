@@ -4,3 +4,21 @@ body {
   margin: 0;
   background: transparent;
 }
+
+/* Reduced motion: the OS setting, or ?rm=1 in the link (sets html[data-rm], see main.tsx).
+   This is the reduced-motion version of every CSS animation in the app. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+html[data-rm] *,
+html[data-rm] *::before,
+html[data-rm] *::after {
+  animation: none !important;
+  transition: none !important;
+}

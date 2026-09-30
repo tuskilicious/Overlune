@@ -23,12 +23,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .scene * {
-    animation: none !important;
-  }
-}
-
 .scene-main {
   flex: 1;
   display: flex;
