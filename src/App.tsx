@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/react";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { sentryEnvironment } from "./lib/sentry";
 import EditorPage from "./editor/EditorPage";
+import Alerts from "./overlays/alerts/Alerts";
 import Chat from "./overlays/chat/Chat";
 import FromLink from "./overlays/FromLink";
 import OverlayPlaceholder from "./overlays/OverlayPlaceholder";
@@ -43,6 +44,10 @@ export default function App() {
         <Route
           path="/o/chat"
           element={<FromLink>{(s, error) => <Chat settings={s} error={error} />}</FromLink>}
+        />
+        <Route
+          path="/o/alerts"
+          element={<FromLink>{(s, error) => <Alerts settings={s} error={error} />}</FromLink>}
         />
         <Route path="/o/:overlay" element={<OverlayPlaceholder />} />
         {showSentryTest && <Route path="/_sentry-test" element={<SentryTestPage />} />}

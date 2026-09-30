@@ -3,7 +3,13 @@ import { fromZoneInput, toZoneInput } from "../lib/time";
 import { isHttpsUrl } from "../lib/url-safety";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
-import { defaultBots, defaultSettings, socialPlatforms, type Settings } from "../settings/schema";
+import {
+  defaultBots,
+  defaultSettings,
+  defaultTemplates,
+  socialPlatforms,
+  type Settings,
+} from "../settings/schema";
 import { loadSaved, save } from "../settings/storage";
 import { decodeLink, encode } from "../settings/url";
 import { themes } from "../themes";
@@ -11,6 +17,7 @@ import { cleanSlate } from "../themes/clean-slate";
 import { contrast } from "../lib/contrast";
 import { colorTokens, fontIds, themeIds, type ColorToken, type FontId } from "../themes/types";
 import { applyOverrides, themeVars } from "../themes/vars";
+import type { AlertKind } from "../alerts/events";
 import ChatView from "../overlays/chat/ChatView";
 import { botsFromInput } from "../overlays/chat/filters";
 import { chatSamples } from "./chat-samples";
@@ -122,6 +129,14 @@ function NumberField(props: {
   );
 }
 
+const alertFields: [AlertKind, string][] = [
+  ["raid", "Raid message"],
+  ["sub", "New sub message"],
+  ["resub", "Resub message"],
+  ["subgift", "Gift sub message"],
+  ["bits", "Bits message"],
+];
+
 const fadeOptions = [
   [0, "Never"],
   [15, "15 seconds"],
@@ -206,6 +221,11 @@ export default function EditorPage() {
     setSettings((s) => ({ ...s, [key]: { ...s[key], ...patch } }));
   const updateChat = (patch: Partial<Settings["chat"]>) =>
     setSettings((s) => ({ ...s, chat: { ...s.chat, ...patch } }));
+  const updateTemplate = (kind: AlertKind, value: string) =>
+    setSettings((s) => ({
+      ...s,
+      alerts: { ...s.alerts, templates: { ...s.alerts.templates, [kind]: value } },
+    }));
   const updateSocial = (i: number, patch: Partial<Settings["socials"][number]>) =>
     update({ socials: settings.socials.map((s, j) => (i === j ? { ...s, ...patch } : s)) });
 
@@ -554,6 +574,26 @@ export default function EditorPage() {
                 ))}
               </select>
             </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Alerts</legend>
+            <p id="alerts-hint" className="editor-hint">
+              Alerts use your channel name from Chat. In each message, {"{user}"} becomes their name
+              and {"{amount}"} the number. {"{s}"} adds an “s” unless the number is 1.
+            </p>
+            {alertFields.map(([kind, label]) => (
+              <label key={kind}>
+                {label}
+                <input
+                  value={settings.alerts.templates[kind]}
+                  maxLength={100}
+                  placeholder={defaultTemplates[kind]}
+                  aria-describedby="alerts-hint"
+                  onChange={(e) => updateTemplate(kind, e.target.value)}
+                />
+              </label>
+            ))}
           </fieldset>
 
           <fieldset>

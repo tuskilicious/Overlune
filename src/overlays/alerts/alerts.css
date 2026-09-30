@@ -1,0 +1,76 @@
+/* Alerts: 1920×1080 transparent canvas, one box centered at the top (docs/DESIGN.md "Overlay layout rules"). */
+.alerts {
+  box-sizing: border-box;
+  width: 1920px;
+  height: 1080px;
+  padding: 64px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+.alerts .overlay-error {
+  max-width: 1000px;
+}
+
+.alert-box {
+  box-sizing: border-box;
+  max-width: 1200px;
+  padding: 28px 48px;
+  background: var(--surface);
+  border: var(--border);
+  border-top: 6px solid var(--accent);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.alert-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.alert-user,
+.alert-amount {
+  color: var(--accent);
+}
+
+.alert-message {
+  margin: 12px 0 0;
+  font-size: 28px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; /* long resub messages stay a compact box */
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+/* Enter, then fade out as the alert's time ends. Reduced-motion version: index.css turns both off,
+   and the queue removes the box on time. */
+.alerts[data-anim="slide-fade"] .alert-box {
+  animation:
+    alert-in 400ms ease-out both,
+    alert-out 400ms ease-in calc(var(--alert-ms) - 400ms) forwards;
+}
+
+@keyframes alert-in {
+  from {
+    opacity: 0;
+    transform: translateY(-32px);
+  }
+}
+
+@keyframes alert-out {
+  to {
+    opacity: 0;
+  }
+}

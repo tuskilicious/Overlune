@@ -1,6 +1,11 @@
 import { compressToEncodedURIComponent } from "lz-string";
 import { describe, expect, it } from "vitest";
-import { defaultBots, defaultSettings, type Settings } from "../../../src/settings/schema";
+import {
+  defaultBots,
+  defaultSettings,
+  defaultTemplates,
+  type Settings,
+} from "../../../src/settings/schema";
 import { decode, decodeLink, encode } from "../../../src/settings/url";
 
 const raw = (data: unknown) => `#1.${compressToEncodedURIComponent(JSON.stringify(data))}`;
@@ -26,6 +31,15 @@ const sample: Settings = {
     height: 800,
     fontScale: 1.5,
     fadeAfter: 30,
+  },
+  alerts: {
+    templates: {
+      raid: "RAID {user} {amount}",
+      sub: "{user} subbed",
+      resub: "{user} x{amount}",
+      subgift: "{user} gave {amount}",
+      bits: "{user} {amount} bits",
+    },
   },
   advanced: {
     colors: { accent: "#ff2bd6", surface: "#101010" },
@@ -227,6 +241,30 @@ describe("chat options (T3.5)", () => {
     );
     expect(ok).toBe(false);
     expect(settings.chat).toEqual(defaultSettings.chat);
+    expect(settings.brb.title).toBe("Kept");
+  });
+});
+
+describe("alert templates (T4.3)", () => {
+  it("default for links made before alerts existed", () => {
+    const { settings, ok } = decode(raw({ chat: { channel: "dallas" } }));
+    expect(ok).toBe(true);
+    expect(settings.alerts.templates).toEqual(defaultTemplates);
+  });
+
+  it("cut long templates to 100 characters instead of rejecting them", () => {
+    const { settings, ok } = decode(raw({ alerts: { templates: { raid: "x".repeat(500) } } }));
+    expect(ok).toBe(true);
+    expect(settings.alerts.templates.raid).toBe("x".repeat(100));
+    expect(settings.alerts.templates.sub).toBe(defaultTemplates.sub);
+  });
+
+  it("reject a template that isn't text", () => {
+    const { settings, ok } = decode(
+      raw({ brb: { title: "Kept" }, alerts: { templates: { sub: 5 } } }),
+    );
+    expect(ok).toBe(false);
+    expect(settings.alerts.templates).toEqual(defaultTemplates);
     expect(settings.brb.title).toBe("Kept");
   });
 });

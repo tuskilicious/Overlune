@@ -55,10 +55,11 @@ function LinkRow({ name, width, height, link }: LinkInfo & { link: string }) {
 /** "Link to paste into OBS" for each overlay. Every link carries all settings. */
 export default function ObsLinks({ settings }: { settings: Settings }) {
   const hash = encode(settings);
-  // Every overlay that gets a link: the scenes plus chat (sized in the editor). Alerts add a row here.
+  // Every overlay that gets a link: the scenes, chat (sized in the editor) and alerts.
   const links: LinkInfo[] = [
     ...(Object.keys(overlays) as OverlayId[]).map((id) => ({ id, ...overlays[id] })),
     { id: "chat", name: "Chat", width: settings.chat.width, height: settings.chat.height },
+    { id: "alerts", name: "Alerts", width: 1920, height: 1080 },
   ];
   return (
     <section id="obs-links" tabIndex={-1} className="editor-links" aria-labelledby="links-heading">

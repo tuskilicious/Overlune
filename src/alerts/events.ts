@@ -58,3 +58,12 @@ export function createAlertMapper() {
     }
   };
 }
+
+/** One sample of each alert, for `?test=1` links and the editor's test buttons. */
+export const testAlerts: AlertEvent[] = [
+  { kind: "raid", user: "FriendlyRaider", amount: 42, message: "" },
+  { kind: "sub", user: "NewSubscriber", amount: 1, message: "" },
+  { kind: "resub", user: "LoyalViewer", amount: 12, message: "A whole year already!" },
+  { kind: "subgift", user: "GenerousGifter", amount: 5, message: "" },
+  { kind: "bits", user: "CheerLeader", amount: 500, message: "cheer500 Love the stream!" },
+];

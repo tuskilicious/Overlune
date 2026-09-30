@@ -33,6 +33,15 @@ export const socialPlatforms = [
   "discord",
 ] as const;
 
+/** Default alert messages. `{s}` is "s" unless the amount is 1. */
+export const defaultTemplates = {
+  raid: "{user} is raiding with {amount} viewer{s}!",
+  sub: "{user} just subscribed!",
+  resub: "{user} subscribed for {amount} month{s}!",
+  subgift: "{user} gifted {amount} sub{s}!",
+  bits: "{user} cheered {amount} bit{s}!",
+} as const;
+
 /** Common chat bots, hidden unless the streamer removes them from the list. */
 export const defaultBots = [
   "nightbot",
@@ -93,6 +102,20 @@ export const settingsV1 = z.object({
       fontScale: z.number().min(0.75).max(2).default(1),
       /** Seconds before a message fades away; 0 keeps messages (T3.5). */
       fadeAfter: z.number().int().min(0).max(600).default(0),
+    })
+    .prefault({}),
+  /** Alert messages (T4.3). {user}, {amount} and {s} are filled in; "" means the default. */
+  alerts: z
+    .object({
+      templates: z
+        .object({
+          raid: text(100, defaultTemplates.raid),
+          sub: text(100, defaultTemplates.sub),
+          resub: text(100, defaultTemplates.resub),
+          subgift: text(100, defaultTemplates.subgift),
+          bits: text(100, defaultTemplates.bits),
+        })
+        .prefault({}),
     })
     .prefault({}),
   /** "Advanced" overrides on top of the theme (T2.7). Empty means the theme as designed. */
