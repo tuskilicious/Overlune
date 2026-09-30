@@ -46,7 +46,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
 ## Phase 2: Scenes + editor
 - [x] **T2.1 BRB and Stream Ending overlays,** reusing the shared scene frame.
   - *Passed in OBS 32 (2026-09-30). One shared `TextScene` serves `/o/brb` and `/o/ending`; split into folders if either scene gets its own features. No new screenshot baselines (shared frame already covered by T1.7).*
-- [ ] **T2.2 Editor shell:** theme picker with a full-stream preview and text fields for each overlay.
+- [x] **T2.2 Editor shell:** theme picker with a full-stream preview and text fields for each overlay.
+  - *Also covers countdown end time + time zone, socials and logo link (no other task had them). Preview uses `SceneFrame` directly, so no countdown yet; T2.3 splits the scenes into route + view and shows the real overlay. Editor tests are Playwright (`tests/e2e/editor.spec.ts`), so Testing Library/jsdom were not added.*
 - [ ] **T2.3 Live preview** that renders the overlay components directly (same code as OBS).
 - [ ] **T2.4 "Link to paste into OBS" panel:** copy button and width × height shown for each overlay.
 - [ ] **T2.5 "Load my overlay from a link"** and "Your link is your save file" messaging.
