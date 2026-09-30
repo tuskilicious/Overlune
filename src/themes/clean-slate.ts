@@ -16,10 +16,11 @@ export const cleanSlate: Theme = {
   fontBody: "Inter",
   radius: 8,
   border: "1px solid #2A2E37",
+  shadow: "none",
   bgEffect: "none",
   enter: { id: "slide-fade", durationMs: 300 },
   exit: { id: "slide-fade", durationMs: 300 },
   alertAnim: "slide-fade",
-  alertSound: null,
+  alertSound: "clean-slate.ogg",
   badgeStyle: "pill",
 };

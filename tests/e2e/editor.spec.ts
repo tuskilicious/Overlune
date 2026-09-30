@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
@@ -5,30 +6,112 @@ test.beforeEach(async ({ page }) => {
 });
 
 const preview = (page: import("@playwright/test").Page) =>
-  page.getByRole("region", { name: "Preview" });
+  page.getByRole("region", { name: "Preview", exact: true });
+
+// The preview is hidden from screen readers (it repeats the form), so find it by class, not role.
+const previewTitle = (page: import("@playwright/test").Page, text: string) =>
+  preview(page).locator(".scene-title", { hasText: text });
+
+test("the editor has no axe accessibility violations", async ({ page }) => {
+  const scan = () =>
+    new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  expect((await scan()).violations).toEqual([]);
+
+  await page.getByText("Advanced: colors and fonts").click();
+  await page.getByRole("button", { name: "Add a social" }).click();
+  await page.getByRole("button", { name: "Start over" }).click();
+  expect((await scan()).violations).toEqual([]);
+});
+
+test("the whole editor works from the keyboard", async ({ page }) => {
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "Skip to your OBS links" })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#obs-links")).toBeFocused();
+  await expect(page).toHaveURL(/\/#1\./); // the skip link never replaces the settings in the address
+
+  await page.getByRole("radio", { name: "Starting Soon" }).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByRole("radio", { name: "Be Right Back" })).toBeChecked();
+  await page.keyboard.press("Tab");
+  await page.keyboard.type("Keyboard title");
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Keyboard title");
+
+  await page.getByRole("button", { name: "Add a social" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByLabel("Site")).toBeVisible();
+
+  await page.locator("#advanced-summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByLabel("Titles")).toBeVisible();
+});
+
+test("focus stays in place when the button you pressed goes away", async ({ page }) => {
+  await page.getByRole("button", { name: "Add a social" }).click();
+  await page.getByRole("button", { name: /^Remove/ }).press("Enter");
+  await expect(page.getByRole("button", { name: "Add a social" })).toBeFocused();
+
+  await page.getByText("Advanced: colors and fonts").click();
+  await page.getByLabel("Titles").fill("#ff0000");
+  await page.getByRole("button", { name: "Reset Titles to the theme" }).press("Enter");
+  await expect(page.getByLabel("Titles")).toBeFocused();
+
+  await page.getByLabel("Titles").fill("#ff0000");
+  await page.getByRole("button", { name: "Reset all to the theme" }).press("Enter");
+  await expect(page.locator("#advanced-summary")).toBeFocused();
+
+  await page.getByRole("button", { name: "Start over" }).press("Enter");
+  await page.getByRole("button", { name: "Cancel" }).press("Enter");
+  await expect(page.getByRole("button", { name: "Start over" })).toBeFocused();
+  await page.getByRole("button", { name: "Start over" }).press("Enter");
+  await page.getByRole("button", { name: "Yes, start over" }).press("Enter");
+  await expect(page.getByRole("button", { name: "Start over" })).toBeFocused();
+});
+
+test("keyboard focus is always visible", async ({ page }) => {
+  await page.getByRole("button", { name: "Add a social" }).click();
+  await page.getByText("Advanced: colors and fonts").click();
+  // Reach the first stop with a real key press, so the browser treats focus as keyboard focus.
+  await page.getByRole("link", { name: "Skip to your OBS links" }).focus();
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+  let visited = 0;
+  // Tab through the whole page from the first stop; every stop must show the 2px focus ring.
+  for (; ; await page.keyboard.press("Tab")) {
+    const focused = await page.evaluate(() => {
+      const el = document.activeElement!;
+      const s = getComputedStyle(el);
+      return {
+        tag: el.tagName,
+        ring: `${s.outlineStyle} ${s.outlineWidth}`,
+        label: el.outerHTML.slice(0, 60),
+      };
+    });
+    if (focused.tag === "BODY") break;
+    // ponytail: Chrome's built-in calendar button inside the date field is its own Tab stop that pages
+    // can't style or detect (the field reports no focus). Keyboard users type the date or press Space instead.
+    if (focused.ring === "none 3px" && focused.label.startsWith('<input type="datetime-local"'))
+      continue;
+    expect(focused.ring, focused.label).toBe("solid 2px");
+    expect(++visited).toBeLessThan(80);
+  }
+  expect(visited).toBeGreaterThan(30);
+});
 
 test("the editor shows Starting Soon in the preview by default", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Overlune" })).toBeVisible();
   await expect(page.getByRole("radio", { name: "Clean Slate" })).toBeChecked();
-  await expect(
-    preview(page).getByRole("heading", { name: "Starting soon", exact: true }),
-  ).toBeVisible();
+  await expect(previewTitle(page, "Starting soon")).toBeVisible();
 });
 
 test("typing a title updates the preview of the chosen scene", async ({ page }) => {
   await page.getByRole("radio", { name: "Be Right Back" }).check();
-  await expect(
-    preview(page).getByRole("heading", { name: "Be right back", exact: true }),
-  ).toBeVisible();
+  await expect(previewTitle(page, "Be right back")).toBeVisible();
   await page.getByLabel("Title", { exact: true }).fill("Grabbing snacks");
-  await expect(
-    preview(page).getByRole("heading", { name: "Grabbing snacks", exact: true }),
-  ).toBeVisible();
+  await expect(previewTitle(page, "Grabbing snacks")).toBeVisible();
 
   await page.getByRole("radio", { name: "Stream Ending" }).check();
-  await expect(
-    preview(page).getByRole("heading", { name: "Thanks for watching!", exact: true }),
-  ).toBeVisible();
+  await expect(previewTitle(page, "Thanks for watching!")).toBeVisible();
 });
 
 test("socials can be added and removed", async ({ page }) => {
@@ -37,17 +120,17 @@ test("socials can be added and removed", async ({ page }) => {
   await page.getByLabel("Name or handle").fill("mychannel");
   await expect(preview(page).getByText("YouTube mychannel")).toBeVisible();
   await page.getByRole("button", { name: "Remove YouTube mychannel" }).click();
-  await expect(preview(page).getByRole("list")).toHaveCount(0);
+  await expect(preview(page).locator("ul")).toHaveCount(0);
 });
 
 test("only https: logo links reach the preview", async ({ page }) => {
   const logo = page.getByLabel("Link to your logo image");
   await logo.fill("javascript:alert(1)");
-  await expect(page.getByRole("alert")).toHaveText("This link must start with https://");
+  await expect(page.locator("#logo-error")).toHaveText("This link must start with https://");
   await expect(preview(page).locator("img")).toHaveCount(0);
 
   await logo.fill("https://example.com/logo.png");
-  await expect(page.getByRole("alert")).toHaveText("");
+  await expect(page.locator("#logo-error")).toHaveText("");
   await expect(preview(page).locator("img")).toHaveAttribute("src", "https://example.com/logo.png");
 });
 
@@ -77,8 +160,19 @@ test("the preview runs the real overlay, countdown included", async ({ page }) =
 
 test("each overlay link shows the size to enter in OBS", async ({ page }) => {
   const rows = page.getByRole("region", { name: "Links to paste into OBS" }).getByRole("listitem");
-  await expect(rows).toHaveCount(3);
-  for (const row of await rows.all()) await expect(row).toContainText("Width 1920 · Height 1080");
+  await expect(rows).toHaveCount(5);
+  for (const row of (await rows.all()).slice(0, 3))
+    await expect(row).toContainText("Width 1920 · Height 1080");
+  await expect(rows.nth(3)).toContainText("Chat · Width 400 · Height 600");
+  await expect(rows.nth(4)).toContainText("Alerts · Width 1920 · Height 1080");
+});
+
+test("a pasted Twitch link becomes the channel name in the chat link", async ({ page }) => {
+  const field = page.getByLabel("Your Twitch channel name");
+  await field.fill("https://www.twitch.tv/Some_Streamer");
+  await expect(field).toHaveValue("Some_Streamer");
+  const link = await page.getByRole("textbox", { name: /^Chat/ }).inputValue();
+  expect(link).toMatch(/\/o\/chat#1\./);
 });
 
 test("an old link loads back into the editor", async ({ page, context }) => {
@@ -101,7 +195,7 @@ test("an old link loads back into the editor", async ({ page, context }) => {
   await expect(page.getByLabel("Link to your logo image")).toHaveValue(
     "https://example.com/logo.png",
   );
-  await expect(preview(page).getByRole("heading", { name: "Grabbing snacks" })).toBeVisible();
+  await expect(previewTitle(page, "Grabbing snacks")).toBeVisible();
 });
 
 test("text that isn't an Overlune link changes nothing", async ({ page }) => {
@@ -157,7 +251,7 @@ test("the editor still works when browser storage is blocked", async ({ page }) 
   });
   await page.goto("/");
   await page.getByLabel("Title", { exact: true }).fill("Still works");
-  await expect(preview(page).getByRole("heading", { name: "Still works" })).toBeVisible();
+  await expect(previewTitle(page, "Still works")).toBeVisible();
 });
 
 test("start over asks first, then resets to the defaults", async ({ page }) => {
@@ -187,7 +281,7 @@ test("Advanced starts closed, and overrides reach the preview and the OBS link",
 
   await titleColor.fill("#ff2bd6");
   await page.getByLabel("Heading font").selectOption("Orbitron");
-  const title = preview(page).getByRole("heading", { name: "Starting soon", exact: true });
+  const title = previewTitle(page, "Starting soon");
   await expect(title).toHaveCSS("color", "rgb(255, 43, 214)");
   await expect(title).toHaveCSS("font-family", /^"?Orbitron/);
 
@@ -229,4 +323,126 @@ test("a copied link opens the overlay with the editor's settings", async ({ page
   await page.goto(link);
   await expect(page.getByRole("heading", { name: "Grabbing snacks" })).toBeVisible();
   await expect(page.getByRole("status")).toHaveCount(0);
+});
+
+test("the bot list can be edited and reset", async ({ page }) => {
+  const box = page.getByLabel("Bots to hide");
+  await expect(box).toHaveValue(/^nightbot\nstreamelements\n/);
+  await box.fill("MyBot\n");
+  await expect(box).toHaveValue("MyBot\n"); // typing isn't rewritten under the cursor
+  await page.reload();
+  await expect(page.getByLabel("Bots to hide")).toHaveValue("mybot");
+  await page.getByRole("button", { name: "Reset to the usual bots" }).click();
+  await expect(page.getByLabel("Bots to hide")).toHaveValue(/^nightbot\n/);
+  await expect(page.getByLabel("Hide chat commands")).toBeChecked();
+});
+
+test("chat size and text options update the link row and the chat preview", async ({ page }) => {
+  const preview = page.getByRole("region", { name: "Chat preview" });
+  await expect(preview.getByText("Love the new look")).toBeAttached();
+  await expect(preview.locator("img.chat-emote")).toHaveAttribute("alt", "Kappa");
+
+  const width = page.getByLabel("Chat box width");
+  await width.fill("3"); // half-typed: not saved, shows a hint
+  await expect(page.getByText("Use a whole number from 250 to 1920.")).toBeVisible();
+  await width.fill("500");
+  await page.getByLabel("Chat box height").fill("800");
+  await page.getByLabel("Text size").selectOption("1.5");
+  await page.getByLabel("Hide messages after").selectOption("30");
+
+  const rows = page.getByRole("region", { name: "Links to paste into OBS" }).getByRole("listitem");
+  await expect(rows.nth(3)).toContainText("Chat · Width 500 · Height 800");
+  await expect(preview.locator(".chat")).toHaveCSS("width", "500px");
+  await expect(preview.locator(".chat")).toHaveCSS("font-size", "30px");
+
+  await page.reload();
+  await expect(page.getByLabel("Chat box width")).toHaveValue("500");
+  await expect(page.getByLabel("Hide messages after")).toHaveValue("30");
+});
+
+test.describe("alert test buttons", () => {
+  const tester = (page: import("@playwright/test").Page) =>
+    page.getByRole("region", { name: "Preview: Alerts" });
+
+  test("a test button shows the alert with your message and plays the sound", async ({ page }) => {
+    await page.getByLabel("Raid message").fill("Welcome {user} and {amount} friends!");
+    const sound = page.waitForRequest(/\/sounds\/clean-slate\.ogg$/);
+    await page.getByRole("button", { name: "Test raid" }).click();
+    await expect(tester(page).locator(".alert-box")).toHaveText(
+      "Welcome FriendlyRaider and 42 friends!",
+    );
+    await sound;
+  });
+
+  test("quick clicks play one alert at a time, in order", async ({ page }) => {
+    await page.clock.install();
+    await page.reload();
+    for (const name of ["Test sub", "Test gift sub", "Test bits"])
+      await page.getByRole("button", { name }).click();
+    const box = tester(page).locator(".alert-box");
+    await expect(box).toHaveCount(1);
+    await expect(box).toHaveAttribute("data-kind", "sub");
+    await page.clock.runFor(5_500);
+    await expect(box).toHaveAttribute("data-kind", "subgift");
+    await page.clock.runFor(5_500);
+    await expect(box).toHaveAttribute("data-kind", "bits");
+  });
+
+  test("follows and donations are labeled coming soon", async ({ page }) => {
+    await expect(page.getByRole("button", { name: "Follow (coming soon)" })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Donation (coming soon)" })).toBeDisabled();
+  });
+
+  test("offers a test link for OBS that carries the settings", async ({ page }) => {
+    await page.getByLabel("Your Twitch channel name").fill("dallas");
+    const link = await tester(page)
+      .getByRole("textbox", { name: /Link to test your alerts in OBS/ })
+      .inputValue();
+    expect(link).toMatch(/\/o\/alerts\?test=1#1\./);
+    const normal = await page.getByRole("textbox", { name: /^Alerts/ }).inputValue();
+    expect(link.split("#")[1]).toBe(normal.split("#")[1]);
+  });
+});
+
+test("every preview is scaled to fit its box", async ({ page }) => {
+  await page.getByRole("button", { name: "Test raid" }).click();
+  for (const sel of [".scene", ".chat", ".alerts"]) {
+    const el = page.locator(`.editor-preview > ${sel}`).first();
+    const box = await el.boundingBox();
+    const frame = await el.locator("..").boundingBox();
+    expect(box!.width).toBeLessThanOrEqual(frame!.width + 1);
+  }
+});
+
+test("picking Neon Grid restyles the preview, alerts and sound", async ({ page }) => {
+  await page.getByRole("radio", { name: "Neon Grid" }).check();
+  const scene = preview(page).locator(".scene");
+  await expect(scene).toHaveAttribute("data-bg", "grid");
+  await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Orbitron/);
+
+  const sound = page.waitForRequest(/\/sounds\/neon-grid\.ogg$/);
+  await page.getByRole("button", { name: "Test raid" }).click();
+  await expect(
+    page.getByRole("region", { name: "Preview: Alerts" }).locator(".alerts"),
+  ).toHaveAttribute("data-anim", "glitch");
+  await sound;
+
+  await page.reload();
+  await expect(page.getByRole("radio", { name: "Neon Grid" })).toBeChecked();
+});
+
+test("picking Cozy Café restyles the preview, alerts and sound", async ({ page }) => {
+  await page.getByRole("radio", { name: "Cozy Café" }).check();
+  await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "steam");
+  await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Fredoka/);
+
+  const sound = page.waitForRequest(/\/sounds\/cozy-cafe\.ogg$/);
+  await page.getByRole("button", { name: "Test raid" }).click();
+  await expect(
+    page.getByRole("region", { name: "Preview: Alerts" }).locator(".alerts"),
+  ).toHaveAttribute("data-anim", "bounce");
+  await sound;
+
+  await page.reload();
+  await expect(page.getByRole("radio", { name: "Cozy Café" })).toBeChecked();
 });

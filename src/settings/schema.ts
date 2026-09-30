@@ -33,6 +33,31 @@ export const socialPlatforms = [
   "discord",
 ] as const;
 
+/** Default alert messages. `{s}` is "s" unless the amount is 1. */
+export const defaultTemplates = {
+  raid: "{user} is raiding with {amount} viewer{s}!",
+  sub: "{user} just subscribed!",
+  resub: "{user} subscribed for {amount} month{s}!",
+  subgift: "{user} gifted {amount} sub{s}!",
+  bits: "{user} cheered {amount} bit{s}!",
+} as const;
+
+/** Common chat bots, hidden unless the streamer removes them from the list. */
+export const defaultBots = [
+  "nightbot",
+  "streamelements",
+  "streamlabs",
+  "moobot",
+  "fossabot",
+  "wizebot",
+  "sery_bot",
+  "soundalerts",
+  "botrixoficial",
+  "kofistreambot",
+  "streamstickers",
+  "pokemoncommunitygame",
+] as const;
+
 export const settingsV1 = z.object({
   theme: z.enum(themeIds).default("clean-slate"),
   logo: z
@@ -56,6 +81,45 @@ export const settingsV1 = z.object({
     .prefault({}),
   brb: z.object({ title: text(60, "Be right back"), subtitle: text(120) }).prefault({}),
   ending: z.object({ title: text(60, "Thanks for watching!"), subtitle: text(120) }).prefault({}),
+  /** Chat overlay (T3.3). `channel` is a Twitch login; "" until the streamer adds it. */
+  chat: z
+    .object({
+      channel: z
+        .string()
+        .regex(/^[A-Za-z0-9_]{0,25}$/, "Channel names use letters, numbers and _")
+        .default(""),
+      /** Hide messages starting with "!" (T3.4). */
+      hideCommands: z.boolean().default(true),
+      /** Lowercase logins whose messages are hidden (T3.4). Editable, so a streamer can keep a bot visible. */
+      bots: z
+        .array(z.string().regex(/^[a-z0-9_]{1,25}$/, "Bot names use a-z, 0-9 and _"))
+        .max(50)
+        .default(() => [...defaultBots]),
+      /** Chat box size in px (T3.5). The streamer enters the same numbers in OBS. */
+      width: z.number().int().min(250).max(1920).default(400),
+      height: z.number().int().min(200).max(1080).default(600),
+      /** Text size multiplier (T3.5). */
+      fontScale: z.number().min(0.75).max(2).default(1),
+      /** Seconds before a message fades away; 0 keeps messages (T3.5). */
+      fadeAfter: z.number().int().min(0).max(600).default(0),
+    })
+    .prefault({}),
+  /** Alert messages (T4.3). {user}, {amount} and {s} are filled in; "" means the default. */
+  alerts: z
+    .object({
+      templates: z
+        .object({
+          raid: text(100, defaultTemplates.raid),
+          sub: text(100, defaultTemplates.sub),
+          resub: text(100, defaultTemplates.resub),
+          subgift: text(100, defaultTemplates.subgift),
+          bits: text(100, defaultTemplates.bits),
+        })
+        .prefault({}),
+      /** Alert sound volume in percent; 0 is silent (T4.4). */
+      volume: z.number().int().min(0).max(100).default(70),
+    })
+    .prefault({}),
   /** "Advanced" overrides on top of the theme (T2.7). Empty means the theme as designed. */
   advanced: z
     .object({

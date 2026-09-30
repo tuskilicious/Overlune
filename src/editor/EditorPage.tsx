@@ -1,9 +1,15 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { fromZoneInput, toZoneInput } from "../lib/time";
 import { isHttpsUrl } from "../lib/url-safety";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
-import { defaultSettings, socialPlatforms, type Settings } from "../settings/schema";
+import {
+  defaultBots,
+  defaultSettings,
+  defaultTemplates,
+  socialPlatforms,
+  type Settings,
+} from "../settings/schema";
 import { loadSaved, save } from "../settings/storage";
 import { decodeLink, encode } from "../settings/url";
 import { themes } from "../themes";
@@ -11,7 +17,15 @@ import { cleanSlate } from "../themes/clean-slate";
 import { contrast } from "../lib/contrast";
 import { colorTokens, fontIds, themeIds, type ColorToken, type FontId } from "../themes/types";
 import { applyOverrides, themeVars } from "../themes/vars";
+import type { AlertKind } from "../alerts/events";
+import ChatView from "../overlays/chat/ChatView";
+import { botsFromInput } from "../overlays/chat/filters";
+import { chatSamples } from "./chat-samples";
+import { channelFromInput } from "../twitch/irc";
+import AlertTester from "./AlertTester";
 import ObsLinks, { overlays, type OverlayId as Scene } from "./ObsLinks";
+import Preview from "./Preview";
+import SiteFooter from "../components/SiteFooter";
 import "./editor.css";
 
 type Platform = (typeof socialPlatforms)[number];
@@ -40,22 +54,70 @@ const colorNames: Record<ColorToken, string> = {
 /** Color pickers only take #rrggbb; a theme gradient background shows as black until overridden. */
 const asHex = (c: string) => (/^#[0-9a-fA-F]{6}$/.test(c) ? c : "#000000");
 
-/** Shows a 1920×1080 overlay scaled down to the width it's given. */
-function Preview({ children }: { children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.5);
-  useLayoutEffect(() => {
-    const el = ref.current!;
-    const ro = new ResizeObserver(() => setScale(el.clientWidth / 1920));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+/** Whole-number box that lets you type freely and saves only values in range. Shows the saved value again on blur. */
+function NumberField(props: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  describedBy: string;
+  onChange: (n: number) => void;
+}) {
+  const { label, value, min, max, describedBy, onChange } = props;
+  const [text, setText] = useState(String(value));
+  const [shown, setShown] = useState(value);
+  if (value !== shown) {
+    // Changed from outside (load, start over): show the new value.
+    setShown(value);
+    setText(String(value));
+  }
+  const inRange = (t: string) =>
+    t.trim() !== "" && Number.isInteger(Number(t)) && Number(t) >= min && Number(t) <= max;
+  const ok = inRange(text);
+  const errorId = `${describedBy}-${label.replace(/\W+/g, "-").toLowerCase()}`;
   return (
-    <div className="editor-preview" ref={ref} style={{ "--scale": scale } as React.CSSProperties}>
-      {children}
-    </div>
+    <label>
+      {label}
+      <input
+        type="number"
+        inputMode="numeric"
+        min={min}
+        max={max}
+        step={10}
+        value={text}
+        aria-invalid={!ok}
+        aria-describedby={`${describedBy} ${errorId}`}
+        onChange={(e) => {
+          setText(e.target.value);
+          if (inRange(e.target.value)) onChange(Number(e.target.value));
+        }}
+        onBlur={() => setText(String(value))}
+      />
+      <span id={errorId} className="editor-error" role="alert">
+        {!ok && `Use a whole number from ${min} to ${max}.`}
+      </span>
+    </label>
   );
 }
+
+const alertFields: [AlertKind, string][] = [
+  ["raid", "Raid message"],
+  ["sub", "New sub message"],
+  ["resub", "Resub message"],
+  ["subgift", "Gift sub message"],
+  ["bits", "Bits message"],
+];
+
+const fadeOptions = [
+  [0, "Never"],
+  [15, "15 seconds"],
+  [30, "30 seconds"],
+  [60, "1 minute"],
+  [120, "2 minutes"],
+] as const;
+
+/** Keeps keyboard focus in place when the button that had it disappears (WCAG 2.4.3). Runs after React renders. */
+const focusSoon = (id: string) => requestAnimationFrame(() => document.getElementById(id)?.focus());
 
 const loadedMessage = (ok: boolean) =>
   ok
@@ -88,6 +150,7 @@ export default function EditorPage() {
   const [scene, setScene] = useState<Scene>("starting");
   // Kept apart from settings so a half-typed or unsafe link never reaches the preview.
   const [logoInput, setLogoInput] = useState(settings.logo);
+  const [botsInput, setBotsInput] = useState(settings.chat.bots.join("\n"));
   const [loadText, setLoadText] = useState("");
   const [loadStatus, setLoadStatus] = useState(initial.status);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -103,7 +166,9 @@ export default function EditorPage() {
     const fresh = freshSettings();
     setSettings(fresh);
     setLogoInput(fresh.logo);
+    setBotsInput(fresh.chat.bots.join("\n"));
     setConfirmReset(false);
+    focusSoon("start-over");
     setLoadStatus("Started over. Any link you kept still loads your old overlay.");
   };
 
@@ -117,6 +182,7 @@ export default function EditorPage() {
     }
     setSettings(result.settings);
     setLogoInput(result.settings.logo);
+    setBotsInput(result.settings.chat.bots.join("\n"));
     setLoadText("");
     setLoadStatus(loadedMessage(result.ok));
   };
@@ -124,6 +190,13 @@ export default function EditorPage() {
   const update = (patch: Partial<Settings>) => setSettings((s) => ({ ...s, ...patch }));
   const updateScene = <K extends Scene>(key: K, patch: Partial<Settings[K]>) =>
     setSettings((s) => ({ ...s, [key]: { ...s[key], ...patch } }));
+  const updateChat = (patch: Partial<Settings["chat"]>) =>
+    setSettings((s) => ({ ...s, chat: { ...s.chat, ...patch } }));
+  const updateTemplate = (kind: AlertKind, value: string) =>
+    setSettings((s) => ({
+      ...s,
+      alerts: { ...s.alerts, templates: { ...s.alerts.templates, [kind]: value } },
+    }));
   const updateSocial = (i: number, patch: Partial<Settings["socials"][number]>) =>
     update({ socials: settings.socials.map((s, j) => (i === j ? { ...s, ...patch } : s)) });
 
@@ -143,6 +216,19 @@ export default function EditorPage() {
 
   return (
     <div className="editor" style={themeVars(cleanSlate)}>
+      {/* No real #fragment jump: the address bar's fragment holds the settings. */}
+      <a
+        className="editor-skip"
+        href="#obs-links"
+        onClick={(e) => {
+          e.preventDefault();
+          const links = document.getElementById("obs-links");
+          links?.scrollIntoView();
+          links?.focus();
+        }}
+      >
+        Skip to your OBS links
+      </a>
       <header className="editor-header">
         <h1>Overlune</h1>
         <p>Free stream overlays that match. Pick a look, add your text, then paste into OBS.</p>
@@ -185,12 +271,19 @@ export default function EditorPage() {
               Yes, start over
             </button>
             {/* Focus lands on the safe choice. */}
-            <button type="button" autoFocus onClick={() => setConfirmReset(false)}>
+            <button
+              type="button"
+              autoFocus
+              onClick={() => {
+                setConfirmReset(false);
+                focusSoon("start-over");
+              }}
+            >
               Cancel
             </button>
           </div>
         ) : (
-          <button type="button" onClick={() => setConfirmReset(true)}>
+          <button id="start-over" type="button" onClick={() => setConfirmReset(true)}>
             Start over
           </button>
         )}
@@ -332,7 +425,10 @@ export default function EditorPage() {
                 <button
                   type="button"
                   aria-label={`Remove ${platformNames[s.platform]} ${s.handle}`.trim()}
-                  onClick={() => update({ socials: settings.socials.filter((_, j) => j !== i) })}
+                  onClick={() => {
+                    update({ socials: settings.socials.filter((_, j) => j !== i) });
+                    focusSoon("add-social");
+                  }}
                 >
                   Remove
                 </button>
@@ -340,6 +436,7 @@ export default function EditorPage() {
             ))}
             {settings.socials.length < 6 && (
               <button
+                id="add-social"
                 type="button"
                 onClick={() =>
                   update({ socials: [...settings.socials, { platform: "twitch", handle: "" }] })
@@ -348,6 +445,147 @@ export default function EditorPage() {
                 Add a social
               </button>
             )}
+          </fieldset>
+
+          <fieldset>
+            <legend>Chat</legend>
+            <label>
+              Your Twitch channel name
+              <input
+                value={settings.chat.channel}
+                maxLength={60}
+                autoComplete="off"
+                spellCheck={false}
+                aria-describedby="chat-hint"
+                onChange={(e) => updateChat({ channel: channelFromInput(e.target.value) })}
+              />
+            </label>
+            <p id="chat-hint" className="editor-hint">
+              The name in your channel link, e.g. twitch.tv/<strong>yourname</strong>. You can paste
+              the whole link.
+            </p>
+            <label className="editor-check">
+              <input
+                type="checkbox"
+                checked={settings.chat.hideCommands}
+                onChange={(e) => updateChat({ hideCommands: e.target.checked })}
+              />
+              Hide chat commands (messages starting with !)
+            </label>
+            <label>
+              Bots to hide (one name per line)
+              <textarea
+                value={botsInput}
+                rows={6}
+                spellCheck={false}
+                aria-describedby="bots-hint"
+                onChange={(e) => {
+                  setBotsInput(e.target.value);
+                  updateChat({ bots: botsFromInput(e.target.value) });
+                }}
+              />
+            </label>
+            <p id="bots-hint" className="editor-hint">
+              Messages from these accounts won’t show in your chat. Remove a name to show that bot.
+            </p>
+            <button
+              id="reset-bots"
+              type="button"
+              onClick={() => {
+                setBotsInput(defaultBots.join("\n"));
+                updateChat({ bots: [...defaultBots] });
+              }}
+            >
+              Reset to the usual bots
+            </button>
+            <div className="editor-size">
+              <NumberField
+                label="Chat box width"
+                value={settings.chat.width}
+                min={250}
+                max={1920}
+                describedBy="size-hint"
+                onChange={(width) => updateChat({ width })}
+              />
+              <NumberField
+                label="Chat box height"
+                value={settings.chat.height}
+                min={200}
+                max={1080}
+                describedBy="size-hint"
+                onChange={(height) => updateChat({ height })}
+              />
+            </div>
+            <p id="size-hint" className="editor-hint">
+              Enter the same width and height in OBS. They’re shown next to the Chat link.
+            </p>
+            <label>
+              Text size
+              <select
+                value={settings.chat.fontScale}
+                onChange={(e) => updateChat({ fontScale: Number(e.target.value) })}
+              >
+                {[0.75, 1, 1.25, 1.5, 2].map((v) => (
+                  <option key={v} value={v}>
+                    {v * 100}%
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Hide messages after
+              <select
+                value={settings.chat.fadeAfter}
+                onChange={(e) => updateChat({ fadeAfter: Number(e.target.value) })}
+              >
+                {fadeOptions.map(([v, label]) => (
+                  <option key={v} value={v}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Alerts</legend>
+            <p id="alerts-hint" className="editor-hint">
+              Alerts use your channel name from Chat. In each message, {"{user}"} becomes their name
+              and {"{amount}"} the number. {"{s}"} adds an “s” unless the number is 1.
+            </p>
+            <label>
+              Alert volume: {settings.alerts.volume}%
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={settings.alerts.volume}
+                aria-describedby="volume-hint"
+                onChange={(e) =>
+                  setSettings((s) => ({
+                    ...s,
+                    alerts: { ...s.alerts, volume: Number(e.target.value) },
+                  }))
+                }
+              />
+            </label>
+            <p id="volume-hint" className="editor-hint">
+              0% turns the sound off. In OBS, tick “Control audio via OBS” on the Alerts source so
+              your viewers hear it.
+            </p>
+            {alertFields.map(([kind, label]) => (
+              <label key={kind}>
+                {label}
+                <input
+                  value={settings.alerts.templates[kind]}
+                  maxLength={100}
+                  placeholder={defaultTemplates[kind]}
+                  aria-describedby="alerts-hint"
+                  onChange={(e) => updateTemplate(kind, e.target.value)}
+                />
+              </label>
+            ))}
           </fieldset>
 
           <fieldset>
@@ -373,7 +611,7 @@ export default function EditorPage() {
           </fieldset>
 
           <details className="editor-advanced">
-            <summary>Advanced: colors and fonts</summary>
+            <summary id="advanced-summary">Advanced: colors and fonts</summary>
             <p className="editor-hint">
               The theme already looks good. Change these only if you want your own brand colors.
             </p>
@@ -383,6 +621,7 @@ export default function EditorPage() {
                 <div key={token} className="editor-color">
                   <label>
                     <input
+                      id={`color-${token}`}
                       type="color"
                       value={asHex(look[token])}
                       onChange={(e) =>
@@ -401,6 +640,7 @@ export default function EditorPage() {
                         const colors = { ...settings.advanced.colors };
                         delete colors[token];
                         updateAdvanced({ colors });
+                        focusSoon(`color-${token}`);
                       }}
                     >
                       Reset
@@ -434,9 +674,10 @@ export default function EditorPage() {
             </fieldset>
             <button
               type="button"
-              onClick={() =>
-                update({ advanced: { colors: {}, fontHeading: null, fontBody: null } })
-              }
+              onClick={() => {
+                update({ advanced: { colors: {}, fontHeading: null, fontBody: null } });
+                focusSoon("advanced-summary");
+              }}
             >
               Reset all to the theme
             </button>
@@ -454,9 +695,20 @@ export default function EditorPage() {
               )}
             </Preview>
           </section>
+          <section className="editor-preview-wrap editor-chat-preview" aria-label="Chat preview">
+            <h2>Preview: Chat (sample messages)</h2>
+            <Preview width={settings.chat.width} height={settings.chat.height}>
+              <ChatView
+                settings={{ ...settings, chat: { ...settings.chat, fadeAfter: 0 } }}
+                messages={chatSamples}
+              />
+            </Preview>
+          </section>
+          <AlertTester settings={settings} />
           <ObsLinks settings={settings} />
         </div>
       </div>
+      <SiteFooter />
     </div>
   );
 }

@@ -20,6 +20,7 @@ Every theme defines exactly these tokens (`src/themes/types.ts`):
 | `fontHeading` / `fontBody` | `@fontsource` families (OFL) |
 | `radius` | Corner radius (px) |
 | `border` | Border style for surfaces |
+| `shadow` | Box shadow for surfaces: a glow, a soft shadow, or `none` |
 | `bgEffect` | Background effect id (e.g. `grid`, `steam`, `fireflies`) |
 | `enter` / `exit` | Entrance and exit animation ids + duration |
 | `alertAnim` | Alert animation id |
@@ -42,7 +43,7 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 - Effects: perspective grid background, glitch-in alerts
 
 **3. Cozy Café:** warm and lo-fi.
-- Colors: bg `#F4EADB`, surface `#FFF8EE`, primary `#6B4A35`, accent `#D98E5A`, text `#3B2A20`
+- Colors: bg `#F4EADB`, surface `#FFF8EE`, primary `#6B4A35`, accent `#9C5A2C` (shipped; the first pick `#D98E5A` failed AA on the surface), muted `#7A6354`, text `#3B2A20`
 - Fonts: Fredoka / Nunito
 - Shape: radius 20, soft shadows
 - Effects: steam wisps, gentle bounce

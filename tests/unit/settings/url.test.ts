@@ -1,6 +1,11 @@
 import { compressToEncodedURIComponent } from "lz-string";
 import { describe, expect, it } from "vitest";
-import { defaultSettings, type Settings } from "../../../src/settings/schema";
+import {
+  defaultBots,
+  defaultSettings,
+  defaultTemplates,
+  type Settings,
+} from "../../../src/settings/schema";
 import { decode, decodeLink, encode } from "../../../src/settings/url";
 
 const raw = (data: unknown) => `#1.${compressToEncodedURIComponent(JSON.stringify(data))}`;
@@ -18,6 +23,25 @@ const sample: Settings = {
   },
   brb: { title: "Snack break", subtitle: "Back in 5" },
   ending: { title: "GG!", subtitle: "Raiding a friend" },
+  chat: {
+    channel: "Tuskilicious",
+    hideCommands: false,
+    bots: ["mybot"],
+    width: 500,
+    height: 800,
+    fontScale: 1.5,
+    fadeAfter: 30,
+  },
+  alerts: {
+    templates: {
+      raid: "RAID {user} {amount}",
+      sub: "{user} subbed",
+      resub: "{user} x{amount}",
+      subgift: "{user} gave {amount}",
+      bits: "{user} {amount} bits",
+    },
+    volume: 40,
+  },
   advanced: {
     colors: { accent: "#ff2bd6", surface: "#101010" },
     fontHeading: "Orbitron",
@@ -150,5 +174,110 @@ describe("advanced overrides (T2.7)", () => {
   it("reject unknown color names and fonts that aren't bundled", () => {
     expect(decode(raw({ advanced: { colors: { border: "#000000" } } })).ok).toBe(false);
     expect(decode(raw({ advanced: { fontHeading: "Comic Sans MS" } })).ok).toBe(false);
+  });
+});
+
+describe("chat channel (T3.3)", () => {
+  it("defaults to empty, so links made before chat existed still load", () => {
+    const { settings, ok } = decode(raw({ brb: { title: "Hi" } }));
+    expect(ok).toBe(true);
+    expect(settings.chat).toEqual({ ...defaultSettings.chat, channel: "" });
+  });
+
+  it.each(["two words", "#dallas", "a".repeat(26), "<script>", "twitch.tv/dallas"])(
+    "rejects %s and keeps the other fields",
+    (channel) => {
+      const { settings, ok } = decode(raw({ brb: { title: "Kept" }, chat: { channel } }));
+      expect(ok).toBe(false);
+      expect(settings.chat.channel).toBe("");
+      expect(settings.brb.title).toBe("Kept");
+    },
+  );
+});
+
+describe("chat filters (T3.4)", () => {
+  it("give links from T3.3 the usual bots and hidden commands", () => {
+    const { settings, ok } = decode(raw({ chat: { channel: "dallas" } }));
+    expect(ok).toBe(true);
+    expect(settings.chat).toEqual({
+      ...defaultSettings.chat,
+      channel: "dallas",
+      bots: [...defaultBots],
+    });
+  });
+
+  it("keep an edited bot list, including an empty one", () => {
+    expect(decode(raw({ chat: { bots: [] } })).settings.chat.bots).toEqual([]);
+    expect(decode(raw({ chat: { bots: ["mybot"] } })).settings.chat.bots).toEqual(["mybot"]);
+  });
+
+  it.each([[["Nightbot"]], [["bad name"]], [Array.from({ length: 51 }, (_, i) => `bot${i}`)]])(
+    "reject bot list %j",
+    (bots) => {
+      const { settings, ok } = decode(raw({ brb: { title: "Kept" }, chat: { bots } }));
+      expect(ok).toBe(false);
+      expect(settings.chat.bots).toEqual([...defaultBots]);
+      expect(settings.brb.title).toBe("Kept");
+    },
+  );
+});
+
+describe("chat options (T3.5)", () => {
+  it("default to the T3.3 look for older links", () => {
+    const { chat } = decode(raw({ chat: { channel: "dallas" } })).settings;
+    expect(chat).toMatchObject({ width: 400, height: 600, fontScale: 1, fadeAfter: 0 });
+  });
+
+  it.each([
+    { width: 100 },
+    { width: 5000 },
+    { height: 10.5 },
+    { fontScale: 3 },
+    { fontScale: "big" },
+    { fadeAfter: -1 },
+    { fadeAfter: 99999 },
+  ])("reject %j", (bad) => {
+    const { settings, ok } = decode(
+      raw({ brb: { title: "Kept" }, chat: { channel: "dallas", ...bad } }),
+    );
+    expect(ok).toBe(false);
+    expect(settings.chat).toEqual(defaultSettings.chat);
+    expect(settings.brb.title).toBe("Kept");
+  });
+});
+
+describe("alert templates (T4.3)", () => {
+  it("default for links made before alerts existed", () => {
+    const { settings, ok } = decode(raw({ chat: { channel: "dallas" } }));
+    expect(ok).toBe(true);
+    expect(settings.alerts.templates).toEqual(defaultTemplates);
+  });
+
+  it("cut long templates to 100 characters instead of rejecting them", () => {
+    const { settings, ok } = decode(raw({ alerts: { templates: { raid: "x".repeat(500) } } }));
+    expect(ok).toBe(true);
+    expect(settings.alerts.templates.raid).toBe("x".repeat(100));
+    expect(settings.alerts.templates.sub).toBe(defaultTemplates.sub);
+  });
+
+  it("reject a template that isn't text", () => {
+    const { settings, ok } = decode(
+      raw({ brb: { title: "Kept" }, alerts: { templates: { sub: 5 } } }),
+    );
+    expect(ok).toBe(false);
+    expect(settings.alerts.templates).toEqual(defaultTemplates);
+    expect(settings.brb.title).toBe("Kept");
+  });
+});
+
+describe("alert volume (T4.4)", () => {
+  it("defaults to 70% for older links", () => {
+    expect(decode(raw({ alerts: { templates: {} } })).settings.alerts.volume).toBe(70);
+  });
+
+  it.each([-1, 101, 50.5, "loud"])("rejects %j", (volume) => {
+    const { settings, ok } = decode(raw({ alerts: { volume } }));
+    expect(ok).toBe(false);
+    expect(settings.alerts.volume).toBe(70);
   });
 });

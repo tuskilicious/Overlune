@@ -16,6 +16,110 @@
   animation: scene-slide-fade var(--enter-ms) ease-out both;
 }
 
+/* Neon Grid: a floor grid scrolling toward the viewer. Transform-only animation, so it stays on the GPU.
+   Reduced-motion version: index.css stops it and the grid stands still. */
+.scene[data-bg="grid"] {
+  position: relative;
+  isolation: isolate; /* the grid layers sit above the scene background but under the content */
+}
+
+.scene[data-bg="grid"]::before,
+.scene[data-bg="grid"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: 55%;
+  pointer-events: none;
+}
+
+.scene[data-bg="grid"]::before {
+  left: -50%;
+  right: -50%;
+  height: 120%;
+  background-image:
+    linear-gradient(var(--accent) 2px, transparent 2px),
+    linear-gradient(90deg, var(--accent) 2px, transparent 2px);
+  background-size: 96px 96px;
+  opacity: 0.45;
+  transform-origin: 50% 0;
+  transform: perspective(480px) rotateX(70deg);
+  animation: scene-grid 1.6s linear infinite;
+}
+
+/* The horizon: a glowing line with the grid fading into the distance below it. */
+.scene[data-bg="grid"]::after {
+  height: 22%;
+  border-top: 2px solid var(--primary);
+  box-shadow: 0 -16px 24px -12px var(--primary); /* glow above the line only */
+  background: linear-gradient(var(--bg), transparent);
+}
+
+@keyframes scene-grid {
+  to {
+    transform: perspective(480px) rotateX(70deg) translateY(96px);
+  }
+}
+
+/* Cozy Café: soft steam wisps rising from the bottom. Transform and opacity only (no blur filter).
+   Reduced-motion version: index.css stops them and the wisps stand still. */
+.scene[data-bg="steam"] {
+  position: relative;
+  isolation: isolate;
+}
+
+.scene[data-bg="steam"]::before,
+.scene[data-bg="steam"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  bottom: -120px;
+  width: 360px;
+  height: 720px;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 22% at 50% 70%, rgba(255, 255, 255, 0.7), transparent 70%),
+    radial-gradient(ellipse 40% 18% at 58% 40%, rgba(255, 255, 255, 0.55), transparent 70%),
+    radial-gradient(ellipse 30% 14% at 44% 14%, rgba(255, 255, 255, 0.4), transparent 70%);
+  animation: scene-steam 9s ease-in-out infinite;
+}
+
+.scene[data-bg="steam"]::before {
+  left: 12%;
+}
+
+.scene[data-bg="steam"]::after {
+  right: 12%;
+  animation-delay: -4.5s;
+}
+
+@keyframes scene-steam {
+  0% {
+    opacity: 0;
+    transform: translateY(80px) scaleX(0.9);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-360px) scaleX(1.15);
+  }
+}
+
+.scene[data-enter="bounce"] .scene-main,
+.scene[data-enter="bounce"] .scene-socials {
+  animation: scene-bounce var(--enter-ms) cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes scene-bounce {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.96);
+  }
+}
+
 @keyframes scene-slide-fade {
   from {
     opacity: 0;
@@ -68,6 +172,7 @@
   background: var(--surface);
   border: var(--border);
   border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 .scene-platform {

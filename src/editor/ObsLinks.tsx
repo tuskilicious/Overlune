@@ -1,8 +1,9 @@
 import { useRef, useState } from "react";
+import { Link } from "react-router";
 import type { Settings } from "../settings/schema";
 import { encode } from "../settings/url";
 
-/** Every overlay the editor makes, with the Browser Source size to enter in OBS. Chat and alerts add rows here. */
+/** The full-screen scenes, with the Browser Source size to enter in OBS. */
 export const overlays = {
   starting: { name: "Starting Soon", width: 1920, height: 1080 },
   brb: { name: "Be Right Back", width: 1920, height: 1080 },
@@ -11,8 +12,14 @@ export const overlays = {
 
 export type OverlayId = keyof typeof overlays;
 
-function LinkRow({ id, link }: { id: OverlayId; link: string }) {
-  const { name, width, height } = overlays[id];
+export interface LinkInfo {
+  id: string;
+  name: string;
+  width: number;
+  height: number;
+}
+
+export function LinkRow({ name, width, height, link }: LinkInfo & { link: string }) {
   const input = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState("");
 
@@ -49,16 +56,22 @@ function LinkRow({ id, link }: { id: OverlayId; link: string }) {
 /** "Link to paste into OBS" for each overlay. Every link carries all settings. */
 export default function ObsLinks({ settings }: { settings: Settings }) {
   const hash = encode(settings);
+  // Every overlay that gets a link: the scenes, chat (sized in the editor) and alerts.
+  const links: LinkInfo[] = [
+    ...(Object.keys(overlays) as OverlayId[]).map((id) => ({ id, ...overlays[id] })),
+    { id: "chat", name: "Chat", width: settings.chat.width, height: settings.chat.height },
+    { id: "alerts", name: "Alerts", width: 1920, height: 1080 },
+  ];
   return (
-    <section className="editor-links" aria-labelledby="links-heading">
+    <section id="obs-links" tabIndex={-1} className="editor-links" aria-labelledby="links-heading">
       <h2 id="links-heading">Links to paste into OBS</h2>
       <p>
         In OBS, add a <strong>Browser</strong> source, paste the link, and enter the width and
-        height shown.
+        height shown. New to OBS? Follow the <Link to="/guide">step-by-step setup guide</Link>.
       </p>
       <ul>
-        {(Object.keys(overlays) as OverlayId[]).map((id) => (
-          <LinkRow key={id} id={id} link={`${location.origin}/o/${id}#${hash}`} />
+        {links.map((l) => (
+          <LinkRow key={l.id} {...l} link={`${location.origin}/o/${l.id}#${hash}`} />
         ))}
       </ul>
     </section>

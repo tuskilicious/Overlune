@@ -9,6 +9,10 @@
   font-family: var(--font-body);
 }
 
+:where(.editor) a {
+  color: var(--accent);
+}
+
 .editor-header h1 {
   margin: 0;
   font-family: var(--font-heading);
@@ -102,8 +106,9 @@
   font-size: 14px;
 }
 
-.editor input:not([type="radio"]),
+.editor input:not([type="radio"], [type="checkbox"]),
 .editor select,
+.editor textarea,
 .editor button {
   font: inherit;
   font-size: 15px;
@@ -115,8 +120,56 @@
   min-width: 0;
 }
 
+/* Control outlines need 3:1 against the panel (WCAG 1.4.11); panel borders stay subtle. */
+.editor input:not([type="radio"], [type="checkbox"]),
+.editor select,
+.editor textarea,
+.editor button {
+  border: 1px solid var(--text-muted);
+}
+
+.editor ::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+.editor-skip {
+  position: absolute;
+  left: 16px;
+  top: -100px;
+  padding: 8px 12px;
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius);
+}
+
+.editor-skip:focus {
+  top: 8px;
+}
+
+#obs-links:focus {
+  outline: none;
+}
+
 .editor input[aria-invalid="true"] {
   border-color: #ff8a8a;
+}
+
+.editor textarea {
+  resize: vertical;
+}
+
+.editor label.editor-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
 }
 
 .editor button {
@@ -280,4 +333,63 @@
   min-height: 1.2em;
   font-size: 14px;
   color: var(--accent);
+}
+
+.editor-size {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Chat is narrow: show it smaller than the scene preview, keeping its own shape. */
+.editor-chat-preview .editor-preview {
+  max-width: 280px;
+  background: var(--bg);
+}
+
+.editor-preview > .chat,
+.editor-preview > .alerts {
+  transform: scale(var(--scale));
+  transform-origin: 0 0;
+}
+
+.editor-test-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.editor button:disabled {
+  cursor: not-allowed;
+  color: var(--text-muted);
+  border-style: dashed;
+}
+
+.editor-test-link {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.editor-alert-tester .editor-hint {
+  margin: 8px 0 0;
+}
+
+/* Footer on the editor and guide pages (SiteFooter). */
+.site-footer {
+  margin-top: 48px;
+  padding-top: 16px;
+  border-top: var(--border);
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.site-footer ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
 }
