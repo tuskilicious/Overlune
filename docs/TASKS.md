@@ -13,10 +13,10 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - Accept: committing a fake token is blocked.
 - [ ] **T0.6 CI:** `.github/workflows/ci.yml` runs lint, typecheck, test, build, gitleaks and `npm audit --audit-level=high`. Add `dependabot.yml`.
   - Accept: CI is green on a PR.
-- [ ] **T0.7 Deploy:** Cloudflare Pages with production on `main` and previews on PRs. Add `public/_headers` (CSP, HSTS, etc.) and `public/_redirects` for the SPA fallback.
+- [ ] **T0.7 Deploy:** Cloudflare Pages with production on `main` and previews on PRs. Add `public/_headers` (CSP, HSTS, etc.) and `public/_redirects` for the SPA fallback. Set `VITE_SENTRY_DSN` and `VITE_SENTRY_ENVIRONMENT` (`staging` for previews, `production` for `main`) per `docs/SENTRY.md` step 5.
   - Accept: headers are verified on the preview URL with `curl -I`.
-- [ ] **T0.8 Sentry:** separate staging and production environments, `sendDefaultPii: false`, and a `beforeSend` that strips URL fragments.
-  - *Code is in place (see `docs/SENTRY.md`). Remaining: add the DSN, run the verify step, and set the Cloudflare env vars.*
+- [x] **T0.8 Sentry:** separate staging and production environments, `sendDefaultPii: false`, and a `beforeSend` that strips URL fragments.
+  - *Verified 2026-09-30: test event reached Sentry (EU, `development`) with no settings fragment. Cloudflare env vars moved to T0.7 (no Pages project yet).*
   - Accept: a test error appears in Sentry without the settings fragment.
 - [ ] **T0.9 Owner setup:** turn on 2FA for GitHub, Cloudflare and Sentry, and enable GitHub secret scanning with push protection. *Owner does this.*
 
