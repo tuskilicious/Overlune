@@ -11,8 +11,9 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - Accept: all scripts pass on a clean checkout.
 - [x] **T0.5 Secret scanning:** husky pre-commit running gitleaks and lint-staged. Document installing gitleaks in the README.
   - Accept: committing a fake token is blocked.
-- [ ] **T0.6 CI:** `.github/workflows/ci.yml` runs lint, typecheck, test, build, gitleaks and `npm audit --audit-level=high`. Add `dependabot.yml`.
+- [x] **T0.6 CI:** `.github/workflows/ci.yml` runs lint, typecheck, test, build, gitleaks and `npm audit --audit-level=high`. Add `dependabot.yml`.
   - Accept: CI is green on a PR.
+  - *Green on PR #1. Dependabot activates once this is merged to `main`.*
 - [ ] **T0.7 Deploy:** Cloudflare Pages with production on `main` and previews on PRs. Add `public/_headers` (CSP, HSTS, etc.) and `public/_redirects` for the SPA fallback. Set `VITE_SENTRY_DSN` and `VITE_SENTRY_ENVIRONMENT` (`staging` for previews, `production` for `main`) per `docs/SENTRY.md` step 5.
   - Accept: headers are verified on the preview URL with `curl -I`.
 - [x] **T0.8 Sentry:** separate staging and production environments, `sendDefaultPii: false`, and a `beforeSend` that strips URL fragments.
