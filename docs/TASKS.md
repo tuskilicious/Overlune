@@ -34,7 +34,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - Accept: reloading the page does not reset the countdown, and a unit test covers the time math.
 - [x] **T1.4 Overlay error state component,** shown for invalid settings.
   - *Passed in OBS 32 (2026-09-30). `SceneFrame` takes an `error` slot; chat can reuse `OverlayError` with its own message.*
-- [ ] **T1.5 Reduced motion:** the `?rm=1` flag and `prefers-reduced-motion` both disable animations.
+- [x] **T1.5 Reduced motion:** the `?rm=1` flag and `prefers-reduced-motion` both disable animations.
+  - *Passed in OBS 32 (2026-09-30). One global CSS rule covers every animation; JS motion helper comes with alerts (T4).*
 - [ ] **T1.6 Write `docs/OBS-TESTING.md` results for Starting Soon.** Check it in OBS and Streamlabs: transparency, fonts, countdown after a scene switch, and CPU use.
 - [ ] **T1.7 Playwright smoke test** that renders `/o/starting` with a fixture link and compares a screenshot.
 - [ ] **T1.8 Save the first link fixture** to `tests/fixtures/links/v1/`.

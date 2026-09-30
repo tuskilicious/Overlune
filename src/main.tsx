@@ -8,6 +8,10 @@ import "./index.css";
 // Initialize Sentry before rendering anything.
 initSentry();
 
+// ?rm=1 forces reduced motion (public link contract, docs/STACK.md). OBS doesn't always pass on the OS setting.
+if (new URLSearchParams(location.search).get("rm") === "1")
+  document.documentElement.dataset.rm = "";
+
 const container = document.getElementById("root");
 if (!container) throw new Error("Root element #root not found");
 

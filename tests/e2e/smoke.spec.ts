@@ -30,6 +30,25 @@ for (const hash of ["#1.garbage", "#9.abc"]) {
   });
 }
 
+const entranceAnimation = (page: import("@playwright/test").Page) =>
+  page.locator(".scene-main").evaluate((el) => getComputedStyle(el).animationName);
+
+test("the entrance animates by default", async ({ page }) => {
+  await page.goto("/o/starting");
+  expect(await entranceAnimation(page)).toBe("scene-slide-fade");
+});
+
+test("?rm=1 turns animations off", async ({ page }) => {
+  await page.goto("/o/starting?rm=1");
+  expect(await entranceAnimation(page)).toBe("none");
+});
+
+test("the OS reduced-motion setting turns animations off", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/o/starting");
+  expect(await entranceAnimation(page)).toBe("none");
+});
+
 test("one bad field shows the error card but keeps the rest", async ({ page }) => {
   await page.goto(link({ logo: "javascript:alert(1)", starting: { title: "Back in a bit" } }));
   await expect(page.getByRole("status")).toBeVisible();
