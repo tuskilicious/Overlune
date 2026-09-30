@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   applyEvent,
   botsFromInput,
+  expire,
   MAX_MESSAGES,
   type ChatFilters,
 } from "../../../src/overlays/chat/filters";
@@ -86,5 +87,26 @@ describe("botsFromInput", () => {
     expect(botsFromInput(Array.from({ length: 60 }, (_, i) => `b${i}`).join("\n"))).toHaveLength(
       50,
     );
+  });
+});
+
+describe("fade-out", () => {
+  it("records when each message arrived", () => {
+    const [m] = applyEvent([], parseLine(priv("1", "a", "hi")), on, 1234);
+    expect(m!.at).toBe(1234);
+  });
+
+  it("drops only messages older than the fade time", () => {
+    const list = [
+      { ...msg("old", "a", "x"), at: 0 },
+      { ...msg("new", "a", "y"), at: 20_000 },
+    ];
+    expect(expire(list, 30_000, 15).map((m) => m.id)).toEqual(["new"]);
+  });
+
+  it("keeps everything when fade is off, and returns the same list when nothing expired", () => {
+    const list = [{ ...msg("1", "a", "x"), at: 0 }];
+    expect(expire(list, 1e9, 0)).toBe(list);
+    expect(expire(list, 1000, 15)).toBe(list);
   });
 });

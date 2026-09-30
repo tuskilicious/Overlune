@@ -71,7 +71,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *Passed in OBS 32 (2026-09-30). `/o/chat`, 400×600, last 50 messages. New v1 field `chat.channel` (default "", old links unchanged; fixture `v1/chat.json`). Editor has a "Your Twitch channel name" field that accepts a pasted twitch.tv link, plus a Chat row in the OBS links. Name colors are lightened toward the theme text until they read at AA. Editor chat preview with sample messages left for T3.5.*
 - [x] **T3.4 Filters:** hide known bots (editable list) and `!commands`, and remove messages on CLEARMSG and CLEARCHAT.
   - *Passed in OBS 32 (2026-09-30). New v1 fields `chat.hideCommands` (default on) and `chat.bots` (default: 12 common bots, max 50; old links get the defaults; fixture `v1/chat-filters.json`). Logic in `src/overlays/chat/filters.ts` (`applyEvent`). Editor: checkbox, one-name-per-line bot box, and "Reset to the usual bots".*
-- [ ] **T3.5 Chat options:** size, font scale, and optional fade-out.
+- [x] **T3.5 Chat options:** size, font scale, and optional fade-out.
+  - *Passed in OBS 32 (2026-09-30). New v1 fields `chat.width` (250–1920, default 400), `chat.height` (200–1080, default 600), `chat.fontScale` (0.75–2, default 1) and `chat.fadeAfter` (seconds, 0 = never); old links unchanged; fixture `v1/chat-options.json`. Chat sizes are in em so text size scales everything. Fade: CSS fade plus a 1s timer that removes messages (works with reduced motion). Editor: size fields, text size, "Hide messages after", the Chat link row shows the chosen size, and a chat preview with sample messages.*
 - [ ] **T3.6 OBS test + Playwright test** using a mocked IRC feed.
 
 ## Phase 4: Alerts

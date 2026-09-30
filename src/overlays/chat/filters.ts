@@ -12,12 +12,13 @@ export function applyEvent(
   messages: ChatMessage[],
   e: TwitchEvent,
   { hideCommands, bots }: ChatFilters,
+  now = Date.now(),
 ): ChatMessage[] {
   switch (e.type) {
     case "chat":
       if (bots.includes(e.login)) return messages;
       if (hideCommands && e.text.trimStart().startsWith("!")) return messages;
-      return [...messages.slice(1 - MAX_MESSAGES), e];
+      return [...messages.slice(1 - MAX_MESSAGES), { ...e, at: now }];
     case "clearmsg":
       return messages.filter((m) => m.id !== e.targetId);
     case "clearchat":
@@ -25,6 +26,13 @@ export function applyEvent(
     default:
       return messages;
   }
+}
+
+/** Drops messages older than `fadeAfter` seconds (0 keeps everything). Same list back when nothing expired. */
+export function expire(messages: ChatMessage[], now: number, fadeAfter: number): ChatMessage[] {
+  if (fadeAfter <= 0) return messages;
+  const kept = messages.filter((m) => m.at === undefined || now - m.at < fadeAfter * 1000);
+  return kept.length === messages.length ? messages : kept;
 }
 
 /** Editor text box → bot list. One name per line (commas and spaces work too); "@" dropped, bad names skipped. */

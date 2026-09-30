@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 const preview = (page: import("@playwright/test").Page) =>
-  page.getByRole("region", { name: "Preview" });
+  page.getByRole("region", { name: "Preview", exact: true });
 
 // The preview is hidden from screen readers (it repeats the form), so find it by class, not role.
 const previewTitle = (page: import("@playwright/test").Page, text: string) =>
@@ -126,11 +126,11 @@ test("socials can be added and removed", async ({ page }) => {
 test("only https: logo links reach the preview", async ({ page }) => {
   const logo = page.getByLabel("Link to your logo image");
   await logo.fill("javascript:alert(1)");
-  await expect(page.getByRole("alert")).toHaveText("This link must start with https://");
+  await expect(page.locator("#logo-error")).toHaveText("This link must start with https://");
   await expect(preview(page).locator("img")).toHaveCount(0);
 
   await logo.fill("https://example.com/logo.png");
-  await expect(page.getByRole("alert")).toHaveText("");
+  await expect(page.locator("#logo-error")).toHaveText("");
   await expect(preview(page).locator("img")).toHaveAttribute("src", "https://example.com/logo.png");
 });
 
@@ -334,4 +334,27 @@ test("the bot list can be edited and reset", async ({ page }) => {
   await page.getByRole("button", { name: "Reset to the usual bots" }).click();
   await expect(page.getByLabel("Bots to hide")).toHaveValue(/^nightbot\n/);
   await expect(page.getByLabel("Hide chat commands")).toBeChecked();
+});
+
+test("chat size and text options update the link row and the chat preview", async ({ page }) => {
+  const preview = page.getByRole("region", { name: "Chat preview" });
+  await expect(preview.getByText("Love the new look")).toBeAttached();
+  await expect(preview.locator("img.chat-emote")).toHaveAttribute("alt", "Kappa");
+
+  const width = page.getByLabel("Chat box width");
+  await width.fill("3"); // half-typed: not saved, shows a hint
+  await expect(page.getByText("Use a whole number from 250 to 1920.")).toBeVisible();
+  await width.fill("500");
+  await page.getByLabel("Chat box height").fill("800");
+  await page.getByLabel("Text size").selectOption("1.5");
+  await page.getByLabel("Hide messages after").selectOption("30");
+
+  const rows = page.getByRole("region", { name: "Links to paste into OBS" }).getByRole("listitem");
+  await expect(rows.nth(3)).toContainText("Chat · Width 500 · Height 800");
+  await expect(preview.locator(".chat")).toHaveCSS("width", "500px");
+  await expect(preview.locator(".chat")).toHaveCSS("font-size", "30px");
+
+  await page.reload();
+  await expect(page.getByLabel("Chat box width")).toHaveValue("500");
+  await expect(page.getByLabel("Hide messages after")).toHaveValue("30");
 });

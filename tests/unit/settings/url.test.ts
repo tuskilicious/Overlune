@@ -18,7 +18,15 @@ const sample: Settings = {
   },
   brb: { title: "Snack break", subtitle: "Back in 5" },
   ending: { title: "GG!", subtitle: "Raiding a friend" },
-  chat: { channel: "Tuskilicious", hideCommands: false, bots: ["mybot"] },
+  chat: {
+    channel: "Tuskilicious",
+    hideCommands: false,
+    bots: ["mybot"],
+    width: 500,
+    height: 800,
+    fontScale: 1.5,
+    fadeAfter: 30,
+  },
   advanced: {
     colors: { accent: "#ff2bd6", surface: "#101010" },
     fontHeading: "Orbitron",
@@ -158,7 +166,7 @@ describe("chat channel (T3.3)", () => {
   it("defaults to empty, so links made before chat existed still load", () => {
     const { settings, ok } = decode(raw({ brb: { title: "Hi" } }));
     expect(ok).toBe(true);
-    expect(settings.chat).toEqual({ channel: "", hideCommands: true, bots: [...defaultBots] });
+    expect(settings.chat).toEqual({ ...defaultSettings.chat, channel: "" });
   });
 
   it.each(["two words", "#dallas", "a".repeat(26), "<script>", "twitch.tv/dallas"])(
@@ -177,8 +185,8 @@ describe("chat filters (T3.4)", () => {
     const { settings, ok } = decode(raw({ chat: { channel: "dallas" } }));
     expect(ok).toBe(true);
     expect(settings.chat).toEqual({
+      ...defaultSettings.chat,
       channel: "dallas",
-      hideCommands: true,
       bots: [...defaultBots],
     });
   });
@@ -197,4 +205,28 @@ describe("chat filters (T3.4)", () => {
       expect(settings.brb.title).toBe("Kept");
     },
   );
+});
+
+describe("chat options (T3.5)", () => {
+  it("default to the T3.3 look for older links", () => {
+    const { chat } = decode(raw({ chat: { channel: "dallas" } })).settings;
+    expect(chat).toMatchObject({ width: 400, height: 600, fontScale: 1, fadeAfter: 0 });
+  });
+
+  it.each([
+    { width: 100 },
+    { width: 5000 },
+    { height: 10.5 },
+    { fontScale: 3 },
+    { fontScale: "big" },
+    { fadeAfter: -1 },
+    { fadeAfter: 99999 },
+  ])("reject %j", (bad) => {
+    const { settings, ok } = decode(
+      raw({ brb: { title: "Kept" }, chat: { channel: "dallas", ...bad } }),
+    );
+    expect(ok).toBe(false);
+    expect(settings.chat).toEqual(defaultSettings.chat);
+    expect(settings.brb.title).toBe("Kept");
+  });
 });

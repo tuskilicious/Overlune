@@ -11,12 +11,14 @@ export const overlays = {
 
 export type OverlayId = keyof typeof overlays;
 
-/** Every overlay that gets a link: the scenes plus chat. Alerts add a row here. */
-const links = { ...overlays, chat: { name: "Chat", width: 400, height: 600 } } as const;
-type LinkId = keyof typeof links;
+interface LinkInfo {
+  id: string;
+  name: string;
+  width: number;
+  height: number;
+}
 
-function LinkRow({ id, link }: { id: LinkId; link: string }) {
-  const { name, width, height } = links[id];
+function LinkRow({ name, width, height, link }: LinkInfo & { link: string }) {
   const input = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState("");
 
@@ -53,6 +55,11 @@ function LinkRow({ id, link }: { id: LinkId; link: string }) {
 /** "Link to paste into OBS" for each overlay. Every link carries all settings. */
 export default function ObsLinks({ settings }: { settings: Settings }) {
   const hash = encode(settings);
+  // Every overlay that gets a link: the scenes plus chat (sized in the editor). Alerts add a row here.
+  const links: LinkInfo[] = [
+    ...(Object.keys(overlays) as OverlayId[]).map((id) => ({ id, ...overlays[id] })),
+    { id: "chat", name: "Chat", width: settings.chat.width, height: settings.chat.height },
+  ];
   return (
     <section id="obs-links" tabIndex={-1} className="editor-links" aria-labelledby="links-heading">
       <h2 id="links-heading">Links to paste into OBS</h2>
@@ -61,8 +68,8 @@ export default function ObsLinks({ settings }: { settings: Settings }) {
         height shown.
       </p>
       <ul>
-        {(Object.keys(links) as LinkId[]).map((id) => (
-          <LinkRow key={id} id={id} link={`${location.origin}/o/${id}#${hash}`} />
+        {links.map((l) => (
+          <LinkRow key={l.id} {...l} link={`${location.origin}/o/${l.id}#${hash}`} />
         ))}
       </ul>
     </section>

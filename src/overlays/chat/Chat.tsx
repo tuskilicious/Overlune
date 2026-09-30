@@ -3,9 +3,9 @@ import type { Settings } from "../../settings/schema";
 import { connectChat, type ChatStatus } from "../../twitch/irc";
 import OverlayError from "../OverlayError";
 import ChatView, { type ChatMessage } from "./ChatView";
-import { applyEvent, type ChatFilters } from "./filters";
+import { applyEvent, expire, type ChatFilters } from "./filters";
 
-function useChat(channel: string, filters: ChatFilters) {
+function useChat(channel: string, filters: ChatFilters, fadeAfter: number) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [status, setStatus] = useState<ChatStatus>("connecting");
   // Read through a ref so changing a filter never reconnects.
@@ -21,13 +21,18 @@ function useChat(channel: string, filters: ChatFilters) {
       }),
     [channel],
   );
+  useEffect(() => {
+    if (fadeAfter <= 0) return;
+    const id = setInterval(() => setMessages((m) => expire(m, Date.now(), fadeAfter)), 1000);
+    return () => clearInterval(id);
+  }, [fadeAfter]);
   return { messages, status };
 }
 
 /** /o/chat: live Twitch chat for the channel in the link. */
 export default function Chat({ settings, error }: { settings: Settings; error?: ReactNode }) {
   const { channel } = settings.chat;
-  const { messages, status } = useChat(channel, settings.chat);
+  const { messages, status } = useChat(channel, settings.chat, settings.chat.fadeAfter);
   return (
     <ChatView
       settings={settings}

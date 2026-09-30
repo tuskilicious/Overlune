@@ -11,7 +11,9 @@ import { cleanSlate } from "../themes/clean-slate";
 import { contrast } from "../lib/contrast";
 import { colorTokens, fontIds, themeIds, type ColorToken, type FontId } from "../themes/types";
 import { applyOverrides, themeVars } from "../themes/vars";
+import ChatView from "../overlays/chat/ChatView";
 import { botsFromInput } from "../overlays/chat/filters";
+import { chatSamples } from "./chat-samples";
 import { channelFromInput } from "../twitch/irc";
 import ObsLinks, { overlays, type OverlayId as Scene } from "./ObsLinks";
 import "./editor.css";
@@ -42,22 +44,30 @@ const colorNames: Record<ColorToken, string> = {
 /** Color pickers only take #rrggbb; a theme gradient background shows as black until overridden. */
 const asHex = (c: string) => (/^#[0-9a-fA-F]{6}$/.test(c) ? c : "#000000");
 
-/** Shows a 1920×1080 overlay scaled down to the width it's given. */
-function Preview({ children }: { children: React.ReactNode }) {
+/** Shows an overlay (1920×1080 unless sized) scaled down to the width it's given. */
+function Preview({
+  width = 1920,
+  height = 1080,
+  children,
+}: {
+  width?: number;
+  height?: number;
+  children: React.ReactNode;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
   useLayoutEffect(() => {
     const el = ref.current!;
-    const ro = new ResizeObserver(() => setScale(el.clientWidth / 1920));
+    const ro = new ResizeObserver(() => setScale(el.clientWidth / width));
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [width]);
   return (
     // The preview only repeats the form visually, so screen readers and Tab skip it (no second h1, no duplicate text).
     <div
       className="editor-preview"
       ref={ref}
-      style={{ "--scale": scale } as React.CSSProperties}
+      style={{ "--scale": scale, aspectRatio: `${width} / ${height}` } as React.CSSProperties}
       aria-hidden
       inert
     >
@@ -65,6 +75,60 @@ function Preview({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+/** Whole-number box that lets you type freely and saves only values in range. Shows the saved value again on blur. */
+function NumberField(props: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  describedBy: string;
+  onChange: (n: number) => void;
+}) {
+  const { label, value, min, max, describedBy, onChange } = props;
+  const [text, setText] = useState(String(value));
+  const [shown, setShown] = useState(value);
+  if (value !== shown) {
+    // Changed from outside (load, start over): show the new value.
+    setShown(value);
+    setText(String(value));
+  }
+  const inRange = (t: string) =>
+    t.trim() !== "" && Number.isInteger(Number(t)) && Number(t) >= min && Number(t) <= max;
+  const ok = inRange(text);
+  const errorId = `${describedBy}-${label.replace(/\W+/g, "-").toLowerCase()}`;
+  return (
+    <label>
+      {label}
+      <input
+        type="number"
+        inputMode="numeric"
+        min={min}
+        max={max}
+        step={10}
+        value={text}
+        aria-invalid={!ok}
+        aria-describedby={`${describedBy} ${errorId}`}
+        onChange={(e) => {
+          setText(e.target.value);
+          if (inRange(e.target.value)) onChange(Number(e.target.value));
+        }}
+        onBlur={() => setText(String(value))}
+      />
+      <span id={errorId} className="editor-error" role="alert">
+        {!ok && `Use a whole number from ${min} to ${max}.`}
+      </span>
+    </label>
+  );
+}
+
+const fadeOptions = [
+  [0, "Never"],
+  [15, "15 seconds"],
+  [30, "30 seconds"],
+  [60, "1 minute"],
+  [120, "2 minutes"],
+] as const;
 
 /** Keeps keyboard focus in place when the button that had it disappears (WCAG 2.4.3). Runs after React renders. */
 const focusSoon = (id: string) => requestAnimationFrame(() => document.getElementById(id)?.focus());
@@ -443,6 +507,53 @@ export default function EditorPage() {
             >
               Reset to the usual bots
             </button>
+            <div className="editor-size">
+              <NumberField
+                label="Chat box width"
+                value={settings.chat.width}
+                min={250}
+                max={1920}
+                describedBy="size-hint"
+                onChange={(width) => updateChat({ width })}
+              />
+              <NumberField
+                label="Chat box height"
+                value={settings.chat.height}
+                min={200}
+                max={1080}
+                describedBy="size-hint"
+                onChange={(height) => updateChat({ height })}
+              />
+            </div>
+            <p id="size-hint" className="editor-hint">
+              Enter the same width and height in OBS. They’re shown next to the Chat link.
+            </p>
+            <label>
+              Text size
+              <select
+                value={settings.chat.fontScale}
+                onChange={(e) => updateChat({ fontScale: Number(e.target.value) })}
+              >
+                {[0.75, 1, 1.25, 1.5, 2].map((v) => (
+                  <option key={v} value={v}>
+                    {v * 100}%
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Hide messages after
+              <select
+                value={settings.chat.fadeAfter}
+                onChange={(e) => updateChat({ fadeAfter: Number(e.target.value) })}
+              >
+                {fadeOptions.map(([v, label]) => (
+                  <option key={v} value={v}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </fieldset>
 
           <fieldset>
@@ -550,6 +661,15 @@ export default function EditorPage() {
               ) : (
                 <TextScene scene={scene} settings={settings} />
               )}
+            </Preview>
+          </section>
+          <section className="editor-preview-wrap editor-chat-preview" aria-label="Chat preview">
+            <h2>Preview: Chat (sample messages)</h2>
+            <Preview width={settings.chat.width} height={settings.chat.height}>
+              <ChatView
+                settings={{ ...settings, chat: { ...settings.chat, fadeAfter: 0 } }}
+                messages={chatSamples}
+              />
             </Preview>
           </section>
           <ObsLinks settings={settings} />

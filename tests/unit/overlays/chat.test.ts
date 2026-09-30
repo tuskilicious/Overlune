@@ -39,6 +39,29 @@ describe("ChatView", () => {
   });
 });
 
+describe("ChatView options (T3.5)", () => {
+  it("uses the size, text scale and fade from the settings", () => {
+    const html = renderToStaticMarkup(
+      createElement(ChatView, {
+        settings: {
+          ...defaultSettings,
+          chat: { ...defaultSettings.chat, width: 500, height: 700, fontScale: 1.5, fadeAfter: 30 },
+        },
+        messages: [],
+      }),
+    );
+    expect(html).toContain("width:500px");
+    expect(html).toContain("height:700px");
+    expect(html).toContain("--chat-scale:1.5");
+    expect(html).toContain("--fade-ms:30000ms");
+    expect(html).toContain('data-fade="true"');
+  });
+
+  it("doesn't fade by default", () => {
+    expect(render([])).not.toContain("data-fade");
+  });
+});
+
 describe("readableOn (name colors)", () => {
   const { surface, text } = cleanSlate;
 

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { readableOn } from "../../lib/contrast";
 import type { Settings } from "../../settings/schema";
 import { themes } from "../../themes";
@@ -8,7 +8,8 @@ import { emoteUrl, splitMessage } from "../../twitch/emotes";
 import type { TwitchEvent } from "../../twitch/parse";
 import "./chat.css";
 
-export type ChatMessage = Extract<TwitchEvent, { type: "chat" }>;
+/** A chat event, plus when it arrived (ms) for fade-out. Sample messages have no `at`. */
+export type ChatMessage = Extract<TwitchEvent, { type: "chat" }> & { at?: number };
 
 /** Theme-styled role badges (Helix badge images need a login, docs/STACK.md). Shown in this order. */
 const roles = [
@@ -28,8 +29,21 @@ interface Props {
 /** The chat box, newest message at the bottom. All chat text renders as React text or <img>; never as HTML. */
 export default function ChatView({ settings, messages, error }: Props) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
+  const { width, height, fontScale, fadeAfter } = settings.chat;
+  const style = {
+    ...themeVars(theme),
+    width,
+    height,
+    "--chat-scale": fontScale,
+    "--fade-ms": `${fadeAfter * 1000}ms`,
+  } as CSSProperties;
   return (
-    <div className="chat" data-enter={theme.enter.id} style={themeVars(theme)}>
+    <div
+      className="chat"
+      data-enter={theme.enter.id}
+      data-fade={fadeAfter > 0 || undefined}
+      style={style}
+    >
       {error}
       <ol className="chat-list">
         {messages.map((m) => (

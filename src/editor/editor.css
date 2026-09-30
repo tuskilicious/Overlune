@@ -330,3 +330,20 @@
   font-size: 14px;
   color: var(--accent);
 }
+
+.editor-size {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Chat is narrow: show it smaller than the scene preview, keeping its own shape. */
+.editor-chat-preview .editor-preview {
+  max-width: 280px;
+  background: var(--bg);
+}
+
+.editor-preview > .chat {
+  transform: scale(var(--scale));
+  transform-origin: 0 0;
+}

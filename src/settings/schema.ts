@@ -86,6 +86,13 @@ export const settingsV1 = z.object({
         .array(z.string().regex(/^[a-z0-9_]{1,25}$/, "Bot names use a-z, 0-9 and _"))
         .max(50)
         .default(() => [...defaultBots]),
+      /** Chat box size in px (T3.5). The streamer enters the same numbers in OBS. */
+      width: z.number().int().min(250).max(1920).default(400),
+      height: z.number().int().min(200).max(1080).default(600),
+      /** Text size multiplier (T3.5). */
+      fontScale: z.number().min(0.75).max(2).default(1),
+      /** Seconds before a message fades away; 0 keeps messages (T3.5). */
+      fadeAfter: z.number().int().min(0).max(600).default(0),
     })
     .prefault({}),
   /** "Advanced" overrides on top of the theme (T2.7). Empty means the theme as designed. */
