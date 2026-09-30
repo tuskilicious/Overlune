@@ -51,6 +51,8 @@ export const settingsV1 = z.object({
       doneText: text(60, "Starting now!"),
     })
     .prefault({}),
+  brb: z.object({ title: text(60, "Be right back"), subtitle: text(120) }).prefault({}),
+  ending: z.object({ title: text(60, "Thanks for watching!"), subtitle: text(120) }).prefault({}),
 });
 
 export type Settings = z.output<typeof settingsV1>;
