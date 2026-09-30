@@ -104,3 +104,23 @@ test("saved link still works: v1/alerts.json", async ({ page }) => {
   await expect.poll(twitch.joins).toBe(1);
   await expect(page.getByRole("status")).toHaveCount(0);
 });
+
+test("each alert plays the theme sound, served from this site", async ({ page }) => {
+  const twitch = await fakeTwitch(page);
+  await page.goto(link({ chat: { channel: "dallas" } }));
+  const sound = page.waitForResponse(/\/sounds\/clean-slate\.ogg$/);
+  await twitch.send(raid("Raider", 3));
+  const response = await sound;
+  expect([200, 206]).toContain(response.status()); // media loads with range requests
+  expect(response.headers()["content-type"]).toMatch(/ogg/);
+});
+
+test("volume 0 plays no sound", async ({ page }) => {
+  const requests: string[] = [];
+  page.on("request", (r) => requests.push(r.url()));
+  const twitch = await fakeTwitch(page);
+  await page.goto(link({ chat: { channel: "dallas" }, alerts: { volume: 0 } }));
+  await twitch.send(raid("Raider", 3));
+  await expect(box(page)).toBeVisible();
+  expect(requests.filter((u) => u.includes("/sounds/"))).toEqual([]);
+});

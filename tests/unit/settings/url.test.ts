@@ -40,6 +40,7 @@ const sample: Settings = {
       subgift: "{user} gave {amount}",
       bits: "{user} {amount} bits",
     },
+    volume: 40,
   },
   advanced: {
     colors: { accent: "#ff2bd6", surface: "#101010" },
@@ -266,5 +267,17 @@ describe("alert templates (T4.3)", () => {
     expect(ok).toBe(false);
     expect(settings.alerts.templates).toEqual(defaultTemplates);
     expect(settings.brb.title).toBe("Kept");
+  });
+});
+
+describe("alert volume (T4.4)", () => {
+  it("defaults to 70% for older links", () => {
+    expect(decode(raw({ alerts: { templates: {} } })).settings.alerts.volume).toBe(70);
+  });
+
+  it.each([-1, 101, 50.5, "loud"])("rejects %j", (volume) => {
+    const { settings, ok } = decode(raw({ alerts: { volume } }));
+    expect(ok).toBe(false);
+    expect(settings.alerts.volume).toBe(70);
   });
 });

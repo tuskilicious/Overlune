@@ -582,6 +582,27 @@ export default function EditorPage() {
               Alerts use your channel name from Chat. In each message, {"{user}"} becomes their name
               and {"{amount}"} the number. {"{s}"} adds an “s” unless the number is 1.
             </p>
+            <label>
+              Alert volume: {settings.alerts.volume}%
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={settings.alerts.volume}
+                aria-describedby="volume-hint"
+                onChange={(e) =>
+                  setSettings((s) => ({
+                    ...s,
+                    alerts: { ...s.alerts, volume: Number(e.target.value) },
+                  }))
+                }
+              />
+            </label>
+            <p id="volume-hint" className="editor-hint">
+              0% turns the sound off. In OBS, tick “Control audio via OBS” on the Alerts source so
+              your viewers hear it.
+            </p>
             {alertFields.map(([kind, label]) => (
               <label key={kind}>
                 {label}

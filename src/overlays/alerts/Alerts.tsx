@@ -1,8 +1,10 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useLocation } from "react-router";
 import { createAlertMapper, testAlerts, type AlertEvent } from "../../alerts/events";
 import { createAlertQueue } from "../../alerts/queue";
+import { playSound } from "../../alerts/sound";
 import type { Settings } from "../../settings/schema";
+import { themes } from "../../themes";
 import { connectChat, type ChatStatus } from "../../twitch/irc";
 import OverlayError from "../OverlayError";
 import AlertView from "./AlertView";
@@ -13,11 +15,22 @@ export default function Alerts({ settings, error }: { settings: Settings; error?
   const test = new URLSearchParams(useLocation().search).get("test") === "1";
   const [alert, setAlert] = useState<AlertEvent | null>(null);
   const [status, setStatus] = useState<ChatStatus>("connecting");
+  // Read through a ref so changing the sound or volume never reconnects.
+  const sound = { file: themes[settings.theme].alertSound, volume: settings.alerts.volume };
+  const soundRef = useRef(sound);
+  useEffect(() => {
+    soundRef.current = sound;
+  });
 
   useEffect(() => {
-    const queue = createAlertQueue(setAlert);
+    const queue = createAlertQueue((a) => {
+      setAlert(a);
+      const { file, volume } = soundRef.current;
+      if (a && file) playSound(file, volume);
+    });
     const toAlert = createAlertMapper();
-    if (test) testAlerts.forEach((a) => queue.push(a));
+    // A tick later, so an effect that is set up and torn down at once (React dev mode) plays nothing.
+    const testTimer = test ? setTimeout(() => testAlerts.forEach((a) => queue.push(a))) : undefined;
     const stop = connectChat(channel, {
       onStatus: setStatus,
       onEvent: (e) => {
@@ -27,6 +40,7 @@ export default function Alerts({ settings, error }: { settings: Settings; error?
     });
     return () => {
       stop();
+      clearTimeout(testTimer);
       queue.stop();
     };
   }, [channel, test]);

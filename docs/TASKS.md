@@ -84,7 +84,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *`createAlertQueue(onChange)` in `src/alerts/queue.ts`: 5 s per alert, 0.5 s gap, first come first served, at most 30 waiting (extras dropped and counted), `stop()` for unmount. Used by the `/o/alerts` overlay from T4.3.*
 - [x] **T4.3 Alert templates** with `{user}` and `{amount}` variables. Values are escaped.
   - *Passed in OBS 32 (2026-10-01). `fillTemplate` in `src/alerts/templates.ts` (also `{s}` for plurals); everything renders as React text. New v1 field `alerts.templates` (defaults; fixture `v1/alerts.json`). Built the `/o/alerts` overlay (1920×1080, box centered top, uses the Chat channel), editor fields and an Alerts link row. New public link flag `?test=1` plays one sample of each alert (documented in STACK.md); the editor will offer it in T4.5.*
-- [ ] **T4.4 Sound playback,** with a volume setting and licensed default sounds recorded in `ASSETS.md`.
+- [x] **T4.4 Sound playback,** with a volume setting and licensed default sounds recorded in `ASSETS.md`.
+  - *Passed in OBS 32 (2026-10-01). `playSound` in `src/alerts/sound.ts` (an `<audio>` element, never throws). Clean Slate plays Kenney Interface Sounds `confirmation_002` (CC0) as `public/sounds/clean-slate.ogg`. New v1 field `alerts.volume` (0–100, default 70; fixture `v1/alerts-volume.json`) with an editor slider. Custom sounds were asked for and skipped for now: an upload needs a backend (v2), and an https sound link would need the CSP `media-src` widened.*
 - [ ] **T4.5 Test buttons in the editor** that trigger alerts in the preview. Follows and donations are shown as "coming soon".
 - [ ] **T4.6 OBS test,** including "Control audio via OBS".
 

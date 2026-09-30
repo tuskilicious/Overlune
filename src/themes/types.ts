@@ -40,7 +40,7 @@ export interface Theme {
   enter: Anim;
   exit: Anim;
   alertAnim: AlertAnimId;
-  /** File in public/sounds (licensed, see docs/ASSETS.md). null until T4.4 ships sounds. */
+  /** File in public/sounds (licensed, see docs/ASSETS.md), or null for a silent theme. */
   alertSound: string | null;
   badgeStyle: BadgeStyle;
 }

@@ -116,6 +116,8 @@ export const settingsV1 = z.object({
           bits: text(100, defaultTemplates.bits),
         })
         .prefault({}),
+      /** Alert sound volume in percent; 0 is silent (T4.4). */
+      volume: z.number().int().min(0).max(100).default(70),
     })
     .prefault({}),
   /** "Advanced" overrides on top of the theme (T2.7). Empty means the theme as designed. */

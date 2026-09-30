@@ -10,7 +10,10 @@ describe("AlertView", () => {
       createElement(AlertView, {
         settings: {
           ...defaultSettings,
-          alerts: { templates: { ...defaultSettings.alerts.templates, sub: "<b>{user}</b>" } },
+          alerts: {
+            ...defaultSettings.alerts,
+            templates: { ...defaultSettings.alerts.templates, sub: "<b>{user}</b>" },
+          },
         },
         alert: {
           kind: "sub",

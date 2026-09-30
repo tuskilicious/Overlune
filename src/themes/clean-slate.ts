@@ -20,6 +20,6 @@ export const cleanSlate: Theme = {
   enter: { id: "slide-fade", durationMs: 300 },
   exit: { id: "slide-fade", durationMs: 300 },
   alertAnim: "slide-fade",
-  alertSound: null,
+  alertSound: "clean-slate.ogg",
   badgeStyle: "pill",
 };
