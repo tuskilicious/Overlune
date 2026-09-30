@@ -17,14 +17,17 @@ interface Props {
   settings: Settings;
   title: string;
   subtitle: string;
+  /** Shown above the content (e.g. <OverlayError />), which moves down to make room. */
+  error?: ReactNode;
   children?: ReactNode;
 }
 
 /** Shared 1920×1080 scene layout for Starting Soon, BRB and Stream Ending. */
-export default function SceneFrame({ settings, title, subtitle, children }: Props) {
+export default function SceneFrame({ settings, title, subtitle, error, children }: Props) {
   const theme = themes[settings.theme];
   return (
     <div className="scene" data-enter={theme.enter.id} style={themeVars(theme)}>
+      {error}
       <div className="scene-main">
         {settings.logo && <img className="scene-logo" src={settings.logo} alt="Channel logo" />}
         <h1 className="scene-title">{title}</h1>
