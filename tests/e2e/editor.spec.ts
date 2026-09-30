@@ -175,6 +175,47 @@ test("start over asks first, then resets to the defaults", async ({ page }) => {
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Starting soon");
 });
 
+test("Advanced starts closed, and overrides reach the preview and the OBS link", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  const titleColor = page.getByLabel("Titles");
+  await expect(titleColor).toBeHidden();
+  await page.getByText("Advanced: colors and fonts").click();
+  await expect(titleColor).toHaveValue("#e8eaed");
+
+  await titleColor.fill("#ff2bd6");
+  await page.getByLabel("Heading font").selectOption("Orbitron");
+  const title = preview(page).getByRole("heading", { name: "Starting soon", exact: true });
+  await expect(title).toHaveCSS("color", "rgb(255, 43, 214)");
+  await expect(title).toHaveCSS("font-family", /^"?Orbitron/);
+
+  await page.getByRole("button", { name: "Copy Starting Soon link" }).click();
+  await page.goto(await page.evaluate(() => navigator.clipboard.readText()));
+  await expect(page.getByRole("heading", { name: "Starting soon" })).toHaveCSS(
+    "color",
+    "rgb(255, 43, 214)",
+  );
+  await expect(page.getByRole("status")).toHaveCount(0);
+});
+
+test("hard-to-read colors show a warning, and reset brings the theme back", async ({ page }) => {
+  await page.getByText("Advanced: colors and fonts").click();
+  const warning = page.getByRole("status").filter({ hasText: "hard to read" });
+  await page.getByLabel("Text", { exact: true }).fill("#20232a");
+  await expect(warning).toBeVisible();
+
+  await page.getByRole("button", { name: "Reset Text to the theme" }).click();
+  await expect(warning).toHaveCount(0);
+  await expect(page.getByLabel("Text", { exact: true })).toHaveValue("#e8eaed");
+
+  await page.getByLabel("Titles").fill("#00ff00");
+  await page.getByRole("button", { name: "Reset all to the theme" }).click();
+  await expect(page.getByLabel("Titles")).toHaveValue("#e8eaed");
+  await expect(page.getByRole("button", { name: /^Reset (?!all).* to the theme$/ })).toHaveCount(0);
+});
+
 test("a copied link opens the overlay with the editor's settings", async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.getByRole("radio", { name: "Be Right Back" }).check();

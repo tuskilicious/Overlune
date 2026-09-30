@@ -162,6 +162,52 @@
   align-self: end;
 }
 
+.editor-advanced {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.editor-advanced summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 8px 0;
+}
+
+.editor-advanced[open] {
+  gap: 12px;
+}
+
+.editor .editor-hint {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.editor-color {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.editor .editor-color label {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.editor input[type="color"] {
+  width: 44px;
+  height: 32px;
+  padding: 2px;
+  cursor: pointer;
+}
+
+.editor-advanced > button {
+  margin-top: 12px;
+}
+
 .editor-error {
   margin: 0;
   min-height: 1em;
