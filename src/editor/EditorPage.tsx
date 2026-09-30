@@ -4,6 +4,7 @@ import { isHttpsUrl } from "../lib/url-safety";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
 import { defaultSettings, socialPlatforms, type Settings } from "../settings/schema";
+import { loadSaved, save } from "../settings/storage";
 import { decodeLink, encode } from "../settings/url";
 import { themes } from "../themes";
 import { cleanSlate } from "../themes/clean-slate";
@@ -48,27 +49,50 @@ const loadedMessage = (ok: boolean) =>
     ? "Loaded! You can keep editing."
     : "Loaded, but some settings couldn’t be read, so defaults are showing for those.";
 
+const freshSettings = (): Settings => ({
+  ...defaultSettings,
+  starting: { ...defaultSettings.starting, tz: browserTz },
+});
+
+/** Where the editor starts: a link in the address wins, then this browser's autosave, then defaults. */
+function initialState(): { settings: Settings; status: string } {
+  const fromUrl = decodeLink(location.hash);
+  if (fromUrl) return { settings: fromUrl.settings, status: loadedMessage(fromUrl.ok) };
+  const saved = loadSaved();
+  if (saved)
+    return {
+      settings: saved.settings,
+      status: saved.ok
+        ? "Welcome back! We restored your last overlay from this browser."
+        : "Welcome back! Some saved settings couldn’t be read, so defaults are showing for those.",
+    };
+  return { settings: freshSettings(), status: "" };
+}
+
 export default function EditorPage() {
-  // A bookmarked editor link (/#1.…) opens with its settings.
-  const [fromUrl] = useState(() => decodeLink(location.hash));
-  const [settings, setSettings] = useState<Settings>(
-    () =>
-      fromUrl?.settings ?? {
-        ...defaultSettings,
-        starting: { ...defaultSettings.starting, tz: browserTz },
-      },
-  );
+  const [initial] = useState(initialState);
+  const [settings, setSettings] = useState<Settings>(initial.settings);
   const [scene, setScene] = useState<Scene>("starting");
   // Kept apart from settings so a half-typed or unsafe link never reaches the preview.
   const [logoInput, setLogoInput] = useState(settings.logo);
   const [loadText, setLoadText] = useState("");
-  const [loadStatus, setLoadStatus] = useState(fromUrl ? loadedMessage(fromUrl.ok) : "");
+  const [loadStatus, setLoadStatus] = useState(initial.status);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   // The address bar always holds the current settings, so bookmarking the editor saves the work.
   // replaceState: no history entry per keystroke. Sentry strips the fragment (lib/sentry-scrub.ts).
   useEffect(() => {
     history.replaceState(history.state, "", `#${encode(settings)}`);
+    save(settings);
   }, [settings]);
+
+  const startOver = () => {
+    const fresh = freshSettings();
+    setSettings(fresh);
+    setLogoInput(fresh.logo);
+    setConfirmReset(false);
+    setLoadStatus("Started over. Any link you kept still loads your old overlay.");
+  };
 
   const load = () => {
     const result = decodeLink(loadText);
@@ -106,7 +130,7 @@ export default function EditorPage() {
         <p>
           Overlune has no accounts. Your overlay lives in its link.{" "}
           <strong>Bookmark this page</strong> or keep any of your OBS links, and paste it below to
-          keep editing.
+          keep editing. Changes also save in this browser automatically.
         </p>
         <form
           className="editor-load"
@@ -128,6 +152,25 @@ export default function EditorPage() {
         <p className="editor-load-status" role="status">
           {loadStatus}
         </p>
+        {confirmReset ? (
+          <div className="editor-reset" role="group" aria-labelledby="reset-question">
+            <span id="reset-question">
+              Clear everything and start from the defaults? Keep your link first if you might want
+              it back.
+            </span>
+            <button type="button" onClick={startOver}>
+              Yes, start over
+            </button>
+            {/* Focus lands on the safe choice. */}
+            <button type="button" autoFocus onClick={() => setConfirmReset(false)}>
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <button type="button" onClick={() => setConfirmReset(true)}>
+            Start over
+          </button>
+        )}
       </section>
 
       <div className="editor-body">

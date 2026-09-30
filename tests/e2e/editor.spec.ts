@@ -89,6 +89,7 @@ test("an old link loads back into the editor", async ({ page, context }) => {
   await page.getByRole("button", { name: "Copy Be Right Back link" }).click();
   const link = await page.evaluate(() => navigator.clipboard.readText());
 
+  await page.evaluate(() => localStorage.clear()); // a different browser, no autosave
   await page.goto("/");
   await page.getByRole("radio", { name: "Be Right Back" }).check();
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Be right back");
@@ -125,6 +126,53 @@ test("the editor's own address saves the work, so reload or a bookmark keeps it"
   await page.reload();
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Bookmarked title");
   await expect(page.getByRole("status").filter({ hasText: "Loaded!" })).toBeVisible();
+});
+
+test("autosave restores the last overlay when the editor opens without a link", async ({
+  page,
+}) => {
+  await page.getByLabel("Title", { exact: true }).fill("Autosaved title");
+  await page.goto("about:blank");
+  await page.goto("/");
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Autosaved title");
+  await expect(page.getByRole("status").filter({ hasText: "Welcome back!" })).toBeVisible();
+});
+
+test("a link in the address wins over the autosave", async ({ page }) => {
+  await page.getByLabel("Title", { exact: true }).fill("From the link");
+  const link = page.url();
+  await page.getByLabel("Title", { exact: true }).fill("Autosaved later");
+  await page.goto("about:blank");
+  await page.goto(link);
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("From the link");
+});
+
+test("the editor still works when browser storage is blocked", async ({ page }) => {
+  await page.addInitScript(() => {
+    const blocked = () => {
+      throw new DOMException("blocked", "SecurityError");
+    };
+    Storage.prototype.getItem = blocked;
+    Storage.prototype.setItem = blocked;
+  });
+  await page.goto("/");
+  await page.getByLabel("Title", { exact: true }).fill("Still works");
+  await expect(preview(page).getByRole("heading", { name: "Still works" })).toBeVisible();
+});
+
+test("start over asks first, then resets to the defaults", async ({ page }) => {
+  await page.getByLabel("Title", { exact: true }).fill("Old title");
+  await page.getByRole("button", { name: "Start over" }).click();
+  await expect(page.getByRole("button", { name: "Cancel" })).toBeFocused();
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Old title");
+
+  await page.getByRole("button", { name: "Start over" }).click();
+  await page.getByRole("button", { name: "Yes, start over" }).click();
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Starting soon");
+  await page.goto("about:blank");
+  await page.goto("/");
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Starting soon");
 });
 
 test("a copied link opens the overlay with the editor's settings", async ({ page, context }) => {
