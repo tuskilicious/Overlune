@@ -74,3 +74,24 @@ test("the preview runs the real overlay, countdown included", async ({ page }) =
   await expect(preview(page).locator(".countdown-time")).toHaveText(/^\d{2}:\d{2}$|^1:00:00$/);
   await expect(preview(page).getByText(/^Starts at .* UTC$/)).toBeVisible();
 });
+
+test("each overlay link shows the size to enter in OBS", async ({ page }) => {
+  const rows = page.getByRole("region", { name: "Links to paste into OBS" }).getByRole("listitem");
+  await expect(rows).toHaveCount(3);
+  for (const row of await rows.all()) await expect(row).toContainText("Width 1920 · Height 1080");
+});
+
+test("a copied link opens the overlay with the editor's settings", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.getByRole("radio", { name: "Be Right Back" }).check();
+  await page.getByLabel("Title", { exact: true }).fill("Grabbing snacks");
+
+  await page.getByRole("button", { name: "Copy Be Right Back link" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Copied!" })).toBeVisible();
+  const link = await page.evaluate(() => navigator.clipboard.readText());
+  expect(link).toMatch(/\/o\/brb#1\./);
+
+  await page.goto(link);
+  await expect(page.getByRole("heading", { name: "Grabbing snacks" })).toBeVisible();
+  await expect(page.getByRole("status")).toHaveCount(0);
+});

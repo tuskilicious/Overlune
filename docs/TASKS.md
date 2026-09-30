@@ -50,7 +50,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *Also covers countdown end time + time zone, socials and logo link (no other task had them). Preview uses `SceneFrame` directly, so no countdown yet; T2.3 splits the scenes into route + view and shows the real overlay. Editor tests are Playwright (`tests/e2e/editor.spec.ts`), so Testing Library/jsdom were not added.*
 - [x] **T2.3 Live preview** that renders the overlay components directly (same code as OBS).
   - *Passed in OBS 32 (2026-09-30). `FromLink` reads the link for overlay routes; `StartingSoon`/`TextScene` take `settings` as props, so the editor preview renders them directly, countdown included.*
-- [ ] **T2.4 "Link to paste into OBS" panel:** copy button and width × height shown for each overlay.
+- [x] **T2.4 "Link to paste into OBS" panel:** copy button and width × height shown for each overlay.
+  - *`src/editor/ObsLinks.tsx`. Sizes live in its `overlays` table, so chat and alerts add a row there. If copying is blocked, the link is selected and "Press Ctrl+C to copy" shows. No `?rm=1` toggle; the setup guide (T5.3) can mention it.*
 - [ ] **T2.5 "Load my overlay from a link"** and "Your link is your save file" messaging.
 - [ ] **T2.6 Local autosave** (localStorage, wrapped in try/catch). The editor still works without it.
 - [ ] **T2.7 Advanced section** for color and font overrides, collapsed by default.

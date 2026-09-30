@@ -8,16 +8,10 @@ import { themes } from "../themes";
 import { cleanSlate } from "../themes/clean-slate";
 import { themeIds } from "../themes/types";
 import { themeVars } from "../themes/vars";
+import ObsLinks, { overlays, type OverlayId as Scene } from "./ObsLinks";
 import "./editor.css";
 
-type Scene = "starting" | "brb" | "ending";
 type Platform = (typeof socialPlatforms)[number];
-
-const sceneNames: Record<Scene, string> = {
-  starting: "Starting Soon",
-  brb: "Be Right Back",
-  ending: "Stream Ending",
-};
 
 const platformNames: Record<Platform, string> = {
   twitch: "Twitch",
@@ -102,7 +96,7 @@ export default function EditorPage() {
           <fieldset>
             <legend>Scene to edit</legend>
             <div className="editor-scenes">
-              {(Object.keys(sceneNames) as Scene[]).map((id) => (
+              {(Object.keys(overlays) as Scene[]).map((id) => (
                 <label key={id}>
                   <input
                     type="radio"
@@ -111,14 +105,14 @@ export default function EditorPage() {
                     checked={scene === id}
                     onChange={() => setScene(id)}
                   />
-                  {sceneNames[id]}
+                  {overlays[id].name}
                 </label>
               ))}
             </div>
           </fieldset>
 
           <fieldset>
-            <legend>{sceneNames[scene]} text</legend>
+            <legend>{overlays[scene].name} text</legend>
             <label>
               Title
               <input
@@ -251,16 +245,19 @@ export default function EditorPage() {
           </fieldset>
         </form>
 
-        <section className="editor-preview-wrap" aria-label="Preview">
-          <h2>Preview: {sceneNames[scene]}</h2>
-          <Preview>
-            {scene === "starting" ? (
-              <StartingSoon settings={settings} />
-            ) : (
-              <TextScene scene={scene} settings={settings} />
-            )}
-          </Preview>
-        </section>
+        <div className="editor-side">
+          <section className="editor-preview-wrap" aria-label="Preview">
+            <h2>Preview: {overlays[scene].name}</h2>
+            <Preview>
+              {scene === "starting" ? (
+                <StartingSoon settings={settings} />
+              ) : (
+                <TextScene scene={scene} settings={settings} />
+              )}
+            </Preview>
+          </section>
+          <ObsLinks settings={settings} />
+        </div>
       </div>
     </div>
   );
