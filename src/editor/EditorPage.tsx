@@ -25,6 +25,7 @@ import { channelFromInput } from "../twitch/irc";
 import AlertTester from "./AlertTester";
 import ObsLinks, { overlays, type OverlayId as Scene } from "./ObsLinks";
 import Preview from "./Preview";
+import SiteFooter from "../components/SiteFooter";
 import "./editor.css";
 
 type Platform = (typeof socialPlatforms)[number];
@@ -707,6 +708,7 @@ export default function EditorPage() {
           <ObsLinks settings={settings} />
         </div>
       </div>
+      <SiteFooter />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import SiteFooter from "../components/SiteFooter";
 import { defaultSettings } from "../settings/schema";
 import { cleanSlate } from "../themes/clean-slate";
 import "../themes/fonts";
@@ -198,6 +199,7 @@ export default function SetupGuide() {
           </ol>
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }

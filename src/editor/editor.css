@@ -375,3 +375,21 @@
 .editor-alert-tester .editor-hint {
   margin: 8px 0 0;
 }
+
+/* Footer on the editor and guide pages (SiteFooter). */
+.site-footer {
+  margin-top: 48px;
+  padding-top: 16px;
+  border-top: var(--border);
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.site-footer ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
