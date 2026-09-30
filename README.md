@@ -62,6 +62,9 @@ npm run test:e2e     # overlay smoke tests (Playwright)
 ```
 Also test every overlay inside OBS. See `docs/OBS-TESTING.md`.
 
+### Updating screenshot baselines
+Screenshot tests (`*.visual.spec.ts`) only run on Linux, because fonts render differently on Windows and macOS. CI is the source of truth. When a screenshot test fails in CI, download the `playwright-results` artifact from the run to see the expected, actual and diff images. If the change was intended, copy the actual image over the baseline in `tests/e2e/*.visual.spec.ts-snapshots/` and commit it. A new screenshot test fails once in CI and writes its baseline into the same artifact.
+
 ## Deploy
 Cloudflare Pages:
 - Every PR gets a preview deploy (staging).
