@@ -23,7 +23,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
 - [ ] **T0.9 Owner setup:** turn on 2FA for GitHub, Cloudflare and Sentry, and enable GitHub secret scanning with push protection. *Owner does this.*
 
 ## Phase 1: Week 1, one scene working in OBS
-- [ ] **T1.1 Theme types + Clean Slate theme** per `docs/DESIGN.md`. Self-host fonts and record them in `docs/ASSETS.md`.
+- [x] **T1.1 Theme types + Clean Slate theme** per `docs/DESIGN.md`. Self-host fonts and record them in `docs/ASSETS.md`.
+  - *Contrast test covers every theme. Token→CSS variable helper deferred to T1.3 (first consumer).*
 - [ ] **T1.2 Settings v1 schema** (zod) and URL encode/decode (`#1.<lz-string>`).
   - Accept: unit tests cover a round trip, invalid input falling back to defaults, a `javascript:` logo URL being rejected, and very long text being truncated.
 - [ ] **T1.3 Starting Soon overlay:** title, subtitle, socials row, and a countdown to a fixed end time with the timezone shown. At zero it shows a custom message.

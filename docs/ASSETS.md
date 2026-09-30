@@ -4,4 +4,4 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 
 | Asset | Type | Used in | Source URL | License | Attribution required? | Added |
 |---|---|---|---|---|---|---|
-| _example: Inter_ | font | Clean Slate, editor | https://fontsource.org/fonts/inter | SIL OFL 1.1 | No | YYYY-MM-DD |
+| Inter (`@fontsource/inter` 5.3.0, weights 400/600/700) | font | Clean Slate, editor | https://fontsource.org/fonts/inter | SIL OFL 1.1 | No | 2026-09-30 |
