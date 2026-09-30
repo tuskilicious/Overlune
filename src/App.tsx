@@ -4,6 +4,7 @@ import { sentryEnvironment } from "./lib/sentry";
 import EditorPage from "./editor/EditorPage";
 import OverlayPlaceholder from "./overlays/OverlayPlaceholder";
 import StartingSoon from "./overlays/starting/StartingSoon";
+import TextScene from "./overlays/TextScene";
 import SentryTestPage from "./components/SentryTestPage";
 
 // Lets Sentry name page-load/navigation traces by route (e.g. /o/:overlay).
@@ -18,6 +19,8 @@ export default function App() {
       <SentryRoutes>
         <Route path="/" element={<EditorPage />} />
         <Route path="/o/starting" element={<StartingSoon />} />
+        <Route path="/o/brb" element={<TextScene scene="brb" />} />
+        <Route path="/o/ending" element={<TextScene scene="ending" />} />
         <Route path="/o/:overlay" element={<OverlayPlaceholder />} />
         {showSentryTest && <Route path="/_sentry-test" element={<SentryTestPage />} />}
       </SentryRoutes>

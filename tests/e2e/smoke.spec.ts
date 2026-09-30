@@ -55,3 +55,20 @@ test("one bad field shows the error card but keeps the rest", async ({ page }) =
   await expect(page.getByRole("heading", { name: "Back in a bit" })).toBeVisible();
   await expect(page.locator("img")).toHaveCount(0);
 });
+
+for (const [route, heading] of [
+  ["brb", "Be right back"],
+  ["ending", "Thanks for watching!"],
+] as const) {
+  test(`${route} overlay renders its default title`, async ({ page }) => {
+    await page.goto(`/o/${route}`);
+    await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+    await expect(page.getByRole("status")).toHaveCount(0);
+  });
+
+  test(`${route} overlay shows the error card for a damaged link`, async ({ page }) => {
+    await page.goto(`/o/${route}#1.garbage`);
+    await expect(page.getByRole("status")).toContainText("This overlay link has a problem");
+    await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+  });
+}

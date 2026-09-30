@@ -16,6 +16,8 @@ const sample: Settings = {
     tz: "Asia/Kolkata",
     doneText: "Here we go",
   },
+  brb: { title: "Snack break", subtitle: "Back in 5" },
+  ending: { title: "GG!", subtitle: "Raiding a friend" },
 };
 
 describe("settings link", () => {
@@ -23,6 +25,14 @@ describe("settings link", () => {
     const hash = encode(sample);
     expect(hash).toMatch(/^1\./);
     expect(decode(`#${hash}`)).toEqual({ settings: sample, ok: true });
+  });
+
+  it("fills in BRB and Ending defaults for links made before those scenes existed", () => {
+    const { settings, ok } = decode(raw({ starting: { title: "Old link" } }));
+    expect(ok).toBe(true);
+    expect(settings.starting.title).toBe("Old link");
+    expect(settings.brb).toEqual(defaultSettings.brb);
+    expect(settings.ending).toEqual(defaultSettings.ending);
   });
 
   it("uses defaults for an empty hash without flagging an error", () => {
