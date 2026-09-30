@@ -9,6 +9,10 @@
   font-family: var(--font-body);
 }
 
+:where(.editor) a {
+  color: var(--accent);
+}
+
 .editor-header h1 {
   margin: 0;
   font-family: var(--font-heading);

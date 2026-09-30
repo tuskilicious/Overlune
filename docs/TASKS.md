@@ -96,7 +96,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *Passed in OBS 32 (2026-10-01), CPU ~2%. `src/themes/neon-grid.ts`: scrolling perspective grid with a glowing horizon (`bgEffect: "grid"`, transform-only), glitch-in alerts (`alertAnim: "glitch"`), Kenney Sci-Fi `forceField_000` (CC0) as `neon-grid.ogg`. New theme token `shadow` (surface glow; Cozy Café will reuse it for soft shadows). Fixture `v1/neon-grid.json`. Screenshot baseline for the theme left for later (Linux-only baselines).*
 - [x] **T5.2 Cozy Café theme.**
   - *Passed in OBS 32 (2026-10-01), CPU ~2%. `src/themes/cozy-cafe.ts`: rising steam wisps (`bgEffect: "steam"`, transform/opacity only), `bounce` entrance for scenes, chat and alerts, soft `shadow`, Kenney Interface `glass_004` (CC0) as `cozy-cafe.ogg`. Accent darkened to `#9C5A2C` (the suggested `#D98E5A` failed AA on the surface). Fixture `v1/cozy-cafe.json`. Screenshot baseline left for later (Linux-only baselines).*
-- [ ] **T5.3 Setup guide page** for OBS and Streamlabs, with screenshots: Browser Source, sizes, black box fix, blank chat fix, audio.
+- [x] **T5.3 Setup guide page** for OBS and Streamlabs, with screenshots: Browser Source, sizes, black box fix, blank chat fix, audio.
+  - *Done 2026-10-01. `/guide` (`src/editor/SetupGuide.tsx`), linked from "Links to paste into OBS". Sizes table comes from the editor's `overlays` list (e2e checks they match). Four OBS 32 screenshots by the owner in `public/guide/` (recorded in ASSETS.md); e2e checks they load. **Left for later:** Streamlabs screenshots (the Streamlabs section is text only).*
 - [ ] **T5.4 Legal drafts** in `docs/legal/` (privacy policy and terms) plus footer links and a contact email. *Needs review.*
 - [ ] **T5.5 README complete:** what it is, setup, env var names, run, test, deploy.
 - [ ] **T5.6 Pre-launch checklist** in CLAUDE.md, all items checked.

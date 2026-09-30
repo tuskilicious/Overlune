@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Link } from "react-router";
 import type { Settings } from "../settings/schema";
 import { encode } from "../settings/url";
 
@@ -66,7 +67,7 @@ export default function ObsLinks({ settings }: { settings: Settings }) {
       <h2 id="links-heading">Links to paste into OBS</h2>
       <p>
         In OBS, add a <strong>Browser</strong> source, paste the link, and enter the width and
-        height shown.
+        height shown. New to OBS? Follow the <Link to="/guide">step-by-step setup guide</Link>.
       </p>
       <ul>
         {links.map((l) => (

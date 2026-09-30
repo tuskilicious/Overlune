@@ -1,0 +1,60 @@
+/* Setup guide (/guide): the editor's Clean Slate chrome, laid out for reading. */
+.guide main {
+  max-width: 760px;
+  line-height: 1.6;
+}
+
+.guide section {
+  margin-bottom: 32px;
+}
+
+.guide h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-size: 22px;
+}
+
+.guide li {
+  margin-bottom: 6px;
+}
+
+.guide-shot {
+  margin: 16px 0;
+}
+
+.guide-shot img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: var(--border);
+  border-radius: var(--radius);
+}
+
+.guide-sizes {
+  margin: 16px 0;
+  border-collapse: collapse;
+  background: var(--surface);
+}
+
+.guide-sizes caption {
+  padding-bottom: 8px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.guide-sizes th,
+.guide-sizes td {
+  padding: 8px 16px;
+  border-bottom: var(--border);
+  text-align: left;
+}
+
+.guide-note {
+  color: var(--text-muted);
+}
+
+.guide-shot figcaption {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
