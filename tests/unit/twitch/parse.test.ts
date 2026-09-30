@@ -77,6 +77,8 @@ describe("USERNOTICE", () => {
       months: 1,
       recipient: undefined,
       viewers: 0,
+      giftCount: 0,
+      giftId: undefined,
     });
   });
 
@@ -102,6 +104,19 @@ describe("USERNOTICE", () => {
       recipient: "Mr_Woodchuck",
       months: 1,
       channel: "forstycup",
+    });
+  });
+
+  it("parses a gift bomb and links its gifts by id", () => {
+    const bomb = parseLine(
+      "@badge-info=;badges=subscriber/12;color=#8A2BE2;display-name=GenerousGal;emotes=;id=a1b2c3d4-0000-4000-8000-000000000001;login=generousgal;mod=0;msg-id=submysterygift;msg-param-community-gift-id=4412835412356789012;msg-param-mass-gift-count=5;msg-param-origin-id=4412835412356789012;msg-param-sender-count=25;msg-param-sub-plan=1000;room-id=12345678;subscriber=1;system-msg=GenerousGal\\sis\\sgifting\\s5\\sTier\\s1\\sSubs\\sto\\sdallas's\\scommunity!;tmi-sent-ts=1700000000000;user-id=5551234;user-type= :tmi.twitch.tv USERNOTICE #dallas",
+    );
+    expect(bomb).toMatchObject({
+      kind: "giftbomb",
+      msgId: "submysterygift",
+      displayName: "GenerousGal",
+      giftCount: 5,
+      giftId: "4412835412356789012",
     });
   });
 

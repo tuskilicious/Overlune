@@ -12,7 +12,8 @@ export interface EmoteRange {
   end: number;
 }
 
-export type SubKind = "sub" | "resub" | "subgift" | "raid" | "other";
+/** `giftbomb` is Twitch's `submysterygift`: "X is gifting N subs", followed by N `subgift` notices. */
+export type SubKind = "sub" | "resub" | "subgift" | "giftbomb" | "raid" | "other";
 
 export type TwitchEvent =
   | {
@@ -47,6 +48,10 @@ export type TwitchEvent =
       recipient?: string;
       /** raid only: how many viewers came along. */
       viewers: number;
+      /** giftbomb only: how many subs are being gifted. */
+      giftCount: number;
+      /** giftbomb and the subgifts it causes share this id, so the gifts can be grouped. */
+      giftId?: string;
     }
   | { type: "clearmsg"; channel: string; targetId: string }
   /** `login` set: one user was timed out or banned. Unset: the whole chat was cleared. */
@@ -143,6 +148,7 @@ const SUB_KINDS: Record<string, SubKind> = {
   sub: "sub",
   resub: "resub",
   subgift: "subgift",
+  submysterygift: "giftbomb",
   raid: "raid",
 };
 
@@ -195,6 +201,8 @@ function toEvent({ tags, prefix, command, params }: RawLine): TwitchEvent | null
             ? tags["msg-param-recipient-display-name"] || tags["msg-param-recipient-user-name"]
             : undefined,
         viewers: count.parse(tags["msg-param-viewerCount"]),
+        giftCount: count.parse(tags["msg-param-mass-gift-count"]),
+        giftId: tags["msg-param-community-gift-id"]?.slice(0, 64) || undefined,
       };
     }
 

@@ -77,7 +77,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *`tests/e2e/chat.spec.ts` fakes Twitch with `page.routeWebSocket` (no network): anonymous login, rendering, HTML safety, PING/PONG, filters and moderation, both error states, reconnect, fade with `?rm=1`, saved chat links. OBS sign-off passed on the PR #24 preview deploy with real headers (2026-10-01): CPU ~2%, stable after 10 min. Streamlabs deferred to pre-launch (checklist item 9).*
 
 ## Phase 4: Alerts
-- [ ] **T4.1 Alert event mapping** from parsed events: raid, sub, resub, gift sub, bits.
+- [x] **T4.1 Alert event mapping** from parsed events: raid, sub, resub, gift sub, bits.
+  - *`createAlertMapper()` in `src/alerts/events.ts` → `{ kind, user, amount, message }`. A gift bomb (`submysterygift`, new parser kind `giftbomb` with `giftCount`/`giftId`) is one alert with the total; its individual gifts are skipped. Anonymous gifters show as "Anonymous". Sub tier left out until a template needs it.*
 - [ ] **T4.2 Alert queue:** one at a time, bursts are handled, and there is a maximum queue length.
   - Accept: unit test with 20 events arriving at once.
 - [ ] **T4.3 Alert templates** with `{user}` and `{amount}` variables. Values are escaped.
