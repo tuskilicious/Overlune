@@ -33,6 +33,22 @@ export const socialPlatforms = [
   "discord",
 ] as const;
 
+/** Common chat bots, hidden unless the streamer removes them from the list. */
+export const defaultBots = [
+  "nightbot",
+  "streamelements",
+  "streamlabs",
+  "moobot",
+  "fossabot",
+  "wizebot",
+  "sery_bot",
+  "soundalerts",
+  "botrixoficial",
+  "kofistreambot",
+  "streamstickers",
+  "pokemoncommunitygame",
+] as const;
+
 export const settingsV1 = z.object({
   theme: z.enum(themeIds).default("clean-slate"),
   logo: z
@@ -63,6 +79,13 @@ export const settingsV1 = z.object({
         .string()
         .regex(/^[A-Za-z0-9_]{0,25}$/, "Channel names use letters, numbers and _")
         .default(""),
+      /** Hide messages starting with "!" (T3.4). */
+      hideCommands: z.boolean().default(true),
+      /** Lowercase logins whose messages are hidden (T3.4). Editable, so a streamer can keep a bot visible. */
+      bots: z
+        .array(z.string().regex(/^[a-z0-9_]{1,25}$/, "Bot names use a-z, 0-9 and _"))
+        .max(50)
+        .default(() => [...defaultBots]),
     })
     .prefault({}),
   /** "Advanced" overrides on top of the theme (T2.7). Empty means the theme as designed. */

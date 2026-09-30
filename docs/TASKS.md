@@ -69,7 +69,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *`connectChat(channel, { onEvent, onStatus })` returns a stop function. Statuses: `connecting`, `connected` (on ROOMSTATE), `reconnecting`, `error` (4 failures in a row, or no join reply in 10s, which is how Twitch treats a missing channel; it keeps retrying) and `bad-channel` (no socket opened). Backoff 1s→30s with jitter; also reconnects on RECONNECT and after 6 min of silence. Checked live against Twitch. The error screen itself comes with T3.3.*
 - [x] **T3.3 Chat overlay:** message list, name colors, emotes rendered as `<img>` elements (no innerHTML), theme-styled role badges, long-message wrapping, and a max message count.
   - *Passed in OBS 32 (2026-09-30). `/o/chat`, 400×600, last 50 messages. New v1 field `chat.channel` (default "", old links unchanged; fixture `v1/chat.json`). Editor has a "Your Twitch channel name" field that accepts a pasted twitch.tv link, plus a Chat row in the OBS links. Name colors are lightened toward the theme text until they read at AA. Editor chat preview with sample messages left for T3.5.*
-- [ ] **T3.4 Filters:** hide known bots (editable list) and `!commands`, and remove messages on CLEARMSG and CLEARCHAT.
+- [x] **T3.4 Filters:** hide known bots (editable list) and `!commands`, and remove messages on CLEARMSG and CLEARCHAT.
+  - *Passed in OBS 32 (2026-09-30). New v1 fields `chat.hideCommands` (default on) and `chat.bots` (default: 12 common bots, max 50; old links get the defaults; fixture `v1/chat-filters.json`). Logic in `src/overlays/chat/filters.ts` (`applyEvent`). Editor: checkbox, one-name-per-line bot box, and "Reset to the usual bots".*
 - [ ] **T3.5 Chat options:** size, font scale, and optional fade-out.
 - [ ] **T3.6 OBS test + Playwright test** using a mocked IRC feed.
 

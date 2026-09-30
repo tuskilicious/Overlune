@@ -1,6 +1,6 @@
 import { compressToEncodedURIComponent } from "lz-string";
 import { describe, expect, it } from "vitest";
-import { defaultSettings, type Settings } from "../../../src/settings/schema";
+import { defaultBots, defaultSettings, type Settings } from "../../../src/settings/schema";
 import { decode, decodeLink, encode } from "../../../src/settings/url";
 
 const raw = (data: unknown) => `#1.${compressToEncodedURIComponent(JSON.stringify(data))}`;
@@ -18,7 +18,7 @@ const sample: Settings = {
   },
   brb: { title: "Snack break", subtitle: "Back in 5" },
   ending: { title: "GG!", subtitle: "Raiding a friend" },
-  chat: { channel: "Tuskilicious" },
+  chat: { channel: "Tuskilicious", hideCommands: false, bots: ["mybot"] },
   advanced: {
     colors: { accent: "#ff2bd6", surface: "#101010" },
     fontHeading: "Orbitron",
@@ -158,7 +158,7 @@ describe("chat channel (T3.3)", () => {
   it("defaults to empty, so links made before chat existed still load", () => {
     const { settings, ok } = decode(raw({ brb: { title: "Hi" } }));
     expect(ok).toBe(true);
-    expect(settings.chat).toEqual({ channel: "" });
+    expect(settings.chat).toEqual({ channel: "", hideCommands: true, bots: [...defaultBots] });
   });
 
   it.each(["two words", "#dallas", "a".repeat(26), "<script>", "twitch.tv/dallas"])(
@@ -167,6 +167,33 @@ describe("chat channel (T3.3)", () => {
       const { settings, ok } = decode(raw({ brb: { title: "Kept" }, chat: { channel } }));
       expect(ok).toBe(false);
       expect(settings.chat.channel).toBe("");
+      expect(settings.brb.title).toBe("Kept");
+    },
+  );
+});
+
+describe("chat filters (T3.4)", () => {
+  it("give links from T3.3 the usual bots and hidden commands", () => {
+    const { settings, ok } = decode(raw({ chat: { channel: "dallas" } }));
+    expect(ok).toBe(true);
+    expect(settings.chat).toEqual({
+      channel: "dallas",
+      hideCommands: true,
+      bots: [...defaultBots],
+    });
+  });
+
+  it("keep an edited bot list, including an empty one", () => {
+    expect(decode(raw({ chat: { bots: [] } })).settings.chat.bots).toEqual([]);
+    expect(decode(raw({ chat: { bots: ["mybot"] } })).settings.chat.bots).toEqual(["mybot"]);
+  });
+
+  it.each([[["Nightbot"]], [["bad name"]], [Array.from({ length: 51 }, (_, i) => `bot${i}`)]])(
+    "reject bot list %j",
+    (bots) => {
+      const { settings, ok } = decode(raw({ brb: { title: "Kept" }, chat: { bots } }));
+      expect(ok).toBe(false);
+      expect(settings.chat.bots).toEqual([...defaultBots]);
       expect(settings.brb.title).toBe("Kept");
     },
   );

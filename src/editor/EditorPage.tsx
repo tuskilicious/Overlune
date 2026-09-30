@@ -3,7 +3,7 @@ import { fromZoneInput, toZoneInput } from "../lib/time";
 import { isHttpsUrl } from "../lib/url-safety";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
-import { defaultSettings, socialPlatforms, type Settings } from "../settings/schema";
+import { defaultBots, defaultSettings, socialPlatforms, type Settings } from "../settings/schema";
 import { loadSaved, save } from "../settings/storage";
 import { decodeLink, encode } from "../settings/url";
 import { themes } from "../themes";
@@ -11,6 +11,7 @@ import { cleanSlate } from "../themes/clean-slate";
 import { contrast } from "../lib/contrast";
 import { colorTokens, fontIds, themeIds, type ColorToken, type FontId } from "../themes/types";
 import { applyOverrides, themeVars } from "../themes/vars";
+import { botsFromInput } from "../overlays/chat/filters";
 import { channelFromInput } from "../twitch/irc";
 import ObsLinks, { overlays, type OverlayId as Scene } from "./ObsLinks";
 import "./editor.css";
@@ -99,6 +100,7 @@ export default function EditorPage() {
   const [scene, setScene] = useState<Scene>("starting");
   // Kept apart from settings so a half-typed or unsafe link never reaches the preview.
   const [logoInput, setLogoInput] = useState(settings.logo);
+  const [botsInput, setBotsInput] = useState(settings.chat.bots.join("\n"));
   const [loadText, setLoadText] = useState("");
   const [loadStatus, setLoadStatus] = useState(initial.status);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -114,6 +116,7 @@ export default function EditorPage() {
     const fresh = freshSettings();
     setSettings(fresh);
     setLogoInput(fresh.logo);
+    setBotsInput(fresh.chat.bots.join("\n"));
     setConfirmReset(false);
     focusSoon("start-over");
     setLoadStatus("Started over. Any link you kept still loads your old overlay.");
@@ -129,6 +132,7 @@ export default function EditorPage() {
     }
     setSettings(result.settings);
     setLogoInput(result.settings.logo);
+    setBotsInput(result.settings.chat.bots.join("\n"));
     setLoadText("");
     setLoadStatus(loadedMessage(result.ok));
   };
@@ -136,6 +140,8 @@ export default function EditorPage() {
   const update = (patch: Partial<Settings>) => setSettings((s) => ({ ...s, ...patch }));
   const updateScene = <K extends Scene>(key: K, patch: Partial<Settings[K]>) =>
     setSettings((s) => ({ ...s, [key]: { ...s[key], ...patch } }));
+  const updateChat = (patch: Partial<Settings["chat"]>) =>
+    setSettings((s) => ({ ...s, chat: { ...s.chat, ...patch } }));
   const updateSocial = (i: number, patch: Partial<Settings["socials"][number]>) =>
     update({ socials: settings.socials.map((s, j) => (i === j ? { ...s, ...patch } : s)) });
 
@@ -396,13 +402,47 @@ export default function EditorPage() {
                 autoComplete="off"
                 spellCheck={false}
                 aria-describedby="chat-hint"
-                onChange={(e) => update({ chat: { channel: channelFromInput(e.target.value) } })}
+                onChange={(e) => updateChat({ channel: channelFromInput(e.target.value) })}
               />
             </label>
             <p id="chat-hint" className="editor-hint">
               The name in your channel link, e.g. twitch.tv/<strong>yourname</strong>. You can paste
               the whole link.
             </p>
+            <label className="editor-check">
+              <input
+                type="checkbox"
+                checked={settings.chat.hideCommands}
+                onChange={(e) => updateChat({ hideCommands: e.target.checked })}
+              />
+              Hide chat commands (messages starting with !)
+            </label>
+            <label>
+              Bots to hide (one name per line)
+              <textarea
+                value={botsInput}
+                rows={6}
+                spellCheck={false}
+                aria-describedby="bots-hint"
+                onChange={(e) => {
+                  setBotsInput(e.target.value);
+                  updateChat({ bots: botsFromInput(e.target.value) });
+                }}
+              />
+            </label>
+            <p id="bots-hint" className="editor-hint">
+              Messages from these accounts won’t show in your chat. Remove a name to show that bot.
+            </p>
+            <button
+              id="reset-bots"
+              type="button"
+              onClick={() => {
+                setBotsInput(defaultBots.join("\n"));
+                updateChat({ bots: [...defaultBots] });
+              }}
+            >
+              Reset to the usual bots
+            </button>
           </fieldset>
 
           <fieldset>

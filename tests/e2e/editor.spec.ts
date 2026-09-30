@@ -323,3 +323,15 @@ test("a copied link opens the overlay with the editor's settings", async ({ page
   await expect(page.getByRole("heading", { name: "Grabbing snacks" })).toBeVisible();
   await expect(page.getByRole("status")).toHaveCount(0);
 });
+
+test("the bot list can be edited and reset", async ({ page }) => {
+  const box = page.getByLabel("Bots to hide");
+  await expect(box).toHaveValue(/^nightbot\nstreamelements\n/);
+  await box.fill("MyBot\n");
+  await expect(box).toHaveValue("MyBot\n"); // typing isn't rewritten under the cursor
+  await page.reload();
+  await expect(page.getByLabel("Bots to hide")).toHaveValue("mybot");
+  await page.getByRole("button", { name: "Reset to the usual bots" }).click();
+  await expect(page.getByLabel("Bots to hide")).toHaveValue(/^nightbot\n/);
+  await expect(page.getByLabel("Hide chat commands")).toBeChecked();
+});

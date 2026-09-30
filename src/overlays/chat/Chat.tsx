@@ -1,22 +1,23 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Settings } from "../../settings/schema";
 import { connectChat, type ChatStatus } from "../../twitch/irc";
 import OverlayError from "../OverlayError";
 import ChatView, { type ChatMessage } from "./ChatView";
+import { applyEvent, type ChatFilters } from "./filters";
 
-/** Older messages are dropped past this, so a busy chat never grows the page. */
-export const MAX_MESSAGES = 50;
-
-function useChat(channel: string) {
+function useChat(channel: string, filters: ChatFilters) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [status, setStatus] = useState<ChatStatus>("connecting");
+  // Read through a ref so changing a filter never reconnects.
+  const filtersRef = useRef(filters);
+  useEffect(() => {
+    filtersRef.current = filters;
+  });
   useEffect(
     () =>
       connectChat(channel, {
         onStatus: setStatus,
-        onEvent: (e) => {
-          if (e.type === "chat") setMessages((m) => [...m.slice(1 - MAX_MESSAGES), e]);
-        },
+        onEvent: (e) => setMessages((m) => applyEvent(m, e, filtersRef.current)),
       }),
     [channel],
   );
@@ -26,7 +27,7 @@ function useChat(channel: string) {
 /** /o/chat: live Twitch chat for the channel in the link. */
 export default function Chat({ settings, error }: { settings: Settings; error?: ReactNode }) {
   const { channel } = settings.chat;
-  const { messages, status } = useChat(channel);
+  const { messages, status } = useChat(channel, settings.chat);
   return (
     <ChatView
       settings={settings}

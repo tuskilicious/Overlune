@@ -102,8 +102,9 @@
   font-size: 14px;
 }
 
-.editor input:not([type="radio"]),
+.editor input:not([type="radio"], [type="checkbox"]),
 .editor select,
+.editor textarea,
 .editor button {
   font: inherit;
   font-size: 15px;
@@ -116,8 +117,9 @@
 }
 
 /* Control outlines need 3:1 against the panel (WCAG 1.4.11); panel borders stay subtle. */
-.editor input:not([type="radio"]),
+.editor input:not([type="radio"], [type="checkbox"]),
 .editor select,
+.editor textarea,
 .editor button {
   border: 1px solid var(--text-muted);
 }
@@ -147,6 +149,23 @@
 
 .editor input[aria-invalid="true"] {
   border-color: #ff8a8a;
+}
+
+.editor textarea {
+  resize: vertical;
+}
+
+.editor label.editor-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
 }
 
 .editor button {
