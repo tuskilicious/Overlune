@@ -62,6 +62,64 @@
   }
 }
 
+/* Cozy Café: soft steam wisps rising from the bottom. Transform and opacity only (no blur filter).
+   Reduced-motion version: index.css stops them and the wisps stand still. */
+.scene[data-bg="steam"] {
+  position: relative;
+  isolation: isolate;
+}
+
+.scene[data-bg="steam"]::before,
+.scene[data-bg="steam"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  bottom: -120px;
+  width: 360px;
+  height: 720px;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 22% at 50% 70%, rgba(255, 255, 255, 0.7), transparent 70%),
+    radial-gradient(ellipse 40% 18% at 58% 40%, rgba(255, 255, 255, 0.55), transparent 70%),
+    radial-gradient(ellipse 30% 14% at 44% 14%, rgba(255, 255, 255, 0.4), transparent 70%);
+  animation: scene-steam 9s ease-in-out infinite;
+}
+
+.scene[data-bg="steam"]::before {
+  left: 12%;
+}
+
+.scene[data-bg="steam"]::after {
+  right: 12%;
+  animation-delay: -4.5s;
+}
+
+@keyframes scene-steam {
+  0% {
+    opacity: 0;
+    transform: translateY(80px) scaleX(0.9);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-360px) scaleX(1.15);
+  }
+}
+
+.scene[data-enter="bounce"] .scene-main,
+.scene[data-enter="bounce"] .scene-socials {
+  animation: scene-bounce var(--enter-ms) cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes scene-bounce {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.96);
+  }
+}
+
 @keyframes scene-slide-fade {
   from {
     opacity: 0;

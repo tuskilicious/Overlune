@@ -430,3 +430,19 @@ test("picking Neon Grid restyles the preview, alerts and sound", async ({ page }
   await page.reload();
   await expect(page.getByRole("radio", { name: "Neon Grid" })).toBeChecked();
 });
+
+test("picking Cozy Café restyles the preview, alerts and sound", async ({ page }) => {
+  await page.getByRole("radio", { name: "Cozy Café" }).check();
+  await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "steam");
+  await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Fredoka/);
+
+  const sound = page.waitForRequest(/\/sounds\/cozy-cafe\.ogg$/);
+  await page.getByRole("button", { name: "Test raid" }).click();
+  await expect(
+    page.getByRole("region", { name: "Preview: Alerts" }).locator(".alerts"),
+  ).toHaveAttribute("data-anim", "bounce");
+  await sound;
+
+  await page.reload();
+  await expect(page.getByRole("radio", { name: "Cozy Café" })).toBeChecked();
+});

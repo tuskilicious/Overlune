@@ -1,7 +1,7 @@
 // Every theme defines exactly these tokens (docs/DESIGN.md "Theme token set").
 // Id unions list only the effects/animations that exist today; each new theme adds its own.
 
-export const themeIds = ["clean-slate", "neon-grid"] as const;
+export const themeIds = ["clean-slate", "neon-grid", "cozy-cafe"] as const;
 /** Bundled @fontsource families (OFL, docs/ASSETS.md). Loaded by src/themes/fonts.ts. Only add to the end. */
 export const fontIds = ["Inter", "Orbitron", "Rajdhani", "Fredoka", "Nunito"] as const;
 export type FontId = (typeof fontIds)[number];
@@ -9,9 +9,9 @@ export type FontId = (typeof fontIds)[number];
 export const colorTokens = ["bg", "surface", "primary", "accent", "text", "textMuted"] as const;
 export type ColorToken = (typeof colorTokens)[number];
 export type ThemeId = (typeof themeIds)[number];
-export type BgEffect = "none" | "grid";
-export type AnimId = "slide-fade";
-export type AlertAnimId = "slide-fade" | "glitch";
+export type BgEffect = "none" | "grid" | "steam";
+export type AnimId = "slide-fade" | "bounce";
+export type AlertAnimId = "slide-fade" | "glitch" | "bounce";
 export type BadgeStyle = "pill";
 
 export interface Anim {

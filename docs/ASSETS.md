@@ -11,3 +11,4 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 | Nunito (`@fontsource/nunito` 5.3.0, weights 400/600/700) | font | Advanced font picker; Cozy Café (T5.2) | https://fontsource.org/fonts/nunito | SIL OFL 1.1 | No | 2026-09-30 |
 | `public/sounds/clean-slate.ogg` (Kenney Interface Sounds 1.0, `confirmation_002.ogg`, unchanged) | sound | Clean Slate alert sound | https://kenney.nl/assets/interface-sounds | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
 | `public/sounds/neon-grid.ogg` (Kenney Sci-Fi Sounds 1.0, `forceField_000.ogg`, unchanged) | sound | Neon Grid alert sound | https://kenney.nl/assets/sci-fi-sounds | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
+| `public/sounds/cozy-cafe.ogg` (Kenney Interface Sounds 1.0, `glass_004.ogg`, unchanged) | sound | Cozy Café alert sound | https://kenney.nl/assets/interface-sounds | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
