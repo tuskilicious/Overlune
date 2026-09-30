@@ -3,7 +3,7 @@
 Work one task at a time, top to bottom. A task is done when its acceptance criteria pass, lint, typecheck and tests pass, and overlay tasks have passed `docs/OBS-TESTING.md`. Tick the box when done.
 
 ## Phase 0: Repo foundation
-- [ ] **T0.1 Choose license.** MIT is recommended. Add `LICENSE`. *Needs owner decision.*
+- [x] **T0.1 Choose license.** MIT is recommended. Add `LICENSE`. *Needs owner decision.*
 - [x] **T0.2 Git init.** `.gitignore` is already present. Make the first commit with the docs only.
 - [x] **T0.3 Scaffold** Vite + React + TS (strict) per `docs/STACK.md`. *Files written by hand. Run `npm install`, then pin the exact installed versions in `package.json` and commit the lockfile.*
   - Accept: `npm run dev` shows a placeholder editor page and `/o/starting` shows a placeholder overlay.

@@ -64,4 +64,4 @@ Cloudflare Pages:
 - Rules for Claude Code: `CLAUDE.md`
 
 ## License
-To be decided (MIT recommended). See `docs/TASKS.md` T0.1.
+MIT. See `LICENSE`. Fonts, sounds and art keep their own licenses, listed in `docs/ASSETS.md`.
