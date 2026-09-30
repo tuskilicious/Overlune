@@ -73,7 +73,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *Passed in OBS 32 (2026-09-30). New v1 fields `chat.hideCommands` (default on) and `chat.bots` (default: 12 common bots, max 50; old links get the defaults; fixture `v1/chat-filters.json`). Logic in `src/overlays/chat/filters.ts` (`applyEvent`). Editor: checkbox, one-name-per-line bot box, and "Reset to the usual bots".*
 - [x] **T3.5 Chat options:** size, font scale, and optional fade-out.
   - *Passed in OBS 32 (2026-09-30). New v1 fields `chat.width` (250–1920, default 400), `chat.height` (200–1080, default 600), `chat.fontScale` (0.75–2, default 1) and `chat.fadeAfter` (seconds, 0 = never); old links unchanged; fixture `v1/chat-options.json`. Chat sizes are in em so text size scales everything. Fade: CSS fade plus a 1s timer that removes messages (works with reduced motion). Editor: size fields, text size, "Hide messages after", the Chat link row shows the chosen size, and a chat preview with sample messages.*
-- [ ] **T3.6 OBS test + Playwright test** using a mocked IRC feed.
+- [x] **T3.6 OBS test + Playwright test** using a mocked IRC feed.
+  - *`tests/e2e/chat.spec.ts` fakes Twitch with `page.routeWebSocket` (no network): anonymous login, rendering, HTML safety, PING/PONG, filters and moderation, both error states, reconnect, fade with `?rm=1`, saved chat links. OBS sign-off passed on the PR #24 preview deploy with real headers (2026-10-01): CPU ~2%, stable after 10 min. Streamlabs deferred to pre-launch (checklist item 9).*
 
 ## Phase 4: Alerts
 - [ ] **T4.1 Alert event mapping** from parsed events: raid, sub, resub, gift sub, bits.
