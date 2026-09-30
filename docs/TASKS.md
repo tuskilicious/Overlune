@@ -38,7 +38,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *Passed in OBS 32 (2026-09-30). One global CSS rule covers every animation; JS motion helper comes with alerts (T4).*
 - [x] **T1.6 Write `docs/OBS-TESTING.md` results for Starting Soon.** Check it in OBS and Streamlabs: transparency, fonts, countdown after a scene switch, and CPU use.
   - *OBS 32 passed, CPU 1.6–2% (2026-09-30). **Streamlabs deferred**: must be done before launch (pre-launch item 9).*
-- [ ] **T1.7 Playwright smoke test** that renders `/o/starting` with a fixture link and compares a screenshot.
+- [x] **T1.7 Playwright smoke test** that renders `/o/starting` with a fixture link and compares a screenshot.
+  - *Linux-only baseline made in CI (fonts render differently on Windows). Fixture saved as `tests/fixtures/links/v1/starting.json`, so T1.8 only needs the "every saved link still loads" check.*
 - [ ] **T1.8 Save the first link fixture** to `tests/fixtures/links/v1/`.
 
 ## Phase 2: Scenes + editor
