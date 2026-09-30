@@ -79,8 +79,9 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
 ## Phase 4: Alerts
 - [x] **T4.1 Alert event mapping** from parsed events: raid, sub, resub, gift sub, bits.
   - *`createAlertMapper()` in `src/alerts/events.ts` → `{ kind, user, amount, message }`. A gift bomb (`submysterygift`, new parser kind `giftbomb` with `giftCount`/`giftId`) is one alert with the total; its individual gifts are skipped. Anonymous gifters show as "Anonymous". Sub tier left out until a template needs it.*
-- [ ] **T4.2 Alert queue:** one at a time, bursts are handled, and there is a maximum queue length.
+- [x] **T4.2 Alert queue:** one at a time, bursts are handled, and there is a maximum queue length.
   - Accept: unit test with 20 events arriving at once.
+  - *`createAlertQueue(onChange)` in `src/alerts/queue.ts`: 5 s per alert, 0.5 s gap, first come first served, at most 30 waiting (extras dropped and counted), `stop()` for unmount. Used by the `/o/alerts` overlay from T4.3.*
 - [ ] **T4.3 Alert templates** with `{user}` and `{amount}` variables. Values are escaped.
 - [ ] **T4.4 Sound playback,** with a volume setting and licensed default sounds recorded in `ASSETS.md`.
 - [ ] **T4.5 Test buttons in the editor** that trigger alerts in the preview. Follows and donations are shown as "coming soon".
