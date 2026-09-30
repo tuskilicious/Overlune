@@ -58,7 +58,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *`src/settings/storage.ts` stores the link format, so autosaves get the same validation and migrations. Start order: link in the address, then autosave, then defaults. Added a two-step "Start over" (focus lands on Cancel).*
 - [x] **T2.7 Advanced section** for color and font overrides, collapsed by default.
   - *Passed in OBS 32 (2026-09-30). New v1 field `advanced` with defaults (old links unchanged; fixture `v1/advanced.json`). Colors are `#rrggbb` only; fonts from the bundled list (Inter, Orbitron, Rajdhani, Fredoka, Nunito, recorded in ASSETS.md, ready for T5.1/T5.2). Editor warns when overrides drop text below AA contrast.*
-- [ ] **T2.8 Accessibility pass on the editor:** keyboard navigation, focus rings, labels, AA contrast.
+- [x] **T2.8 Accessibility pass on the editor:** keyboard navigation, focus rings, labels, AA contrast.
+  - *axe (WCAG 2.1 A/AA) runs in CI with no violations. Fixed: control borders 1.2:1 → 5.2:1, placeholder contrast, focus lost when Remove/Reset/Start over buttons disappear, duplicate h1 (preview is now `inert` + `aria-hidden`), added a skip link. Known limit: Chrome's built-in calendar button in the date field shows no focus ring and can't be styled.*
 
 ## Phase 3: Chat skin
 - [ ] **T3.1 IRC parser** (`src/twitch/parse.ts`) that turns raw IRC lines into typed events.

@@ -51,11 +51,21 @@ function Preview({ children }: { children: React.ReactNode }) {
     return () => ro.disconnect();
   }, []);
   return (
-    <div className="editor-preview" ref={ref} style={{ "--scale": scale } as React.CSSProperties}>
+    // The preview only repeats the form visually, so screen readers and Tab skip it (no second h1, no duplicate text).
+    <div
+      className="editor-preview"
+      ref={ref}
+      style={{ "--scale": scale } as React.CSSProperties}
+      aria-hidden
+      inert
+    >
       {children}
     </div>
   );
 }
+
+/** Keeps keyboard focus in place when the button that had it disappears (WCAG 2.4.3). Runs after React renders. */
+const focusSoon = (id: string) => requestAnimationFrame(() => document.getElementById(id)?.focus());
 
 const loadedMessage = (ok: boolean) =>
   ok
@@ -104,6 +114,7 @@ export default function EditorPage() {
     setSettings(fresh);
     setLogoInput(fresh.logo);
     setConfirmReset(false);
+    focusSoon("start-over");
     setLoadStatus("Started over. Any link you kept still loads your old overlay.");
   };
 
@@ -143,6 +154,19 @@ export default function EditorPage() {
 
   return (
     <div className="editor" style={themeVars(cleanSlate)}>
+      {/* No real #fragment jump: the address bar's fragment holds the settings. */}
+      <a
+        className="editor-skip"
+        href="#obs-links"
+        onClick={(e) => {
+          e.preventDefault();
+          const links = document.getElementById("obs-links");
+          links?.scrollIntoView();
+          links?.focus();
+        }}
+      >
+        Skip to your OBS links
+      </a>
       <header className="editor-header">
         <h1>Overlune</h1>
         <p>Free stream overlays that match. Pick a look, add your text, then paste into OBS.</p>
@@ -185,12 +209,19 @@ export default function EditorPage() {
               Yes, start over
             </button>
             {/* Focus lands on the safe choice. */}
-            <button type="button" autoFocus onClick={() => setConfirmReset(false)}>
+            <button
+              type="button"
+              autoFocus
+              onClick={() => {
+                setConfirmReset(false);
+                focusSoon("start-over");
+              }}
+            >
               Cancel
             </button>
           </div>
         ) : (
-          <button type="button" onClick={() => setConfirmReset(true)}>
+          <button id="start-over" type="button" onClick={() => setConfirmReset(true)}>
             Start over
           </button>
         )}
@@ -332,7 +363,10 @@ export default function EditorPage() {
                 <button
                   type="button"
                   aria-label={`Remove ${platformNames[s.platform]} ${s.handle}`.trim()}
-                  onClick={() => update({ socials: settings.socials.filter((_, j) => j !== i) })}
+                  onClick={() => {
+                    update({ socials: settings.socials.filter((_, j) => j !== i) });
+                    focusSoon("add-social");
+                  }}
                 >
                   Remove
                 </button>
@@ -340,6 +374,7 @@ export default function EditorPage() {
             ))}
             {settings.socials.length < 6 && (
               <button
+                id="add-social"
                 type="button"
                 onClick={() =>
                   update({ socials: [...settings.socials, { platform: "twitch", handle: "" }] })
@@ -373,7 +408,7 @@ export default function EditorPage() {
           </fieldset>
 
           <details className="editor-advanced">
-            <summary>Advanced: colors and fonts</summary>
+            <summary id="advanced-summary">Advanced: colors and fonts</summary>
             <p className="editor-hint">
               The theme already looks good. Change these only if you want your own brand colors.
             </p>
@@ -383,6 +418,7 @@ export default function EditorPage() {
                 <div key={token} className="editor-color">
                   <label>
                     <input
+                      id={`color-${token}`}
                       type="color"
                       value={asHex(look[token])}
                       onChange={(e) =>
@@ -401,6 +437,7 @@ export default function EditorPage() {
                         const colors = { ...settings.advanced.colors };
                         delete colors[token];
                         updateAdvanced({ colors });
+                        focusSoon(`color-${token}`);
                       }}
                     >
                       Reset
@@ -434,9 +471,10 @@ export default function EditorPage() {
             </fieldset>
             <button
               type="button"
-              onClick={() =>
-                update({ advanced: { colors: {}, fontHeading: null, fontBody: null } })
-              }
+              onClick={() => {
+                update({ advanced: { colors: {}, fontHeading: null, fontBody: null } });
+                focusSoon("advanced-summary");
+              }}
             >
               Reset all to the theme
             </button>

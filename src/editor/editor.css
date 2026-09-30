@@ -115,6 +115,36 @@
   min-width: 0;
 }
 
+/* Control outlines need 3:1 against the panel (WCAG 1.4.11); panel borders stay subtle. */
+.editor input:not([type="radio"]),
+.editor select,
+.editor button {
+  border: 1px solid var(--text-muted);
+}
+
+.editor ::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+.editor-skip {
+  position: absolute;
+  left: 16px;
+  top: -100px;
+  padding: 8px 12px;
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius);
+}
+
+.editor-skip:focus {
+  top: 8px;
+}
+
+#obs-links:focus {
+  outline: none;
+}
+
 .editor input[aria-invalid="true"] {
   border-color: #ff8a8a;
 }

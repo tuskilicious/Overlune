@@ -50,7 +50,7 @@ function LinkRow({ id, link }: { id: OverlayId; link: string }) {
 export default function ObsLinks({ settings }: { settings: Settings }) {
   const hash = encode(settings);
   return (
-    <section className="editor-links" aria-labelledby="links-heading">
+    <section id="obs-links" tabIndex={-1} className="editor-links" aria-labelledby="links-heading">
       <h2 id="links-heading">Links to paste into OBS</h2>
       <p>
         In OBS, add a <strong>Browser</strong> source, paste the link, and enter the width and

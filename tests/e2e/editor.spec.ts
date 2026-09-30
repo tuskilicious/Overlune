@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
@@ -7,28 +8,110 @@ test.beforeEach(async ({ page }) => {
 const preview = (page: import("@playwright/test").Page) =>
   page.getByRole("region", { name: "Preview" });
 
+// The preview is hidden from screen readers (it repeats the form), so find it by class, not role.
+const previewTitle = (page: import("@playwright/test").Page, text: string) =>
+  preview(page).locator(".scene-title", { hasText: text });
+
+test("the editor has no axe accessibility violations", async ({ page }) => {
+  const scan = () =>
+    new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  expect((await scan()).violations).toEqual([]);
+
+  await page.getByText("Advanced: colors and fonts").click();
+  await page.getByRole("button", { name: "Add a social" }).click();
+  await page.getByRole("button", { name: "Start over" }).click();
+  expect((await scan()).violations).toEqual([]);
+});
+
+test("the whole editor works from the keyboard", async ({ page }) => {
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "Skip to your OBS links" })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#obs-links")).toBeFocused();
+  await expect(page).toHaveURL(/\/#1\./); // the skip link never replaces the settings in the address
+
+  await page.getByRole("radio", { name: "Starting Soon" }).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByRole("radio", { name: "Be Right Back" })).toBeChecked();
+  await page.keyboard.press("Tab");
+  await page.keyboard.type("Keyboard title");
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Keyboard title");
+
+  await page.getByRole("button", { name: "Add a social" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByLabel("Site")).toBeVisible();
+
+  await page.locator("#advanced-summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByLabel("Titles")).toBeVisible();
+});
+
+test("focus stays in place when the button you pressed goes away", async ({ page }) => {
+  await page.getByRole("button", { name: "Add a social" }).click();
+  await page.getByRole("button", { name: /^Remove/ }).press("Enter");
+  await expect(page.getByRole("button", { name: "Add a social" })).toBeFocused();
+
+  await page.getByText("Advanced: colors and fonts").click();
+  await page.getByLabel("Titles").fill("#ff0000");
+  await page.getByRole("button", { name: "Reset Titles to the theme" }).press("Enter");
+  await expect(page.getByLabel("Titles")).toBeFocused();
+
+  await page.getByLabel("Titles").fill("#ff0000");
+  await page.getByRole("button", { name: "Reset all to the theme" }).press("Enter");
+  await expect(page.locator("#advanced-summary")).toBeFocused();
+
+  await page.getByRole("button", { name: "Start over" }).press("Enter");
+  await page.getByRole("button", { name: "Cancel" }).press("Enter");
+  await expect(page.getByRole("button", { name: "Start over" })).toBeFocused();
+  await page.getByRole("button", { name: "Start over" }).press("Enter");
+  await page.getByRole("button", { name: "Yes, start over" }).press("Enter");
+  await expect(page.getByRole("button", { name: "Start over" })).toBeFocused();
+});
+
+test("keyboard focus is always visible", async ({ page }) => {
+  await page.getByRole("button", { name: "Add a social" }).click();
+  await page.getByText("Advanced: colors and fonts").click();
+  // Reach the first stop with a real key press, so the browser treats focus as keyboard focus.
+  await page.getByRole("link", { name: "Skip to your OBS links" }).focus();
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+  let visited = 0;
+  // Tab through the whole page from the first stop; every stop must show the 2px focus ring.
+  for (; ; await page.keyboard.press("Tab")) {
+    const focused = await page.evaluate(() => {
+      const el = document.activeElement!;
+      const s = getComputedStyle(el);
+      return {
+        tag: el.tagName,
+        ring: `${s.outlineStyle} ${s.outlineWidth}`,
+        label: el.outerHTML.slice(0, 60),
+      };
+    });
+    if (focused.tag === "BODY") break;
+    // ponytail: Chrome's built-in calendar button inside the date field is its own Tab stop that pages
+    // can't style or detect (the field reports no focus). Keyboard users type the date or press Space instead.
+    if (focused.ring === "none 3px" && focused.label.startsWith('<input type="datetime-local"'))
+      continue;
+    expect(focused.ring, focused.label).toBe("solid 2px");
+    expect(++visited).toBeLessThan(80);
+  }
+  expect(visited).toBeGreaterThan(30);
+});
+
 test("the editor shows Starting Soon in the preview by default", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Overlune" })).toBeVisible();
   await expect(page.getByRole("radio", { name: "Clean Slate" })).toBeChecked();
-  await expect(
-    preview(page).getByRole("heading", { name: "Starting soon", exact: true }),
-  ).toBeVisible();
+  await expect(previewTitle(page, "Starting soon")).toBeVisible();
 });
 
 test("typing a title updates the preview of the chosen scene", async ({ page }) => {
   await page.getByRole("radio", { name: "Be Right Back" }).check();
-  await expect(
-    preview(page).getByRole("heading", { name: "Be right back", exact: true }),
-  ).toBeVisible();
+  await expect(previewTitle(page, "Be right back")).toBeVisible();
   await page.getByLabel("Title", { exact: true }).fill("Grabbing snacks");
-  await expect(
-    preview(page).getByRole("heading", { name: "Grabbing snacks", exact: true }),
-  ).toBeVisible();
+  await expect(previewTitle(page, "Grabbing snacks")).toBeVisible();
 
   await page.getByRole("radio", { name: "Stream Ending" }).check();
-  await expect(
-    preview(page).getByRole("heading", { name: "Thanks for watching!", exact: true }),
-  ).toBeVisible();
+  await expect(previewTitle(page, "Thanks for watching!")).toBeVisible();
 });
 
 test("socials can be added and removed", async ({ page }) => {
@@ -37,7 +120,7 @@ test("socials can be added and removed", async ({ page }) => {
   await page.getByLabel("Name or handle").fill("mychannel");
   await expect(preview(page).getByText("YouTube mychannel")).toBeVisible();
   await page.getByRole("button", { name: "Remove YouTube mychannel" }).click();
-  await expect(preview(page).getByRole("list")).toHaveCount(0);
+  await expect(preview(page).locator("ul")).toHaveCount(0);
 });
 
 test("only https: logo links reach the preview", async ({ page }) => {
@@ -101,7 +184,7 @@ test("an old link loads back into the editor", async ({ page, context }) => {
   await expect(page.getByLabel("Link to your logo image")).toHaveValue(
     "https://example.com/logo.png",
   );
-  await expect(preview(page).getByRole("heading", { name: "Grabbing snacks" })).toBeVisible();
+  await expect(previewTitle(page, "Grabbing snacks")).toBeVisible();
 });
 
 test("text that isn't an Overlune link changes nothing", async ({ page }) => {
@@ -157,7 +240,7 @@ test("the editor still works when browser storage is blocked", async ({ page }) 
   });
   await page.goto("/");
   await page.getByLabel("Title", { exact: true }).fill("Still works");
-  await expect(preview(page).getByRole("heading", { name: "Still works" })).toBeVisible();
+  await expect(previewTitle(page, "Still works")).toBeVisible();
 });
 
 test("start over asks first, then resets to the defaults", async ({ page }) => {
@@ -187,7 +270,7 @@ test("Advanced starts closed, and overrides reach the preview and the OBS link",
 
   await titleColor.fill("#ff2bd6");
   await page.getByLabel("Heading font").selectOption("Orbitron");
-  const title = preview(page).getByRole("heading", { name: "Starting soon", exact: true });
+  const title = previewTitle(page, "Starting soon");
   await expect(title).toHaveCSS("color", "rgb(255, 43, 214)");
   await expect(title).toHaveCSS("font-family", /^"?Orbitron/);
 

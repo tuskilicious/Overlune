@@ -20,6 +20,7 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 |---|---|
 | Unit tests | Vitest + Testing Library |
 | Overlay smoke tests | Playwright (Chromium, which is close to OBS's browser) with screenshot checks |
+| Accessibility checks | `@axe-core/playwright` (dev only): the editor must have no WCAG 2.1 A/AA violations |
 | Lint / format | ESLint + Prettier |
 | Typecheck | `tsc --noEmit` |
 | Git hooks | husky → gitleaks (secrets) + lint-staged |
