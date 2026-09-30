@@ -1,7 +1,8 @@
 // Every theme defines exactly these tokens (docs/DESIGN.md "Theme token set").
 // Id unions list only the effects/animations that exist today; each new theme adds its own.
 
-export type ThemeId = "clean-slate";
+export const themeIds = ["clean-slate"] as const;
+export type ThemeId = (typeof themeIds)[number];
 export type BgEffect = "none";
 export type AnimId = "slide-fade";
 export type AlertAnimId = "slide-fade";
