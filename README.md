@@ -68,6 +68,13 @@ Cloudflare Pages:
 - Merging to `main` deploys production.
 - Security headers live in `public/_headers`.
 
+Pages settings: build command `npm run build`, output `dist`, Node from `.nvmrc`. Environment variables (Settings → Variables):
+
+| Variable | Production | Preview |
+|---|---|---|
+| `VITE_SENTRY_DSN` | the Sentry DSN | the Sentry DSN |
+| `VITE_SENTRY_ENVIRONMENT` | `production` | `staging` |
+
 ## Docs
 - Product: `docs/PRD.md`
 - Tasks: `docs/TASKS.md`
