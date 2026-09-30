@@ -25,6 +25,7 @@
   border: var(--border);
   border-top: 6px solid var(--accent);
   border-radius: var(--radius);
+  box-shadow: var(--shadow);
   text-align: center;
 }
 
@@ -72,5 +73,44 @@
 @keyframes alert-out {
   to {
     opacity: 0;
+  }
+}
+
+/* Neon Grid: the box glitches in (sliced and jittering), then fades out like slide-fade. */
+.alerts[data-anim="glitch"] .alert-box {
+  animation:
+    alert-glitch 500ms steps(1, end) both,
+    alert-out 400ms ease-in calc(var(--alert-ms) - 400ms) forwards;
+}
+
+@keyframes alert-glitch {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(-24px) skewX(-10deg);
+    clip-path: inset(40% 0 45% 0);
+  }
+  25% {
+    transform: translateX(18px);
+    clip-path: inset(8% 0 70% 0);
+  }
+  40% {
+    transform: translateX(-10px);
+    clip-path: inset(60% 0 4% 0);
+  }
+  55% {
+    transform: translateX(6px);
+    clip-path: inset(20% 0 30% 0);
+  }
+  70% {
+    transform: translateX(-3px);
+    clip-path: none;
+  }
+  85%,
+  100% {
+    transform: none;
+    clip-path: none;
   }
 }

@@ -16,6 +16,52 @@
   animation: scene-slide-fade var(--enter-ms) ease-out both;
 }
 
+/* Neon Grid: a floor grid scrolling toward the viewer. Transform-only animation, so it stays on the GPU.
+   Reduced-motion version: index.css stops it and the grid stands still. */
+.scene[data-bg="grid"] {
+  position: relative;
+  isolation: isolate; /* the grid layers sit above the scene background but under the content */
+}
+
+.scene[data-bg="grid"]::before,
+.scene[data-bg="grid"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: 55%;
+  pointer-events: none;
+}
+
+.scene[data-bg="grid"]::before {
+  left: -50%;
+  right: -50%;
+  height: 120%;
+  background-image:
+    linear-gradient(var(--accent) 2px, transparent 2px),
+    linear-gradient(90deg, var(--accent) 2px, transparent 2px);
+  background-size: 96px 96px;
+  opacity: 0.45;
+  transform-origin: 50% 0;
+  transform: perspective(480px) rotateX(70deg);
+  animation: scene-grid 1.6s linear infinite;
+}
+
+/* The horizon: a glowing line with the grid fading into the distance below it. */
+.scene[data-bg="grid"]::after {
+  height: 22%;
+  border-top: 2px solid var(--primary);
+  box-shadow: 0 -16px 24px -12px var(--primary); /* glow above the line only */
+  background: linear-gradient(var(--bg), transparent);
+}
+
+@keyframes scene-grid {
+  to {
+    transform: perspective(480px) rotateX(70deg) translateY(96px);
+  }
+}
+
 @keyframes scene-slide-fade {
   from {
     opacity: 0;
@@ -68,6 +114,7 @@
   background: var(--surface);
   border: var(--border);
   border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 .scene-platform {

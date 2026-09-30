@@ -15,6 +15,7 @@ export function themeVars(t: Theme): CSSProperties {
     "--font-body": `"${t.fontBody}", system-ui, sans-serif`,
     "--radius": `${t.radius}px`,
     "--border": t.border,
+    "--shadow": t.shadow,
     "--enter-ms": `${t.enter.durationMs}ms`,
   } as CSSProperties;
 }

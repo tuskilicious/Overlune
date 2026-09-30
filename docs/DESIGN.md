@@ -20,6 +20,7 @@ Every theme defines exactly these tokens (`src/themes/types.ts`):
 | `fontHeading` / `fontBody` | `@fontsource` families (OFL) |
 | `radius` | Corner radius (px) |
 | `border` | Border style for surfaces |
+| `shadow` | Box shadow for surfaces: a glow, a soft shadow, or `none` |
 | `bgEffect` | Background effect id (e.g. `grid`, `steam`, `fireflies`) |
 | `enter` / `exit` | Entrance and exit animation ids + duration |
 | `alertAnim` | Alert animation id |

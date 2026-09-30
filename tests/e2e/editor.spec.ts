@@ -413,3 +413,20 @@ test("every preview is scaled to fit its box", async ({ page }) => {
     expect(box!.width).toBeLessThanOrEqual(frame!.width + 1);
   }
 });
+
+test("picking Neon Grid restyles the preview, alerts and sound", async ({ page }) => {
+  await page.getByRole("radio", { name: "Neon Grid" }).check();
+  const scene = preview(page).locator(".scene");
+  await expect(scene).toHaveAttribute("data-bg", "grid");
+  await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Orbitron/);
+
+  const sound = page.waitForRequest(/\/sounds\/neon-grid\.ogg$/);
+  await page.getByRole("button", { name: "Test raid" }).click();
+  await expect(
+    page.getByRole("region", { name: "Preview: Alerts" }).locator(".alerts"),
+  ).toHaveAttribute("data-anim", "glitch");
+  await sound;
+
+  await page.reload();
+  await expect(page.getByRole("radio", { name: "Neon Grid" })).toBeChecked();
+});

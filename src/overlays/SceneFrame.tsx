@@ -27,7 +27,12 @@ interface Props {
 export default function SceneFrame({ settings, title, subtitle, error, children }: Props) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
   return (
-    <div className="scene" data-enter={theme.enter.id} style={themeVars(theme)}>
+    <div
+      className="scene"
+      data-enter={theme.enter.id}
+      data-bg={theme.bgEffect}
+      style={themeVars(theme)}
+    >
       {error}
       <div className="scene-main">
         {settings.logo && <img className="scene-logo" src={settings.logo} alt="Channel logo" />}

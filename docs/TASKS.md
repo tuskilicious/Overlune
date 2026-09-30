@@ -92,7 +92,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *Passed on the PR #29 preview deploy with real headers (2026-10-01): alerts, sound in the Audio Mixer, reload behavior, 10 min stable, CPU ~2%. Automated coverage: `tests/e2e/alerts.spec.ts` and the editor alert tests. Streamlabs deferred to pre-launch (checklist item 9).*
 
 ## Phase 5: Launch
-- [ ] **T5.1 Neon Grid theme.**
+- [x] **T5.1 Neon Grid theme.**
+  - *Passed in OBS 32 (2026-10-01), CPU ~2%. `src/themes/neon-grid.ts`: scrolling perspective grid with a glowing horizon (`bgEffect: "grid"`, transform-only), glitch-in alerts (`alertAnim: "glitch"`), Kenney Sci-Fi `forceField_000` (CC0) as `neon-grid.ogg`. New theme token `shadow` (surface glow; Cozy Café will reuse it for soft shadows). Fixture `v1/neon-grid.json`. Screenshot baseline for the theme left for later (Linux-only baselines).*
 - [ ] **T5.2 Cozy Café theme.**
 - [ ] **T5.3 Setup guide page** for OBS and Streamlabs, with screenshots: Browser Source, sizes, black box fix, blank chat fix, audio.
 - [ ] **T5.4 Legal drafts** in `docs/legal/` (privacy policy and terms) plus footer links and a contact email. *Needs review.*
