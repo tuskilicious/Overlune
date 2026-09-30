@@ -14,6 +14,16 @@ export interface Decoded {
   ok: boolean;
 }
 
+/**
+ * Settings from anything a streamer might paste: an overlay link, an editor link, or just "#1.…".
+ * null when there is no settings part. Only decodes; never opens the link.
+ */
+export function decodeLink(text: string): Decoded | null {
+  const i = text.indexOf("#");
+  const hash = i === -1 ? "" : text.slice(i + 1).trim();
+  return hash === "" ? null : decode(hash);
+}
+
 /** Never throws. Accepts the hash with or without its leading "#". */
 export function decode(hash: string): Decoded {
   const raw = hash.replace(/^#/, "");

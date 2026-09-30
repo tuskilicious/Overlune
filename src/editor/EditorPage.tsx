@@ -1,9 +1,10 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { fromZoneInput, toZoneInput } from "../lib/time";
 import { isHttpsUrl } from "../lib/url-safety";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
 import { defaultSettings, socialPlatforms, type Settings } from "../settings/schema";
+import { decodeLink, encode } from "../settings/url";
 import { themes } from "../themes";
 import { cleanSlate } from "../themes/clean-slate";
 import { themeIds } from "../themes/types";
@@ -42,14 +43,46 @@ function Preview({ children }: { children: React.ReactNode }) {
   );
 }
 
+const loadedMessage = (ok: boolean) =>
+  ok
+    ? "Loaded! You can keep editing."
+    : "Loaded, but some settings couldn’t be read, so defaults are showing for those.";
+
 export default function EditorPage() {
-  const [settings, setSettings] = useState<Settings>(() => ({
-    ...defaultSettings,
-    starting: { ...defaultSettings.starting, tz: browserTz },
-  }));
+  // A bookmarked editor link (/#1.…) opens with its settings.
+  const [fromUrl] = useState(() => decodeLink(location.hash));
+  const [settings, setSettings] = useState<Settings>(
+    () =>
+      fromUrl?.settings ?? {
+        ...defaultSettings,
+        starting: { ...defaultSettings.starting, tz: browserTz },
+      },
+  );
   const [scene, setScene] = useState<Scene>("starting");
   // Kept apart from settings so a half-typed or unsafe link never reaches the preview.
   const [logoInput, setLogoInput] = useState(settings.logo);
+  const [loadText, setLoadText] = useState("");
+  const [loadStatus, setLoadStatus] = useState(fromUrl ? loadedMessage(fromUrl.ok) : "");
+
+  // The address bar always holds the current settings, so bookmarking the editor saves the work.
+  // replaceState: no history entry per keystroke. Sentry strips the fragment (lib/sentry-scrub.ts).
+  useEffect(() => {
+    history.replaceState(history.state, "", `#${encode(settings)}`);
+  }, [settings]);
+
+  const load = () => {
+    const result = decodeLink(loadText);
+    if (!result) {
+      setLoadStatus(
+        "That doesn’t look like an Overlune link. Copy one from “Links to paste into OBS”.",
+      );
+      return;
+    }
+    setSettings(result.settings);
+    setLogoInput(result.settings.logo);
+    setLoadText("");
+    setLoadStatus(loadedMessage(result.ok));
+  };
 
   const update = (patch: Partial<Settings>) => setSettings((s) => ({ ...s, ...patch }));
   const updateScene = <K extends Scene>(key: K, patch: Partial<Settings[K]>) =>
@@ -67,6 +100,35 @@ export default function EditorPage() {
         <h1>Overlune</h1>
         <p>Free stream overlays that match. Pick a look, add your text, then paste into OBS.</p>
       </header>
+
+      <section className="editor-save" aria-labelledby="save-heading">
+        <h2 id="save-heading">Your link is your save file</h2>
+        <p>
+          Overlune has no accounts. Your overlay lives in its link.{" "}
+          <strong>Bookmark this page</strong> or keep any of your OBS links, and paste it below to
+          keep editing.
+        </p>
+        <form
+          className="editor-load"
+          onSubmit={(e) => {
+            e.preventDefault();
+            load();
+          }}
+        >
+          <label>
+            Load my overlay from a link
+            <input
+              value={loadText}
+              placeholder="Paste a link from Overlune"
+              onChange={(e) => setLoadText(e.target.value)}
+            />
+          </label>
+          <button type="submit">Load</button>
+        </form>
+        <p className="editor-load-status" role="status">
+          {loadStatus}
+        </p>
+      </section>
 
       <div className="editor-body">
         <form className="editor-form" onSubmit={(e) => e.preventDefault()}>

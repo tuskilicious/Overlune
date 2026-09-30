@@ -81,6 +81,52 @@ test("each overlay link shows the size to enter in OBS", async ({ page }) => {
   for (const row of await rows.all()) await expect(row).toContainText("Width 1920 · Height 1080");
 });
 
+test("an old link loads back into the editor", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.getByRole("radio", { name: "Be Right Back" }).check();
+  await page.getByLabel("Title", { exact: true }).fill("Grabbing snacks");
+  await page.getByLabel("Link to your logo image").fill("https://example.com/logo.png");
+  await page.getByRole("button", { name: "Copy Be Right Back link" }).click();
+  const link = await page.evaluate(() => navigator.clipboard.readText());
+
+  await page.goto("/");
+  await page.getByRole("radio", { name: "Be Right Back" }).check();
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Be right back");
+
+  await page.getByLabel("Load my overlay from a link").fill(link);
+  await page.getByRole("button", { name: "Load", exact: true }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Loaded!" })).toBeVisible();
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Grabbing snacks");
+  await expect(page.getByLabel("Link to your logo image")).toHaveValue(
+    "https://example.com/logo.png",
+  );
+  await expect(preview(page).getByRole("heading", { name: "Grabbing snacks" })).toBeVisible();
+});
+
+test("text that isn't an Overlune link changes nothing", async ({ page }) => {
+  await page.getByLabel("Title", { exact: true }).fill("My title");
+  await page.getByLabel("Load my overlay from a link").fill("https://example.com/");
+  await page.getByLabel("Load my overlay from a link").press("Enter");
+  await expect(page.getByRole("status").filter({ hasText: "doesn’t look like" })).toBeVisible();
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("My title");
+});
+
+test("a damaged link loads what it can and says so", async ({ page }) => {
+  await page.getByLabel("Load my overlay from a link").fill("https://overlune.pages.dev/o/brb#1.x");
+  await page.getByRole("button", { name: "Load", exact: true }).click();
+  await expect(page.getByRole("status").filter({ hasText: "couldn’t be read" })).toBeVisible();
+});
+
+test("the editor's own address saves the work, so reload or a bookmark keeps it", async ({
+  page,
+}) => {
+  await page.getByLabel("Title", { exact: true }).fill("Bookmarked title");
+  await expect(page).toHaveURL(/\/#1\./);
+  await page.reload();
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Bookmarked title");
+  await expect(page.getByRole("status").filter({ hasText: "Loaded!" })).toBeVisible();
+});
+
 test("a copied link opens the overlay with the editor's settings", async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.getByRole("radio", { name: "Be Right Back" }).check();
