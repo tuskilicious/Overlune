@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import type { Settings } from "../settings/schema";
 import { themes } from "../themes";
-import { themeVars } from "../themes/vars";
+import "../themes/fonts";
+import { applyOverrides, themeVars } from "../themes/vars";
 import "./scene.css";
 
 const platformLabel: Record<Settings["socials"][number]["platform"], string> = {
@@ -24,7 +25,7 @@ interface Props {
 
 /** Shared 1920×1080 scene layout for Starting Soon, BRB and Stream Ending. */
 export default function SceneFrame({ settings, title, subtitle, error, children }: Props) {
-  const theme = themes[settings.theme];
+  const theme = applyOverrides(themes[settings.theme], settings.advanced);
   return (
     <div className="scene" data-enter={theme.enter.id} style={themeVars(theme)}>
       {error}

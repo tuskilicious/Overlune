@@ -5,3 +5,7 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 | Asset | Type | Used in | Source URL | License | Attribution required? | Added |
 |---|---|---|---|---|---|---|
 | Inter (`@fontsource/inter` 5.3.0, weights 400/600/700) | font | Clean Slate, editor | https://fontsource.org/fonts/inter | SIL OFL 1.1 | No | 2026-09-30 |
+| Orbitron (`@fontsource/orbitron` 5.3.0, weights 400/600/700) | font | Advanced font picker; Neon Grid (T5.1) | https://fontsource.org/fonts/orbitron | SIL OFL 1.1 | No | 2026-09-30 |
+| Rajdhani (`@fontsource/rajdhani` 5.3.0, weights 400/600/700) | font | Advanced font picker; Neon Grid (T5.1) | https://fontsource.org/fonts/rajdhani | SIL OFL 1.1 | No | 2026-09-30 |
+| Fredoka (`@fontsource/fredoka` 5.3.0, weights 400/600/700) | font | Advanced font picker; Cozy Café (T5.2) | https://fontsource.org/fonts/fredoka | SIL OFL 1.1 | No | 2026-09-30 |
+| Nunito (`@fontsource/nunito` 5.3.0, weights 400/600/700) | font | Advanced font picker; Cozy Café (T5.2) | https://fontsource.org/fonts/nunito | SIL OFL 1.1 | No | 2026-09-30 |

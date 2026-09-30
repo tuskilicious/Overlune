@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { isHttpsUrl } from "../lib/url-safety";
-import { themeIds } from "../themes/types";
+import { colorTokens, fontIds, themeIds } from "../themes/types";
 
 // PUBLIC CONTRACT: v1 links are in the wild once shipped. Only add fields with defaults.
 // Renaming, removing or tightening a field needs a new version plus a migration (CLAUDE.md).
@@ -20,6 +20,9 @@ const isTimeZone = (tz: string) => {
     return false;
   }
 };
+
+/** Only plain #rrggbb, never arbitrary CSS (no url(), gradients or other tricks). */
+const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/, "Colors must look like #1a2b3c");
 
 export const socialPlatforms = [
   "twitch",
@@ -53,6 +56,14 @@ export const settingsV1 = z.object({
     .prefault({}),
   brb: z.object({ title: text(60, "Be right back"), subtitle: text(120) }).prefault({}),
   ending: z.object({ title: text(60, "Thanks for watching!"), subtitle: text(120) }).prefault({}),
+  /** "Advanced" overrides on top of the theme (T2.7). Empty means the theme as designed. */
+  advanced: z
+    .object({
+      colors: z.partialRecord(z.enum(colorTokens), hexColor).default({}),
+      fontHeading: z.enum(fontIds).nullable().default(null),
+      fontBody: z.enum(fontIds).nullable().default(null),
+    })
+    .prefault({}),
 });
 
 export type Settings = z.output<typeof settingsV1>;

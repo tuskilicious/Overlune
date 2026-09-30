@@ -18,6 +18,11 @@ const sample: Settings = {
   },
   brb: { title: "Snack break", subtitle: "Back in 5" },
   ending: { title: "GG!", subtitle: "Raiding a friend" },
+  advanced: {
+    colors: { accent: "#ff2bd6", surface: "#101010" },
+    fontHeading: "Orbitron",
+    fontBody: null,
+  },
 };
 
 describe("settings link", () => {
@@ -115,5 +120,35 @@ describe("decodeLink (Load my overlay from a link)", () => {
       settings: defaultSettings,
       ok: false,
     });
+  });
+});
+
+describe("advanced overrides (T2.7)", () => {
+  it("default to none, so links made before T2.7 look exactly as before", () => {
+    expect(decode(raw({ brb: { title: "Hi" } })).settings.advanced).toEqual({
+      colors: {},
+      fontHeading: null,
+      fontBody: null,
+    });
+  });
+
+  it.each([
+    "red",
+    "#fff",
+    "url(https://evil.example/x.png)",
+    "#12345g",
+    "linear-gradient(red, blue)",
+  ])("reject %s as a color and fall back to the theme", (bad) => {
+    const { settings, ok } = decode(
+      raw({ brb: { title: "Kept" }, advanced: { colors: { accent: bad } } }),
+    );
+    expect(ok).toBe(false);
+    expect(settings.advanced.colors).toEqual({});
+    expect(settings.brb.title).toBe("Kept");
+  });
+
+  it("reject unknown color names and fonts that aren't bundled", () => {
+    expect(decode(raw({ advanced: { colors: { border: "#000000" } } })).ok).toBe(false);
+    expect(decode(raw({ advanced: { fontHeading: "Comic Sans MS" } })).ok).toBe(false);
   });
 });

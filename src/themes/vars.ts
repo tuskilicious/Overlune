@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import type { Settings } from "../settings/schema";
 import type { Theme } from "./types";
 
 /** Theme tokens as CSS custom properties. Set through React's style prop (CSSOM), which the CSP allows. */
@@ -16,4 +17,14 @@ export function themeVars(t: Theme): CSSProperties {
     "--border": t.border,
     "--enter-ms": `${t.enter.durationMs}ms`,
   } as CSSProperties;
+}
+
+/** The theme with the streamer's "Advanced" color and font overrides applied. */
+export function applyOverrides(t: Theme, a: Settings["advanced"]): Theme {
+  return {
+    ...t,
+    ...a.colors,
+    fontHeading: a.fontHeading ?? t.fontHeading,
+    fontBody: a.fontBody ?? t.fontBody,
+  };
 }
