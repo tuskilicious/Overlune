@@ -343,7 +343,31 @@
   background: var(--bg);
 }
 
-.editor-preview > .chat {
+.editor-preview > .chat,
+.editor-preview > .alerts {
   transform: scale(var(--scale));
   transform-origin: 0 0;
+}
+
+.editor-test-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.editor button:disabled {
+  cursor: not-allowed;
+  color: var(--text-muted);
+  border-style: dashed;
+}
+
+.editor-test-link {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.editor-alert-tester .editor-hint {
+  margin: 8px 0 0;
 }

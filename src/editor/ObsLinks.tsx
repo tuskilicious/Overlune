@@ -11,14 +11,14 @@ export const overlays = {
 
 export type OverlayId = keyof typeof overlays;
 
-interface LinkInfo {
+export interface LinkInfo {
   id: string;
   name: string;
   width: number;
   height: number;
 }
 
-function LinkRow({ name, width, height, link }: LinkInfo & { link: string }) {
+export function LinkRow({ name, width, height, link }: LinkInfo & { link: string }) {
   const input = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState("");
 

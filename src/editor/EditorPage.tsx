@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { fromZoneInput, toZoneInput } from "../lib/time";
 import { isHttpsUrl } from "../lib/url-safety";
 import StartingSoon from "../overlays/starting/StartingSoon";
@@ -22,7 +22,9 @@ import ChatView from "../overlays/chat/ChatView";
 import { botsFromInput } from "../overlays/chat/filters";
 import { chatSamples } from "./chat-samples";
 import { channelFromInput } from "../twitch/irc";
+import AlertTester from "./AlertTester";
 import ObsLinks, { overlays, type OverlayId as Scene } from "./ObsLinks";
+import Preview from "./Preview";
 import "./editor.css";
 
 type Platform = (typeof socialPlatforms)[number];
@@ -50,38 +52,6 @@ const colorNames: Record<ColorToken, string> = {
 
 /** Color pickers only take #rrggbb; a theme gradient background shows as black until overridden. */
 const asHex = (c: string) => (/^#[0-9a-fA-F]{6}$/.test(c) ? c : "#000000");
-
-/** Shows an overlay (1920×1080 unless sized) scaled down to the width it's given. */
-function Preview({
-  width = 1920,
-  height = 1080,
-  children,
-}: {
-  width?: number;
-  height?: number;
-  children: React.ReactNode;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.5);
-  useLayoutEffect(() => {
-    const el = ref.current!;
-    const ro = new ResizeObserver(() => setScale(el.clientWidth / width));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [width]);
-  return (
-    // The preview only repeats the form visually, so screen readers and Tab skip it (no second h1, no duplicate text).
-    <div
-      className="editor-preview"
-      ref={ref}
-      style={{ "--scale": scale, aspectRatio: `${width} / ${height}` } as React.CSSProperties}
-      aria-hidden
-      inert
-    >
-      {children}
-    </div>
-  );
-}
 
 /** Whole-number box that lets you type freely and saves only values in range. Shows the saved value again on blur. */
 function NumberField(props: {
@@ -733,6 +703,7 @@ export default function EditorPage() {
               />
             </Preview>
           </section>
+          <AlertTester settings={settings} />
           <ObsLinks settings={settings} />
         </div>
       </div>

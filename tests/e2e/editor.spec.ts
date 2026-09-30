@@ -359,3 +359,57 @@ test("chat size and text options update the link row and the chat preview", asyn
   await expect(page.getByLabel("Chat box width")).toHaveValue("500");
   await expect(page.getByLabel("Hide messages after")).toHaveValue("30");
 });
+
+test.describe("alert test buttons", () => {
+  const tester = (page: import("@playwright/test").Page) =>
+    page.getByRole("region", { name: "Preview: Alerts" });
+
+  test("a test button shows the alert with your message and plays the sound", async ({ page }) => {
+    await page.getByLabel("Raid message").fill("Welcome {user} and {amount} friends!");
+    const sound = page.waitForRequest(/\/sounds\/clean-slate\.ogg$/);
+    await page.getByRole("button", { name: "Test raid" }).click();
+    await expect(tester(page).locator(".alert-box")).toHaveText(
+      "Welcome FriendlyRaider and 42 friends!",
+    );
+    await sound;
+  });
+
+  test("quick clicks play one alert at a time, in order", async ({ page }) => {
+    await page.clock.install();
+    await page.reload();
+    for (const name of ["Test sub", "Test gift sub", "Test bits"])
+      await page.getByRole("button", { name }).click();
+    const box = tester(page).locator(".alert-box");
+    await expect(box).toHaveCount(1);
+    await expect(box).toHaveAttribute("data-kind", "sub");
+    await page.clock.runFor(5_500);
+    await expect(box).toHaveAttribute("data-kind", "subgift");
+    await page.clock.runFor(5_500);
+    await expect(box).toHaveAttribute("data-kind", "bits");
+  });
+
+  test("follows and donations are labeled coming soon", async ({ page }) => {
+    await expect(page.getByRole("button", { name: "Follow (coming soon)" })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Donation (coming soon)" })).toBeDisabled();
+  });
+
+  test("offers a test link for OBS that carries the settings", async ({ page }) => {
+    await page.getByLabel("Your Twitch channel name").fill("dallas");
+    const link = await tester(page)
+      .getByRole("textbox", { name: /Link to test your alerts in OBS/ })
+      .inputValue();
+    expect(link).toMatch(/\/o\/alerts\?test=1#1\./);
+    const normal = await page.getByRole("textbox", { name: /^Alerts/ }).inputValue();
+    expect(link.split("#")[1]).toBe(normal.split("#")[1]);
+  });
+});
+
+test("every preview is scaled to fit its box", async ({ page }) => {
+  await page.getByRole("button", { name: "Test raid" }).click();
+  for (const sel of [".scene", ".chat", ".alerts"]) {
+    const el = page.locator(`.editor-preview > ${sel}`).first();
+    const box = await el.boundingBox();
+    const frame = await el.locator("..").boundingBox();
+    expect(box!.width).toBeLessThanOrEqual(frame!.width + 1);
+  }
+});
