@@ -1,6 +1,6 @@
 # Overlune Terms of Use
 
-> **Draft: needs lawyer review before launch.** Not yet legal advice or final terms.
+> **Self-written, not legal advice.** Overlune is a free, non-commercial hobby project. This document was written by the maintainer, has not been reviewed by a lawyer, and does not guarantee compliance with any law.
 
 _Last updated: 2026-10-01_
 
@@ -33,7 +33,7 @@ To the fullest extent the law allows, the Overlune maintainers are not liable fo
 We may change or stop Overlune, or update these terms, at any time. When the terms change, we will update the date at the top. The full history of this file is public on GitHub. Continuing to use Overlune after a change means you accept the new terms.
 
 ## 9. Governing law
-These terms are governed by the laws of **[jurisdiction: lawyer to confirm]**.
+These terms are governed by the laws of **[country: maintainer to fill in]**.
 
 ## 10. Contact
 support@overlune.in
