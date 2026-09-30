@@ -1,20 +1,15 @@
-import { useMemo } from "react";
-import { useLocation } from "react-router";
-import { decode } from "../settings/url";
-import OverlayError from "./OverlayError";
+import type { ReactNode } from "react";
+import type { Settings } from "../settings/schema";
 import SceneFrame from "./SceneFrame";
 
+interface Props {
+  scene: "brb" | "ending";
+  settings: Settings;
+  error?: ReactNode;
+}
+
 /** BRB and Stream Ending: title, subtitle and socials only. */
-export default function TextScene({ scene }: { scene: "brb" | "ending" }) {
-  const { hash } = useLocation();
-  const { settings, ok } = useMemo(() => decode(hash), [hash]);
+export default function TextScene({ scene, settings, error }: Props) {
   const { title, subtitle } = settings[scene];
-  return (
-    <SceneFrame
-      settings={settings}
-      title={title}
-      subtitle={subtitle}
-      error={!ok && <OverlayError />}
-    />
-  );
+  return <SceneFrame settings={settings} title={title} subtitle={subtitle} error={error} />;
 }

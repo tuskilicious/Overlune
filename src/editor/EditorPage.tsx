@@ -1,7 +1,8 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { fromZoneInput, toZoneInput } from "../lib/time";
 import { isHttpsUrl } from "../lib/url-safety";
-import SceneFrame from "../overlays/SceneFrame";
+import StartingSoon from "../overlays/starting/StartingSoon";
+import TextScene from "../overlays/TextScene";
 import { defaultSettings, socialPlatforms, type Settings } from "../settings/schema";
 import { themes } from "../themes";
 import { cleanSlate } from "../themes/clean-slate";
@@ -253,7 +254,11 @@ export default function EditorPage() {
         <section className="editor-preview-wrap" aria-label="Preview">
           <h2>Preview: {sceneNames[scene]}</h2>
           <Preview>
-            <SceneFrame settings={settings} title={current.title} subtitle={current.subtitle} />
+            {scene === "starting" ? (
+              <StartingSoon settings={settings} />
+            ) : (
+              <TextScene scene={scene} settings={settings} />
+            )}
           </Preview>
         </section>
       </div>

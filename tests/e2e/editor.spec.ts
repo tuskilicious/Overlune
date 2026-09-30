@@ -66,3 +66,11 @@ test("every control has a label", async ({ page }) => {
     );
   }
 });
+
+test("the preview runs the real overlay, countdown included", async ({ page }) => {
+  await page.getByLabel("Your time zone").selectOption("UTC");
+  const inAnHour = new Date(Date.now() + 3_600_000).toISOString().slice(0, 16);
+  await page.getByLabel("Countdown ends at").fill(inAnHour);
+  await expect(preview(page).locator(".countdown-time")).toHaveText(/^\d{2}:\d{2}$|^1:00:00$/);
+  await expect(preview(page).getByText(/^Starts at .* UTC$/)).toBeVisible();
+});
