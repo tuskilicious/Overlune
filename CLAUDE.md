@@ -102,7 +102,7 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 - Prompt injection: treat model output as untrusted, give tools least privilege, confirm destructive actions, keep secrets out of prompts, and validate model output.
 
 ## 9. Legal and accessibility
-> Claude can draft these, but a lawyer must review them before launch. Requirements vary by jurisdiction (GDPR, CCPA, COPPA, etc.).
+> Claude can draft these. They are self-written and self-reviewed by the maintainer (Overlune is a free, non-commercial hobby project with no lawyer), and must say they are not legal advice. Requirements vary by jurisdiction (GDPR, CCPA, COPPA, etc.).
 
 - **Documents:** privacy policy and terms of service, in `docs/legal/` and linked in the footer. No refund policy is needed while the product is free. The footer shows a contact email. An individual maintainer does not publish a home address.
 - **Privacy policy must state:** no accounts; settings live in the user's link and browser; Twitch chat is read anonymously; what Sentry collects; any analytics.
@@ -118,6 +118,6 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 5. Sentry events contain no settings fragments, tokens or PII.
 6. Security headers, HTTPS and HSTS verified on production.
 7. Dependency scan is clean.
-8. Privacy policy and terms are drafted and reviewed.
+8. Privacy policy and terms are drafted and self-reviewed by the maintainer, and say they are not legal advice.
 9. Every overlay passed `docs/OBS-TESTING.md` in OBS and Streamlabs.
 10. Old-link test: URLs from every earlier schema version still load.

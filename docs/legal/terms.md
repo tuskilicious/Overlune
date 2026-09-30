@@ -33,7 +33,7 @@ To the fullest extent the law allows, the Overlune maintainers are not liable fo
 We may change or stop Overlune, or update these terms, at any time. When the terms change, we will update the date at the top. The full history of this file is public on GitHub. Continuing to use Overlune after a change means you accept the new terms.
 
 ## 9. Governing law
-These terms are governed by the laws of **[country: maintainer to fill in]**.
+These terms are governed by the laws of **India**.
 
 ## 10. Contact
 support@overlune.in
