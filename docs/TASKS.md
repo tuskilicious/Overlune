@@ -7,7 +7,7 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
 - [x] **T0.2 Git init.** `.gitignore` is already present. Make the first commit with the docs only.
 - [x] **T0.3 Scaffold** Vite + React + TS (strict) per `docs/STACK.md`. *Files written by hand. Run `npm install`, then pin the exact installed versions in `package.json` and commit the lockfile.*
   - Accept: `npm run dev` shows a placeholder editor page and `/o/starting` shows a placeholder overlay.
-- [ ] **T0.4 Scripts:** `lint`, `typecheck`, `test`, `test:e2e`, `build`, with ESLint and Prettier configured.
+- [x] **T0.4 Scripts:** `lint`, `typecheck`, `test`, `test:e2e`, `build`, with ESLint and Prettier configured.
   - Accept: all scripts pass on a clean checkout.
 - [ ] **T0.5 Secret scanning:** husky pre-commit running gitleaks and lint-staged. Document installing gitleaks in the README.
   - Accept: committing a fake token is blocked.

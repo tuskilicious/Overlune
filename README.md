@@ -13,7 +13,7 @@ Everything matches one theme. Paste the links into OBS or Streamlabs and you're 
 
 ## Setup
 Requirements:
-- Node.js 22 LTS
+- Node.js 24 LTS
 - Git
 - [gitleaks](https://github.com/gitleaks/gitleaks), for the pre-commit secret scan
 - OBS Studio, for testing overlays
@@ -22,6 +22,7 @@ Requirements:
 git clone <repo-url> overlune
 cd overlune
 npm ci
+npx playwright install chromium   # one-time, for npm run test:e2e
 cp .env.example .env.local   # fill in values if you use Sentry locally
 ```
 
@@ -42,7 +43,7 @@ npm run dev          # editor at http://localhost:5173, overlays at /o/<name>
 
 ## Test
 ```bash
-npm run lint
+npm run lint         # ESLint + Prettier check (npm run format to fix)
 npm run typecheck
 npm test             # unit tests (Vitest)
 npm run test:e2e     # overlay smoke tests (Playwright)

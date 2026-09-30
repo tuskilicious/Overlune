@@ -11,8 +11,7 @@ import { scrubBreadcrumb, scrubEvent } from "./sentry-scrub";
 const dsn = import.meta.env.VITE_SENTRY_DSN;
 
 export const sentryEnvironment: string =
-  import.meta.env.VITE_SENTRY_ENVIRONMENT ??
-  (import.meta.env.DEV ? "development" : "production");
+  import.meta.env.VITE_SENTRY_ENVIRONMENT ?? (import.meta.env.DEV ? "development" : "production");
 
 export const sentryEnabled = Boolean(dsn);
 

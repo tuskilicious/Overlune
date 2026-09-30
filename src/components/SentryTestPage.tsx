@@ -8,8 +8,8 @@ export default function SentryTestPage() {
     <main style={{ fontFamily: "system-ui, sans-serif", padding: 32 }}>
       <h1>Sentry test</h1>
       <p>
-        Sentry is <strong>{sentryEnabled ? "on" : "off (VITE_SENTRY_DSN not set)"}</strong>, environment:{" "}
-        <code>{sentryEnvironment}</code>
+        Sentry is <strong>{sentryEnabled ? "on" : "off (VITE_SENTRY_DSN not set)"}</strong>,
+        environment: <code>{sentryEnvironment}</code>
       </p>
       <button
         type="button"
