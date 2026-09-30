@@ -19,6 +19,39 @@
   color: var(--text-muted);
 }
 
+.editor-save {
+  margin-bottom: 24px;
+  padding: 16px;
+  max-width: 800px;
+  background: var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+}
+
+.editor-save h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.editor-save p {
+  margin: 4px 0 12px;
+  color: var(--text-muted);
+}
+
+.editor-load {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.editor .editor-load-status {
+  margin: 8px 0 0;
+  min-height: 1.2em;
+  font-size: 14px;
+  color: var(--accent);
+}
+
 .editor-body {
   display: grid;
   grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);

@@ -1,7 +1,7 @@
 import { compressToEncodedURIComponent } from "lz-string";
 import { describe, expect, it } from "vitest";
 import { defaultSettings, type Settings } from "../../../src/settings/schema";
-import { decode, encode } from "../../../src/settings/url";
+import { decode, decodeLink, encode } from "../../../src/settings/url";
 
 const raw = (data: unknown) => `#1.${compressToEncodedURIComponent(JSON.stringify(data))}`;
 
@@ -88,5 +88,32 @@ describe("settings link", () => {
     const { settings, ok } = decode(raw({ ...sample, socials }));
     expect(ok).toBe(false);
     expect(settings.socials).toEqual([]);
+  });
+});
+
+describe("decodeLink (Load my overlay from a link)", () => {
+  const hash = encode(sample);
+
+  it("reads overlay links, editor links and bare fragments, ignoring spaces", () => {
+    for (const text of [
+      `https://overlune.pages.dev/o/brb#${hash}`,
+      `https://overlune.pages.dev/#${hash}`,
+      `#${hash}`,
+      `  http://localhost:5173/o/starting?rm=1#${hash}\n`,
+    ])
+      expect(decodeLink(text)).toEqual({ settings: sample, ok: true });
+  });
+
+  it("returns null when there is no settings part", () => {
+    expect(decodeLink("https://overlune.pages.dev/o/brb")).toBeNull();
+    expect(decodeLink("hello")).toBeNull();
+    expect(decodeLink("https://overlune.pages.dev/#  ")).toBeNull();
+  });
+
+  it("flags a damaged link but still returns usable settings", () => {
+    expect(decodeLink("https://overlune.pages.dev/o/brb#1.garbage")).toEqual({
+      settings: defaultSettings,
+      ok: false,
+    });
   });
 });

@@ -52,7 +52,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *Passed in OBS 32 (2026-09-30). `FromLink` reads the link for overlay routes; `StartingSoon`/`TextScene` take `settings` as props, so the editor preview renders them directly, countdown included.*
 - [x] **T2.4 "Link to paste into OBS" panel:** copy button and width × height shown for each overlay.
   - *`src/editor/ObsLinks.tsx`. Sizes live in its `overlays` table, so chat and alerts add a row there. If copying is blocked, the link is selected and "Press Ctrl+C to copy" shows. No `?rm=1` toggle; the setup guide (T5.3) can mention it.*
-- [ ] **T2.5 "Load my overlay from a link"** and "Your link is your save file" messaging.
+- [x] **T2.5 "Load my overlay from a link"** and "Your link is your save file" messaging.
+  - *The editor's own address also carries the settings (`/#1.…`, same format, updated with `replaceState`), so a bookmark or reload keeps the work. `decodeLink()` accepts overlay links, editor links or a bare `#1.…`.*
 - [ ] **T2.6 Local autosave** (localStorage, wrapped in try/catch). The editor still works without it.
 - [ ] **T2.7 Advanced section** for color and font overrides, collapsed by default.
 - [ ] **T2.8 Accessibility pass on the editor:** keyboard navigation, focus rings, labels, AA contrast.
