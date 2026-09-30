@@ -5,7 +5,7 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 ## Core
 | Area | Choice | Why |
 |---|---|---|
-| Runtime | Node.js 22 LTS | Current LTS |
+| Runtime | Node.js 24 LTS | Current LTS |
 | Build | Vite | Fast, static output |
 | UI | React + TypeScript (`strict: true`) | Decided in planning |
 | Routing | React Router | Editor + overlay routes |
