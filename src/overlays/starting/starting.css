@@ -1,0 +1,29 @@
+.countdown {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.countdown-time {
+  font-family: var(--font-heading);
+  font-size: 160px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown-at {
+  font-size: 32px;
+  color: var(--text-muted);
+}
+
+.countdown-done {
+  font-family: var(--font-heading);
+  font-size: 96px;
+  font-weight: 700;
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}

@@ -1,0 +1,6 @@
+/* Overlays sit on top of the stream: no page margin, no background. */
+html,
+body {
+  margin: 0;
+  background: transparent;
+}
