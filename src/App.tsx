@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/react";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { sentryEnvironment } from "./lib/sentry";
 import EditorPage from "./editor/EditorPage";
+import FromLink from "./overlays/FromLink";
 import OverlayPlaceholder from "./overlays/OverlayPlaceholder";
 import StartingSoon from "./overlays/starting/StartingSoon";
 import TextScene from "./overlays/TextScene";
@@ -18,9 +19,26 @@ export default function App() {
     <BrowserRouter>
       <SentryRoutes>
         <Route path="/" element={<EditorPage />} />
-        <Route path="/o/starting" element={<StartingSoon />} />
-        <Route path="/o/brb" element={<TextScene scene="brb" />} />
-        <Route path="/o/ending" element={<TextScene scene="ending" />} />
+        <Route
+          path="/o/starting"
+          element={<FromLink>{(s, error) => <StartingSoon settings={s} error={error} />}</FromLink>}
+        />
+        <Route
+          path="/o/brb"
+          element={
+            <FromLink>
+              {(s, error) => <TextScene scene="brb" settings={s} error={error} />}
+            </FromLink>
+          }
+        />
+        <Route
+          path="/o/ending"
+          element={
+            <FromLink>
+              {(s, error) => <TextScene scene="ending" settings={s} error={error} />}
+            </FromLink>
+          }
+        />
         <Route path="/o/:overlay" element={<OverlayPlaceholder />} />
         {showSentryTest && <Route path="/_sentry-test" element={<SentryTestPage />} />}
       </SentryRoutes>
