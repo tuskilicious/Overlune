@@ -163,8 +163,9 @@ v1 fixes from watching someone set Overlune up as a brand-new streamer. These ar
 ### From the look-and-feel walkthrough (2026-10-01)
 Found by going through the live site at 1366×768 as a brand-new streamer. These make v1 more approachable before T5.7; they are not v2 features. One branch and PR per task. Tasks that change the layout get a proposal approved by the owner first (as in T6.12). Every task keeps axe clean, e2e passing and old links working.
 
-- [ ] **T6.15 Guide heading overlaps its intro.** On `/guide`, "Set up your overlays in OBS" is drawn on top of "About 5 minutes…", because `.editor-header h1` had `line-height: 0` (meant for the editor's logo image).
+- [x] **T6.15 Guide heading overlaps its intro.** On `/guide`, "Set up your overlays in OBS" is drawn on top of "About 5 minutes…", because `.editor-header h1` had `line-height: 0` (meant for the editor's logo image).
   - Accept: the logo image is `display: block` and the h1 keeps its normal line height. The editor header looks the same. e2e check that the guide heading doesn't overlap the line under it.
+  - *Done 2026-10-01. `line-height: 0` replaced by `.editor-header h1 img { display: block }` in `editor.css`. New e2e check in `guide.spec.ts` (fails on the old CSS). Editor and guide only, so no OBS test.*
 - [ ] **T6.16 A welcome for first-time visitors.** The page opens on a small tagline and a "Load my overlay from a link" box, so a newcomer isn't shown what they'll get.
   - Accept: a short welcome above the editor shows what Overlune makes (a real overlay preview, not a stock image) and what to do first, in beginner words. It gets out of the way once the streamer starts editing or comes back with a saved overlay. No unsupported claims. Layout approved first.
 - [ ] **T6.17 Theme picker shows the overlays.** Themes are radio buttons with small colour swatches, and the default (Clean Slate) is the plainest look.

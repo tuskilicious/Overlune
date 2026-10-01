@@ -11,6 +11,14 @@ test("the editor links to the setup guide and back", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Links to paste into OBS" })).toBeVisible();
 });
 
+test("the guide heading doesn't overlap the line under it", async ({ page }) => {
+  await page.goto("/guide");
+  const h1 = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
+  const intro = (await page.getByText("About 5 minutes.").boundingBox())!;
+  expect(h1.height).toBeGreaterThan(0);
+  expect(intro.y).toBeGreaterThanOrEqual(h1.y + h1.height);
+});
+
 test("the guide covers every fix beginners need", async ({ page }) => {
   await page.goto("/guide");
   for (const name of [
