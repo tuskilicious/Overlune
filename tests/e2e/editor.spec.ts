@@ -261,6 +261,27 @@ test.describe("steps (T6.18, T6.20)", () => {
   });
 });
 
+test("the logo field shows the logo, or a friendly message when no picture loads (T6.21)", async ({
+  page,
+}) => {
+  await page.route("https://logos.example/ok.png", (r) =>
+    r.fulfill({ path: "public/images/brand/logo.png" }),
+  );
+  await page.route("https://logos.example/page", (r) =>
+    r.fulfill({ contentType: "text/html", body: "<p>not a picture</p>" }),
+  );
+  const logo = page.getByLabel("Link to your logo image");
+  await expect(page.getByText("Copy image address")).toBeVisible();
+
+  await logo.fill("https://logos.example/page");
+  await expect(page.locator("#logo-error")).toHaveText(/^No picture loaded from this link/);
+  await expect(logo).toHaveAttribute("aria-invalid", "true");
+
+  await logo.fill("https://logos.example/ok.png");
+  await expect(page.getByRole("img", { name: "Your logo" })).toBeVisible();
+  await expect(page.locator("#logo-error")).toHaveText("");
+});
+
 test("alert messages can be built without typing codes (T6.19)", async ({ page }) => {
   await openMore(page, "Change alert messages");
   const raid = page.getByLabel("Raid message", { exact: true });
@@ -323,11 +344,11 @@ test("socials can be added and removed", async ({ page }) => {
 test("only https: logo links reach the preview", async ({ page }) => {
   const logo = page.getByLabel("Link to your logo image");
   await logo.fill("javascript:alert(1)");
-  await expect(page.locator("#logo-error")).toHaveText("This link must start with https://");
+  await expect(page.locator("#logo-error")).toContainText("This link must start with https://");
   await expect(preview(page).locator("img")).toHaveCount(0);
 
   await logo.fill("https://example.com/logo.png");
-  await expect(page.locator("#logo-error")).toHaveText("");
+  await expect(page.locator("#logo-error")).not.toContainText("https://");
   await expect(preview(page).locator("img")).toHaveAttribute("src", "https://example.com/logo.png");
 });
 
