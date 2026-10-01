@@ -10,6 +10,10 @@ test.beforeEach(async ({ page }) => {
   await startEditing(page);
 });
 
+/** Rarely changed settings sit in closed disclosures (T6.20). */
+const openMore = (page: import("@playwright/test").Page, name: string) =>
+  page.getByText(name, { exact: true }).click();
+
 const preview = (page: import("@playwright/test").Page) =>
   page.getByRole("region", { name: "Preview", exact: true });
 
@@ -221,6 +225,39 @@ test.describe("first visit (T6.16, T6.17)", () => {
     await page.reload();
     await expect(page.getByRole("region", { name: "Pick a look to start" })).toHaveCount(0);
     await expect(page.getByRole("radio", { name: "Forest Night" })).toBeChecked();
+  });
+});
+
+test.describe("steps (T6.18, T6.20)", () => {
+  test("the steps bar jumps to each step and moves focus there", async ({ page }) => {
+    const bar = page.getByRole("navigation", { name: "Steps" });
+    await expect(bar.getByRole("link")).toHaveText([
+      "1. Pick a look",
+      "2. Add your details",
+      "3. Links to paste into OBS",
+    ]);
+    await bar.getByRole("link", { name: "2. Add your details" }).click();
+    await expect(page.getByRole("heading", { name: "2. Add your details" })).toBeFocused();
+    await bar.getByRole("link", { name: "3. Links to paste into OBS" }).click();
+    await expect(page.locator("#obs-links")).toBeFocused();
+    await expect(page).toHaveURL(/\/#1\./); // jumping never replaces the settings in the address
+  });
+
+  test("rarely changed chat and alert settings start tucked away", async ({ page }) => {
+    for (const label of ["Bots to hide", "Chat box width", "Text size", "Hide messages after"])
+      await expect(page.getByLabel(label)).toBeHidden();
+    await expect(page.getByLabel("Raid message")).toBeHidden();
+    await expect(page.getByLabel("Your Twitch channel name")).toBeVisible();
+    await expect(page.getByLabel(/^Alert volume/)).toBeVisible();
+
+    await openMore(page, "More chat options");
+    await expect(page.getByLabel("Bots to hide")).toBeVisible();
+    await openMore(page, "Change alert messages");
+    await expect(page.getByLabel("Raid message")).toBeVisible();
+    const scan = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(scan.violations).toEqual([]);
   });
 });
 
@@ -497,12 +534,14 @@ test("a copied link opens the overlay with the editor's settings", async ({ page
 });
 
 test("the bot list can be edited and reset", async ({ page }) => {
+  await openMore(page, "More chat options");
   const box = page.getByLabel("Bots to hide");
   await expect(box).toHaveValue(/^nightbot\nstreamelements\n/);
   await box.fill("MyBot\n");
   await expect(box).toHaveValue("MyBot\n"); // typing isn't rewritten under the cursor
   await page.reload();
   await expect(page.getByLabel("Bots to hide")).toHaveValue("mybot");
+  await openMore(page, "More chat options");
   await page.getByRole("button", { name: "Reset to the usual bots" }).click();
   await expect(page.getByLabel("Bots to hide")).toHaveValue(/^nightbot\n/);
   await expect(page.getByLabel("Hide chat commands")).toBeChecked();
@@ -513,6 +552,7 @@ test("chat size and text options update the link row and the chat preview", asyn
   await expect(preview.getByText("Love the new look")).toBeAttached();
   await expect(preview.locator("img.chat-emote")).toHaveAttribute("alt", "Kappa");
 
+  await openMore(page, "More chat options");
   const width = page.getByLabel("Chat box width");
   await width.fill("3"); // half-typed: not saved, shows a hint
   await expect(page.getByText("Use a whole number from 250 to 1920.")).toBeVisible();
@@ -536,6 +576,7 @@ test.describe("alert test buttons", () => {
     page.getByRole("region", { name: "Preview: Alerts" });
 
   test("a test button shows the alert with your message and plays the sound", async ({ page }) => {
+    await openMore(page, "Change alert messages");
     await page.getByLabel("Raid message").fill("Welcome {user} and {amount} friends!");
     const sound = page.waitForRequest(/\/sounds\/clean-slate\.ogg$/);
     await page.getByRole("button", { name: "Test raid" }).click();
@@ -560,9 +601,11 @@ test.describe("alert test buttons", () => {
     await expect(box).toHaveAttribute("data-kind", "bits");
   });
 
-  test("follows and donations are labeled coming soon", async ({ page }) => {
-    await expect(page.getByRole("button", { name: "Follow (coming soon)" })).toBeDisabled();
-    await expect(page.getByRole("button", { name: "Donation (coming soon)" })).toBeDisabled();
+  test("follows and donations are one line of coming-soon text", async ({ page }) => {
+    await expect(
+      tester(page).getByText("Follow and donation alerts are coming in a later version."),
+    ).toBeVisible();
+    await expect(tester(page).getByRole("button", { name: /Follow|Donation/ })).toHaveCount(0);
   });
 
   test("offers a test link for OBS that carries the settings", async ({ page }) => {

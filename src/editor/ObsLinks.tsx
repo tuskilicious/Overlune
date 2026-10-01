@@ -54,7 +54,7 @@ export function LinkRow({ name, width, height, link }: LinkInfo & { link: string
 }
 
 /** "Link to paste into OBS" for each overlay. Every link carries all settings. */
-export default function ObsLinks({ settings }: { settings: Settings }) {
+export default function ObsLinks({ settings, heading }: { settings: Settings; heading: string }) {
   const hash = encode(settings);
   // Every overlay that gets a link: the scenes, chat (sized in the editor) and alerts.
   const links: LinkInfo[] = [
@@ -64,7 +64,7 @@ export default function ObsLinks({ settings }: { settings: Settings }) {
   ];
   return (
     <section id="obs-links" tabIndex={-1} className="editor-links" aria-labelledby="links-heading">
-      <h2 id="links-heading">Links to paste into OBS</h2>
+      <h2 id="links-heading">{heading}</h2>
       <p>
         In OBS, add a <strong>Browser</strong> source, paste the link, and enter the width and
         height shown. New to OBS? Follow the <Link to="/guide">step-by-step setup guide</Link>.

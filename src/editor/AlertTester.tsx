@@ -66,15 +66,9 @@ export default function AlertTester({ settings }: { settings: Settings }) {
             {label}
           </button>
         ))}
-        <button type="button" disabled aria-describedby="coming-soon">
-          Follow (coming soon)
-        </button>
-        <button type="button" disabled aria-describedby="coming-soon">
-          Donation (coming soon)
-        </button>
       </div>
-      <p id="coming-soon" className="editor-hint">
-        Follow and donation alerts need a Twitch login. They’re planned for a later version.
+      <p className="editor-hint">
+        Follow and donation alerts are coming in a later version. They need a Twitch login.
       </p>
       <ul className="editor-test-link">
         <LinkRow
