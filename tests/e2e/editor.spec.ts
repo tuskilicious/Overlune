@@ -155,7 +155,16 @@ test("the preview runs the real overlay, countdown included", async ({ page }) =
   const inAnHour = new Date(Date.now() + 3_600_000).toISOString().slice(0, 16);
   await page.getByLabel("Countdown ends at").fill(inAnHour);
   await expect(preview(page).locator(".countdown-time")).toHaveText(/^\d{2}:\d{2}$|^1:00:00$/);
-  await expect(preview(page).getByText(/^Starts at .* UTC$/)).toBeVisible();
+  // "tomorrow" when the test runs in the last hour before UTC midnight.
+  await expect(preview(page).getByText(/^Starts (at|tomorrow,) .* UTC$/)).toBeVisible();
+});
+
+test("a countdown days away shows days and names the start day", async ({ page }) => {
+  await page.getByLabel("Your time zone").selectOption("UTC");
+  const inTwoDays = new Date(Date.now() + 50 * 3_600_000).toISOString().slice(0, 16);
+  await page.getByLabel("Countdown ends at").fill(inTwoDays);
+  await expect(preview(page).locator(".countdown-time")).toHaveText(/^2d \d{1,2}h \d{1,2}m$/);
+  await expect(preview(page).getByText(/^Starts \w{3} \d{1,2} \w{3}, .* UTC$/)).toBeVisible();
 });
 
 test("each overlay link shows the size to enter in OBS", async ({ page }) => {

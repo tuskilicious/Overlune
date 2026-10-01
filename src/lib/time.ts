@@ -3,9 +3,13 @@ export function secondsLeft(endsAt: number, now: number): number {
   return Math.max(0, Math.ceil((endsAt - now) / 1000));
 }
 
-/** 754 → "12:34", 3754 → "1:02:34". Hours keep counting past 24. */
+/** 754 → "12:34", 3754 → "1:02:34". A day or more → "1d 13h 59m", so viewers don't read "37:59:55" as tonight. */
 export function formatCountdown(total: number): string {
   const pad = (n: number) => String(n).padStart(2, "0");
+  if (total >= 86400) {
+    const d = Math.floor(total / 86400);
+    return `${d}d ${Math.floor((total % 86400) / 3600)}h ${Math.floor((total % 3600) / 60)}m`;
+  }
   const h = Math.floor(total / 3600);
   const m = Math.floor((total % 3600) / 60);
   const s = total % 60;
@@ -53,4 +57,25 @@ export function fromZoneInput(value: string, tz: string): number | null {
   // Two passes so the offset is taken at the result, not the guess (matters next to a DST switch).
   const first = guess - (wallClock(guess, tz) - guess);
   return guess - (wallClock(first, tz) - first);
+}
+
+/** Calendar day of instant `ms` in `tz`, as a day count. Only differences between two of these mean anything. */
+const dayNumber = (ms: number, tz: string) => Math.floor(wallClock(ms, tz) / 86_400_000);
+
+/**
+ * The countdown's label, naming the day in the streamer's zone when it isn't today:
+ * "Starts at 8:00 PM GMT+5:30", "Starts tomorrow, 8:00 PM GMT+5:30", "Starts Sat 3 Oct, 8:00 PM GMT+5:30".
+ */
+export function formatStartsAt(endsAt: number, tz: string, now: number): string {
+  const time = formatEndTime(endsAt, tz);
+  const days = dayNumber(endsAt, tz) - dayNumber(now, tz);
+  if (days <= 0) return `Starts at ${time}`;
+  if (days === 1) return `Starts tomorrow, ${time}`;
+  const date = new Intl.DateTimeFormat("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: tz,
+  }).format(endsAt);
+  return `Starts ${date}, ${time}`;
 }
