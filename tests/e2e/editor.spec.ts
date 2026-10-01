@@ -428,7 +428,9 @@ test.describe("alert test buttons", () => {
     const link = await tester(page)
       .getByRole("textbox", { name: /Link to test your alerts in OBS/ })
       .inputValue();
-    expect(link).toMatch(/\/o\/alerts\?test=1#1\./);
+    const until = Number(link.match(/\/o\/alerts\?test=1&until=(\d+)#1\./)?.[1]);
+    // Stops playing samples about 15 minutes from now.
+    expect(Math.abs(until - (Date.now() / 1000 + 15 * 60))).toBeLessThan(120);
     const normal = await page.getByRole("textbox", { name: /^Alerts/ }).inputValue();
     expect(link.split("#")[1]).toBe(normal.split("#")[1]);
   });
