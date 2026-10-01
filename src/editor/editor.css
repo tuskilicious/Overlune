@@ -77,6 +77,63 @@
   }
 }
 
+/* Only narrow windows have the "Show preview" bar. */
+.editor-preview-toggle {
+  display: none;
+}
+
+/* Narrow windows (often the editor squeezed next to OBS): the scene preview docks to the bottom so it can be
+   seen while typing. Collapsed it's just the bar. The page keeps room for the dock, and scroll-padding keeps a
+   focused field from hiding behind it. Desktop-width layouts are unchanged; no mobile features (PRD). */
+@media (max-width: 800px) {
+  .editor {
+    padding-bottom: 88px;
+  }
+
+  html {
+    scroll-padding-bottom: 88px;
+  }
+
+  .editor:has(.editor-scene-preview[data-open]) {
+    padding-bottom: calc(45vh + 88px);
+  }
+
+  html:has(.editor-scene-preview[data-open]) {
+    scroll-padding-bottom: calc(45vh + 88px);
+  }
+
+  .editor .editor-scene-preview {
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px 16px;
+    background: var(--bg);
+    border-top: var(--border);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .editor .editor-preview-toggle {
+    display: block;
+    width: 100%;
+  }
+
+  .editor-scene-preview:not([data-open]) .editor-scene-preview-body {
+    display: none;
+  }
+
+  .editor-scene-preview-body {
+    margin-top: 12px;
+  }
+
+  /* Short enough to leave room for the form above it. */
+  .editor-scene-preview-body .editor-preview {
+    max-width: calc(45vh * 16 / 9);
+    margin: 0 auto;
+  }
+}
+
 .editor-form {
   display: flex;
   flex-direction: column;

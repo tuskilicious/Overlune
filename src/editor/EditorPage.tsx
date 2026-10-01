@@ -159,6 +159,8 @@ export default function EditorPage() {
   const [initial] = useState(initialState);
   const [settings, setSettings] = useState<Settings>(initial.settings);
   const [scene, setScene] = useState<Scene>("starting");
+  /** Narrow windows only: whether the docked preview is expanded. */
+  const [previewOpen, setPreviewOpen] = useState(false);
   // Kept apart from settings so a half-typed or unsafe link never reaches the preview.
   const [logoInput, setLogoInput] = useState(settings.logo);
   const [botsInput, setBotsInput] = useState(settings.chat.bots.join("\n"));
@@ -761,15 +763,31 @@ export default function EditorPage() {
         </form>
 
         <div className="editor-side">
-          <section className="editor-preview-wrap" aria-label="Preview">
-            <h2>Preview: {overlays[scene].name}</h2>
-            <Preview>
-              {scene === "starting" ? (
-                <StartingSoon settings={settings} />
-              ) : (
-                <TextScene scene={scene} settings={settings} />
-              )}
-            </Preview>
+          {/* In narrow windows this docks to the bottom behind a "Show preview" bar (editor.css). */}
+          <section
+            className="editor-preview-wrap editor-scene-preview"
+            aria-label="Preview"
+            data-open={previewOpen || undefined}
+          >
+            <button
+              type="button"
+              className="editor-preview-toggle"
+              aria-expanded={previewOpen}
+              aria-controls="scene-preview-body"
+              onClick={() => setPreviewOpen((o) => !o)}
+            >
+              {previewOpen ? "Hide preview" : "Show preview"}
+            </button>
+            <div id="scene-preview-body" className="editor-scene-preview-body">
+              <h2>Preview: {overlays[scene].name}</h2>
+              <Preview>
+                {scene === "starting" ? (
+                  <StartingSoon settings={settings} />
+                ) : (
+                  <TextScene scene={scene} settings={settings} />
+                )}
+              </Preview>
+            </div>
           </section>
           <section className="editor-preview-wrap editor-chat-preview" aria-label="Chat preview">
             <h2>Preview: Chat (sample messages)</h2>

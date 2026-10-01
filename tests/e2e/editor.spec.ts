@@ -560,3 +560,42 @@ test("picking Vaporwave Sunset restyles the preview, alerts and sound", async ({
   await page.reload();
   await expect(page.getByRole("radio", { name: "Vaporwave Sunset" })).toBeChecked();
 });
+
+test.describe("narrow editor window (T6.10)", () => {
+  const scan = (page: import("@playwright/test").Page) =>
+    new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  const toggle = (page: import("@playwright/test").Page) =>
+    page.getByRole("button", { name: /^(Show|Hide) preview$/ });
+
+  test("a bar pinned to the bottom shows and hides the preview", async ({ page }) => {
+    await page.setViewportSize({ width: 600, height: 800 });
+    await expect(toggle(page)).toHaveText("Show preview");
+    await expect(toggle(page)).toHaveAttribute("aria-expanded", "false");
+    await expect(preview(page).locator(".scene")).toBeHidden();
+    const bar = await toggle(page).boundingBox();
+    expect(bar!.y + bar!.height).toBeGreaterThan(800 - 80); // at the bottom of the window
+    expect((await scan(page)).violations).toEqual([]);
+
+    await toggle(page).click();
+    await expect(toggle(page)).toHaveAttribute("aria-expanded", "true");
+    await expect(toggle(page)).toHaveText("Hide preview");
+    await page.getByLabel("Title", { exact: true }).fill("Narrow window");
+    await expect(previewTitle(page, "Narrow window")).toBeVisible();
+    expect((await scan(page)).violations).toEqual([]);
+  });
+
+  test("works from the keyboard", async ({ page }) => {
+    await page.setViewportSize({ width: 600, height: 800 });
+    await toggle(page).focus();
+    await page.keyboard.press("Enter");
+    await expect(toggle(page)).toHaveAttribute("aria-expanded", "true");
+    await page.keyboard.press("Space");
+    await expect(toggle(page)).toHaveAttribute("aria-expanded", "false");
+  });
+
+  test("wide windows keep the preview beside the form, with no bar", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(toggle(page)).toBeHidden();
+    await expect(preview(page).locator(".scene")).toBeVisible();
+  });
+});
