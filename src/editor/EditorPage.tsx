@@ -303,6 +303,22 @@ export default function EditorPage() {
   const madeSomething = JSON.stringify(settings) !== freshJson;
   /** First visit: a gallery of looks comes before the editor (T6.16). Saved or loaded work skips it. */
   const welcome = !started;
+
+  /** The step whose heading has scrolled past the top third of the window, shown in the steps bar (T6.32). */
+  const [currentStep, setCurrentStep] = useState<string>(steps[0][0]);
+  useEffect(() => {
+    if (welcome) return;
+    const update = () => {
+      const atBottom = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+      const passed = steps.filter(
+        ([id]) => (document.getElementById(id)?.getBoundingClientRect().top ?? 0) < innerHeight / 3,
+      );
+      setCurrentStep(atBottom ? steps[2][0] : (passed.at(-1) ?? steps[0])[0]);
+    };
+    update();
+    addEventListener("scroll", update, { passive: true });
+    return () => removeEventListener("scroll", update);
+  }, [welcome]);
   const current = settings[scene];
 
   const updateAdvanced = (patch: Partial<Settings["advanced"]>) =>
@@ -451,7 +467,11 @@ export default function EditorPage() {
             <ol>
               {steps.map(([id, name]) => (
                 <li key={id}>
-                  <a href={`#${id}`} onClick={(e) => jumpTo(e, id)}>
+                  <a
+                    href={`#${id}`}
+                    aria-current={currentStep === id ? "step" : undefined}
+                    onClick={(e) => jumpTo(e, id)}
+                  >
                     {name}
                   </a>
                 </li>

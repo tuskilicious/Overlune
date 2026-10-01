@@ -218,8 +218,9 @@ Found by going through the live site again after T6.13–T6.25. One branch and P
 - [x] **T6.31 Smaller look picker in the editor.** The picker's 8 cards fill a screen, and the chosen look can sit below the fold.
   - Accept: the editor's picker uses smaller cards so all 8 fit without scrolling at 1366×768, names still readable, keyboard and axe unchanged. e2e test.
   - *Built 2026-10-02 on `feat/compact-picker`. CSS only: the editor's picker is three across with tighter cards and 13px names (long names wrap to two lines). At 1366×768 all 8 looks and the top of step 2 are on the first screen. The welcome gallery is unchanged. e2e test. Owner checked the batch preview (PR #63). Editor only, so no OBS test.*
-- [ ] **T6.32 Steps bar shows the current step.** The bar doesn't say where you are.
+- [x] **T6.32 Steps bar shows the current step.** The bar doesn't say where you are.
   - Accept: the step whose section is on screen is highlighted in the bar and marked `aria-current="step"`. e2e test.
+  - *Built 2026-10-02 on `feat/current-step`. A passive scroll listener marks the last step whose heading has passed the top third of the window (step 3 at the bottom of the page). The marked step gets `aria-current="step"`, the accent color and a 3px underline, so it doesn't rely on color alone. e2e test. Owner checked the batch preview (PR #64). Editor only, so no OBS test.*
 - [ ] **T6.33 Header tagline from the brand kit.** The header says "Free stream overlays that match…", but BRAND.md's primary tagline is "Free stream overlays that look pro."
   - Accept: the header uses the brand tagline plus a short how-to line. No unsupported claims.
 
