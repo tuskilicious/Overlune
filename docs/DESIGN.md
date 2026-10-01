@@ -50,7 +50,7 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 
 ### Right after launch
 **4. Arcade 8-Bit**
-- Colors: bg `#1A1030`, surface `#2B1B4F`, accents `#FFD23F` `#3EE6A0` `#FF5C7A`, text `#FFFFFF`
+- Colors: bg `#1A1030`, surface `#2B1B4F`, primary `#FFD23F`, accent `#3EE6A0`, pixel drop shadow `#FF5C7A`, muted `#C9BDEB` (shipped), text `#FFFFFF`
 - Fonts: Press Start 2P / VT323
 - Shape: radius 0, stepped animations
 - Effects: CRT scanlines

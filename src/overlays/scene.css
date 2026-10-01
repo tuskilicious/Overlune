@@ -120,6 +120,46 @@
   }
 }
 
+/* Arcade 8-Bit: CRT scanlines over the whole scene, plus a faint bright band rolling down it.
+   Transform-only animation. Reduced-motion version: index.css stops the band; the lines stay. */
+.scene[data-bg="scanlines"] {
+  position: relative;
+}
+
+.scene[data-bg="scanlines"]::before,
+.scene[data-bg="scanlines"]::after {
+  content: "";
+  position: absolute;
+  z-index: 1; /* over the content, like a real screen */
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.scene[data-bg="scanlines"]::before {
+  top: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(rgba(0, 0, 0, 0.28) 0 2px, transparent 2px 4px);
+}
+
+.scene[data-bg="scanlines"]::after {
+  top: -160px;
+  height: 160px;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.05), transparent);
+  animation: scene-roll 6s linear infinite;
+}
+
+@keyframes scene-roll {
+  to {
+    transform: translateY(1240px);
+  }
+}
+
+.scene[data-enter="steps"] .scene-main,
+.scene[data-enter="steps"] .scene-socials {
+  animation: scene-slide-fade var(--enter-ms) steps(4, end) both;
+}
+
 @keyframes scene-slide-fade {
   from {
     opacity: 0;

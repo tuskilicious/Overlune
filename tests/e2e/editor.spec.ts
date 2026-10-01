@@ -446,3 +446,19 @@ test("picking Cozy Café restyles the preview, alerts and sound", async ({ page 
   await page.reload();
   await expect(page.getByRole("radio", { name: "Cozy Café" })).toBeChecked();
 });
+
+test("picking Arcade 8-Bit restyles the preview, alerts and sound", async ({ page }) => {
+  await page.getByRole("radio", { name: "Arcade 8-Bit" }).check();
+  await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "scanlines");
+  await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Press Start 2P/);
+
+  const sound = page.waitForRequest(/\/sounds\/arcade-8bit\.ogg$/);
+  await page.getByRole("button", { name: "Test raid" }).click();
+  await expect(
+    page.getByRole("region", { name: "Preview: Alerts" }).locator(".alerts"),
+  ).toHaveAttribute("data-anim", "steps");
+  await sound;
+
+  await page.reload();
+  await expect(page.getByRole("radio", { name: "Arcade 8-Bit" })).toBeChecked();
+});
