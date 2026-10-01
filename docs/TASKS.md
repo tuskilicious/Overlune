@@ -211,6 +211,7 @@ Found by going through the live site again after T6.13–T6.25. One branch and P
   - *Built 2026-10-02 on `feat/chars-left`. `CharsLeft` under the title, subtitle, countdown-done message, each social name and each alert message: empty until 10 or fewer remain, then "N characters left" (`aria-live="polite"`, linked with `aria-describedby`). Limits unchanged. e2e test; also fixed a race in "a link in the address wins over the autosave", which read the address before the editor updated it. Waiting for the owner's batch check.*
 - [ ] **T6.29 Picking a look opens at the top.** After picking a look on the welcome gallery, the page lands mid-way with the preview under the steps bar.
   - Accept: the editor opens scrolled to the top, with focus still on the picked look's radio. e2e test.
+  - *Built 2026-10-02 on `fix/pick-opens-top`. The gallery focuses the picked radio with `preventScroll` and scrolls to the top. e2e: keyboard and mouse picks (Vaporwave Sunset, the last card) land at the top with focus on the radio; the mouse test failed before. Waiting for the owner's batch check.*
 - [ ] **T6.30 Preview stays in view.** On wide windows the scene preview scrolls away while editing socials, logo or colors.
   - Accept: at desktop widths the scene preview stays pinned under the steps bar while the form scrolls; chat and alert previews and narrow layouts are unchanged. e2e test.
 - [ ] **T6.31 Smaller look picker in the editor.** The picker's 8 cards fill a screen, and the chosen look can sit below the fold.

@@ -210,6 +210,7 @@ test.describe("first visit (T6.16, T6.17)", () => {
     await page.keyboard.press("Enter");
     await expect(page.getByRole("radio", { name: "Neon Grid" })).toBeChecked();
     await expect(page.getByRole("radio", { name: "Neon Grid" })).toBeFocused();
+    await expect.poll(() => page.evaluate(() => scrollY)).toBe(0); // opens at the top (T6.29)
     await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "grid");
   });
 
@@ -218,6 +219,14 @@ test.describe("first visit (T6.16, T6.17)", () => {
     await page.reload();
     await page.getByRole("radio", { name: "Clean Slate" }).check();
     await expect(page.getByLabel("Title", { exact: true })).toBeVisible();
+  });
+
+  test("picking the last look by mouse still opens at the top (T6.29)", async ({ page }) => {
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await page.getByRole("button", { name: "Vaporwave Sunset" }).click();
+    await expect(page.getByRole("radio", { name: "Vaporwave Sunset" })).toBeFocused();
+    await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
+    await expect(page.getByRole("heading", { name: "1. Pick a look" })).toBeInViewport();
   });
 
   test("saved work skips the gallery", async ({ page }) => {
