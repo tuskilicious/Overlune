@@ -529,6 +529,26 @@
   margin: 0 0 12px;
 }
 
+/* "N characters left" (T6.28): no room taken until a field is nearly full. */
+.editor .editor-chars {
+  margin: -4px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.editor .editor-chars:empty {
+  margin: 0;
+}
+
+/* Cancel the fieldset's 12px gap while empty, so fields keep their usual spacing. */
+.editor fieldset > .editor-chars:empty {
+  margin-top: -12px;
+}
+
+.editor-social .editor-chars {
+  grid-column: 1 / -1;
+}
+
 .editor-color {
   display: flex;
   align-items: center;
