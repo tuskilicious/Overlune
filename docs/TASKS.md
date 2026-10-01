@@ -223,4 +223,5 @@ Found by going through the live site again after T6.13–T6.25. One branch and P
   - *Built 2026-10-02 on `feat/current-step`. A passive scroll listener marks the last step whose heading has passed the top third of the window (step 3 at the bottom of the page). The marked step gets `aria-current="step"`, the accent color and a 3px underline, so it doesn't rely on color alone. e2e test. Waiting for the owner's batch check.*
 - [ ] **T6.33 Header tagline from the brand kit.** The header says "Free stream overlays that match…", but BRAND.md's primary tagline is "Free stream overlays that look pro."
   - Accept: the header uses the brand tagline plus a short how-to line. No unsupported claims.
+  - *Built 2026-10-02 on `feat/brand-tagline`. Header: "**Free stream overlays that look pro.** Pick a look, add your text, then paste into OBS." The tagline is in Quicksand at full text color, the how-to stays muted. The "under 10 minutes" support line is still left out until T5.7 measures it. Waiting for the owner's batch check.*
 

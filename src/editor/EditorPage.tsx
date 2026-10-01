@@ -346,7 +346,11 @@ export default function EditorPage() {
         <h1>
           <img src="/images/brand/logo.png" alt="Overlune" width="159" height="48" />
         </h1>
-        <p>Free stream overlays that match. Pick a look, add your text, then paste into OBS.</p>
+        {/* The primary tagline from docs/BRAND.md, then what to do (T6.33). */}
+        <p>
+          <strong className="editor-tagline">Free stream overlays that look pro.</strong> Pick a
+          look, add your text, then paste into OBS.
+        </p>
       </header>
 
       {/* One quiet line until something is made, then the bookmark reminder leads (T6.12). */}

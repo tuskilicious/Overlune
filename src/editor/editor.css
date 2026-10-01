@@ -28,6 +28,11 @@
   color: var(--text-muted);
 }
 
+.editor-tagline {
+  font-family: var(--font-heading);
+  color: var(--text);
+}
+
 /* "Your link is your save file" (PRD): one quiet line until something is made, then the bookmark reminder
    leads with an accent bar (T6.12). The actions wrap under the text in narrow windows. */
 .editor-save {
