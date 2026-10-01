@@ -36,3 +36,6 @@ desktop.ini
 .idea/
 *.swp
 *.swo
+
+# Deploy archives (README, "Antideploy")
+*.tar.gz
