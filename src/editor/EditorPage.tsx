@@ -220,6 +220,8 @@ export default function EditorPage() {
   const [loadText, setLoadText] = useState("");
   const [loadStatus, setLoadStatus] = useState(initial.status);
   const [confirmReset, setConfirmReset] = useState(false);
+  /** The logo link is https: but no picture loaded from it (T6.21). */
+  const [logoBroken, setLogoBroken] = useState(false);
   /** The editor shows instead of the welcome gallery (T6.16). Decided once, so setting everything back to the
    *  defaults never swaps the editor out from under the streamer. Picking Clean Slate changes no setting. */
   const [started, setStarted] = useState(
@@ -876,17 +878,35 @@ export default function EditorPage() {
                     type="url"
                     value={logoInput}
                     maxLength={2048}
-                    aria-invalid={!logoOk}
-                    aria-describedby="logo-error"
+                    aria-invalid={!logoOk || logoBroken}
+                    aria-describedby="logo-hint logo-error"
                     onChange={(e) => {
                       const v = e.target.value.trim();
                       setLogoInput(v);
+                      setLogoBroken(false);
                       update({ logo: v === "" || isHttpsUrl(v) ? v : "" });
                     }}
                   />
                 </label>
+                <p id="logo-hint" className="editor-hint">
+                  Use a picture that’s already online, like your Twitch profile picture: right-click
+                  it, choose <strong>Copy image address</strong>, and paste it here.
+                </p>
+                {settings.logo && !logoBroken && (
+                  <img
+                    key={settings.logo}
+                    className="editor-logo-check"
+                    src={settings.logo}
+                    alt="Your logo"
+                    onError={() => setLogoBroken(true)}
+                  />
+                )}
                 <p id="logo-error" className="editor-error" role="alert">
-                  {!logoOk && "This link must start with https://"}
+                  {!logoOk
+                    ? "This link must start with https://. Copy the image address again and paste it."
+                    : logoBroken
+                      ? "No picture loaded from this link. Check that it opens an image in your browser, not a web page."
+                      : ""}
                 </p>
               </fieldset>
 

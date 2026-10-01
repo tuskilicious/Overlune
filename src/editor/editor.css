@@ -553,6 +553,14 @@
   margin-top: 12px;
 }
 
+/* The logo as loaded, so a streamer sees the link works (T6.21). */
+.editor-logo-check {
+  max-width: 96px;
+  max-height: 96px;
+  object-fit: contain;
+  border-radius: var(--radius);
+}
+
 .editor-error {
   margin: 0;
   min-height: 1em;
