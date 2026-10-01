@@ -34,6 +34,44 @@ test("the time zone shows as text until you choose to change it", async ({ page 
   expect(scan.violations).toEqual([]);
 });
 
+/** "Load my overlay from a link" reveals the paste field (T6.12). */
+const openLoad = (page: import("@playwright/test").Page) =>
+  page.getByRole("button", { name: "Load my overlay from a link" }).click();
+
+test.describe("save file box (T6.12)", () => {
+  const box = (page: import("@playwright/test").Page) => page.locator(".editor-save");
+
+  test("is one compact line before anything is made", async ({ page }) => {
+    await expect(page.getByRole("heading", { name: /Your link is your save file/ })).toBeVisible();
+    await expect(box(page)).not.toContainText("Bookmark this page");
+    await expect(page.getByRole("button", { name: "Start over" })).toHaveCount(0);
+    await expect(page.getByLabel("Paste a link from Overlune")).toBeHidden();
+  });
+
+  test("puts the bookmark reminder first once something is made", async ({ page }) => {
+    await page.getByLabel("Title", { exact: true }).fill("My stream");
+    await expect(box(page)).toContainText("Bookmark this page to keep your overlay.");
+    await expect(page.getByRole("button", { name: "Start over" })).toBeVisible();
+    const scan = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(scan.violations).toEqual([]);
+  });
+
+  test("Load reveals the paste field from the keyboard", async ({ page }) => {
+    const load = page.getByRole("button", { name: "Load my overlay from a link" });
+    await expect(load).toHaveAttribute("aria-expanded", "false");
+    await load.focus();
+    await page.keyboard.press("Enter");
+    await expect(load).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByLabel("Paste a link from Overlune")).toBeFocused();
+    const scan = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(scan.violations).toEqual([]);
+  });
+});
+
 test("the editor has no axe accessibility violations", async ({ page }) => {
   const scan = () =>
     new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
@@ -82,12 +120,15 @@ test("focus stays in place when the button you pressed goes away", async ({ page
   await page.getByRole("button", { name: "Reset all to the theme" }).press("Enter");
   await expect(page.locator("#advanced-summary")).toBeFocused();
 
+  // Everything above was undone, so make a change for "Start over" to clear (it only shows then, T6.12).
+  await page.getByLabel("Title", { exact: true }).fill("Something to clear");
   await page.getByRole("button", { name: "Start over" }).press("Enter");
   await page.getByRole("button", { name: "Cancel" }).press("Enter");
   await expect(page.getByRole("button", { name: "Start over" })).toBeFocused();
   await page.getByRole("button", { name: "Start over" }).press("Enter");
   await page.getByRole("button", { name: "Yes, start over" }).press("Enter");
-  await expect(page.getByRole("button", { name: "Start over" })).toBeFocused();
+  // Back to the defaults, so "Start over" is gone (T6.12); focus moves to the Load button.
+  await expect(page.getByRole("button", { name: "Load my overlay from a link" })).toBeFocused();
 });
 
 test("keyboard focus is always visible", async ({ page }) => {
@@ -240,7 +281,8 @@ test("an old link loads back into the editor", async ({ page, context }) => {
   await page.getByRole("radio", { name: "Be Right Back" }).check();
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Be right back");
 
-  await page.getByLabel("Load my overlay from a link").fill(link);
+  await openLoad(page);
+  await page.getByLabel("Paste a link from Overlune").fill(link);
   await page.getByRole("button", { name: "Load", exact: true }).click();
   await expect(page.getByRole("status").filter({ hasText: "Loaded!" })).toBeVisible();
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Grabbing snacks");
@@ -252,14 +294,16 @@ test("an old link loads back into the editor", async ({ page, context }) => {
 
 test("text that isn't an Overlune link changes nothing", async ({ page }) => {
   await page.getByLabel("Title", { exact: true }).fill("My title");
-  await page.getByLabel("Load my overlay from a link").fill("https://example.com/");
-  await page.getByLabel("Load my overlay from a link").press("Enter");
+  await openLoad(page);
+  await page.getByLabel("Paste a link from Overlune").fill("https://example.com/");
+  await page.getByLabel("Paste a link from Overlune").press("Enter");
   await expect(page.getByRole("status").filter({ hasText: "doesn’t look like" })).toBeVisible();
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("My title");
 });
 
 test("a damaged link loads what it can and says so", async ({ page }) => {
-  await page.getByLabel("Load my overlay from a link").fill("https://overlune.pages.dev/o/brb#1.x");
+  await openLoad(page);
+  await page.getByLabel("Paste a link from Overlune").fill("https://overlune.pages.dev/o/brb#1.x");
   await page.getByRole("button", { name: "Load", exact: true }).click();
   await expect(page.getByRole("status").filter({ hasText: "couldn’t be read" })).toBeVisible();
 });

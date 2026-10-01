@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { contrast } from "../../../src/lib/contrast";
-import { cleanSlate as t } from "../../../src/themes/clean-slate";
+import { brandChrome as t } from "../../../src/editor/brand";
 
-// The editor chrome uses Clean Slate tokens (docs/DESIGN.md). Error red is set in editor.css.
+// The editor chrome uses Overlune's brand tokens (docs/BRAND.md). Error red is set in editor.css.
 const error = "#ff8a8a";
 
 describe("editor colors meet WCAG AA", () => {

@@ -1,4 +1,4 @@
-/* Editor chrome uses Clean Slate tokens (docs/DESIGN.md), set as CSS variables on .editor. */
+/* Editor chrome uses Overlune brand tokens (src/editor/brand.ts, docs/BRAND.md), set as CSS variables on .editor. */
 .editor {
   min-height: 100vh;
   color-scheme: dark;
@@ -24,23 +24,78 @@
   color: var(--text-muted);
 }
 
+/* "Your link is your save file" (PRD): one quiet line until something is made, then the bookmark reminder
+   leads with an accent bar (T6.12). The actions wrap under the text in narrow windows. */
 .editor-save {
   margin-bottom: 24px;
-  padding: 16px;
+  padding: 12px 16px;
   max-width: 800px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 16px; /* rows space themselves, so an empty status line adds nothing */
   background: var(--surface);
   border: var(--border);
   border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.editor-save[data-made] {
+  border-left: 4px solid var(--accent);
+}
+
+.editor-save-text {
+  flex: 1 1 320px;
 }
 
 .editor-save h2 {
+  display: inline;
   margin: 0;
-  font-size: 18px;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .editor-save p {
-  margin: 4px 0 12px;
-  color: var(--text-muted);
+  margin: 0;
+}
+
+.editor-save .editor-save-lead {
+  margin-bottom: 2px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.editor-save-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.editor-save .editor-load,
+.editor-save .editor-load-status {
+  flex: 1 1 100%;
+}
+
+.editor-save .editor-load {
+  margin-top: 12px;
+}
+
+/* The grid display below would otherwise override the hidden attribute. */
+.editor-save .editor-load[hidden] {
+  display: none;
+}
+
+.editor-save .editor-load button {
+  align-self: end;
+}
+
+/* Takes no room while empty, but stays in the page so screen readers still hear "Loaded!". */
+.editor-save .editor-load-status:empty {
+  margin: 0;
+  min-height: 0;
 }
 
 .editor-load {

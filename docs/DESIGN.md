@@ -87,5 +87,5 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 - Error states use the theme's surface and text colors, stay readable, and never flash.
 
 ## Editor UI
-- The editor uses Clean Slate tokens for its own chrome, so it stays neutral next to any theme preview.
+- The editor and setup guide use Overlune's brand tokens for their chrome (`src/editor/brand.ts`, `docs/BRAND.md`). The near-black Night ground keeps the chrome quiet next to any theme preview.
 - Visible focus rings, full keyboard navigation, and labels on every control.

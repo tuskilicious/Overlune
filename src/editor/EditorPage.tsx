@@ -13,7 +13,7 @@ import {
 import { loadSaved, save } from "../settings/storage";
 import { decodeLink, encode } from "../settings/url";
 import { themes } from "../themes";
-import { cleanSlate } from "../themes/clean-slate";
+import { brandChrome } from "./brand";
 import { contrast } from "../lib/contrast";
 import { colorTokens, fontIds, themeIds, type ColorToken, type FontId } from "../themes/types";
 import { applyOverrides, themeVars } from "../themes/vars";
@@ -139,6 +139,7 @@ const freshSettings = (): Settings => ({
   ...defaultSettings,
   starting: { ...defaultSettings.starting, tz: browserTz },
 });
+const freshJson = JSON.stringify(freshSettings());
 
 /** Where the editor starts: a link in the address wins, then this browser's autosave, then defaults. */
 function initialState(): { settings: Settings; status: string } {
@@ -163,6 +164,7 @@ export default function EditorPage() {
   const [previewOpen, setPreviewOpen] = useState(false);
   /** The long time zone list stays hidden until "Change" (T6.11). */
   const [tzOpen, setTzOpen] = useState(false);
+  const [loadOpen, setLoadOpen] = useState(false);
   // Kept apart from settings so a half-typed or unsafe link never reaches the preview.
   const [logoInput, setLogoInput] = useState(settings.logo);
   const [botsInput, setBotsInput] = useState(settings.chat.bots.join("\n"));
@@ -183,7 +185,7 @@ export default function EditorPage() {
     setLogoInput(fresh.logo);
     setBotsInput(fresh.chat.bots.join("\n"));
     setConfirmReset(false);
-    focusSoon("start-over");
+    focusSoon("load-toggle"); // "Start over" disappears with nothing left to clear
     setLoadStatus("Started over. Any link you kept still loads your old overlay.");
   };
 
@@ -217,6 +219,8 @@ export default function EditorPage() {
 
   const logoOk = logoInput === "" || isHttpsUrl(logoInput);
   const { starting } = settings;
+  /** Anything changed from a fresh editor, including work restored from a link or autosave. */
+  const madeSomething = JSON.stringify(settings) !== freshJson;
   const current = settings[scene];
 
   const updateAdvanced = (patch: Partial<Settings["advanced"]>) =>
@@ -230,7 +234,7 @@ export default function EditorPage() {
     );
 
   return (
-    <div className="editor" style={themeVars(cleanSlate)}>
+    <div className="editor" style={themeVars(brandChrome)}>
       {/* No real #fragment jump: the address bar's fragment holds the settings. */}
       <a
         className="editor-skip"
@@ -251,25 +255,77 @@ export default function EditorPage() {
         <p>Free stream overlays that match. Pick a look, add your text, then paste into OBS.</p>
       </header>
 
-      <section className="editor-save" aria-labelledby="save-heading">
-        <h2 id="save-heading">Your link is your save file</h2>
-        <p>
-          Overlune has no accounts. Your overlay lives in its link.{" "}
-          <strong>Bookmark this page</strong> or keep any of your OBS links, and paste it below to
-          keep editing. Changes also save in this browser automatically.
-        </p>
+      {/* One quiet line until something is made, then the bookmark reminder leads (T6.12). */}
+      <section
+        className="editor-save"
+        aria-labelledby="save-heading"
+        data-made={madeSomething || undefined}
+      >
+        <div className="editor-save-text">
+          {madeSomething && (
+            <p className="editor-save-lead">Bookmark this page to keep your overlay.</p>
+          )}
+          <div>
+            <h2 id="save-heading">Your link is your save file.</h2>{" "}
+            {madeSomething ? "Changes also save in this browser." : "No accounts needed."}
+          </div>
+        </div>
+        <div className="editor-save-actions">
+          <button
+            id="load-toggle"
+            type="button"
+            aria-expanded={loadOpen}
+            aria-controls="load-form"
+            onClick={() => {
+              setLoadOpen((o) => !o);
+              if (!loadOpen) focusSoon("load-input");
+            }}
+          >
+            Load my overlay from a link
+          </button>
+          {madeSomething &&
+            (confirmReset ? (
+              <div className="editor-reset" role="group" aria-labelledby="reset-question">
+                <span id="reset-question">
+                  Clear everything and start from the defaults? Keep your link first if you might
+                  want it back.
+                </span>
+                <button type="button" onClick={startOver}>
+                  Yes, start over
+                </button>
+                {/* Focus lands on the safe choice. */}
+                <button
+                  type="button"
+                  autoFocus
+                  onClick={() => {
+                    setConfirmReset(false);
+                    focusSoon("start-over");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button id="start-over" type="button" onClick={() => setConfirmReset(true)}>
+                Start over
+              </button>
+            ))}
+        </div>
         <form
+          id="load-form"
           className="editor-load"
+          hidden={!loadOpen}
           onSubmit={(e) => {
             e.preventDefault();
             load();
           }}
         >
           <label>
-            Load my overlay from a link
+            Paste a link from Overlune
             <input
+              id="load-input"
               value={loadText}
-              placeholder="Paste a link from Overlune"
+              placeholder="Your overlay or editor link"
               onChange={(e) => setLoadText(e.target.value)}
             />
           </label>
@@ -278,32 +334,6 @@ export default function EditorPage() {
         <p className="editor-load-status" role="status">
           {loadStatus}
         </p>
-        {confirmReset ? (
-          <div className="editor-reset" role="group" aria-labelledby="reset-question">
-            <span id="reset-question">
-              Clear everything and start from the defaults? Keep your link first if you might want
-              it back.
-            </span>
-            <button type="button" onClick={startOver}>
-              Yes, start over
-            </button>
-            {/* Focus lands on the safe choice. */}
-            <button
-              type="button"
-              autoFocus
-              onClick={() => {
-                setConfirmReset(false);
-                focusSoon("start-over");
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <button id="start-over" type="button" onClick={() => setConfirmReset(true)}>
-            Start over
-          </button>
-        )}
       </section>
 
       <div className="editor-body">

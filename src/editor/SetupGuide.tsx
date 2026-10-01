@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import SiteFooter from "../components/SiteFooter";
 import { defaultSettings } from "../settings/schema";
-import { cleanSlate } from "../themes/clean-slate";
+import { brandChrome } from "./brand";
 import "../themes/fonts";
 import { themeVars } from "../themes/vars";
 import { overlays } from "./ObsLinks";
@@ -31,7 +31,7 @@ export default function SetupGuide() {
     { name: "Alerts", width: 1920, height: 1080, note: "" },
   ];
   return (
-    <div className="editor guide" style={themeVars(cleanSlate)}>
+    <div className="editor guide" style={themeVars(brandChrome)}>
       <header className="editor-header">
         <p>
           <Link to="/">← Back to the editor</Link>
