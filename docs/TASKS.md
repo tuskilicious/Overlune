@@ -154,7 +154,7 @@ v1 fixes from watching someone set Overlune up as a brand-new streamer. These ar
 - [ ] **T6.13 Privacy and terms as site pages.** Footer links go to markdown on GitHub, which looks unfinished to non-developers.
   - Accept: `/privacy` and `/terms` pages in the editor's style, built from `docs/legal/*.md` (one source of truth). Footer links point to them. No `innerHTML` or `dangerouslySetInnerHTML`.
   - Accept: any new dependency (such as a markdown renderer) is approved by the owner first. CSP in `public/_headers` unchanged and checked on the preview. axe clean on both pages, and no `public/` folder shadows the routes.
-- [ ] **T6.14 Brand kit.** The owner's new logo replaces the old one, and the site uses Overlune's own colors and fonts.
+- [x] **T6.14 Brand kit.** The owner's new logo replaces the old one, and the site uses Overlune's own colors and fonts.
   - Accept: new logo in the editor header, favicon set, Apple touch icon, link-preview (Open Graph) image and `theme-color` in `index.html`. Editor and guide chrome use the brand tokens (`src/editor/brand.ts`, `docs/BRAND.md`), still WCAG AA (contrast unit test). Assets recorded in `docs/ASSETS.md`. CSP unchanged.
   - Accept: `npm test` and `npm run test:e2e` pass, axe stays clean on the editor and guide, and the link preview shows on the deployed preview.
-  - *In progress 2026-10-01. Logo, icons, meta tags and brand chrome done; lint and typecheck pass. `npm test` (263) and `npm run test:e2e` (93, axe clean) pass. Still to do: owner looks at the editor and guide, and the link preview is checked on the deployed preview.*
+  - *Done 2026-10-01. Tests pass (263 unit, 93 e2e, axe clean). Owner checked the editor, guide and link preview on the deployed preview.*
