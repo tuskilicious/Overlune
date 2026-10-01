@@ -20,6 +20,7 @@ const sample: Settings = {
     endsAt: 1_790_000_000_000,
     tz: "Asia/Kolkata",
     doneText: "Here we go",
+    repeat: { mode: "days", days: [1, 5], time: "19:30" },
   },
   brb: { title: "Snack break", subtitle: "Back in 5" },
   ending: { title: "GG!", subtitle: "Raiding a friend" },
@@ -279,5 +280,26 @@ describe("alert volume (T4.4)", () => {
     const { settings, ok } = decode(raw({ alerts: { volume } }));
     expect(ok).toBe(false);
     expect(settings.alerts.volume).toBe(70);
+  });
+});
+
+describe("repeating countdown (T6.8)", () => {
+  it("is off for older links, so they count to their fixed time as before", () => {
+    const { settings, ok } = decode(raw({ starting: { endsAt: 1_790_000_000_000 } }));
+    expect(ok).toBe(true);
+    expect(settings.starting.repeat).toEqual({ mode: "off", days: [], time: "20:00" });
+    expect(settings.starting.endsAt).toBe(1_790_000_000_000);
+  });
+
+  it.each([
+    { mode: "weekly" },
+    { mode: "days", days: [7] },
+    { mode: "days", days: [1, 1, 1, 1, 1, 1, 1, 1] },
+    { mode: "daily", time: "25:00" },
+    { mode: "daily", time: "8pm" },
+  ])("rejects %j", (repeat) => {
+    const { settings, ok } = decode(raw({ starting: { repeat } }));
+    expect(ok).toBe(false);
+    expect(settings.starting.repeat.mode).toBe("off");
   });
 });

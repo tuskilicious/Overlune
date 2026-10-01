@@ -77,6 +77,19 @@ export const settingsV1 = z.object({
       endsAt: z.number().int().nonnegative().nullable().default(null),
       tz: z.string().max(64).refine(isTimeZone, "Unknown time zone").default("UTC"),
       doneText: text(60, "Starting now!"),
+      /** Repeating countdown (T6.8): when not "off", counts to the next matching time in `tz` instead of `endsAt`. */
+      repeat: z
+        .object({
+          mode: z.enum(["off", "daily", "days"]).default("off"),
+          /** Weekdays for "days": 0 = Sunday … 6 = Saturday. */
+          days: z.array(z.number().int().min(0).max(6)).max(7).default([]),
+          /** Wall-clock start time in `tz`, "HH:MM". */
+          time: z
+            .string()
+            .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Times look like 20:00")
+            .default("20:00"),
+        })
+        .prefault({}),
     })
     .prefault({}),
   brb: z.object({ title: text(60, "Be right back"), subtitle: text(120) }).prefault({}),

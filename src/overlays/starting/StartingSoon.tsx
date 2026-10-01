@@ -1,23 +1,18 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { formatCountdown, formatStartsAt, secondsLeft } from "../../lib/time";
+import { formatCountdown, formatStartsAt, nextRepeatStart, secondsLeft } from "../../lib/time";
 import type { Settings } from "../../settings/schema";
 import SceneFrame from "../SceneFrame";
 import "./starting.css";
 
-/** Counts down to a fixed instant from the link, so reloads and scene switches never reset it. */
-function useSecondsLeft(endsAt: number | null): number | null {
-  const [secs, setSecs] = useState(() =>
-    endsAt === null ? null : secondsLeft(endsAt, Date.now()),
-  );
+/** The current time, whole seconds. React skips re-renders for an unchanged value, so this redraws once per second. */
+function useNowSeconds(): number {
+  const read = () => Math.floor(Date.now() / 1000) * 1000;
+  const [now, setNow] = useState(read);
   useEffect(() => {
-    if (endsAt === null) return;
-    // React skips the re-render when the value is unchanged, so this redraws once per second.
-    const tick = () => setSecs(secondsLeft(endsAt, Date.now()));
-    tick();
-    const id = setInterval(tick, 250);
+    const id = setInterval(() => setNow(read()), 250);
     return () => clearInterval(id);
-  }, [endsAt]);
-  return secs;
+  }, []);
+  return now;
 }
 
 export default function StartingSoon({
@@ -27,8 +22,12 @@ export default function StartingSoon({
   settings: Settings;
   error?: ReactNode;
 }) {
-  const { title, subtitle, endsAt, tz, doneText } = settings.starting;
-  const secs = useSecondsLeft(endsAt);
+  const { title, subtitle, tz, doneText, repeat } = settings.starting;
+  const now = useNowSeconds();
+  // Both are fixed by the link, so reloads and scene switches never reset the countdown.
+  const endsAt =
+    repeat.mode === "off" ? settings.starting.endsAt : nextRepeatStart(repeat, tz, now);
+  const secs = endsAt === null ? null : secondsLeft(endsAt, now);
 
   return (
     <SceneFrame settings={settings} title={title} subtitle={subtitle} error={error}>
@@ -37,7 +36,7 @@ export default function StartingSoon({
           {secs > 0 ? (
             <>
               <div className="countdown-time">{formatCountdown(secs)}</div>
-              <div className="countdown-at">{formatStartsAt(endsAt, tz, endsAt - secs * 1000)}</div>
+              <div className="countdown-at">{formatStartsAt(endsAt, tz, now)}</div>
             </>
           ) : (
             <div className="countdown-done">{doneText}</div>

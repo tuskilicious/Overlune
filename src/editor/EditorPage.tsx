@@ -40,6 +40,17 @@ const platformNames: Record<Platform, string> = {
 };
 
 const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+type RepeatMode = Settings["starting"]["repeat"]["mode"];
+/** Monday first; values are JavaScript weekdays (0 = Sunday), as stored in the link. */
+const weekdays = [
+  [1, "Mon"],
+  [2, "Tue"],
+  [3, "Wed"],
+  [4, "Thu"],
+  [5, "Fri"],
+  [6, "Sat"],
+  [0, "Sun"],
+] as const;
 const timeZones = Array.from(new Set(["UTC", browserTz, ...Intl.supportedValuesOf("timeZone")]));
 
 const colorNames: Record<ColorToken, string> = {
@@ -355,19 +366,82 @@ export default function EditorPage() {
             {scene === "starting" && (
               <>
                 <label>
-                  Countdown ends at (leave empty for no countdown)
-                  <input
-                    type="datetime-local"
-                    value={
-                      starting.endsAt === null ? "" : toZoneInput(starting.endsAt, starting.tz)
-                    }
+                  Repeat this countdown every stream
+                  <select
+                    value={starting.repeat.mode}
+                    aria-describedby="repeat-hint"
                     onChange={(e) =>
                       updateScene("starting", {
-                        endsAt: fromZoneInput(e.target.value, starting.tz),
+                        repeat: { ...starting.repeat, mode: e.target.value as RepeatMode },
                       })
                     }
-                  />
+                  >
+                    <option value="off">No, just once</option>
+                    <option value="daily">Every day</option>
+                    <option value="days">On these days</option>
+                  </select>
                 </label>
+                <p id="repeat-hint" className="editor-hint">
+                  A repeating countdown always counts to your next stream, so you never re-paste the
+                  link into OBS.
+                </p>
+                {starting.repeat.mode === "off" ? (
+                  <label>
+                    Countdown ends at (leave empty for no countdown)
+                    <input
+                      type="datetime-local"
+                      value={
+                        starting.endsAt === null ? "" : toZoneInput(starting.endsAt, starting.tz)
+                      }
+                      onChange={(e) =>
+                        updateScene("starting", {
+                          endsAt: fromZoneInput(e.target.value, starting.tz),
+                        })
+                      }
+                    />
+                  </label>
+                ) : (
+                  <>
+                    {starting.repeat.mode === "days" && (
+                      <fieldset className="editor-days">
+                        <legend>Stream days</legend>
+                        {weekdays.map(([day, name]) => (
+                          <label key={day} className="editor-check">
+                            <input
+                              type="checkbox"
+                              checked={starting.repeat.days.includes(day)}
+                              onChange={(e) =>
+                                updateScene("starting", {
+                                  repeat: {
+                                    ...starting.repeat,
+                                    days: e.target.checked
+                                      ? [...starting.repeat.days, day].sort()
+                                      : starting.repeat.days.filter((d) => d !== day),
+                                  },
+                                })
+                              }
+                            />
+                            {name}
+                          </label>
+                        ))}
+                      </fieldset>
+                    )}
+                    <label>
+                      Stream starts at
+                      <input
+                        type="time"
+                        value={starting.repeat.time}
+                        onChange={(e) =>
+                          // Clearing the field would make an invalid time, so keep the last good one.
+                          e.target.value &&
+                          updateScene("starting", {
+                            repeat: { ...starting.repeat, time: e.target.value },
+                          })
+                        }
+                      />
+                    </label>
+                  </>
+                )}
                 <label>
                   Your time zone
                   <select

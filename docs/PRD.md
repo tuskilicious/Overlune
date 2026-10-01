@@ -35,7 +35,8 @@ The free alternatives are StreamElements and Streamlabs themes, OWN3D freebies a
 1. **Themes:** 3 at launch (Clean Slate, Neon Grid, Cozy Café), with 5 more right after launch. See `docs/DESIGN.md`. One theme choice restyles everything. Advanced overrides are tucked away.
 2. **Scenes:** Starting Soon, BRB and Stream Ending, each 1920×1080.
    - Editable title, subtitle and socials row.
-   - Starting Soon counts down to a **fixed end time** stored in the URL, so the countdown survives OBS reloads. The timezone is shown.
+   - Starting Soon counts down to a **fixed end time** stored in the URL, so the countdown survives OBS reloads. The timezone is shown, and the start day is named when it isn't today.
+   - Optionally the countdown **repeats** (every day, or on chosen weekdays at a set time), so one link always counts to the next stream and never needs re-pasting. Fixed stays the default. After the start time it shows the done text for 2 hours, then counts to the next stream.
 3. **Chat skin** (Twitch, no login):
    - Username colors, Twitch emotes and theme-styled role badges (broadcaster, mod, VIP, sub).
    - Hides bots and `!commands`, removes deleted messages and bans, wraps long messages.
