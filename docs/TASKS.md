@@ -118,3 +118,33 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
 - [x] **T6.5 Vaporwave Sunset theme.**
   - *Passed in OBS (2026-10-01) on the PR #39 preview. `src/themes/vaporwave-sunset.ts`: static `sunset` background (purple sky fading to coral and orange at the horizon, striped sun via `mask-image`, palm silhouettes from `public/images/themes/vaporwave-palms.svg`), chrome titles (`background-clip: text` with a band of `primary`), a soft dark text shadow so scene text stays readable over the sun, `slide-fade` entrance and alerts, Audiowide / Space Grotesk, Kenney Digital Audio `threeTone1` (CC0) as `vaporwave-sunset.ogg`. Fixture `v1/vaporwave-sunset.json`; e2e checks that the palms image loads.*
 - [ ] **T6.6 Review feedback from 5 streamers** before starting v2 (see PRD).
+
+### From the new-streamer walkthrough (2026-10-01)
+v1 fixes from watching someone set Overlune up as a brand-new streamer. These are not v2 features. One branch and PR per task.
+
+- [ ] **T6.7 Countdown shows the right day.** A countdown more than a day away shows "37:59:55" and "Starts at 11:30 PM GMT+5:30", which viewers read as tonight.
+  - Accept: if the end time isn't today in the streamer's time zone, the label names the day: "Starts tomorrow, 11:30 PM GMT+5:30", or "Starts Fri 3 Oct, 11:30 PM GMT+5:30" from 2 days out. The zone stays shown (PRD).
+  - Accept: 24 hours or more shows "1d 13h 59m". Under 24 hours keeps HH:MM:SS (and MM:SS under an hour).
+  - Accept: unit tests in `tests/unit/lib/time.test.ts` cover today, tomorrow, 2+ days, just before and after midnight in the streamer's zone, and a DST change day. No link change.
+  - Accept: OBS check of Starting Soon with an end time 2 days away.
+- [ ] **T6.8 Repeating countdown.** A new countdown time means pasting a new Starting Soon link into OBS each time, which breaks "paste once, never touch it again".
+  - Accept: new optional link field `starting.repeat` (default off, so old links behave exactly as before): off, "Every day" or "On these days" (weekdays plus a time), using the existing `starting.tz`. The overlay counts down to the next matching time, and DST changes keep the wall-clock time.
+  - Accept: after the start time, the overlay shows the done text for 2 hours, then counts to the next stream. *(Rule confirmed by the owner.)*
+  - Accept: editor copy for beginners: "Repeat this countdown every stream", plus one line saying a repeating countdown means you never re-paste the link.
+  - Accept: fixture `tests/fixtures/links/v1/countdown-repeat.json`; the old-link test still passes for every existing fixture. Unit tests for the next-time logic (today vs. next week, chosen days, DST).
+  - Accept: PRD v1 scope line updated (fixed end time stays the default, repeating is an addition). Tested in OBS per `docs/OBS-TESTING.md`.
+- [ ] **T6.9 Test alerts link is hard to forget.** Beginners paste the test link, forget to switch back, and go live with fake alerts.
+  - Accept: in test mode the overlay shows a small, clear label: "Test mode: switch back to your normal Alerts link before going live." It shows on stream on purpose. Its reduced-motion version is static.
+  - Accept: new test links carry an expiry (`?test=1&until=<unix seconds>`, stamped 15 minutes ahead when the link is copied). After that time the samples stop, but the label stays. Old `?test=1` links with no `until` keep working exactly as before. `docs/STACK.md` documents the new flag.
+  - Accept: unit or e2e tests cover old `?test=1`, a new link before expiry and a new link after expiry. Tested in OBS with "Control audio via OBS".
+- [ ] **T6.10 Preview visible in narrow editor windows.** Below 800px wide the preview sits about 2,500px under the controls, so changes can't be seen while typing (the editor is often squeezed next to OBS).
+  - Accept: at 800px and narrower, a "Show preview" bar is pinned to the bottom of the window and expands the preview. It works from the keyboard and has a visible focus ring. Wider layouts are unchanged.
+  - Accept: narrow desktop windows only, no mobile editor features (PRD out of scope). axe stays clean at 600px and at full width, and the focus order makes sense. e2e test for the toggle.
+- [ ] **T6.11 Simpler time zone picker.** The full time zone list is very long.
+  - Accept: the editor shows the detected zone as text ("Your time zone: India Standard Time (Asia/Calcutta)") with a "Change" button that reveals the existing select. Keyboard accessible, visible focus, focus moves to the select on "Change". axe clean. e2e test.
+- [ ] **T6.12 Lighter "save file" box.** "Your link is your save file" is the first thing on the page, before anything has been made.
+  - Accept: layout proposed to and approved by the owner before changing it.
+  - Accept: the PRD message stays, in a compact form. "Load my overlay from a link" and "Start over" move into a smaller row, and the bookmark reminder gets more weight after the first edit. axe clean, e2e still pass.
+- [ ] **T6.13 Privacy and terms as site pages.** Footer links go to markdown on GitHub, which looks unfinished to non-developers.
+  - Accept: `/privacy` and `/terms` pages in the editor's style, built from `docs/legal/*.md` (one source of truth). Footer links point to them. No `innerHTML` or `dangerouslySetInnerHTML`.
+  - Accept: any new dependency (such as a markdown renderer) is approved by the owner first. CSP in `public/_headers` unchanged and checked on the preview. axe clean on both pages, and no `public/` folder shadows the routes.
