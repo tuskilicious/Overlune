@@ -26,6 +26,8 @@ interface Props {
 /** Shared 1920×1080 scene layout for Starting Soon, BRB and Stream Ending. */
 export default function SceneFrame({ settings, title, subtitle, error, children }: Props) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
+  // A row added in the editor but not filled in yet would show as a bare "Twitch" box on stream (T6.27).
+  const socials = settings.socials.filter((s) => s.handle.trim());
   const scene = useRef<HTMLDivElement>(null);
   const titleEl = useRef<HTMLHeadingElement>(null);
   /** Long titles shrink until everything fits in 1920×1080 (T6.26): wide fonts like Arcade's wrap to many lines,
@@ -71,9 +73,9 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
         {subtitle && <p className="scene-subtitle">{subtitle}</p>}
         {children}
       </div>
-      {settings.socials.length > 0 && (
+      {socials.length > 0 && (
         <ul className="scene-socials">
-          {settings.socials.map((s, i) => (
+          {socials.map((s, i) => (
             <li key={i}>
               <span className="scene-platform">{platformLabel[s.platform]}</span> {s.handle}
             </li>

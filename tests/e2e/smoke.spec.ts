@@ -10,6 +10,22 @@ test("starting soon overlay renders", async ({ page }) => {
   await expect(page.getByRole("status")).toHaveCount(0);
 });
 
+test("socials with no name are left off the scene (T6.27)", async ({ page }) => {
+  await page.goto(
+    link({
+      socials: [
+        { platform: "twitch", handle: "" },
+        { platform: "youtube", handle: "   " },
+        { platform: "x", handle: "somestreamer" },
+      ],
+    }),
+  );
+  await expect(page.locator(".scene-socials li")).toHaveText(["X somestreamer"]);
+  await page.goto(link({ socials: [{ platform: "twitch", handle: "" }] }));
+  await expect(page.getByRole("heading", { name: "Starting soon" })).toBeVisible();
+  await expect(page.locator(".scene-socials")).toHaveCount(0);
+});
+
 test("a valid link shows no error card", async ({ page }) => {
   await page.goto(link({ starting: { title: "Back in a bit" } }));
   await expect(page.getByRole("heading", { name: "Back in a bit" })).toBeVisible();
