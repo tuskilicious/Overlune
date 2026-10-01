@@ -188,6 +188,7 @@ Found by going through the live site at 1366×768 as a brand-new streamer. These
   - *Built 2026-10-01 on `feat/fuller-previews`. Four more sample chat lines (9 in all) fill the default 400×600 box. Between test alerts the alerts preview shows the sample raid, held still (`editor-shot`), with a line saying to press a test button for the real thing. e2e test. Waiting for the owner's batch check.*
 - [ ] **T6.23 Tidier OBS links.** Each link shows a long raw URL (`…#1.N4IgLgFg…`) that looks broken.
   - Accept: the Copy button and the width and height lead. The raw link is shortened or hidden but still selectable for people who want it, and copying still gives the full link. e2e copy tests still pass.
+  - *Built 2026-10-01 on `feat/tidy-links`. CSS only: the name and size lead at 16px, Copy link is a filled Lune Violet button (Night text, same 5.3:1 pair the contrast test checks), and the raw link is a borderless, faint line cut to 48 characters. It is still the full value and selectable, so the Ctrl+C fallback works. The copy status sits under the button. e2e copy tests pass unchanged. Waiting for the owner's batch check.*
 - [ ] **T6.24 A "you're set" moment.** After copying links there is no sign of what's done or left.
   - Accept: copied links are marked (for example, "Copied ✓" stays next to each one for the session), with a short next step pointing to the setup guide. No tracking or storage beyond the existing autosave.
 - [ ] **T6.25 Brand header on the guide.** `/guide` has no logo and is dense text.
