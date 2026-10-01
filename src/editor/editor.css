@@ -395,8 +395,23 @@
 .editor-themes,
 .editor-welcome-looks {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 8px;
+}
+
+/* The editor's picker is three across with smaller names, so all 8 looks fit on a laptop screen (T6.31). */
+.editor-themes {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.editor .editor-themes .editor-card {
+  padding: 4px;
+  gap: 4px;
+}
+
+.editor-themes .editor-card-name {
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.25;
 }
 
 /* Four across (two rows of four looks), two in narrow windows. */

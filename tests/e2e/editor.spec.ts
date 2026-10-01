@@ -364,6 +364,15 @@ test("the scene preview stays in view while the form scrolls (T6.30)", async ({ 
   await expect(page.getByRole("button", { name: "Test raid" })).toBeInViewport();
 });
 
+test("all 8 looks fit on a laptop screen without scrolling (T6.31)", async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.evaluate(() => scrollTo(0, 0));
+  for (const name of ["Clean Slate", "Vaporwave Sunset"])
+    await expect(page.locator(".editor-themes .editor-card", { hasText: name })).toBeInViewport({
+      ratio: 1,
+    });
+});
+
 test("the look picker shows each theme as a picture you can click", async ({ page }) => {
   await page
     .locator(".editor-themes .editor-card", { hasText: "Vaporwave Sunset" })
