@@ -355,6 +355,15 @@ test("nearly full text fields say how many characters are left (T6.28)", async (
   await expect(page.locator("#chars-title")).toHaveText("0 characters left");
 });
 
+test("the scene preview stays in view while the form scrolls (T6.30)", async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.getByLabel("Link to your logo image").scrollIntoViewIfNeeded();
+  await expect(preview(page).locator(".scene")).toBeInViewport();
+  // The preview column scrolls on its own to reach the alert test buttons.
+  await page.getByRole("button", { name: "Test raid" }).scrollIntoViewIfNeeded();
+  await expect(page.getByRole("button", { name: "Test raid" })).toBeInViewport();
+});
+
 test("the look picker shows each theme as a picture you can click", async ({ page }) => {
   await page
     .locator(".editor-themes .editor-card", { hasText: "Vaporwave Sunset" })
