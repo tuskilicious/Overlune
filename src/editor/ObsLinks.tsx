@@ -19,7 +19,19 @@ export interface LinkInfo {
   height: number;
 }
 
-export function LinkRow({ name, width, height, link }: LinkInfo & { link: string }) {
+export function LinkRow({
+  name,
+  width,
+  height,
+  link,
+  copiedLink,
+  onCopied,
+}: LinkInfo & {
+  link: string;
+  /** The version of this link last copied, if any (T6.24). */
+  copiedLink?: string;
+  onCopied?: (link: string) => void;
+}) {
   const input = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState("");
 
@@ -27,6 +39,7 @@ export function LinkRow({ name, width, height, link }: LinkInfo & { link: string
     try {
       await navigator.clipboard.writeText(link);
       setStatus("Copied!");
+      onCopied?.(link);
     } catch {
       input.current?.select();
       setStatus("Press Ctrl+C to copy");
@@ -43,6 +56,14 @@ export function LinkRow({ name, width, height, link }: LinkInfo & { link: string
         </span>
         <input ref={input} readOnly value={link} onFocus={(e) => e.target.select()} />
       </label>
+      {/* A link carries the settings, so after an edit the copy in OBS is out of date. */}
+      {copiedLink === link ? (
+        <span className="editor-link-done">✓ Copied</span>
+      ) : (
+        copiedLink && (
+          <span className="editor-link-stale">Changed since you copied it. Copy it again.</span>
+        )
+      )}
       <button type="button" onClick={copy} aria-label={`Copy ${name} link`}>
         Copy link
       </button>
@@ -62,6 +83,10 @@ export default function ObsLinks({ settings, heading }: { settings: Settings; he
     { id: "chat", name: "Chat", width: settings.chat.width, height: settings.chat.height },
     { id: "alerts", name: "Alerts", width: 1920, height: 1080 },
   ];
+  /** Each link as last copied this visit; kept in memory only (no tracking, no storage). */
+  const [copied, setCopied] = useState<Record<string, string>>({});
+  const linkFor = (id: string) => `${location.origin}/o/${id}#${hash}`;
+  const done = links.filter((l) => copied[l.id] === linkFor(l.id)).length;
   return (
     <section id="obs-links" tabIndex={-1} className="editor-links" aria-labelledby="links-heading">
       <h2 id="links-heading">{heading}</h2>
@@ -71,9 +96,27 @@ export default function ObsLinks({ settings, heading }: { settings: Settings; he
       </p>
       <ul>
         {links.map((l) => (
-          <LinkRow key={l.id} {...l} link={`${location.origin}/o/${l.id}#${hash}`} />
+          <LinkRow
+            key={l.id}
+            {...l}
+            link={linkFor(l.id)}
+            copiedLink={copied[l.id]}
+            onCopied={(link) => setCopied((c) => ({ ...c, [l.id]: link }))}
+          />
         ))}
       </ul>
+      {done > 0 && (
+        <p className="editor-links-progress">
+          {done === links.length ? (
+            <>
+              <strong>You’re set: all {links.length} links copied.</strong> Paste each one into its
+              own Browser source in OBS. The <Link to="/guide">setup guide</Link> shows how.
+            </>
+          ) : (
+            `${done} of ${links.length} links copied.`
+          )}
+        </p>
+      )}
     </section>
   );
 }

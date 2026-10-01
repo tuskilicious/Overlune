@@ -307,6 +307,31 @@ test("alert messages can be built without typing codes (T6.19)", async ({ page }
   );
 });
 
+test("copied links are marked, and the last copy says what's next (T6.24)", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  const links = page.getByRole("region", { name: "Links to paste into OBS" });
+  await links.getByRole("button", { name: "Copy Starting Soon link" }).click();
+  await expect(links.getByRole("listitem").first()).toContainText("✓ Copied");
+  await expect(links.getByText("1 of 5 links copied.")).toBeVisible();
+
+  // Editing changes every link, so the copy in OBS is out of date.
+  await page.getByLabel("Title", { exact: true }).fill("Soon!");
+  await expect(links.getByRole("listitem").first()).toContainText(
+    "Changed since you copied it. Copy it again.",
+  );
+
+  for (const name of ["Starting Soon", "Be Right Back", "Stream Ending", "Chat", "Alerts"])
+    await links.getByRole("button", { name: `Copy ${name} link` }).click();
+  await expect(links.getByText("You’re set: all 5 links copied.")).toBeVisible();
+  await expect(links.getByRole("link", { name: "setup guide", exact: true })).toHaveAttribute(
+    "href",
+    "/guide",
+  );
+});
+
 test("the look picker shows each theme as a picture you can click", async ({ page }) => {
   await page
     .locator(".editor-themes .editor-card", { hasText: "Vaporwave Sunset" })
