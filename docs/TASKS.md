@@ -129,7 +129,7 @@ v1 fixes from watching someone set Overlune up as a brand-new streamer. These ar
   - Accept: OBS check of Starting Soon with an end time 2 days away.
 - [ ] **T6.8 Repeating countdown.** A new countdown time means pasting a new Starting Soon link into OBS each time, which breaks "paste once, never touch it again".
   - Accept: new optional link field `starting.repeat` (default off, so old links behave exactly as before): off, "Every day" or "On these days" (weekdays plus a time), using the existing `starting.tz`. The overlay counts down to the next matching time, and DST changes keep the wall-clock time.
-  - Accept: after the start time, the overlay shows the done text for 2 hours, then counts to the next stream. *(Proposed rule. Owner to confirm.)*
+  - Accept: after the start time, the overlay shows the done text for 2 hours, then counts to the next stream. *(Rule confirmed by the owner.)*
   - Accept: editor copy for beginners: "Repeat this countdown every stream", plus one line saying a repeating countdown means you never re-paste the link.
   - Accept: fixture `tests/fixtures/links/v1/countdown-repeat.json`; the old-link test still passes for every existing fixture. Unit tests for the next-time logic (today vs. next week, chosen days, DST).
   - Accept: PRD v1 scope line updated (fixed end time stays the default, repeating is an addition). Tested in OBS per `docs/OBS-TESTING.md`.
