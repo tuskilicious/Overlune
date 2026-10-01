@@ -105,6 +105,7 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
 - [x] **T5.6 Pre-launch checklist** in CLAUDE.md, all items checked.
   - *Signed off 2026-10-01 after PR #30 brought T2.8–T5.5 to `main`. All 10 items checked in CLAUDE.md; production headers re-verified; `npm audit` clean after the vitest 4.1.11 merge. CLAUDE.md §9 changed to self-reviewed legal docs, governing law India. **Left for later:** the two Streamlabs screenshots in the setup guide (from T5.3).*
 - [ ] **T5.7 Launch:** use it live on the owner's stream and hand it to 5 streamers.
+  - *On hold (2026-10-01): the owner wants the site more approachable and better looking first (T6.15–T6.25 and T6.13).*
 
 ## Post-launch
 - [x] **T6.1 Arcade 8-Bit theme.**
@@ -158,3 +159,29 @@ v1 fixes from watching someone set Overlune up as a brand-new streamer. These ar
   - Accept: new logo in the editor header, favicon set, Apple touch icon, link-preview (Open Graph) image and `theme-color` in `index.html`. Editor and guide chrome use the brand tokens (`src/editor/brand.ts`, `docs/BRAND.md`), still WCAG AA (contrast unit test). Assets recorded in `docs/ASSETS.md`. CSP unchanged.
   - Accept: `npm test` and `npm run test:e2e` pass, axe stays clean on the editor and guide, and the link preview shows on the deployed preview.
   - *Done 2026-10-01. Tests pass (263 unit, 93 e2e, axe clean). Owner checked the editor, guide and link preview on the deployed preview.*
+
+### From the look-and-feel walkthrough (2026-10-01)
+Found by going through the live site at 1366×768 as a brand-new streamer. These make v1 more approachable before T5.7; they are not v2 features. One branch and PR per task. Tasks that change the layout get a proposal approved by the owner first (as in T6.12). Every task keeps axe clean, e2e passing and old links working.
+
+- [ ] **T6.15 Guide heading overlaps its intro.** On `/guide`, "Set up your overlays in OBS" is drawn on top of "About 5 minutes…", because `.editor-header h1` had `line-height: 0` (meant for the editor's logo image).
+  - Accept: the logo image is `display: block` and the h1 keeps its normal line height. The editor header looks the same. e2e check that the guide heading doesn't overlap the line under it.
+- [ ] **T6.16 A welcome for first-time visitors.** The page opens on a small tagline and a "Load my overlay from a link" box, so a newcomer isn't shown what they'll get.
+  - Accept: a short welcome above the editor shows what Overlune makes (a real overlay preview, not a stock image) and what to do first, in beginner words. It gets out of the way once the streamer starts editing or comes back with a saved overlay. No unsupported claims. Layout approved first.
+- [ ] **T6.17 Theme picker shows the overlays.** Themes are radio buttons with small colour swatches, and the default (Clean Slate) is the plainest look.
+  - Accept: each theme is a picture card of its Starting Soon scene (CSS-rendered or a static image recorded in ASSETS.md), still a radio group that works from the keyboard. Owner decides whether the default theme changes; a new default must not change what old links show.
+- [ ] **T6.18 Editor in clear steps.** Everything is open in one long form (about 3,000px tall at 1366×768).
+  - Accept: the controls are grouped into steps a beginner can follow, such as 1. Pick a look, 2. Add your details, 3. Copy your links to OBS. Each step is reachable from the keyboard, and "Skip to your OBS links" still works. No settings are removed. Layout approved first.
+- [ ] **T6.19 Alert messages without template code.** `{user}`, `{amount}` and `{s}` look like programming.
+  - Accept: beginners can edit alert messages without typing codes (for example, insert buttons labelled "Their name" and "Amount", with a live example line below the field). Links keep the same stored format, so old links are unchanged. Unit or e2e test.
+- [ ] **T6.20 Tuck away rarely used settings.** The bot list, chat box size and the disabled "Follow / Donation (coming soon)" buttons are always visible.
+  - Accept: these move behind "More chat options" / "More alert options" style toggles (closed by default, `aria-expanded`), and the "coming soon" buttons become one line of text. Settings still save and load as before.
+- [ ] **T6.21 Clearer logo help.** The logo field asks for an https:// image link, which most beginners don't have.
+  - Accept: help text explains in plain words where to get a link (for example, right-click an image you already use online and copy its address), and a bad link shows a friendly message. Still `https:` only (CLAUDE.md §6). No uploads (out of scope for v1).
+- [ ] **T6.22 Fuller previews.** The chat preview has empty space above its messages, and the alerts preview is empty until a test button is pressed.
+  - Accept: the chat preview is filled or sized to its messages, and the alerts preview shows a resting sample (or a clear "Press a test button" message) instead of an empty box. Reduced-motion versions stay.
+- [ ] **T6.23 Tidier OBS links.** Each link shows a long raw URL (`…#1.N4IgLgFg…`) that looks broken.
+  - Accept: the Copy button and the width and height lead. The raw link is shortened or hidden but still selectable for people who want it, and copying still gives the full link. e2e copy tests still pass.
+- [ ] **T6.24 A "you're set" moment.** After copying links there is no sign of what's done or left.
+  - Accept: copied links are marked (for example, "Copied ✓" stays next to each one for the session), with a short next step pointing to the setup guide. No tracking or storage beyond the existing autosave.
+- [ ] **T6.25 Brand header on the guide.** `/guide` has no logo and is dense text.
+  - Accept: the guide shows the Overlune logo linking back to the editor, and its steps are easier to scan (for example, numbered step cards). The existing OBS screenshots stay. axe clean.
