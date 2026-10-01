@@ -24,7 +24,8 @@ import {
   type ThemeId,
 } from "../themes/types";
 import { applyOverrides, themeVars } from "../themes/vars";
-import type { AlertKind } from "../alerts/events";
+import { testAlerts, type AlertKind } from "../alerts/events";
+import { fillTemplate } from "../alerts/templates";
 import ChatView from "../overlays/chat/ChatView";
 import { botsFromInput } from "../overlays/chat/filters";
 import { chatSamples } from "./chat-samples";
@@ -125,6 +126,15 @@ const alertFields: [AlertKind, string][] = [
   ["subgift", "Gift sub message"],
   ["bits", "Bits message"],
 ];
+
+/** A message as it will read, filled in with the editor's sample alert (T6.19). */
+const exampleAlert = (templates: Settings["alerts"]["templates"], kind: AlertKind) =>
+  fillTemplate(
+    templates,
+    testAlerts.find((a) => a.kind === kind)!,
+  )
+    .map((p) => ("text" in p ? p.text : p.value))
+    .join("");
 
 const fadeOptions = [
   [0, "Never"],
@@ -258,6 +268,20 @@ export default function EditorPage() {
       ...s,
       alerts: { ...s.alerts, templates: { ...s.alerts.templates, [kind]: value } },
     }));
+  /** Puts {user} or {amount} where the cursor was, so nobody has to type the codes (T6.19). */
+  const insertInTemplate = (kind: AlertKind, token: string) => {
+    const input = document.getElementById(`template-${kind}`) as HTMLInputElement;
+    const typed = settings.alerts.templates[kind];
+    const value = typed || defaultTemplates[kind]; // empty shows the default, so add to that
+    const start = typed ? (input.selectionStart ?? value.length) : value.length;
+    const end = typed ? (input.selectionEnd ?? start) : start;
+    updateTemplate(kind, (value.slice(0, start) + token + value.slice(end)).slice(0, 100));
+    const caret = Math.min(start + token.length, 100);
+    requestAnimationFrame(() => {
+      input.focus();
+      input.setSelectionRange(caret, caret);
+    });
+  };
   const updateSocial = (i: number, patch: Partial<Settings["socials"][number]>) =>
     update({ socials: settings.socials.map((s, j) => (i === j ? { ...s, ...patch } : s)) });
 
@@ -798,21 +822,49 @@ export default function EditorPage() {
                 <details className="editor-more">
                   <summary>Change alert messages</summary>
                   <p id="alerts-hint" className="editor-hint">
-                    In each message, {"{user}"} becomes their name and {"{amount}"} the number.{" "}
-                    {"{s}"} adds an “s” unless the number is 1.
+                    Type your message, and use the buttons to add their name or the amount. The
+                    example under each one shows how it will read.
                   </p>
                   {alertFields.map(([kind, label]) => (
-                    <label key={kind}>
-                      {label}
-                      <input
-                        value={settings.alerts.templates[kind]}
-                        maxLength={100}
-                        placeholder={defaultTemplates[kind]}
-                        aria-describedby="alerts-hint"
-                        onChange={(e) => updateTemplate(kind, e.target.value)}
-                      />
-                    </label>
+                    <div key={kind} className="editor-template">
+                      <label>
+                        {label}
+                        <input
+                          id={`template-${kind}`}
+                          value={settings.alerts.templates[kind]}
+                          maxLength={100}
+                          placeholder={defaultTemplates[kind]}
+                          aria-describedby={`alerts-hint template-${kind}-example`}
+                          onChange={(e) => updateTemplate(kind, e.target.value)}
+                        />
+                      </label>
+                      <div className="editor-template-tools">
+                        <button
+                          type="button"
+                          aria-label={`Add their name to ${label}`}
+                          onClick={() => insertInTemplate(kind, "{user}")}
+                        >
+                          + Their name
+                        </button>
+                        {kind !== "sub" && (
+                          <button
+                            type="button"
+                            aria-label={`Add the amount to ${label}`}
+                            onClick={() => insertInTemplate(kind, "{amount}")}
+                          >
+                            + Amount
+                          </button>
+                        )}
+                      </div>
+                      <p id={`template-${kind}-example`} className="editor-hint">
+                        Example: {exampleAlert(settings.alerts.templates, kind)}
+                      </p>
+                    </div>
                   ))}
+                  <p className="editor-hint">
+                    {"{user}"} and {"{amount}"} in a message are where the name and amount go.
+                    {" {s}"} adds an “s” when the amount isn’t 1.
+                  </p>
                 </details>
               </fieldset>
 

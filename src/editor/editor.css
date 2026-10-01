@@ -507,6 +507,28 @@
   color: var(--text-muted);
 }
 
+/* Alert messages (T6.19): the field, buttons that add the name or amount, and how it will read. */
+.editor-template {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.editor-template-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.editor .editor-template-tools button {
+  padding: 4px 10px;
+  font-size: 14px;
+}
+
+.editor .editor-template .editor-hint {
+  margin: 0 0 12px;
+}
+
 .editor-color {
   display: flex;
   align-items: center;
