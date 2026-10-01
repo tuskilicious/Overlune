@@ -166,6 +166,19 @@
   gap: 8px;
 }
 
+/* Weekday checkboxes for a repeating countdown sit in one wrapping row. */
+.editor fieldset.editor-days {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+/* A field label, not a section heading. */
+.editor fieldset.editor-days legend {
+  font-size: 14px;
+  font-weight: 400;
+}
+
 .editor input[type="checkbox"] {
   width: 18px;
   height: 18px;

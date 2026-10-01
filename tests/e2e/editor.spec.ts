@@ -159,6 +159,27 @@ test("the preview runs the real overlay, countdown included", async ({ page }) =
   await expect(preview(page).getByText(/^Starts (at|tomorrow,) .* UTC$/)).toBeVisible();
 });
 
+test("a repeating countdown counts to the next stream and is saved", async ({ page }) => {
+  await page.getByLabel("Your time zone").selectOption("UTC");
+  await page.getByLabel("Repeat this countdown every stream").selectOption("Every day");
+  await expect(page.getByLabel("Countdown ends at")).toHaveCount(0);
+  const inTwoHours = new Date(Date.now() + 2 * 3_600_000).toISOString().slice(11, 16);
+  await page.getByLabel("Stream starts at").fill(inTwoHours);
+  await expect(preview(page).locator(".countdown-time")).toHaveText(/^1:5\d:\d{2}$|^2:00:00$/);
+
+  await page.getByLabel("Repeat this countdown every stream").selectOption("On these days");
+  await page.getByRole("checkbox", { name: "Sat" }).check();
+  const scan = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  expect(scan.violations).toEqual([]);
+
+  await page.reload();
+  await expect(page.getByLabel("Repeat this countdown every stream")).toHaveValue("days");
+  await expect(page.getByRole("checkbox", { name: "Sat" })).toBeChecked();
+  await expect(page.getByLabel("Stream starts at")).toHaveValue(inTwoHours);
+});
+
 test("a countdown days away shows days and names the start day", async ({ page }) => {
   await page.getByLabel("Your time zone").selectOption("UTC");
   const inTwoDays = new Date(Date.now() + 50 * 3_600_000).toISOString().slice(0, 16);

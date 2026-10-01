@@ -128,7 +128,7 @@ v1 fixes from watching someone set Overlune up as a brand-new streamer. These ar
   - Accept: unit tests in `tests/unit/lib/time.test.ts` cover today, tomorrow, 2+ days, just before and after midnight in the streamer's zone, and a DST change day. No link change.
   - Accept: OBS check of Starting Soon with an end time 2 days away.
   - *Passed in OBS (2026-10-01) on the PR #41 preview. `formatCountdown` shows "1d 13h 59m" from 24 hours, and the new `formatStartsAt` (`src/lib/time.ts`) names the day in the streamer's zone. The overlay derives "now" from the countdown, so there's no clock read during render. Editor e2e countdown check made safe in the hour before UTC midnight.*
-- [ ] **T6.8 Repeating countdown.** A new countdown time means pasting a new Starting Soon link into OBS each time, which breaks "paste once, never touch it again".
+- [ ] **T6.8 Repeating countdown.** *Built, waiting on the OBS test.* A new countdown time means pasting a new Starting Soon link into OBS each time, which breaks "paste once, never touch it again".
   - Accept: new optional link field `starting.repeat` (default off, so old links behave exactly as before): off, "Every day" or "On these days" (weekdays plus a time), using the existing `starting.tz`. The overlay counts down to the next matching time, and DST changes keep the wall-clock time.
   - Accept: after the start time, the overlay shows the done text for 2 hours, then counts to the next stream. *(Rule confirmed by the owner.)*
   - Accept: editor copy for beginners: "Repeat this countdown every stream", plus one line saying a repeating countdown means you never re-paste the link.
