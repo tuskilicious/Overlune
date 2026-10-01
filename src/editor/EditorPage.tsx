@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { fromZoneInput, toZoneInput, zoneName } from "../lib/time";
 import { isHttpsUrl } from "../lib/url-safety";
 import StartingSoon from "../overlays/starting/StartingSoon";
@@ -137,6 +137,21 @@ const fadeOptions = [
 /** Keeps keyboard focus in place when the button that had it disappears (WCAG 2.4.3). Runs after React renders. */
 const focusSoon = (id: string) => requestAnimationFrame(() => document.getElementById(id)?.focus());
 
+/** Scrolls to a section and moves focus there. No real #fragment jump: the address bar's fragment holds the settings. */
+const jumpTo = (e: MouseEvent, id: string) => {
+  e.preventDefault();
+  const target = document.getElementById(id);
+  target?.scrollIntoView();
+  target?.focus();
+};
+
+/** The editor's three steps (T6.18), in the steps bar and as section headings. */
+const steps = [
+  ["step-look", "1. Pick a look"],
+  ["step-details", "2. Add your details"],
+  ["obs-links", "3. Links to paste into OBS"],
+] as const;
+
 const loadedMessage = (ok: boolean) =>
   ok
     ? "Loaded! You can keep editing."
@@ -271,12 +286,7 @@ export default function EditorPage() {
         hidden={welcome}
         className="editor-skip"
         href="#obs-links"
-        onClick={(e) => {
-          e.preventDefault();
-          const links = document.getElementById("obs-links");
-          links?.scrollIntoView();
-          links?.focus();
-        }}
+        onClick={(e) => jumpTo(e, "obs-links")}
       >
         Skip to your OBS links
       </a>
@@ -396,525 +406,556 @@ export default function EditorPage() {
           </ul>
         </section>
       ) : (
-        <div className="editor-body">
-          <form className="editor-form" onSubmit={(e) => e.preventDefault()}>
-            <fieldset>
-              <legend>Pick a look</legend>
-              <div className="editor-themes">
-                {themeIds.map((id) => (
-                  <label key={id} className="editor-card">
-                    <ThemeShot id={id} />
-                    <span className="editor-card-name">
+        <>
+          <nav className="editor-steps" aria-label="Steps">
+            <ol>
+              {steps.map(([id, name]) => (
+                <li key={id}>
+                  <a href={`#${id}`} onClick={(e) => jumpTo(e, id)}>
+                    {name}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+          <div className="editor-body">
+            <form className="editor-form" onSubmit={(e) => e.preventDefault()}>
+              <h2 id="step-look" className="editor-step" tabIndex={-1}>
+                {steps[0][1]}
+              </h2>
+              <fieldset aria-labelledby="step-look">
+                <div className="editor-themes">
+                  {themeIds.map((id) => (
+                    <label key={id} className="editor-card">
+                      <ThemeShot id={id} />
+                      <span className="editor-card-name">
+                        <input
+                          type="radio"
+                          id={`theme-${id}`}
+                          name="theme"
+                          value={id}
+                          checked={settings.theme === id}
+                          onChange={() => update({ theme: id })}
+                        />
+                        {themes[id].name}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <h2 id="step-details" className="editor-step" tabIndex={-1}>
+                {steps[1][1]}
+              </h2>
+              <fieldset>
+                <legend>Scene to edit</legend>
+                <div className="editor-scenes">
+                  {(Object.keys(overlays) as Scene[]).map((id) => (
+                    <label key={id}>
                       <input
                         type="radio"
-                        id={`theme-${id}`}
-                        name="theme"
+                        name="scene"
                         value={id}
-                        checked={settings.theme === id}
-                        onChange={() => update({ theme: id })}
+                        checked={scene === id}
+                        onChange={() => setScene(id)}
                       />
-                      {themes[id].name}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
+                      {overlays[id].name}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
 
-            <fieldset>
-              <legend>Scene to edit</legend>
-              <div className="editor-scenes">
-                {(Object.keys(overlays) as Scene[]).map((id) => (
-                  <label key={id}>
-                    <input
-                      type="radio"
-                      name="scene"
-                      value={id}
-                      checked={scene === id}
-                      onChange={() => setScene(id)}
-                    />
-                    {overlays[id].name}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <fieldset>
-              <legend>{overlays[scene].name} text</legend>
-              <label>
-                Title
-                <input
-                  value={current.title}
-                  maxLength={60}
-                  onChange={(e) => updateScene(scene, { title: e.target.value })}
-                />
-              </label>
-              <label>
-                Subtitle
-                <input
-                  value={current.subtitle}
-                  maxLength={120}
-                  onChange={(e) => updateScene(scene, { subtitle: e.target.value })}
-                />
-              </label>
-              {scene === "starting" && (
-                <>
-                  <label>
-                    Repeat this countdown every stream
-                    <select
-                      value={starting.repeat.mode}
-                      aria-describedby="repeat-hint"
-                      onChange={(e) =>
-                        updateScene("starting", {
-                          repeat: { ...starting.repeat, mode: e.target.value as RepeatMode },
-                        })
-                      }
-                    >
-                      <option value="off">No, just once</option>
-                      <option value="daily">Every day</option>
-                      <option value="days">On these days</option>
-                    </select>
-                  </label>
-                  <p id="repeat-hint" className="editor-hint">
-                    A repeating countdown always counts to your next stream, so you never re-paste
-                    the link into OBS.
-                  </p>
-                  {starting.repeat.mode === "off" ? (
+              <fieldset>
+                <legend>{overlays[scene].name} text</legend>
+                <label>
+                  Title
+                  <input
+                    value={current.title}
+                    maxLength={60}
+                    onChange={(e) => updateScene(scene, { title: e.target.value })}
+                  />
+                </label>
+                <label>
+                  Subtitle
+                  <input
+                    value={current.subtitle}
+                    maxLength={120}
+                    onChange={(e) => updateScene(scene, { subtitle: e.target.value })}
+                  />
+                </label>
+                {scene === "starting" && (
+                  <>
                     <label>
-                      Countdown ends at (leave empty for no countdown)
-                      <input
-                        type="datetime-local"
-                        value={
-                          starting.endsAt === null ? "" : toZoneInput(starting.endsAt, starting.tz)
-                        }
+                      Repeat this countdown every stream
+                      <select
+                        value={starting.repeat.mode}
+                        aria-describedby="repeat-hint"
                         onChange={(e) =>
                           updateScene("starting", {
-                            endsAt: fromZoneInput(e.target.value, starting.tz),
+                            repeat: { ...starting.repeat, mode: e.target.value as RepeatMode },
                           })
                         }
-                      />
+                      >
+                        <option value="off">No, just once</option>
+                        <option value="daily">Every day</option>
+                        <option value="days">On these days</option>
+                      </select>
                     </label>
-                  ) : (
-                    <>
-                      {starting.repeat.mode === "days" && (
-                        <fieldset className="editor-days">
-                          <legend>Stream days</legend>
-                          {weekdays.map(([day, name]) => (
-                            <label key={day} className="editor-check">
-                              <input
-                                type="checkbox"
-                                checked={starting.repeat.days.includes(day)}
-                                onChange={(e) =>
-                                  updateScene("starting", {
-                                    repeat: {
-                                      ...starting.repeat,
-                                      days: e.target.checked
-                                        ? [...starting.repeat.days, day].sort()
-                                        : starting.repeat.days.filter((d) => d !== day),
-                                    },
-                                  })
-                                }
-                              />
-                              {name}
-                            </label>
-                          ))}
-                        </fieldset>
-                      )}
+                    <p id="repeat-hint" className="editor-hint">
+                      A repeating countdown always counts to your next stream, so you never re-paste
+                      the link into OBS.
+                    </p>
+                    {starting.repeat.mode === "off" ? (
                       <label>
-                        Stream starts at
+                        Countdown ends at (leave empty for no countdown)
                         <input
-                          type="time"
-                          value={starting.repeat.time}
+                          type="datetime-local"
+                          value={
+                            starting.endsAt === null
+                              ? ""
+                              : toZoneInput(starting.endsAt, starting.tz)
+                          }
                           onChange={(e) =>
-                            // Clearing the field would make an invalid time, so keep the last good one.
-                            e.target.value &&
                             updateScene("starting", {
-                              repeat: { ...starting.repeat, time: e.target.value },
+                              endsAt: fromZoneInput(e.target.value, starting.tz),
                             })
                           }
                         />
                       </label>
-                    </>
-                  )}
-                  <p className="editor-tz">
-                    Your time zone: {zoneName(starting.tz)} ({starting.tz})
-                    {!tzOpen && (
-                      <button
-                        type="button"
-                        aria-label="Change time zone"
-                        onClick={() => {
-                          setTzOpen(true);
-                          focusSoon("tz-select");
-                        }}
-                      >
-                        Change
-                      </button>
+                    ) : (
+                      <>
+                        {starting.repeat.mode === "days" && (
+                          <fieldset className="editor-days">
+                            <legend>Stream days</legend>
+                            {weekdays.map(([day, name]) => (
+                              <label key={day} className="editor-check">
+                                <input
+                                  type="checkbox"
+                                  checked={starting.repeat.days.includes(day)}
+                                  onChange={(e) =>
+                                    updateScene("starting", {
+                                      repeat: {
+                                        ...starting.repeat,
+                                        days: e.target.checked
+                                          ? [...starting.repeat.days, day].sort()
+                                          : starting.repeat.days.filter((d) => d !== day),
+                                      },
+                                    })
+                                  }
+                                />
+                                {name}
+                              </label>
+                            ))}
+                          </fieldset>
+                        )}
+                        <label>
+                          Stream starts at
+                          <input
+                            type="time"
+                            value={starting.repeat.time}
+                            onChange={(e) =>
+                              // Clearing the field would make an invalid time, so keep the last good one.
+                              e.target.value &&
+                              updateScene("starting", {
+                                repeat: { ...starting.repeat, time: e.target.value },
+                              })
+                            }
+                          />
+                        </label>
+                      </>
                     )}
-                  </p>
-                  {/* Stays open once shown: a closed select changes on every arrow key, so closing on change would trap keyboard users. */}
-                  {tzOpen && (
+                    <p className="editor-tz">
+                      Your time zone: {zoneName(starting.tz)} ({starting.tz})
+                      {!tzOpen && (
+                        <button
+                          type="button"
+                          aria-label="Change time zone"
+                          onClick={() => {
+                            setTzOpen(true);
+                            focusSoon("tz-select");
+                          }}
+                        >
+                          Change
+                        </button>
+                      )}
+                    </p>
+                    {/* Stays open once shown: a closed select changes on every arrow key, so closing on change would trap keyboard users. */}
+                    {tzOpen && (
+                      <label>
+                        Your time zone
+                        <select
+                          id="tz-select"
+                          value={starting.tz}
+                          onChange={(e) => {
+                            // Keep the clock time the streamer typed; only its zone changes.
+                            const typed =
+                              starting.endsAt === null
+                                ? ""
+                                : toZoneInput(starting.endsAt, starting.tz);
+                            updateScene("starting", {
+                              tz: e.target.value,
+                              endsAt: fromZoneInput(typed, e.target.value),
+                            });
+                          }}
+                        >
+                          {timeZones.map((tz) => (
+                            <option key={tz}>{tz}</option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
                     <label>
-                      Your time zone
+                      Message when the countdown ends
+                      <input
+                        value={starting.doneText}
+                        maxLength={60}
+                        onChange={(e) => updateScene("starting", { doneText: e.target.value })}
+                      />
+                    </label>
+                  </>
+                )}
+              </fieldset>
+
+              <fieldset>
+                <legend>Your socials (shown on every scene)</legend>
+                {settings.socials.map((s, i) => (
+                  <div key={i} className="editor-social">
+                    <label>
+                      Site
                       <select
-                        id="tz-select"
-                        value={starting.tz}
-                        onChange={(e) => {
-                          // Keep the clock time the streamer typed; only its zone changes.
-                          const typed =
-                            starting.endsAt === null
-                              ? ""
-                              : toZoneInput(starting.endsAt, starting.tz);
-                          updateScene("starting", {
-                            tz: e.target.value,
-                            endsAt: fromZoneInput(typed, e.target.value),
-                          });
-                        }}
+                        value={s.platform}
+                        onChange={(e) => updateSocial(i, { platform: e.target.value as Platform })}
                       >
-                        {timeZones.map((tz) => (
-                          <option key={tz}>{tz}</option>
+                        {socialPlatforms.map((p) => (
+                          <option key={p} value={p}>
+                            {platformNames[p]}
+                          </option>
                         ))}
                       </select>
                     </label>
-                  )}
+                    <label>
+                      Name or handle
+                      <input
+                        value={s.handle}
+                        maxLength={40}
+                        onChange={(e) => updateSocial(i, { handle: e.target.value })}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      aria-label={`Remove ${platformNames[s.platform]} ${s.handle}`.trim()}
+                      onClick={() => {
+                        update({ socials: settings.socials.filter((_, j) => j !== i) });
+                        focusSoon("add-social");
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+                {settings.socials.length < 6 && (
+                  <button
+                    id="add-social"
+                    type="button"
+                    onClick={() =>
+                      update({ socials: [...settings.socials, { platform: "twitch", handle: "" }] })
+                    }
+                  >
+                    Add a social
+                  </button>
+                )}
+              </fieldset>
+
+              <fieldset>
+                <legend>Chat</legend>
+                <label>
+                  Your Twitch channel name
+                  <input
+                    value={settings.chat.channel}
+                    maxLength={60}
+                    autoComplete="off"
+                    spellCheck={false}
+                    aria-describedby="chat-hint"
+                    onChange={(e) => updateChat({ channel: channelFromInput(e.target.value) })}
+                  />
+                </label>
+                <p id="chat-hint" className="editor-hint">
+                  The name in your channel link, e.g. twitch.tv/<strong>yourname</strong>. You can
+                  paste the whole link.
+                </p>
+                <label className="editor-check">
+                  <input
+                    type="checkbox"
+                    checked={settings.chat.hideCommands}
+                    onChange={(e) => updateChat({ hideCommands: e.target.checked })}
+                  />
+                  Hide chat commands (messages starting with !)
+                </label>
+                {/* Rarely changed, so tucked away (T6.20). */}
+                <details className="editor-more">
+                  <summary>More chat options</summary>
                   <label>
-                    Message when the countdown ends
-                    <input
-                      value={starting.doneText}
-                      maxLength={60}
-                      onChange={(e) => updateScene("starting", { doneText: e.target.value })}
+                    Bots to hide (one name per line)
+                    <textarea
+                      value={botsInput}
+                      rows={6}
+                      spellCheck={false}
+                      aria-describedby="bots-hint"
+                      onChange={(e) => {
+                        setBotsInput(e.target.value);
+                        updateChat({ bots: botsFromInput(e.target.value) });
+                      }}
                     />
                   </label>
-                </>
-              )}
-            </fieldset>
-
-            <fieldset>
-              <legend>Your socials (shown on every scene)</legend>
-              {settings.socials.map((s, i) => (
-                <div key={i} className="editor-social">
+                  <p id="bots-hint" className="editor-hint">
+                    Messages from these accounts won’t show in your chat. Remove a name to show that
+                    bot.
+                  </p>
+                  <button
+                    id="reset-bots"
+                    type="button"
+                    onClick={() => {
+                      setBotsInput(defaultBots.join("\n"));
+                      updateChat({ bots: [...defaultBots] });
+                    }}
+                  >
+                    Reset to the usual bots
+                  </button>
+                  <div className="editor-size">
+                    <NumberField
+                      label="Chat box width"
+                      value={settings.chat.width}
+                      min={250}
+                      max={1920}
+                      describedBy="size-hint"
+                      onChange={(width) => updateChat({ width })}
+                    />
+                    <NumberField
+                      label="Chat box height"
+                      value={settings.chat.height}
+                      min={200}
+                      max={1080}
+                      describedBy="size-hint"
+                      onChange={(height) => updateChat({ height })}
+                    />
+                  </div>
+                  <p id="size-hint" className="editor-hint">
+                    Enter the same width and height in OBS. They’re shown next to the Chat link.
+                  </p>
                   <label>
-                    Site
+                    Text size
                     <select
-                      value={s.platform}
-                      onChange={(e) => updateSocial(i, { platform: e.target.value as Platform })}
+                      value={settings.chat.fontScale}
+                      onChange={(e) => updateChat({ fontScale: Number(e.target.value) })}
                     >
-                      {socialPlatforms.map((p) => (
-                        <option key={p} value={p}>
-                          {platformNames[p]}
+                      {[0.75, 1, 1.25, 1.5, 2].map((v) => (
+                        <option key={v} value={v}>
+                          {v * 100}%
                         </option>
                       ))}
                     </select>
                   </label>
                   <label>
-                    Name or handle
-                    <input
-                      value={s.handle}
-                      maxLength={40}
-                      onChange={(e) => updateSocial(i, { handle: e.target.value })}
-                    />
-                  </label>
-                  <button
-                    type="button"
-                    aria-label={`Remove ${platformNames[s.platform]} ${s.handle}`.trim()}
-                    onClick={() => {
-                      update({ socials: settings.socials.filter((_, j) => j !== i) });
-                      focusSoon("add-social");
-                    }}
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-              {settings.socials.length < 6 && (
-                <button
-                  id="add-social"
-                  type="button"
-                  onClick={() =>
-                    update({ socials: [...settings.socials, { platform: "twitch", handle: "" }] })
-                  }
-                >
-                  Add a social
-                </button>
-              )}
-            </fieldset>
-
-            <fieldset>
-              <legend>Chat</legend>
-              <label>
-                Your Twitch channel name
-                <input
-                  value={settings.chat.channel}
-                  maxLength={60}
-                  autoComplete="off"
-                  spellCheck={false}
-                  aria-describedby="chat-hint"
-                  onChange={(e) => updateChat({ channel: channelFromInput(e.target.value) })}
-                />
-              </label>
-              <p id="chat-hint" className="editor-hint">
-                The name in your channel link, e.g. twitch.tv/<strong>yourname</strong>. You can
-                paste the whole link.
-              </p>
-              <label className="editor-check">
-                <input
-                  type="checkbox"
-                  checked={settings.chat.hideCommands}
-                  onChange={(e) => updateChat({ hideCommands: e.target.checked })}
-                />
-                Hide chat commands (messages starting with !)
-              </label>
-              <label>
-                Bots to hide (one name per line)
-                <textarea
-                  value={botsInput}
-                  rows={6}
-                  spellCheck={false}
-                  aria-describedby="bots-hint"
-                  onChange={(e) => {
-                    setBotsInput(e.target.value);
-                    updateChat({ bots: botsFromInput(e.target.value) });
-                  }}
-                />
-              </label>
-              <p id="bots-hint" className="editor-hint">
-                Messages from these accounts won’t show in your chat. Remove a name to show that
-                bot.
-              </p>
-              <button
-                id="reset-bots"
-                type="button"
-                onClick={() => {
-                  setBotsInput(defaultBots.join("\n"));
-                  updateChat({ bots: [...defaultBots] });
-                }}
-              >
-                Reset to the usual bots
-              </button>
-              <div className="editor-size">
-                <NumberField
-                  label="Chat box width"
-                  value={settings.chat.width}
-                  min={250}
-                  max={1920}
-                  describedBy="size-hint"
-                  onChange={(width) => updateChat({ width })}
-                />
-                <NumberField
-                  label="Chat box height"
-                  value={settings.chat.height}
-                  min={200}
-                  max={1080}
-                  describedBy="size-hint"
-                  onChange={(height) => updateChat({ height })}
-                />
-              </div>
-              <p id="size-hint" className="editor-hint">
-                Enter the same width and height in OBS. They’re shown next to the Chat link.
-              </p>
-              <label>
-                Text size
-                <select
-                  value={settings.chat.fontScale}
-                  onChange={(e) => updateChat({ fontScale: Number(e.target.value) })}
-                >
-                  {[0.75, 1, 1.25, 1.5, 2].map((v) => (
-                    <option key={v} value={v}>
-                      {v * 100}%
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Hide messages after
-                <select
-                  value={settings.chat.fadeAfter}
-                  onChange={(e) => updateChat({ fadeAfter: Number(e.target.value) })}
-                >
-                  {fadeOptions.map(([v, label]) => (
-                    <option key={v} value={v}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </fieldset>
-
-            <fieldset>
-              <legend>Alerts</legend>
-              <p id="alerts-hint" className="editor-hint">
-                Alerts use your channel name from Chat. In each message, {"{user}"} becomes their
-                name and {"{amount}"} the number. {"{s}"} adds an “s” unless the number is 1.
-              </p>
-              <label>
-                Alert volume: {settings.alerts.volume}%
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  step={5}
-                  value={settings.alerts.volume}
-                  aria-describedby="volume-hint"
-                  onChange={(e) =>
-                    setSettings((s) => ({
-                      ...s,
-                      alerts: { ...s.alerts, volume: Number(e.target.value) },
-                    }))
-                  }
-                />
-              </label>
-              <p id="volume-hint" className="editor-hint">
-                0% turns the sound off. In OBS, tick “Control audio via OBS” on the Alerts source so
-                your viewers hear it.
-              </p>
-              {alertFields.map(([kind, label]) => (
-                <label key={kind}>
-                  {label}
-                  <input
-                    value={settings.alerts.templates[kind]}
-                    maxLength={100}
-                    placeholder={defaultTemplates[kind]}
-                    aria-describedby="alerts-hint"
-                    onChange={(e) => updateTemplate(kind, e.target.value)}
-                  />
-                </label>
-              ))}
-            </fieldset>
-
-            <fieldset>
-              <legend>Logo (optional)</legend>
-              <label>
-                Link to your logo image (starts with https://)
-                <input
-                  type="url"
-                  value={logoInput}
-                  maxLength={2048}
-                  aria-invalid={!logoOk}
-                  aria-describedby="logo-error"
-                  onChange={(e) => {
-                    const v = e.target.value.trim();
-                    setLogoInput(v);
-                    update({ logo: v === "" || isHttpsUrl(v) ? v : "" });
-                  }}
-                />
-              </label>
-              <p id="logo-error" className="editor-error" role="alert">
-                {!logoOk && "This link must start with https://"}
-              </p>
-            </fieldset>
-
-            <details className="editor-advanced">
-              <summary id="advanced-summary">Advanced: colors and fonts</summary>
-              <p className="editor-hint">
-                The theme already looks good. Change these only if you want your own brand colors.
-              </p>
-              <fieldset>
-                <legend>Colors</legend>
-                {colorTokens.map((token) => (
-                  <div key={token} className="editor-color">
-                    <label>
-                      <input
-                        id={`color-${token}`}
-                        type="color"
-                        value={asHex(look[token])}
-                        onChange={(e) =>
-                          updateAdvanced({
-                            colors: { ...settings.advanced.colors, [token]: e.target.value },
-                          })
-                        }
-                      />
-                      {colorNames[token]}
-                    </label>
-                    {settings.advanced.colors[token] && (
-                      <button
-                        type="button"
-                        aria-label={`Reset ${colorNames[token]} to the theme`}
-                        onClick={() => {
-                          const colors = { ...settings.advanced.colors };
-                          delete colors[token];
-                          updateAdvanced({ colors });
-                          focusSoon(`color-${token}`);
-                        }}
-                      >
-                        Reset
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <p className="editor-error" role="status">
-                  {hardToRead &&
-                    "Your text may be hard to read on stream. Try a lighter text color or a darker “Boxes and cards” color."}
-                </p>
-              </fieldset>
-              <fieldset>
-                <legend>Fonts</legend>
-                {(["fontHeading", "fontBody"] as const).map((key) => (
-                  <label key={key}>
-                    {key === "fontHeading" ? "Heading font" : "Body font"}
+                    Hide messages after
                     <select
-                      value={settings.advanced[key] ?? ""}
-                      onChange={(e) =>
-                        updateAdvanced({ [key]: (e.target.value || null) as FontId | null })
-                      }
+                      value={settings.chat.fadeAfter}
+                      onChange={(e) => updateChat({ fadeAfter: Number(e.target.value) })}
                     >
-                      <option value="">Theme default ({themes[settings.theme][key]})</option>
-                      {fontIds.map((f) => (
-                        <option key={f}>{f}</option>
+                      {fadeOptions.map(([v, label]) => (
+                        <option key={v} value={v}>
+                          {label}
+                        </option>
                       ))}
                     </select>
                   </label>
-                ))}
+                </details>
               </fieldset>
-              <button
-                type="button"
-                onClick={() => {
-                  update({ advanced: { colors: {}, fontHeading: null, fontBody: null } });
-                  focusSoon("advanced-summary");
-                }}
-              >
-                Reset all to the theme
-              </button>
-            </details>
-          </form>
 
-          <div className="editor-side">
-            {/* In narrow windows this docks to the bottom behind a "Show preview" bar (editor.css). */}
-            <section
-              className="editor-preview-wrap editor-scene-preview"
-              aria-label="Preview"
-              data-open={previewOpen || undefined}
-            >
-              <button
-                type="button"
-                className="editor-preview-toggle"
-                aria-expanded={previewOpen}
-                aria-controls="scene-preview-body"
-                onClick={() => setPreviewOpen((o) => !o)}
+              <fieldset>
+                <legend>Alerts</legend>
+                <p className="editor-hint">Alerts use your channel name from Chat.</p>
+                <label>
+                  Alert volume: {settings.alerts.volume}%
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={5}
+                    value={settings.alerts.volume}
+                    aria-describedby="volume-hint"
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        alerts: { ...s.alerts, volume: Number(e.target.value) },
+                      }))
+                    }
+                  />
+                </label>
+                <p id="volume-hint" className="editor-hint">
+                  0% turns the sound off. In OBS, tick “Control audio via OBS” on the Alerts source
+                  so your viewers hear it.
+                </p>
+                <details className="editor-more">
+                  <summary>Change alert messages</summary>
+                  <p id="alerts-hint" className="editor-hint">
+                    In each message, {"{user}"} becomes their name and {"{amount}"} the number.{" "}
+                    {"{s}"} adds an “s” unless the number is 1.
+                  </p>
+                  {alertFields.map(([kind, label]) => (
+                    <label key={kind}>
+                      {label}
+                      <input
+                        value={settings.alerts.templates[kind]}
+                        maxLength={100}
+                        placeholder={defaultTemplates[kind]}
+                        aria-describedby="alerts-hint"
+                        onChange={(e) => updateTemplate(kind, e.target.value)}
+                      />
+                    </label>
+                  ))}
+                </details>
+              </fieldset>
+
+              <fieldset>
+                <legend>Logo (optional)</legend>
+                <label>
+                  Link to your logo image (starts with https://)
+                  <input
+                    type="url"
+                    value={logoInput}
+                    maxLength={2048}
+                    aria-invalid={!logoOk}
+                    aria-describedby="logo-error"
+                    onChange={(e) => {
+                      const v = e.target.value.trim();
+                      setLogoInput(v);
+                      update({ logo: v === "" || isHttpsUrl(v) ? v : "" });
+                    }}
+                  />
+                </label>
+                <p id="logo-error" className="editor-error" role="alert">
+                  {!logoOk && "This link must start with https://"}
+                </p>
+              </fieldset>
+
+              <details className="editor-advanced">
+                <summary id="advanced-summary">Advanced: colors and fonts</summary>
+                <p className="editor-hint">
+                  The theme already looks good. Change these only if you want your own brand colors.
+                </p>
+                <fieldset>
+                  <legend>Colors</legend>
+                  {colorTokens.map((token) => (
+                    <div key={token} className="editor-color">
+                      <label>
+                        <input
+                          id={`color-${token}`}
+                          type="color"
+                          value={asHex(look[token])}
+                          onChange={(e) =>
+                            updateAdvanced({
+                              colors: { ...settings.advanced.colors, [token]: e.target.value },
+                            })
+                          }
+                        />
+                        {colorNames[token]}
+                      </label>
+                      {settings.advanced.colors[token] && (
+                        <button
+                          type="button"
+                          aria-label={`Reset ${colorNames[token]} to the theme`}
+                          onClick={() => {
+                            const colors = { ...settings.advanced.colors };
+                            delete colors[token];
+                            updateAdvanced({ colors });
+                            focusSoon(`color-${token}`);
+                          }}
+                        >
+                          Reset
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <p className="editor-error" role="status">
+                    {hardToRead &&
+                      "Your text may be hard to read on stream. Try a lighter text color or a darker “Boxes and cards” color."}
+                  </p>
+                </fieldset>
+                <fieldset>
+                  <legend>Fonts</legend>
+                  {(["fontHeading", "fontBody"] as const).map((key) => (
+                    <label key={key}>
+                      {key === "fontHeading" ? "Heading font" : "Body font"}
+                      <select
+                        value={settings.advanced[key] ?? ""}
+                        onChange={(e) =>
+                          updateAdvanced({ [key]: (e.target.value || null) as FontId | null })
+                        }
+                      >
+                        <option value="">Theme default ({themes[settings.theme][key]})</option>
+                        {fontIds.map((f) => (
+                          <option key={f}>{f}</option>
+                        ))}
+                      </select>
+                    </label>
+                  ))}
+                </fieldset>
+                <button
+                  type="button"
+                  onClick={() => {
+                    update({ advanced: { colors: {}, fontHeading: null, fontBody: null } });
+                    focusSoon("advanced-summary");
+                  }}
+                >
+                  Reset all to the theme
+                </button>
+              </details>
+            </form>
+
+            <div className="editor-side">
+              {/* In narrow windows this docks to the bottom behind a "Show preview" bar (editor.css). */}
+              <section
+                className="editor-preview-wrap editor-scene-preview"
+                aria-label="Preview"
+                data-open={previewOpen || undefined}
               >
-                {previewOpen ? "Hide preview" : "Show preview"}
-              </button>
-              <div id="scene-preview-body" className="editor-scene-preview-body">
-                <h2>Preview: {overlays[scene].name}</h2>
-                <Preview>
-                  {scene === "starting" ? (
-                    <StartingSoon settings={settings} />
-                  ) : (
-                    <TextScene scene={scene} settings={settings} />
-                  )}
+                <button
+                  type="button"
+                  className="editor-preview-toggle"
+                  aria-expanded={previewOpen}
+                  aria-controls="scene-preview-body"
+                  onClick={() => setPreviewOpen((o) => !o)}
+                >
+                  {previewOpen ? "Hide preview" : "Show preview"}
+                </button>
+                <div id="scene-preview-body" className="editor-scene-preview-body">
+                  <h2>Preview: {overlays[scene].name}</h2>
+                  <Preview>
+                    {scene === "starting" ? (
+                      <StartingSoon settings={settings} />
+                    ) : (
+                      <TextScene scene={scene} settings={settings} />
+                    )}
+                  </Preview>
+                </div>
+              </section>
+              <section
+                className="editor-preview-wrap editor-chat-preview"
+                aria-label="Chat preview"
+              >
+                <h2>Preview: Chat (sample messages)</h2>
+                <Preview width={settings.chat.width} height={settings.chat.height}>
+                  <ChatView
+                    settings={{ ...settings, chat: { ...settings.chat, fadeAfter: 0 } }}
+                    messages={chatSamples}
+                  />
                 </Preview>
-              </div>
-            </section>
-            <section className="editor-preview-wrap editor-chat-preview" aria-label="Chat preview">
-              <h2>Preview: Chat (sample messages)</h2>
-              <Preview width={settings.chat.width} height={settings.chat.height}>
-                <ChatView
-                  settings={{ ...settings, chat: { ...settings.chat, fadeAfter: 0 } }}
-                  messages={chatSamples}
-                />
-              </Preview>
-            </section>
-            <AlertTester settings={settings} />
-            <ObsLinks settings={settings} />
+              </section>
+              <AlertTester settings={settings} />
+            </div>
           </div>
-        </div>
+          <ObsLinks settings={settings} heading={steps[2][1]} />
+        </>
       )}
       <SiteFooter />
     </div>

@@ -264,8 +264,64 @@
   top: 8px;
 }
 
-#obs-links:focus {
+#obs-links:focus,
+.editor-step:focus {
   outline: none;
+}
+
+/* Steps bar (T6.18): stays at the top while scrolling, and jumps to each step. */
+.editor-steps {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: 0 -32px 24px;
+  padding: 10px 32px;
+  background: var(--bg);
+  border-bottom: var(--border);
+}
+
+.editor-steps ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.editor-steps a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.editor-steps a:hover {
+  color: var(--accent);
+}
+
+.editor-step,
+#obs-links {
+  scroll-margin-top: 64px;
+}
+
+.editor .editor-step {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 22px;
+}
+
+.editor .editor-step:not(:first-child) {
+  margin-top: 16px;
+}
+
+.editor-body + .editor-links {
+  margin-top: 32px;
+}
+
+.editor .editor-links h2 {
+  font-family: var(--font-heading);
+  font-size: 22px;
 }
 
 .editor input[aria-invalid="true"] {
@@ -426,13 +482,16 @@
   align-self: end;
 }
 
-.editor-advanced {
+/* "Advanced", plus the rarely changed chat and alert settings (T6.20): native disclosures, closed at first. */
+.editor-advanced,
+.editor-more {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.editor-advanced summary {
+.editor-advanced summary,
+.editor-more summary {
   cursor: pointer;
   font-weight: 600;
   padding: 8px 0;
