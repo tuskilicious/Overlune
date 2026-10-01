@@ -16,3 +16,9 @@ import "@fontsource/nunito/600.css";
 import "@fontsource/nunito/700.css";
 import "@fontsource/press-start-2p/400.css"; // pixel fonts ship one weight only
 import "./vt323.css";
+import "@fontsource/baloo-2/400.css";
+import "@fontsource/baloo-2/600.css";
+import "@fontsource/baloo-2/700.css";
+import "@fontsource/quicksand/400.css";
+import "@fontsource/quicksand/600.css";
+import "@fontsource/quicksand/700.css";

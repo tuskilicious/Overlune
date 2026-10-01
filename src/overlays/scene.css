@@ -160,6 +160,50 @@
   animation: scene-slide-fade var(--enter-ms) steps(4, end) both;
 }
 
+/* Pastel Cloud: a soft diagonal gradient with two puffy clouds drifting across. Transform-only animation.
+   Reduced-motion version: index.css stops them and the clouds stand still. */
+.scene[data-bg="clouds"] {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(160deg, var(--bg), color-mix(in srgb, var(--primary) 18%, #fff));
+}
+
+.scene[data-bg="clouds"]::before,
+.scene[data-bg="clouds"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: -480px;
+  width: 480px;
+  height: 180px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 30% 65%, #fff 0 60px, transparent 61px),
+    radial-gradient(circle at 52% 45%, #fff 0 84px, transparent 85px),
+    radial-gradient(circle at 74% 62%, #fff 0 64px, transparent 65px),
+    radial-gradient(ellipse 42% 22% at 52% 78%, #fff 99%, transparent);
+  opacity: 0.75;
+  animation: scene-drift 70s linear infinite;
+}
+
+.scene[data-bg="clouds"]::before {
+  top: 9%;
+  animation-delay: -20s;
+}
+
+.scene[data-bg="clouds"]::after {
+  top: 58%;
+  scale: 0.7;
+  animation-duration: 95s;
+  animation-delay: -60s;
+}
+
+@keyframes scene-drift {
+  to {
+    transform: translateX(2400px);
+  }
+}
+
 @keyframes scene-slide-fade {
   from {
     opacity: 0;
