@@ -16,7 +16,11 @@
 .editor-header h1 {
   margin: 0;
   font-family: var(--font-heading);
-  line-height: 0;
+}
+
+/* Block, so the logo has no gap under it; the guide's h1 is text and keeps its line height. */
+.editor-header h1 img {
+  display: block;
 }
 
 .editor-header p {
