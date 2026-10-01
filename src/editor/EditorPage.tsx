@@ -431,7 +431,11 @@ export default function EditorPage() {
                     update({ theme: id });
                     pickedThisVisit = true;
                     setStarted(true);
-                    focusSoon(`theme-${id}`);
+                    // Open at the top with the preview in view; focus still lands on the picked look (T6.29).
+                    requestAnimationFrame(() => {
+                      document.getElementById(`theme-${id}`)?.focus({ preventScroll: true });
+                      scrollTo(0, 0);
+                    });
                   }}
                 >
                   <ThemeShot id={id} />
