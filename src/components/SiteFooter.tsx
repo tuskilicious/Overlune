@@ -1,6 +1,5 @@
 import { Link } from "react-router";
 
-const docs = "https://github.com/tuskilicious/Overlune/blob/main/docs/legal";
 export const contactEmail = "support@overlune.in";
 
 /** Footer for the editor and guide pages (never on overlays, which are shown on stream). */
@@ -12,10 +11,10 @@ export default function SiteFooter() {
           <Link to="/guide">Setup guide</Link>
         </li>
         <li>
-          <a href={`${docs}/privacy.md`}>Privacy</a>
+          <Link to="/privacy">Privacy</Link>
         </li>
         <li>
-          <a href={`${docs}/terms.md`}>Terms</a>
+          <Link to="/terms">Terms</Link>
         </li>
         <li>
           Contact: <a href={`mailto:${contactEmail}`}>{contactEmail}</a>

@@ -3,6 +3,9 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import { sentryEnvironment } from "./lib/sentry";
 import EditorPage from "./editor/EditorPage";
 import SetupGuide from "./editor/SetupGuide";
+import LegalPage from "./editor/LegalPage";
+import privacy from "../docs/legal/privacy.md?raw";
+import terms from "../docs/legal/terms.md?raw";
 import Alerts from "./overlays/alerts/Alerts";
 import Chat from "./overlays/chat/Chat";
 import FromLink from "./overlays/FromLink";
@@ -23,6 +26,8 @@ export default function App() {
       <SentryRoutes>
         <Route path="/" element={<EditorPage />} />
         <Route path="/guide" element={<SetupGuide />} />
+        <Route path="/privacy" element={<LegalPage source={privacy} />} />
+        <Route path="/terms" element={<LegalPage source={terms} />} />
         <Route
           path="/o/starting"
           element={<FromLink>{(s, error) => <StartingSoon settings={s} error={error} />}</FromLink>}
