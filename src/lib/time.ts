@@ -104,3 +104,12 @@ export function nextRepeatStart(
   }
   return null;
 }
+
+/** Plain-language zone name: "India Standard Time", "Eastern Time" (no summer/winter variant, so any date works). */
+export function zoneName(tz: string): string {
+  return (
+    new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "longGeneric" })
+      .formatToParts(0)
+      .find((p) => p.type === "timeZoneName")?.value ?? tz
+  );
+}

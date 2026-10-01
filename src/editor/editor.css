@@ -223,6 +223,16 @@
   gap: 8px;
 }
 
+/* "Your time zone: … (…)" with its Change button on the same line when it fits. */
+.editor .editor-tz {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  font-size: 14px;
+}
+
 /* Weekday checkboxes for a repeating countdown sit in one wrapping row. */
 .editor fieldset.editor-days {
   flex-direction: row;
