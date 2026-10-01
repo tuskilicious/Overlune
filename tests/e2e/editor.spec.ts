@@ -510,3 +510,21 @@ test("picking Bold Esports restyles the preview, alerts and sound", async ({ pag
   await page.reload();
   await expect(page.getByRole("radio", { name: "Bold Esports" })).toBeChecked();
 });
+
+test("picking Vaporwave Sunset restyles the preview, alerts and sound", async ({ page }) => {
+  const palms = page.waitForResponse(/\/images\/themes\/vaporwave-palms\.svg$/);
+  await page.getByRole("radio", { name: "Vaporwave Sunset" }).check();
+  await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "sunset");
+  expect((await palms).ok()).toBe(true);
+  await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Audiowide/);
+
+  const sound = page.waitForRequest(/\/sounds\/vaporwave-sunset\.ogg$/);
+  await page.getByRole("button", { name: "Test raid" }).click();
+  await expect(
+    page.getByRole("region", { name: "Preview: Alerts" }).locator(".alerts"),
+  ).toHaveAttribute("data-anim", "slide-fade");
+  await sound;
+
+  await page.reload();
+  await expect(page.getByRole("radio", { name: "Vaporwave Sunset" })).toBeChecked();
+});
