@@ -20,3 +20,6 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 | Baloo 2 (`@fontsource/baloo-2` 5.3.0, weights 400/600/700) | font | Advanced font picker; Pastel Cloud (T6.2) | https://fontsource.org/fonts/baloo-2 | SIL OFL 1.1 | No | 2026-10-01 |
 | Quicksand (`@fontsource/quicksand` 5.3.0, weights 400/600/700) | font | Advanced font picker; Pastel Cloud (T6.2) | https://fontsource.org/fonts/quicksand | SIL OFL 1.1 | No | 2026-10-01 |
 | `public/sounds/pastel-cloud.ogg` (Kenney Interface Sounds 1.0, `pluck_002.ogg`, unchanged) | sound | Pastel Cloud alert sound | https://kenney.nl/assets/interface-sounds | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
+| Lora (`@fontsource/lora` 5.3.0, weights 400/600/700) | font | Advanced font picker; Forest Night (T6.3) | https://fontsource.org/fonts/lora | SIL OFL 1.1 | No | 2026-10-01 |
+| Nunito Sans (`@fontsource/nunito-sans` 5.3.0, weights 400/600/700) | font | Advanced font picker; Forest Night (T6.3) | https://fontsource.org/fonts/nunito-sans | SIL OFL 1.1 | No | 2026-10-01 |
+| `public/sounds/forest-night.ogg` (Kenney Interface Sounds 1.0, `bong_001.ogg`, unchanged) | sound | Forest Night alert sound | https://kenney.nl/assets/interface-sounds | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
