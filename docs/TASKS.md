@@ -212,8 +212,9 @@ Found by going through the live site again after T6.13–T6.25. One branch and P
 - [x] **T6.29 Picking a look opens at the top.** After picking a look on the welcome gallery, the page lands mid-way with the preview under the steps bar.
   - Accept: the editor opens scrolled to the top, with focus still on the picked look's radio. e2e test.
   - *Built 2026-10-02 on `fix/pick-opens-top`. The gallery focuses the picked radio with `preventScroll` and scrolls to the top. e2e: keyboard and mouse picks (Vaporwave Sunset, the last card) land at the top with focus on the radio; the mouse test failed before. Owner checked the batch preview (PR #61). Editor only, so no OBS test.*
-- [ ] **T6.30 Preview stays in view.** On wide windows the scene preview scrolls away while editing socials, logo or colors.
+- [x] **T6.30 Preview stays in view.** On wide windows the scene preview scrolls away while editing socials, logo or colors.
   - Accept: at desktop widths the scene preview stays pinned under the steps bar while the form scrolls; chat and alert previews and narrow layouts are unchanged. e2e test.
+  - *Built 2026-10-02 on `feat/sticky-preview`. Above 800px the preview column is `position: sticky` under the steps bar, capped at the window height with its own scroll, so the scene preview stays in view and chat, alerts and the test buttons are one scroll away inside the column. (A sticky scene preview alone would have slid over the alert test buttons.) It slides up only over the last screen of the form, where the form ends. Narrow windows keep the docked preview. e2e test. Owner checked the batch preview (PR #62). Editor only, so no OBS test.*
 - [ ] **T6.31 Smaller look picker in the editor.** The picker's 8 cards fill a screen, and the chosen look can sit below the fold.
   - Accept: the editor's picker uses smaller cards so all 8 fit without scrolling at 1366×768, names still readable, keyboard and axe unchanged. e2e test.
 - [ ] **T6.32 Steps bar shows the current step.** The bar doesn't say where you are.
