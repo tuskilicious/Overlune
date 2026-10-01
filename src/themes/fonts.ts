@@ -32,3 +32,7 @@ import "@fontsource/anton/400.css";
 import "@fontsource/barlow/400.css";
 import "@fontsource/barlow/600.css";
 import "@fontsource/barlow/700.css";
+import "@fontsource/audiowide/400.css";
+import "@fontsource/space-grotesk/400.css";
+import "@fontsource/space-grotesk/600.css";
+import "@fontsource/space-grotesk/700.css";

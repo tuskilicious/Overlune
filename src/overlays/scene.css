@@ -290,6 +290,63 @@
   }
 }
 
+/* Vaporwave Sunset: a purple sky that turns coral and orange only near the horizon (text stays on purple),
+   a striped sun sinking behind it, and palm silhouettes (public/images/themes). Static, so no reduced-motion version. */
+.scene[data-bg="sunset"] {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(var(--bg) 0 68%, #ff6b6b 90%, #ffb86b);
+}
+
+.scene[data-bg="sunset"]::before,
+.scene[data-bg="sunset"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.scene[data-bg="sunset"]::before {
+  left: 50%;
+  bottom: -230px;
+  width: 560px;
+  height: 560px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(#ffd36b, var(--accent));
+  /* The stripes: gaps that widen toward the bottom of the sun. */
+  mask-image: linear-gradient(
+    #000 0 16%,
+    transparent 16% 18%,
+    #000 18% 24%,
+    transparent 24% 27%,
+    #000 27% 32%,
+    transparent 32% 36%,
+    #000 36% 40%,
+    transparent 40% 45%,
+    #000 45%
+  );
+}
+
+.scene[data-bg="sunset"]::after {
+  inset: 0;
+  background: url("/images/themes/vaporwave-palms.svg") center bottom / cover no-repeat;
+}
+
+/* Keeps subtitles and the countdown readable if a logo pushes them down over the sun. */
+.scene[data-bg="sunset"] .scene-main {
+  text-shadow: 0 2px 10px var(--bg);
+}
+
+/* Chrome titles: white with a band of `primary` across the middle, and a pink edge. */
+.scene[data-bg="sunset"] .scene-title {
+  text-shadow: none; /* it would show through the see-through text fill */
+  background: linear-gradient(#fff 0 38%, var(--primary) 52%, #fff 70%, #e8d9ff);
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 4px 0 var(--accent));
+}
+
 @keyframes scene-slide-fade {
   from {
     opacity: 0;

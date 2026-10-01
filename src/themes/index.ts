@@ -5,6 +5,7 @@ import { cozyCafe } from "./cozy-cafe";
 import { forestNight } from "./forest-night";
 import { neonGrid } from "./neon-grid";
 import { pastelCloud } from "./pastel-cloud";
+import { vaporwaveSunset } from "./vaporwave-sunset";
 import type { Theme, ThemeId } from "./types";
 
 export const themes: Record<ThemeId, Theme> = {
@@ -15,6 +16,7 @@ export const themes: Record<ThemeId, Theme> = {
   "pastel-cloud": pastelCloud,
   "forest-night": forestNight,
   "bold-esports": boldEsports,
+  "vaporwave-sunset": vaporwaveSunset,
 };
 
 export const defaultThemeId: ThemeId = "clean-slate";

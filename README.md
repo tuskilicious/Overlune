@@ -6,7 +6,7 @@ It includes:
 - Starting Soon, BRB and Stream Ending scenes
 - A Twitch chat skin
 - Alerts for raids, subs, gift subs and bits, with sound
-- 3 themes: Clean Slate, Neon Grid and Cozy Café
+- 8 themes: Clean Slate, Neon Grid, Cozy Café, Arcade 8-Bit, Pastel Cloud, Forest Night, Bold Esports and Vaporwave Sunset
 - A step-by-step setup guide for OBS and Streamlabs
 
 Everything matches one theme. Paste the links into OBS or Streamlabs and you're live.
@@ -110,7 +110,7 @@ Pages settings: build command `npm run build`, output `dist`, Node from `.nvmrc`
 
 ## Contributing notes
 - **Overlay links are a public contract.** Streamers paste a link once and never touch it again. Every link carries a schema version. Never break an old link: add a migration plus a saved link in `tests/fixtures/links/` (see its README).
-- **Adding a theme:** one file in `src/themes/` registered in `src/themes/index.ts`. The contrast test checks text on its surface meets WCAG AA. Record every font, sound and image in `docs/ASSETS.md`.
+- **Adding a theme:** one file in `src/themes/` registered in `src/themes/index.ts`, with its id added to the end of `themeIds` (and any new fonts to the end of `fontIds`) in `src/themes/types.ts`. Add a link fixture in `tests/fixtures/links/`. The contrast test checks text on its surface meets WCAG AA. Record every font, sound and image in `docs/ASSETS.md`.
 - **Test overlays in OBS**, not only in Chrome. See `docs/OBS-TESTING.md`.
 - Chat text is untrusted: render it as React text, never as HTML.
 
