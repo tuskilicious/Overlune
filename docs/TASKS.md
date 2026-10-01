@@ -122,7 +122,7 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
 ### From the new-streamer walkthrough (2026-10-01)
 v1 fixes from watching someone set Overlune up as a brand-new streamer. These are not v2 features. One branch and PR per task.
 
-- [ ] **T6.7 Countdown shows the right day.** A countdown more than a day away shows "37:59:55" and "Starts at 11:30 PM GMT+5:30", which viewers read as tonight.
+- [ ] **T6.7 Countdown shows the right day.** *Built, waiting on the OBS test.* A countdown more than a day away shows "37:59:55" and "Starts at 11:30 PM GMT+5:30", which viewers read as tonight.
   - Accept: if the end time isn't today in the streamer's time zone, the label names the day: "Starts tomorrow, 11:30 PM GMT+5:30", or "Starts Fri 3 Oct, 11:30 PM GMT+5:30" from 2 days out. The zone stays shown (PRD).
   - Accept: 24 hours or more shows "1d 13h 59m". Under 24 hours keeps HH:MM:SS (and MM:SS under an hour).
   - Accept: unit tests in `tests/unit/lib/time.test.ts` cover today, tomorrow, 2+ days, just before and after midnight in the streamer's zone, and a DST change day. No link change.

@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { formatCountdown, formatEndTime, secondsLeft } from "../../lib/time";
+import { formatCountdown, formatStartsAt, secondsLeft } from "../../lib/time";
 import type { Settings } from "../../settings/schema";
 import SceneFrame from "../SceneFrame";
 import "./starting.css";
@@ -37,7 +37,7 @@ export default function StartingSoon({
           {secs > 0 ? (
             <>
               <div className="countdown-time">{formatCountdown(secs)}</div>
-              <div className="countdown-at">Starts at {formatEndTime(endsAt, tz)}</div>
+              <div className="countdown-at">{formatStartsAt(endsAt, tz, endsAt - secs * 1000)}</div>
             </>
           ) : (
             <div className="countdown-done">{doneText}</div>
