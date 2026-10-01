@@ -8,11 +8,11 @@ import { overlays } from "./ObsLinks";
 import "./editor.css";
 import "./guide.css";
 
-/** A screenshot from public/guide: the owner's own OBS captures (docs/ASSETS.md). */
+/** A screenshot from public/images/guide (not public/guide, which would shadow the /guide page on some hosts): the owner's own OBS captures (docs/ASSETS.md). */
 function Shot({ file, alt, caption }: { file: string; alt: string; caption?: string }) {
   return (
     <figure className="guide-shot">
-      <img src={`/guide/${file}`} alt={alt} loading="lazy" />
+      <img src={`/images/guide/${file}`} alt={alt} loading="lazy" />
       {caption && <figcaption>{caption}</figcaption>}
     </figure>
   );
