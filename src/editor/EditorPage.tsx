@@ -13,7 +13,7 @@ import {
 import { loadSaved, save } from "../settings/storage";
 import { decodeLink, encode } from "../settings/url";
 import { themes } from "../themes";
-import { cleanSlate } from "../themes/clean-slate";
+import { brandChrome } from "./brand";
 import { contrast } from "../lib/contrast";
 import { colorTokens, fontIds, themeIds, type ColorToken, type FontId } from "../themes/types";
 import { applyOverrides, themeVars } from "../themes/vars";
@@ -234,7 +234,7 @@ export default function EditorPage() {
     );
 
   return (
-    <div className="editor" style={themeVars(cleanSlate)}>
+    <div className="editor" style={themeVars(brandChrome)}>
       {/* No real #fragment jump: the address bar's fragment holds the settings. */}
       <a
         className="editor-skip"

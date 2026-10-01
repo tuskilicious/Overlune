@@ -1,4 +1,4 @@
-/* Editor chrome uses Clean Slate tokens (docs/DESIGN.md), set as CSS variables on .editor. */
+/* Editor chrome uses Overlune brand tokens (src/editor/brand.ts, docs/BRAND.md), set as CSS variables on .editor. */
 .editor {
   min-height: 100vh;
   color-scheme: dark;
