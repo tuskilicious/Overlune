@@ -33,6 +33,9 @@ export default function SetupGuide() {
   return (
     <div className="editor guide" style={themeVars(brandChrome)}>
       <header className="editor-header">
+        <Link to="/" className="guide-logo">
+          <img src="/images/brand/logo.png" alt="Overlune editor" width="159" height="48" />
+        </Link>
         <p>
           <Link to="/">← Back to the editor</Link>
         </p>
@@ -41,7 +44,7 @@ export default function SetupGuide() {
       </header>
 
       <main>
-        <section aria-labelledby="add-heading">
+        <section className="guide-step" aria-labelledby="add-heading">
           <h2 id="add-heading">1. Add an overlay</h2>
           <ol>
             <li>
@@ -89,7 +92,7 @@ export default function SetupGuide() {
           <p>Every link carries your settings, so you only paste it once.</p>
         </section>
 
-        <section aria-labelledby="settings-heading">
+        <section className="guide-step" aria-labelledby="settings-heading">
           <h2 id="settings-heading">2. Tick the right boxes</h2>
           <p>In the same window, below the size:</p>
           <ul>
@@ -109,7 +112,7 @@ export default function SetupGuide() {
           />
         </section>
 
-        <section aria-labelledby="audio-heading">
+        <section className="guide-step" aria-labelledby="audio-heading">
           <h2 id="audio-heading">3. Make sure alerts can be heard</h2>
           <ol>
             <li>
