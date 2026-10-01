@@ -611,27 +611,47 @@
   gap: 12px;
 }
 
+/* Link rows (T6.23): the name, size and Copy button lead. The raw link stays as a short, faint line that can
+   still be selected (the copy fallback selects it), so it no longer looks like a wall of code. */
 .editor-link {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 4px 8px;
-  align-items: end;
+  gap: 4px 16px;
+  align-items: center;
   padding: 12px 16px;
   background: var(--surface);
   border: var(--border);
   border-radius: var(--radius);
 }
 
-.editor-link input {
-  font-family: ui-monospace, monospace;
-  font-size: 13px;
-  color: var(--text-muted);
+.editor-link label > span {
+  font-size: 16px;
 }
 
+.editor .editor-link input {
+  max-width: 48ch;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-overflow: ellipsis;
+}
+
+.editor .editor-link button {
+  padding: 8px 18px;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+/* Under the Copy button, taking no room until there is something to say. */
 .editor-link-status {
-  grid-column: 1 / -1;
-  min-height: 1.2em;
-  font-size: 14px;
+  grid-column: 2;
+  justify-self: center;
+  font-size: 13px;
   color: var(--accent);
 }
 
