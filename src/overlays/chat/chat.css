@@ -130,3 +130,16 @@
   margin: -0.2em 0.05em;
   vertical-align: middle;
 }
+
+/* Bold Esports: angled message boxes that wipe in fast. Extra side padding keeps text clear of the slant. */
+.chat[data-enter="wipe"] .chat-msg {
+  padding-inline: 1em;
+  clip-path: polygon(0.5em 0, 100% 0, calc(100% - 0.5em) 100%, 0 100%);
+  animation: box-wipe var(--enter-ms) ease-out backwards;
+}
+
+.chat[data-enter="wipe"][data-fade] .chat-msg {
+  animation:
+    box-wipe var(--enter-ms) ease-out backwards,
+    chat-out 400ms ease-in calc(var(--fade-ms) - 400ms) forwards;
+}

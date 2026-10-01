@@ -23,3 +23,10 @@ html[data-rm] *::after {
   animation: none !important;
   transition: none !important;
 }
+
+/* Bold Esports wipe: grows a box from its left edge to its own angled clip-path (scene, chat and alert CSS). */
+@keyframes box-wipe {
+  from {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  }
+}

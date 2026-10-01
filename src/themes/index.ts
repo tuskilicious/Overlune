@@ -1,4 +1,5 @@
 import { arcade8bit } from "./arcade-8bit";
+import { boldEsports } from "./bold-esports";
 import { cleanSlate } from "./clean-slate";
 import { cozyCafe } from "./cozy-cafe";
 import { forestNight } from "./forest-night";
@@ -13,6 +14,7 @@ export const themes: Record<ThemeId, Theme> = {
   "arcade-8bit": arcade8bit,
   "pastel-cloud": pastelCloud,
   "forest-night": forestNight,
+  "bold-esports": boldEsports,
 };
 
 export const defaultThemeId: ThemeId = "clean-slate";

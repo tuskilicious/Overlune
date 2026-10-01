@@ -269,6 +269,27 @@
   }
 }
 
+/* Bold Esports: the content wipes in left to right, and the socials bar is a parallelogram.
+   The shape is static, so it stays under reduced motion (index.css only stops the wipe). */
+.scene[data-enter="wipe"] .scene-main {
+  animation: scene-wipe var(--enter-ms) ease-out backwards;
+}
+
+.scene[data-enter="wipe"] .scene-socials {
+  padding-inline: 56px;
+  clip-path: polygon(24px 0, 100% 0, calc(100% - 24px) 100%, 0 100%);
+  animation: box-wipe var(--enter-ms) ease-out backwards;
+}
+
+@keyframes scene-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
 @keyframes scene-slide-fade {
   from {
     opacity: 0;
