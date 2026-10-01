@@ -57,6 +57,7 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 
 **5. Pastel Cloud**
 - Colors: bg gradient `#FDE7F0`→`#E3ECFF`, surface white at 80%, accents `#B79CFF` `#FF9ECF`, text `#4B3F6B`
+- Shipped: bg `#FDE7F0` fading into an 18% tint of primary (drawn by the clouds effect, so color overrides still work), opaque white surface (keeps chat readable over gameplay), primary `#7B5BD6`, accent `#B0367D`, muted `#6E6290`. The suggested pastels fail AA on white.
 - Fonts: Baloo 2 / Quicksand
 - Shape: radius 24
 - Effects: floating clouds

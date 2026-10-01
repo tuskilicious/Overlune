@@ -462,3 +462,19 @@ test("picking Arcade 8-Bit restyles the preview, alerts and sound", async ({ pag
   await page.reload();
   await expect(page.getByRole("radio", { name: "Arcade 8-Bit" })).toBeChecked();
 });
+
+test("picking Pastel Cloud restyles the preview, alerts and sound", async ({ page }) => {
+  await page.getByRole("radio", { name: "Pastel Cloud" }).check();
+  await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "clouds");
+  await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Baloo 2/);
+
+  const sound = page.waitForRequest(/\/sounds\/pastel-cloud\.ogg$/);
+  await page.getByRole("button", { name: "Test raid" }).click();
+  await expect(
+    page.getByRole("region", { name: "Preview: Alerts" }).locator(".alerts"),
+  ).toHaveAttribute("data-anim", "bounce");
+  await sound;
+
+  await page.reload();
+  await expect(page.getByRole("radio", { name: "Pastel Cloud" })).toBeChecked();
+});
