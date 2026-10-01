@@ -246,19 +246,44 @@ test.describe("steps (T6.18, T6.20)", () => {
   test("rarely changed chat and alert settings start tucked away", async ({ page }) => {
     for (const label of ["Bots to hide", "Chat box width", "Text size", "Hide messages after"])
       await expect(page.getByLabel(label)).toBeHidden();
-    await expect(page.getByLabel("Raid message")).toBeHidden();
+    await expect(page.getByLabel("Raid message", { exact: true })).toBeHidden();
     await expect(page.getByLabel("Your Twitch channel name")).toBeVisible();
     await expect(page.getByLabel(/^Alert volume/)).toBeVisible();
 
     await openMore(page, "More chat options");
     await expect(page.getByLabel("Bots to hide")).toBeVisible();
     await openMore(page, "Change alert messages");
-    await expect(page.getByLabel("Raid message")).toBeVisible();
+    await expect(page.getByLabel("Raid message", { exact: true })).toBeVisible();
     const scan = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
       .analyze();
     expect(scan.violations).toEqual([]);
   });
+});
+
+test("alert messages can be built without typing codes (T6.19)", async ({ page }) => {
+  await openMore(page, "Change alert messages");
+  const raid = page.getByLabel("Raid message", { exact: true });
+  const example = page.locator("#template-raid-example");
+  await expect(example).toHaveText("Example: FriendlyRaider is raiding with 42 viewers!");
+
+  await raid.fill("Thanks for the raid, !");
+  await raid.press("End");
+  await raid.press("ArrowLeft");
+  await page.getByRole("button", { name: "Add their name to Raid message" }).click();
+  await expect(raid).toHaveValue("Thanks for the raid, {user}!");
+  await expect(raid).toBeFocused();
+  await expect(example).toHaveText("Example: Thanks for the raid, FriendlyRaider!");
+
+  // An empty message is the default, so the button adds to the default.
+  await expect(page.getByRole("button", { name: "Add the amount to Bits message" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Add the amount to New sub message" })).toHaveCount(
+    0,
+  );
+  await page.getByRole("button", { name: "Add their name to Bits message" }).click();
+  await expect(page.getByLabel("Bits message", { exact: true })).toHaveValue(
+    "{user} cheered {amount} bit{s}!{user}",
+  );
 });
 
 test("the look picker shows each theme as a picture you can click", async ({ page }) => {
@@ -577,7 +602,9 @@ test.describe("alert test buttons", () => {
 
   test("a test button shows the alert with your message and plays the sound", async ({ page }) => {
     await openMore(page, "Change alert messages");
-    await page.getByLabel("Raid message").fill("Welcome {user} and {amount} friends!");
+    await page
+      .getByLabel("Raid message", { exact: true })
+      .fill("Welcome {user} and {amount} friends!");
     const sound = page.waitForRequest(/\/sounds\/clean-slate\.ogg$/);
     await page.getByRole("button", { name: "Test raid" }).click();
     await expect(tester(page).locator(".alert-box")).toHaveText(
