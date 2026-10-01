@@ -478,3 +478,19 @@ test("picking Pastel Cloud restyles the preview, alerts and sound", async ({ pag
   await page.reload();
   await expect(page.getByRole("radio", { name: "Pastel Cloud" })).toBeChecked();
 });
+
+test("picking Forest Night restyles the preview, alerts and sound", async ({ page }) => {
+  await page.getByRole("radio", { name: "Forest Night" }).check();
+  await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "fireflies");
+  await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Lora/);
+
+  const sound = page.waitForRequest(/\/sounds\/forest-night\.ogg$/);
+  await page.getByRole("button", { name: "Test raid" }).click();
+  await expect(
+    page.getByRole("region", { name: "Preview: Alerts" }).locator(".alerts"),
+  ).toHaveAttribute("data-anim", "slide-fade");
+  await sound;
+
+  await page.reload();
+  await expect(page.getByRole("radio", { name: "Forest Night" })).toBeChecked();
+});

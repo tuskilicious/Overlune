@@ -204,6 +204,71 @@
   }
 }
 
+/* Forest Night: moonlight glowing in the top corner and fireflies that drift and blink.
+   Two firefly layers on different timings so they don't blink together. Transform and opacity only.
+   Reduced-motion version: index.css stops them and the fireflies stay lit. */
+.scene[data-bg="fireflies"] {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(
+      circle at 84% 10%,
+      color-mix(in srgb, var(--primary) 22%, transparent),
+      transparent 32%
+    ),
+    var(--bg);
+}
+
+.scene[data-bg="fireflies"]::before,
+.scene[data-bg="fireflies"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  animation: scene-fireflies 7s ease-in-out infinite alternate;
+}
+
+.scene[data-bg="fireflies"]::before {
+  background:
+    radial-gradient(circle at 8% 72%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 21% 38%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 33% 86%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 47% 64%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 62% 22%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 71% 78%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 88% 54%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 94% 88%, var(--accent) 0 3px, transparent 9px);
+}
+
+.scene[data-bg="fireflies"]::after {
+  background:
+    radial-gradient(circle at 4% 30%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 15% 90%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 27% 58%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 40% 18%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 55% 92%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 66% 46%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 79% 30%, var(--accent) 0 3px, transparent 9px),
+    radial-gradient(circle at 91% 70%, var(--accent) 0 3px, transparent 9px);
+  animation-duration: 9s;
+  animation-delay: -4s;
+}
+
+@keyframes scene-fireflies {
+  0% {
+    opacity: 0.2;
+    transform: translate(0, 0);
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.3;
+    transform: translate(24px, -36px);
+  }
+}
+
 @keyframes scene-slide-fade {
   from {
     opacity: 0;

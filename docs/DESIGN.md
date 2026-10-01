@@ -63,7 +63,7 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 - Effects: floating clouds
 
 **6. Forest Night**
-- Colors: bg `#0B1A14`, surface `#12281F`, accent `#9BE564`, moon `#E9F1D6`, text `#E3EFE6`
+- Colors: bg `#0B1A14`, surface `#12281F`, accent `#9BE564`, moon `#E9F1D6` (shipped as `primary`), muted `#9DB5A7` (shipped), text `#E3EFE6`
 - Fonts: Lora / Nunito Sans
 - Shape: radius 12
 - Effects: fireflies, moonlight glow
