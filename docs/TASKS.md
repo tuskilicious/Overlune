@@ -196,3 +196,24 @@ Found by going through the live site at 1366×768 as a brand-new streamer. These
 - [x] **T6.25 Brand header on the guide.** `/guide` has no logo and is dense text.
   - Accept: the guide shows the Overlune logo linking back to the editor, and its steps are easier to scan (for example, numbered step cards). The existing OBS screenshots stay. axe clean.
   - *Built 2026-10-02 on `feat/guide-polish`. The guide header shows the Overlune logo, linking to the editor (alt "Overlune editor"), above "← Back to the editor". Steps 1–3 are cards on the Deep Space surface, so they stand apart from the fixes and the Streamlabs notes. Screenshots and text unchanged. e2e test; guide axe test passes. Owner checked the batch preview (PR #55). Editor and site pages only, so no OBS test.*
+
+### From the second walkthrough (2026-10-02)
+Found by going through the live site again after T6.13–T6.25. One branch and PR per task. T6.26 and T6.27 change overlays, so they need the OBS test (`docs/OBS-TESTING.md`).
+
+- [ ] **T6.26 Long text fits on screen.** With Arcade 8-Bit, a 60-character title wraps to 5 lines and pushes the countdown's "Starts…" line and the socials off the bottom of the 1920×1080 scene.
+  - Accept: on every theme, the longest allowed title and subtitle with a countdown, 3 socials and a logo stay inside 1920×1080 (the title gets smaller as it gets longer). Short titles look the same as now. No link change. e2e check on every theme. OBS test.
+- [ ] **T6.27 Empty socials don't show.** A social with no name shows a bare platform box on stream.
+  - Accept: socials with an empty (or spaces-only) name are left out of every scene. The editor still shows the row so it can be filled in. No link change. Test. OBS test.
+- [ ] **T6.28 Characters-left hints.** The title stops at 60 characters with no warning, so "…for the stream" becomes "…for the strea".
+  - Accept: text fields with a limit (title, subtitle, done message, social names, alert messages) show "N characters left" once 10 or fewer remain, announced politely to screen readers. Limits unchanged. e2e test.
+- [ ] **T6.29 Picking a look opens at the top.** After picking a look on the welcome gallery, the page lands mid-way with the preview under the steps bar.
+  - Accept: the editor opens scrolled to the top, with focus still on the picked look's radio. e2e test.
+- [ ] **T6.30 Preview stays in view.** On wide windows the scene preview scrolls away while editing socials, logo or colors.
+  - Accept: at desktop widths the scene preview stays pinned under the steps bar while the form scrolls; chat and alert previews and narrow layouts are unchanged. e2e test.
+- [ ] **T6.31 Smaller look picker in the editor.** The picker's 8 cards fill a screen, and the chosen look can sit below the fold.
+  - Accept: the editor's picker uses smaller cards so all 8 fit without scrolling at 1366×768, names still readable, keyboard and axe unchanged. e2e test.
+- [ ] **T6.32 Steps bar shows the current step.** The bar doesn't say where you are.
+  - Accept: the step whose section is on screen is highlighted in the bar and marked `aria-current="step"`. e2e test.
+- [ ] **T6.33 Header tagline from the brand kit.** The header says "Free stream overlays that match…", but BRAND.md's primary tagline is "Free stream overlays that look pro."
+  - Accept: the header uses the brand tagline plus a short how-to line. No unsupported claims.
+
