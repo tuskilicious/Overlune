@@ -72,6 +72,17 @@
     chat-out 400ms ease-in calc(var(--fade-ms) - 400ms) forwards;
 }
 
+/* Arcade 8-Bit: each message pops in in four hard steps. */
+.chat[data-enter="steps"] .chat-msg {
+  animation: chat-in var(--enter-ms) steps(4, end) both;
+}
+
+.chat[data-enter="steps"][data-fade] .chat-msg {
+  animation:
+    chat-in var(--enter-ms) steps(4, end) both,
+    chat-out 400ms steps(4, end) calc(var(--fade-ms) - 400ms) forwards;
+}
+
 @keyframes chat-bounce {
   from {
     opacity: 0;

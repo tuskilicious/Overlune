@@ -3,6 +3,7 @@ html,
 body {
   margin: 0;
   background: transparent;
+  font-synthesis-weight: none; /* pixel fonts have one weight; never smear a fake bold */
 }
 
 /* Reduced motion: the OS setting, or ?rm=1 in the link (sets html[data-rm], see main.tsx).

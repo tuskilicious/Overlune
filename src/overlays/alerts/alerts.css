@@ -128,3 +128,17 @@
     transform: translateY(-48px) scale(0.92);
   }
 }
+
+/* Arcade 8-Bit: the box grows in hard pixel steps, and blinks out the same way. */
+.alerts[data-anim="steps"] .alert-box {
+  animation:
+    alert-steps 400ms steps(4, end) both,
+    alert-out 400ms steps(4, end) calc(var(--alert-ms) - 400ms) forwards;
+}
+
+@keyframes alert-steps {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}

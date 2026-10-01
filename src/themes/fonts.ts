@@ -14,3 +14,5 @@ import "@fontsource/fredoka/700.css";
 import "@fontsource/nunito/400.css";
 import "@fontsource/nunito/600.css";
 import "@fontsource/nunito/700.css";
+import "@fontsource/press-start-2p/400.css"; // pixel fonts ship one weight only
+import "./vt323.css";
