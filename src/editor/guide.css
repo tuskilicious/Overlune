@@ -8,6 +8,27 @@
   margin-bottom: 32px;
 }
 
+/* The three setup steps as cards, so they stand apart from the fixes below them (T6.25). */
+.guide .guide-step {
+  padding: 20px 24px;
+  background: var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+}
+
+.guide-step .guide-sizes {
+  background: var(--bg);
+}
+
+.guide-logo {
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.guide-logo img {
+  display: block;
+}
+
 .guide h2 {
   margin: 0 0 8px;
   font-family: var(--font-heading);

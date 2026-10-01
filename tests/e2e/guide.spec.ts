@@ -20,6 +20,12 @@ test("the guide heading doesn't overlap the line under it", async ({ page }) => 
   expect(intro.y).toBeGreaterThanOrEqual(h1.y + h1.height);
 });
 
+test("the guide has the Overlune logo linking back to the editor (T6.25)", async ({ page }) => {
+  await page.goto("/guide");
+  await expect(page.getByRole("link", { name: "Overlune editor" })).toHaveAttribute("href", "/");
+  await expect(page.locator(".guide-step")).toHaveCount(3);
+});
+
 test("the guide covers every fix beginners need", async ({ page }) => {
   await page.goto("/guide");
   for (const name of [
