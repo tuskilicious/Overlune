@@ -1,5 +1,6 @@
 /* Alerts: 1920×1080 transparent canvas, one box centered at the top (docs/DESIGN.md "Overlay layout rules"). */
 .alerts {
+  position: relative; /* for the test-mode label */
   box-sizing: border-box;
   width: 1920px;
   height: 1080px;
@@ -15,6 +16,31 @@
 
 .alerts .overlay-error {
   max-width: 1000px;
+}
+
+/* Test links only: a reminder pinned to the bottom, clear of the alert box. It pulses gently to be noticed;
+   the reduced-motion version (index.css) is the same label, standing still. */
+.alerts-test-label {
+  position: absolute;
+  left: 50%;
+  bottom: 64px;
+  translate: -50% 0;
+  margin: 0;
+  padding: 12px 28px;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--surface);
+  border: 4px dashed var(--accent);
+  border-radius: 12px;
+  white-space: nowrap;
+  animation: test-label-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes test-label-pulse {
+  to {
+    opacity: 0.65;
+  }
 }
 
 .alert-box {
