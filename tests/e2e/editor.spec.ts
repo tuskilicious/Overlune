@@ -373,6 +373,18 @@ test("all 8 looks fit on a laptop screen without scrolling (T6.31)", async ({ pa
     });
 });
 
+test("the steps bar marks the step on screen (T6.32)", async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  const bar = page.getByRole("navigation", { name: "Steps" });
+  const current = bar.locator('[aria-current="step"]');
+  await expect(current).toHaveText("1. Pick a look");
+  await page.getByLabel("Your Twitch channel name").scrollIntoViewIfNeeded();
+  await expect(current).toHaveText("2. Add your details");
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await expect(current).toHaveText("3. Links to paste into OBS");
+  await expect(bar.locator('[aria-current="step"]')).toHaveCount(1);
+});
+
 test("the look picker shows each theme as a picture you can click", async ({ page }) => {
   await page
     .locator(".editor-themes .editor-card", { hasText: "Vaporwave Sunset" })
