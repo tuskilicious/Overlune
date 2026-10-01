@@ -12,6 +12,28 @@ const preview = (page: import("@playwright/test").Page) =>
 const previewTitle = (page: import("@playwright/test").Page, text: string) =>
   preview(page).locator(".scene-title", { hasText: text });
 
+/** The time zone select is behind "Change" (T6.11). */
+const pickTimeZone = async (page: import("@playwright/test").Page, tz: string) => {
+  await page.getByRole("button", { name: "Change time zone" }).click();
+  await page.getByLabel("Your time zone").selectOption(tz);
+};
+
+test("the time zone shows as text until you choose to change it", async ({ page }) => {
+  await expect(page.locator(".editor-tz")).toContainText(/^Your time zone: .+ \(.+\)/);
+  await expect(page.getByLabel("Your time zone")).toHaveCount(0);
+  await page.getByRole("button", { name: "Change time zone" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByLabel("Your time zone")).toBeFocused();
+  await page.getByLabel("Your time zone").selectOption("America/New_York");
+  await expect(page.locator(".editor-tz")).toHaveText(
+    "Your time zone: Eastern Time (America/New_York)",
+  );
+  const scan = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  expect(scan.violations).toEqual([]);
+});
+
 test("the editor has no axe accessibility violations", async ({ page }) => {
   const scan = () =>
     new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
@@ -137,7 +159,7 @@ test("only https: logo links reach the preview", async ({ page }) => {
 test("the countdown time keeps its clock time when the time zone changes", async ({ page }) => {
   const endsAt = page.getByLabel("Countdown ends at");
   await endsAt.fill("2026-10-01T20:00");
-  await page.getByLabel("Your time zone").selectOption("Asia/Tokyo");
+  await pickTimeZone(page, "Asia/Tokyo");
   await expect(endsAt).toHaveValue("2026-10-01T20:00");
 });
 
@@ -151,7 +173,7 @@ test("every control has a label", async ({ page }) => {
 });
 
 test("the preview runs the real overlay, countdown included", async ({ page }) => {
-  await page.getByLabel("Your time zone").selectOption("UTC");
+  await pickTimeZone(page, "UTC");
   const inAnHour = new Date(Date.now() + 3_600_000).toISOString().slice(0, 16);
   await page.getByLabel("Countdown ends at").fill(inAnHour);
   await expect(preview(page).locator(".countdown-time")).toHaveText(/^\d{2}:\d{2}$|^1:00:00$/);
@@ -160,7 +182,7 @@ test("the preview runs the real overlay, countdown included", async ({ page }) =
 });
 
 test("a repeating countdown counts to the next stream and is saved", async ({ page }) => {
-  await page.getByLabel("Your time zone").selectOption("UTC");
+  await pickTimeZone(page, "UTC");
   await page.getByLabel("Repeat this countdown every stream").selectOption("Every day");
   await expect(page.getByLabel("Countdown ends at")).toHaveCount(0);
   const inTwoHours = new Date(Date.now() + 2 * 3_600_000).toISOString().slice(11, 16);
@@ -181,7 +203,7 @@ test("a repeating countdown counts to the next stream and is saved", async ({ pa
 });
 
 test("a countdown days away shows days and names the start day", async ({ page }) => {
-  await page.getByLabel("Your time zone").selectOption("UTC");
+  await pickTimeZone(page, "UTC");
   const inTwoDays = new Date(Date.now() + 50 * 3_600_000).toISOString().slice(0, 16);
   await page.getByLabel("Countdown ends at").fill(inTwoDays);
   await expect(preview(page).locator(".countdown-time")).toHaveText(/^2d \d{1,2}h \d{1,2}m$/);

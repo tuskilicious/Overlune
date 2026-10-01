@@ -5,6 +5,7 @@ import {
   formatStartsAt,
   fromZoneInput,
   nextRepeatStart,
+  zoneName,
   secondsLeft,
   toZoneInput,
 } from "../../../src/lib/time";
@@ -153,5 +154,13 @@ describe("nextRepeatStart (repeating countdown)", () => {
     expect(nextRepeatStart(daily, london, at("2026-03-28T23:00", london))).toBe(
       Date.UTC(2026, 2, 29, 19, 0),
     );
+  });
+});
+
+describe("zoneName", () => {
+  it("gives a plain-language name for a time zone", () => {
+    expect(zoneName("Asia/Calcutta")).toBe("India Standard Time");
+    expect(zoneName("America/New_York")).toBe("Eastern Time");
+    expect(zoneName("Etc/GMT+5")).toBe("GMT-05:00");
   });
 });

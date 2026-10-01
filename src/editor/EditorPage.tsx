@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fromZoneInput, toZoneInput } from "../lib/time";
+import { fromZoneInput, toZoneInput, zoneName } from "../lib/time";
 import { isHttpsUrl } from "../lib/url-safety";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
@@ -161,6 +161,8 @@ export default function EditorPage() {
   const [scene, setScene] = useState<Scene>("starting");
   /** Narrow windows only: whether the docked preview is expanded. */
   const [previewOpen, setPreviewOpen] = useState(false);
+  /** The long time zone list stays hidden until "Change" (T6.11). */
+  const [tzOpen, setTzOpen] = useState(false);
   // Kept apart from settings so a half-typed or unsafe link never reaches the preview.
   const [logoInput, setLogoInput] = useState(settings.logo);
   const [botsInput, setBotsInput] = useState(settings.chat.bots.join("\n"));
@@ -444,25 +446,44 @@ export default function EditorPage() {
                     </label>
                   </>
                 )}
-                <label>
-                  Your time zone
-                  <select
-                    value={starting.tz}
-                    onChange={(e) => {
-                      // Keep the clock time the streamer typed; only its zone changes.
-                      const typed =
-                        starting.endsAt === null ? "" : toZoneInput(starting.endsAt, starting.tz);
-                      updateScene("starting", {
-                        tz: e.target.value,
-                        endsAt: fromZoneInput(typed, e.target.value),
-                      });
-                    }}
-                  >
-                    {timeZones.map((tz) => (
-                      <option key={tz}>{tz}</option>
-                    ))}
-                  </select>
-                </label>
+                <p className="editor-tz">
+                  Your time zone: {zoneName(starting.tz)} ({starting.tz})
+                  {!tzOpen && (
+                    <button
+                      type="button"
+                      aria-label="Change time zone"
+                      onClick={() => {
+                        setTzOpen(true);
+                        focusSoon("tz-select");
+                      }}
+                    >
+                      Change
+                    </button>
+                  )}
+                </p>
+                {/* Stays open once shown: a closed select changes on every arrow key, so closing on change would trap keyboard users. */}
+                {tzOpen && (
+                  <label>
+                    Your time zone
+                    <select
+                      id="tz-select"
+                      value={starting.tz}
+                      onChange={(e) => {
+                        // Keep the clock time the streamer typed; only its zone changes.
+                        const typed =
+                          starting.endsAt === null ? "" : toZoneInput(starting.endsAt, starting.tz);
+                        updateScene("starting", {
+                          tz: e.target.value,
+                          endsAt: fromZoneInput(typed, e.target.value),
+                        });
+                      }}
+                    >
+                      {timeZones.map((tz) => (
+                        <option key={tz}>{tz}</option>
+                      ))}
+                    </select>
+                  </label>
+                )}
                 <label>
                   Message when the countdown ends
                   <input
