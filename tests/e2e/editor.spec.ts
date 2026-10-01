@@ -649,6 +649,15 @@ test.describe("alert test buttons", () => {
     await expect(box).toHaveAttribute("data-kind", "bits");
   });
 
+  test("a still sample raid fills the box between test alerts (T6.22)", async ({ page }) => {
+    const box = tester(page).locator(".alert-box");
+    await expect(box).toHaveAttribute("data-kind", "raid");
+    await expect(box).toHaveCSS("animation-name", "none");
+    await expect(
+      page.getByRole("region", { name: "Chat preview" }).locator(".chat-msg"),
+    ).toHaveCount(9);
+  });
+
   test("follows and donations are one line of coming-soon text", async ({ page }) => {
     await expect(
       tester(page).getByText("Follow and donation alerts are coming in a later version."),

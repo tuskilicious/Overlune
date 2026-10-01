@@ -53,9 +53,15 @@ export default function AlertTester({ settings }: { settings: Settings }) {
   return (
     <section className="editor-preview-wrap editor-alert-tester" aria-labelledby="alerts-preview">
       <h2 id="alerts-preview">Preview: Alerts</h2>
-      <Preview>
-        <AlertView settings={settings} alert={alert} />
-      </Preview>
+      {/* Between test alerts, a still sample raid fills the box (T6.22); editor-shot turns its motion off. */}
+      <div className={alert ? undefined : "editor-shot"}>
+        <Preview>
+          <AlertView settings={settings} alert={alert ?? testAlerts[0]!} />
+        </Preview>
+      </div>
+      <p className="editor-hint">
+        This shows a sample raid. Press a test button to play an alert with its sound.
+      </p>
       <div className="editor-test-buttons">
         {buttons.map(([kind, label]) => (
           <button

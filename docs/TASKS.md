@@ -185,6 +185,7 @@ Found by going through the live site at 1366×768 as a brand-new streamer. These
   - *Built 2026-10-01 on `feat/logo-help`. Hint under the field ("right-click it, choose Copy image address"). Once a link is set, the logo shows as a small picture; if it doesn't load, the field is marked invalid with "No picture loaded from this link…". The https message also says what to do. e2e test with a routed image and a routed web page. Waiting for the owner's batch check.*
 - [ ] **T6.22 Fuller previews.** The chat preview has empty space above its messages, and the alerts preview is empty until a test button is pressed.
   - Accept: the chat preview is filled or sized to its messages, and the alerts preview shows a resting sample (or a clear "Press a test button" message) instead of an empty box. Reduced-motion versions stay.
+  - *Built 2026-10-01 on `feat/fuller-previews`. Four more sample chat lines (9 in all) fill the default 400×600 box. Between test alerts the alerts preview shows the sample raid, held still (`editor-shot`), with a line saying to press a test button for the real thing. e2e test. Waiting for the owner's batch check.*
 - [ ] **T6.23 Tidier OBS links.** Each link shows a long raw URL (`…#1.N4IgLgFg…`) that looks broken.
   - Accept: the Copy button and the width and height lead. The raw link is shortened or hidden but still selectable for people who want it, and copying still gives the full link. e2e copy tests still pass.
 - [ ] **T6.24 A "you're set" moment.** After copying links there is no sign of what's done or left.
