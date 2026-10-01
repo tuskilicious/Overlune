@@ -1,8 +1,13 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+/** A first visit opens on the gallery of looks (T6.16). Clean Slate keeps the editor's fresh defaults. */
+const startEditing = (page: import("@playwright/test").Page) =>
+  page.getByRole("button", { name: "Clean Slate" }).click();
+
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
+  await startEditing(page);
 });
 
 const preview = (page: import("@playwright/test").Page) =>
@@ -84,6 +89,7 @@ test("the editor has no axe accessibility violations", async ({ page }) => {
 });
 
 test("the whole editor works from the keyboard", async ({ page }) => {
+  await page.mouse.click(1, 1); // start Tab from the top of the page, not the picked look
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "Skip to your OBS links" })).toBeFocused();
   await page.keyboard.press("Enter");
@@ -159,6 +165,72 @@ test("keyboard focus is always visible", async ({ page }) => {
     expect(++visited).toBeLessThan(80);
   }
   expect(visited).toBeGreaterThan(30);
+});
+
+test.describe("first visit (T6.16, T6.17)", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+  });
+
+  test("opens on a gallery of every look, before the editor", async ({ page }) => {
+    const gallery = page.getByRole("region", { name: "Pick a look to start" });
+    await expect(gallery.getByRole("button")).toHaveCount(8);
+    for (const name of [
+      "Clean Slate",
+      "Neon Grid",
+      "Cozy Café",
+      "Arcade 8-Bit",
+      "Pastel Cloud",
+      "Forest Night",
+      "Bold Esports",
+      "Vaporwave Sunset",
+    ])
+      await expect(gallery.getByRole("button", { name, exact: true })).toBeVisible();
+    await expect(page.getByLabel("Title", { exact: true })).toHaveCount(0);
+    // Each card is the theme's real Starting Soon scene, held still.
+    await expect(page.locator(".editor-welcome .scene")).toHaveCount(8);
+    await expect(page.locator(".editor-welcome .scene-title").first()).toHaveCSS(
+      "animation-name",
+      "none",
+    );
+    // Returning streamers can still load a saved link.
+    await expect(page.getByRole("button", { name: "Load my overlay from a link" })).toBeVisible();
+    const scan = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(scan.violations).toEqual([]);
+  });
+
+  test("picking a look from the keyboard opens the editor on it", async ({ page }) => {
+    await page.getByRole("button", { name: "Neon Grid" }).focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("radio", { name: "Neon Grid" })).toBeChecked();
+    await expect(page.getByRole("radio", { name: "Neon Grid" })).toBeFocused();
+    await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "grid");
+  });
+
+  test("setting everything back to the defaults keeps the editor", async ({ page }) => {
+    await page.getByRole("button", { name: "Neon Grid" }).click();
+    await page.reload();
+    await page.getByRole("radio", { name: "Clean Slate" }).check();
+    await expect(page.getByLabel("Title", { exact: true })).toBeVisible();
+  });
+
+  test("saved work skips the gallery", async ({ page }) => {
+    await page.getByRole("button", { name: "Forest Night" }).click();
+    await page.reload();
+    await expect(page.getByRole("region", { name: "Pick a look to start" })).toHaveCount(0);
+    await expect(page.getByRole("radio", { name: "Forest Night" })).toBeChecked();
+  });
+});
+
+test("the look picker shows each theme as a picture you can click", async ({ page }) => {
+  await page
+    .locator(".editor-themes .editor-card", { hasText: "Vaporwave Sunset" })
+    .locator(".editor-shot")
+    .click();
+  await expect(page.getByRole("radio", { name: "Vaporwave Sunset" })).toBeChecked();
+  await expect(page.locator(".editor-themes .scene")).toHaveCount(8);
 });
 
 test("the editor shows Starting Soon in the preview by default", async ({ page }) => {
@@ -278,6 +350,7 @@ test("an old link loads back into the editor", async ({ page, context }) => {
 
   await page.evaluate(() => localStorage.clear()); // a different browser, no autosave
   await page.goto("/");
+  await startEditing(page);
   await page.getByRole("radio", { name: "Be Right Back" }).check();
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Be right back");
 
@@ -346,6 +419,7 @@ test("the editor still works when browser storage is blocked", async ({ page }) 
     Storage.prototype.setItem = blocked;
   });
   await page.goto("/");
+  await startEditing(page);
   await page.getByLabel("Title", { exact: true }).fill("Still works");
   await expect(previewTitle(page, "Still works")).toBeVisible();
 });
@@ -362,7 +436,8 @@ test("start over asks first, then resets to the defaults", async ({ page }) => {
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Starting soon");
   await page.goto("about:blank");
   await page.goto("/");
-  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Starting soon");
+  // Nothing left to restore, so a new visit opens on the gallery again (T6.16).
+  await expect(page.getByRole("region", { name: "Pick a look to start" })).toBeVisible();
 });
 
 test("Advanced starts closed, and overrides reach the preview and the OBS link", async ({
@@ -473,6 +548,7 @@ test.describe("alert test buttons", () => {
   test("quick clicks play one alert at a time, in order", async ({ page }) => {
     await page.clock.install();
     await page.reload();
+    await startEditing(page);
     for (const name of ["Test sub", "Test gift sub", "Test bits"])
       await page.getByRole("button", { name }).click();
     const box = tester(page).locator(".alert-box");
@@ -610,10 +686,22 @@ test("picking Bold Esports restyles the preview, alerts and sound", async ({ pag
 });
 
 test("picking Vaporwave Sunset restyles the preview, alerts and sound", async ({ page }) => {
-  const palms = page.waitForResponse(/\/images\/themes\/vaporwave-palms\.svg$/);
   await page.getByRole("radio", { name: "Vaporwave Sunset" }).check();
   await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "sunset");
-  expect((await palms).ok()).toBe(true);
+  // The look cards may have fetched it already, so check the page's resource log rather than wait for a request.
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        performance
+          .getEntriesByType("resource")
+          .some(
+            (e) =>
+              e.name.endsWith("/images/themes/vaporwave-palms.svg") &&
+              (e as PerformanceResourceTiming).responseStatus === 200,
+          ),
+      ),
+    )
+    .toBe(true);
   await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Audiowide/);
 
   const sound = page.waitForRequest(/\/sounds\/vaporwave-sunset\.ogg$/);

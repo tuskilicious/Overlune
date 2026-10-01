@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 
 test("the editor links to the setup guide and back", async ({ page }) => {
   await page.goto("/");
+  await page.getByRole("button", { name: "Clean Slate" }).click(); // first-visit gallery (T6.16)
   await page.getByRole("link", { name: "step-by-step setup guide" }).click();
   await expect(page).toHaveURL(/\/guide$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Set up your overlays in OBS");
@@ -34,6 +35,7 @@ test("the guide covers every fix beginners need", async ({ page }) => {
 
 test("the size table matches the editor's links", async ({ page }) => {
   await page.goto("/");
+  await page.getByRole("button", { name: "Clean Slate" }).click(); // first-visit gallery (T6.16)
   const editorSizes = await page.locator("#obs-links .editor-link label > span").allInnerTexts();
 
   await page.goto("/guide");
