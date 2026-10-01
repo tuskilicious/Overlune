@@ -23,3 +23,6 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 | Lora (`@fontsource/lora` 5.3.0, weights 400/600/700) | font | Advanced font picker; Forest Night (T6.3) | https://fontsource.org/fonts/lora | SIL OFL 1.1 | No | 2026-10-01 |
 | Nunito Sans (`@fontsource/nunito-sans` 5.3.0, weights 400/600/700) | font | Advanced font picker; Forest Night (T6.3) | https://fontsource.org/fonts/nunito-sans | SIL OFL 1.1 | No | 2026-10-01 |
 | `public/sounds/forest-night.ogg` (Kenney Interface Sounds 1.0, `bong_001.ogg`, unchanged) | sound | Forest Night alert sound | https://kenney.nl/assets/interface-sounds | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
+| Anton (`@fontsource/anton` 5.3.0, weight 400) | font | Advanced font picker; Bold Esports (T6.4) | https://fontsource.org/fonts/anton | SIL OFL 1.1 | No | 2026-10-01 |
+| Barlow (`@fontsource/barlow` 5.3.0, weights 400/600/700) | font | Advanced font picker; Bold Esports (T6.4) | https://fontsource.org/fonts/barlow | SIL OFL 1.1 | No | 2026-10-01 |
+| `public/sounds/bold-esports.ogg` (Kenney Digital Audio 1.0, `zapThreeToneUp.ogg`, unchanged) | sound | Bold Esports alert sound | https://kenney.nl/assets/digital-audio | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |

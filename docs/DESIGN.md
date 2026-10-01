@@ -70,6 +70,7 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 
 **7. Bold Esports**
 - Colors: bg `#0E0E10`, surface `#1A1A1E`, accent `#FF2E3A` (alt `#1E6BFF`), text `#FFFFFF`
+- Shipped: primary `#FFFFFF`, accent `#FF2E3A`, muted `#A0A0AB`. The blue alt is not used (3.8:1 on the surface fails AA for text). No shadow, since clip-path cuts it off.
 - Fonts: Anton / Barlow
 - Shape: angled clip-path, fast wipes
 

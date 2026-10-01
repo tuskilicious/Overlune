@@ -142,3 +142,12 @@
     transform: scale(0.6);
   }
 }
+
+/* Bold Esports: an angled box that wipes in fast, then fades out like slide-fade. */
+.alerts[data-anim="wipe"] .alert-box {
+  padding-inline: 72px;
+  clip-path: polygon(32px 0, 100% 0, calc(100% - 32px) 100%, 0 100%);
+  animation:
+    box-wipe 250ms ease-out backwards,
+    alert-out 400ms ease-in calc(var(--alert-ms) - 400ms) forwards;
+}

@@ -494,3 +494,19 @@ test("picking Forest Night restyles the preview, alerts and sound", async ({ pag
   await page.reload();
   await expect(page.getByRole("radio", { name: "Forest Night" })).toBeChecked();
 });
+
+test("picking Bold Esports restyles the preview, alerts and sound", async ({ page }) => {
+  await page.getByRole("radio", { name: "Bold Esports" }).check();
+  await expect(preview(page).locator(".scene")).toHaveAttribute("data-enter", "wipe");
+  await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Anton/);
+
+  const sound = page.waitForRequest(/\/sounds\/bold-esports\.ogg$/);
+  await page.getByRole("button", { name: "Test raid" }).click();
+  await expect(
+    page.getByRole("region", { name: "Preview: Alerts" }).locator(".alerts"),
+  ).toHaveAttribute("data-anim", "wipe");
+  await sound;
+
+  await page.reload();
+  await expect(page.getByRole("radio", { name: "Bold Esports" })).toBeChecked();
+});

@@ -113,5 +113,7 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *Passed in OBS (2026-10-01) on the PR #36 preview. `src/themes/pastel-cloud.ts`: diagonal gradient from `bg` into a pale tint of `primary` with two drifting clouds (`bgEffect: "clouds"`, transform-only), reuses the `bounce` entrance and alert, radius 24, soft lavender shadow, Baloo 2 / Quicksand, Kenney Interface `pluck_002` (CC0) as `pastel-cloud.ogg`. Colors darkened from the suggested pastels to pass AA. Fixture `v1/pastel-cloud.json`.*
 - [x] **T6.3 Forest Night theme.**
   - *Passed in OBS (2026-10-01) on the PR #37 preview. `src/themes/forest-night.ts`: moonlight glow in the top corner (a tint of `primary`) and two layers of drifting, blinking fireflies in the `accent` color (`bgEffect: "fireflies"`, transform/opacity only), `slide-fade` entrance and alerts, radius 12, faint green glow, Lora / Nunito Sans, Kenney Interface `bong_001` (CC0) as `forest-night.ogg`. Fixture `v1/forest-night.json`.*
-- [ ] **T6.4–T6.5 Themes 7–8:** Bold Esports, Vaporwave Sunset.
+- [ ] **T6.4 Bold Esports theme.** *Built, waiting on the OBS test.*
+  - *`src/themes/bold-esports.ts`: new `wipe` entrance and alert. Content wipes in left to right in 250ms, and the socials bar, chat messages and alert box are static parallelograms (clip-path), so the shape stays under reduced motion. Shared `box-wipe` keyframes in `index.css`. Plain background (DESIGN.md lists no effect), Anton / Barlow, Kenney Digital Audio `zapThreeToneUp` (CC0) as `bold-esports.ogg`. Fixture `v1/bold-esports.json`.*
+- [ ] **T6.5 Vaporwave Sunset theme.**
 - [ ] **T6.6 Review feedback from 5 streamers** before starting v2 (see PRD).
