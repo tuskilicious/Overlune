@@ -46,7 +46,8 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 - Route per overlay: `/o/starting`, `/o/brb`, `/o/ending`, `/o/chat`, `/o/alerts`.
 - Settings are in the **hash fragment**: `#<version>.<lz-string payload>`. The fragment is never sent to servers, and it is stripped from Sentry events.
 - Optional query flag `?rm=1` (before the `#`) forces reduced motion: every animation is turned off, same as the OS "reduce motion" setting. Never remove or repurpose it.
-- Optional query flag `?test=1` (before the `#`, alerts only) plays one sample of each alert type when the source loads, then works normally. Lets streamers place the source and check sound in OBS. Never remove or repurpose it.
+- Optional query flag `?test=1` (before the `#`, alerts only) plays one sample of each alert type when the source loads, then works normally. Lets streamers place the source and check sound in OBS. It also shows an on-stream "Test mode" label, so a forgotten test link gets noticed. Never remove or repurpose it.
+- Optional `&until=<unix seconds>` next to `?test=1` (added T6.9): the editor stamps it 15 minutes ahead, and after that time the link plays no samples (the label stays). A value that isn't a number counts as expired. Links without `until` play their samples on every load, as they always have.
 - `src/settings/schema.ts` holds zod schemas per version. `src/settings/migrations.ts` upgrades any old version to the current one.
 - `tests/fixtures/links/` keeps real links from every version. CI loads all of them.
 

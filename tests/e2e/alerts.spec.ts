@@ -92,6 +92,47 @@ test("?test=1 plays one sample of each alert, then goes quiet", async ({ page })
   await expect(box(page)).toHaveCount(0);
 });
 
+const testLabel = (page: Page) =>
+  page.getByText(/^Test mode: switch back to your normal Alerts link/);
+
+test("an old ?test=1 link with no expiry still plays its samples and shows the test label", async ({
+  page,
+}) => {
+  await fakeTwitch(page);
+  await page.goto(link({ chat: { channel: "dallas" } }, "?test=1"));
+  await expect(box(page)).toHaveAttribute("data-kind", "raid");
+  await expect(testLabel(page)).toBeVisible();
+});
+
+test("a new test link plays its samples until it expires", async ({ page }) => {
+  await fakeTwitch(page);
+  const in15Minutes = Math.floor(Date.now() / 1000) + 15 * 60;
+  await page.goto(link({ chat: { channel: "dallas" } }, `?test=1&until=${in15Minutes}`));
+  await expect(box(page)).toHaveAttribute("data-kind", "raid");
+  await expect(testLabel(page)).toBeVisible();
+});
+
+for (const [name, until] of [
+  ["expired", Math.floor(Date.now() / 1000) - 60],
+  ["broken", "soon"],
+]) {
+  test(`a ${name} test link plays nothing but keeps the label`, async ({ page }) => {
+    await page.clock.install();
+    await fakeTwitch(page);
+    await page.goto(link({ chat: { channel: "dallas" } }, `?test=1&until=${until}`));
+    await expect(testLabel(page)).toBeVisible();
+    await page.clock.runFor(2_000);
+    await expect(box(page)).toHaveCount(0);
+  });
+}
+
+test("the normal Alerts link shows no test label", async ({ page }) => {
+  await fakeTwitch(page);
+  await page.goto(link({ chat: { channel: "dallas" } }));
+  await expect(page.locator(".alerts")).toBeVisible();
+  await expect(testLabel(page)).toHaveCount(0);
+});
+
 test("asks for a channel name when the link has none", async ({ page }) => {
   await fakeTwitch(page);
   await page.goto(link({}));

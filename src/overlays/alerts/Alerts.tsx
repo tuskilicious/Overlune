@@ -9,10 +9,16 @@ import { connectChat, type ChatStatus } from "../../twitch/irc";
 import OverlayError from "../OverlayError";
 import AlertView from "./AlertView";
 
-/** /o/alerts: alerts from the chat channel's events. `?test=1` plays one sample of each first (docs/STACK.md). */
+/**
+ * /o/alerts: alerts from the chat channel's events. `?test=1` plays one sample of each first and shows a
+ * "Test mode" label. Newer test links add `&until=<unix seconds>`; after that the samples stop (docs/STACK.md).
+ */
 export default function Alerts({ settings, error }: { settings: Settings; error?: ReactNode }) {
   const { channel } = settings.chat;
-  const test = new URLSearchParams(useLocation().search).get("test") === "1";
+  const params = new URLSearchParams(useLocation().search);
+  const test = params.get("test") === "1";
+  // Absent: an old link, plays forever. Present but not a number counts as expired, so no fake alerts.
+  const until = params.has("until") ? Number(params.get("until")) || 0 : null;
   const [alert, setAlert] = useState<AlertEvent | null>(null);
   const [status, setStatus] = useState<ChatStatus>("connecting");
   // Read through a ref so changing the sound or volume never reconnects.
@@ -30,7 +36,10 @@ export default function Alerts({ settings, error }: { settings: Settings; error?
     });
     const toAlert = createAlertMapper();
     // A tick later, so an effect that is set up and torn down at once (React dev mode) plays nothing.
-    const testTimer = test ? setTimeout(() => testAlerts.forEach((a) => queue.push(a))) : undefined;
+    const playSamples = test && (until === null || Date.now() < until * 1000);
+    const testTimer = playSamples
+      ? setTimeout(() => testAlerts.forEach((a) => queue.push(a)))
+      : undefined;
     const stop = connectChat(channel, {
       onStatus: setStatus,
       onEvent: (e) => {
@@ -43,7 +52,7 @@ export default function Alerts({ settings, error }: { settings: Settings; error?
       clearTimeout(testTimer);
       queue.stop();
     };
-  }, [channel, test]);
+  }, [channel, test, until]);
 
   return (
     <AlertView
@@ -52,6 +61,12 @@ export default function Alerts({ settings, error }: { settings: Settings; error?
       error={
         <>
           {error}
+          {test && (
+            // Shows on stream on purpose: that's how a streamer notices they forgot to switch links.
+            <p className="alerts-test-label">
+              Test mode: switch back to your normal Alerts link before going live.
+            </p>
+          )}
           {channel === "" ? (
             <OverlayError
               title="Alerts need your channel name"

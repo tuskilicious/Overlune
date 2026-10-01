@@ -17,6 +17,9 @@ const buttons: [AlertKind, string][] = [
   ["bits", "Test bits"],
 ];
 
+/** Unix seconds 15 minutes from now. */
+const testLinkExpiry = () => Math.floor(Date.now() / 1000) + 15 * 60;
+
 /** "Preview: Alerts": test buttons play sample alerts through the real queue, sound included. */
 export default function AlertTester({ settings }: { settings: Settings }) {
   const [alert, setAlert] = useState<AlertEvent | null>(null);
@@ -38,7 +41,14 @@ export default function AlertTester({ settings }: { settings: Settings }) {
     return () => q.stop();
   }, []);
 
-  const testLink = `${location.origin}/o/alerts?test=1#${encode(settings)}`;
+  // The test link stops playing samples 15 minutes after it's copied (docs/STACK.md). Restamped every minute,
+  // so it has about 15 minutes left however it's copied.
+  const [until, setUntil] = useState(testLinkExpiry);
+  useEffect(() => {
+    const id = setInterval(() => setUntil(testLinkExpiry()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const testLink = `${location.origin}/o/alerts?test=1&until=${until}#${encode(settings)}`;
 
   return (
     <section className="editor-preview-wrap editor-alert-tester" aria-labelledby="alerts-preview">
@@ -76,8 +86,9 @@ export default function AlertTester({ settings }: { settings: Settings }) {
         />
       </ul>
       <p className="editor-hint">
-        This link plays one of each alert every time OBS loads it. Use it to check the position and
-        sound, then switch back to the normal Alerts link before you go live.
+        This link plays one of each alert when OBS loads it, for 15 minutes after you copy it. Use
+        it to check the position and sound. It shows “Test mode” on screen until you switch back to
+        the normal Alerts link, so you can’t go live with it by mistake.
       </p>
     </section>
   );
