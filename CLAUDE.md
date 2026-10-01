@@ -111,13 +111,14 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 - **Accessibility:** editor meets WCAG AA contrast, has full keyboard navigation with visible focus, and has meaningful alt text. Overlays support reduced motion.
 
 ## Pre-launch checklist
-1. Rotate any exposed keys. Secret scanning is on locally and in CI.
-2. RLS and access-control tests: **N/A for v1** (no database). Confirm this is still true.
-3. Backups: **N/A for v1** (no data). The repo is the source of truth.
-4. MFA: **N/A for v1** (no accounts). Turn on 2FA for the GitHub, Cloudflare and Sentry accounts.
-5. Sentry events contain no settings fragments, tokens or PII.
-6. Security headers, HTTPS and HSTS verified on production.
-7. Dependency scan is clean.
-8. Privacy policy and terms are drafted and self-reviewed by the maintainer, and say they are not legal advice.
-9. Every overlay passed `docs/OBS-TESTING.md` in OBS and Streamlabs.
-10. Old-link test: URLs from every earlier schema version still load.
+Signed off 2026-10-01 for v1 (T5.6). Re-check every item before any later launch or when a change touches it.
+- [x] 1. Rotate any exposed keys. Secret scanning is on locally and in CI. *(Owner confirmed no key was exposed. gitleaks pre-commit and CI; GitHub secret scanning and push protection on.)*
+- [x] 2. RLS and access-control tests: **N/A for v1** (no database). Confirm this is still true. *(Still true: no server, Pages Functions, database, cookies or fetch calls.)*
+- [x] 3. Backups: **N/A for v1** (no data). The repo is the source of truth.
+- [x] 4. MFA: **N/A for v1** (no accounts). Turn on 2FA for the GitHub, Cloudflare and Sentry accounts. *(Owner confirmed.)*
+- [x] 5. Sentry events contain no settings fragments, tokens or PII. *(Owner checked production events. Fragments stripped, no chat text, IP storage off. Performance samples can include the logo link, as the privacy policy states.)*
+- [x] 6. Security headers, HTTPS and HSTS verified on production. *(HSTS, CSP with frame-ancestors, nosniff, Referrer-Policy, Permissions-Policy; HTTP 301 to HTTPS.)*
+- [x] 7. Dependency scan is clean. *(`npm audit`: 0 vulnerabilities.)*
+- [x] 8. Privacy policy and terms are drafted and self-reviewed by the maintainer, and say they are not legal advice.
+- [x] 9. Every overlay passed `docs/OBS-TESTING.md` in OBS and Streamlabs.
+- [x] 10. Old-link test: URLs from every earlier schema version still load. *(Fixture test in CI.)*

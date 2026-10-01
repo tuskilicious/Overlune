@@ -102,7 +102,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *Drafted 2026-10-01: `docs/legal/privacy.md` and `terms.md`, linked (on GitHub) from a footer on the editor and `/guide` with support@overlune.in. Sentry "Prevent Storing of IP Addresses" turned on by the owner, matching the policy. **Update (T5.5):** the owner has no lawyer, so both docs now say they are self-written, not lawyer-reviewed and not legal advice. support@overlune.in confirmed working. Governing law set to India and CLAUDE.md §9 changed to self-reviewed (T5.6).*
 - [x] **T5.5 README complete:** what it is, setup, env var names, run, test, deploy.
   - *Done 2026-10-01. Added a "For streamers" section, themes, setup guide, real clone URL, build/preview, CI summary, contributing notes (link contract, adding a theme), full docs list, contact and an as-is/no-warranty note (MIT `LICENSE`). Env table corrected: `VITE_SENTRY_RELEASE` is not set yet, `SENTRY_AUTH_TOKEN` is planned but unused, and the unused `CLOUDFLARE_*` names were removed (also from `.env.example`). Privacy policy now describes all Sentry data: error reports with breadcrumbs, a session ping per page load, and 5% performance samples that can include the logo link.*
-- [ ] **T5.6 Pre-launch checklist** in CLAUDE.md, all items checked.
+- [x] **T5.6 Pre-launch checklist** in CLAUDE.md, all items checked.
+  - *Signed off 2026-10-01 after PR #30 brought T2.8–T5.5 to `main`. All 10 items checked in CLAUDE.md; production headers re-verified; `npm audit` clean after the vitest 4.1.11 merge. CLAUDE.md §9 changed to self-reviewed legal docs, governing law India. **Left for later:** the two Streamlabs screenshots in the setup guide (from T5.3).*
 - [ ] **T5.7 Launch:** use it live on the owner's stream and hand it to 5 streamers.
 
 ## Post-launch
