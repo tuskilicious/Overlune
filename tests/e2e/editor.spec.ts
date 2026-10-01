@@ -332,6 +332,20 @@ test("copied links are marked, and the last copy says what's next (T6.24)", asyn
   );
 });
 
+test("nearly full text fields say how many characters are left (T6.28)", async ({ page }) => {
+  const title = page.getByLabel("Title", { exact: true });
+  await title.fill("Starting soon");
+  await expect(page.locator("#chars-title")).toHaveText("");
+  await title.fill("x".repeat(51));
+  await expect(page.locator("#chars-title")).toHaveText("9 characters left");
+  await expect(title).toHaveAttribute("aria-describedby", "chars-title");
+  await title.fill("x".repeat(59));
+  await expect(page.locator("#chars-title")).toHaveText("1 character left");
+  await title.pressSequentially("yz");
+  await expect(title).toHaveValue("x".repeat(59) + "y");
+  await expect(page.locator("#chars-title")).toHaveText("0 characters left");
+});
+
 test("the look picker shows each theme as a picture you can click", async ({ page }) => {
   await page
     .locator(".editor-themes .editor-card", { hasText: "Vaporwave Sunset" })
@@ -510,7 +524,9 @@ test("autosave restores the last overlay when the editor opens without a link", 
 });
 
 test("a link in the address wins over the autosave", async ({ page }) => {
+  const before = page.url();
   await page.getByLabel("Title", { exact: true }).fill("From the link");
+  await expect.poll(() => page.url()).not.toBe(before); // the address updates just after the render
   const link = page.url();
   await page.getByLabel("Title", { exact: true }).fill("Autosaved later");
   await page.goto("about:blank");

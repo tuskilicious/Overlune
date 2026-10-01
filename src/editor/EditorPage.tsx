@@ -191,6 +191,16 @@ const ThemeShot = ({ id }: { id: ThemeId }) => (
 );
 
 /** Where the editor starts: a link in the address wins, then this browser's autosave, then defaults. */
+/** "N characters left" once a limited field is nearly full, so text isn't cut off by surprise (T6.28). */
+function CharsLeft({ id, value, max }: { id: string; value: string; max: number }) {
+  const left = max - value.length;
+  return (
+    <p id={id} className="editor-chars" aria-live="polite">
+      {left <= 10 && `${left} character${left === 1 ? "" : "s"} left`}
+    </p>
+  );
+}
+
 function initialState(): { settings: Settings; status: string } {
   const fromUrl = decodeLink(location.hash);
   if (fromUrl) return { settings: fromUrl.settings, status: loadedMessage(fromUrl.ok) };
@@ -498,17 +508,21 @@ export default function EditorPage() {
                   <input
                     value={current.title}
                     maxLength={60}
+                    aria-describedby="chars-title"
                     onChange={(e) => updateScene(scene, { title: e.target.value })}
                   />
                 </label>
+                <CharsLeft id="chars-title" value={current.title} max={60} />
                 <label>
                   Subtitle
                   <input
                     value={current.subtitle}
                     maxLength={120}
+                    aria-describedby="chars-subtitle"
                     onChange={(e) => updateScene(scene, { subtitle: e.target.value })}
                   />
                 </label>
+                <CharsLeft id="chars-subtitle" value={current.subtitle} max={120} />
                 {scene === "starting" && (
                   <>
                     <label>
@@ -635,9 +649,11 @@ export default function EditorPage() {
                       <input
                         value={starting.doneText}
                         maxLength={60}
+                        aria-describedby="chars-done"
                         onChange={(e) => updateScene("starting", { doneText: e.target.value })}
                       />
                     </label>
+                    <CharsLeft id="chars-done" value={starting.doneText} max={60} />
                   </>
                 )}
               </fieldset>
@@ -664,6 +680,7 @@ export default function EditorPage() {
                       <input
                         value={s.handle}
                         maxLength={40}
+                        aria-describedby={`chars-social-${i}`}
                         onChange={(e) => updateSocial(i, { handle: e.target.value })}
                       />
                     </label>
@@ -677,6 +694,7 @@ export default function EditorPage() {
                     >
                       Remove
                     </button>
+                    <CharsLeft id={`chars-social-${i}`} value={s.handle} max={40} />
                   </div>
                 ))}
                 {settings.socials.length < 6 && (
@@ -836,7 +854,7 @@ export default function EditorPage() {
                           value={settings.alerts.templates[kind]}
                           maxLength={100}
                           placeholder={defaultTemplates[kind]}
-                          aria-describedby={`alerts-hint template-${kind}-example`}
+                          aria-describedby={`alerts-hint template-${kind}-example chars-template-${kind}`}
                           onChange={(e) => updateTemplate(kind, e.target.value)}
                         />
                       </label>
@@ -861,6 +879,11 @@ export default function EditorPage() {
                       <p id={`template-${kind}-example`} className="editor-hint">
                         Example: {exampleAlert(settings.alerts.templates, kind)}
                       </p>
+                      <CharsLeft
+                        id={`chars-template-${kind}`}
+                        value={settings.alerts.templates[kind]}
+                        max={100}
+                      />
                     </div>
                   ))}
                   <p className="editor-hint">
