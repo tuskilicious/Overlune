@@ -107,7 +107,7 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
 - [ ] **T5.7 Launch:** use it live on the owner's stream and hand it to 5 streamers.
 
 ## Post-launch
-- [ ] **T6.1 Arcade 8-Bit theme.** *Built, waiting on the OBS test.*
-  - *`src/themes/arcade-8bit.ts`: CRT scanlines over the scene with a slow rolling band (`bgEffect: "scanlines"`, transform-only roll), `steps` entrance for scenes, chat and alerts, square boxes with a yellow border and hard pink pixel shadow, Press Start 2P / VT323 (VT323 gets `size-adjust: 130%` so it reads at the same size as other fonts), Kenney Digital Audio `powerUp1` (CC0) as `arcade-8bit.ogg`. Fake bold turned off app-wide (`font-synthesis-weight: none`) since both pixel fonts ship one weight. Fixture `v1/arcade-8bit.json`.*
+- [x] **T6.1 Arcade 8-Bit theme.**
+  - *Passed in OBS (2026-10-01) on the PR #34 preview. `src/themes/arcade-8bit.ts`: CRT scanlines over the scene with a slow rolling band (`bgEffect: "scanlines"`, transform-only roll), `steps` entrance for scenes, chat and alerts, square boxes with a yellow border and hard pink pixel shadow, Press Start 2P / VT323 (VT323 gets `size-adjust: 130%` so it reads at the same size as other fonts), Kenney Digital Audio `powerUp1` (CC0) as `arcade-8bit.ogg`. Fake bold turned off app-wide (`font-synthesis-weight: none`) since both pixel fonts ship one weight. Fixture `v1/arcade-8bit.json`.*
 - [ ] **T6.2–T6.5 Themes 5–8:** Pastel Cloud, Forest Night, Bold Esports, Vaporwave Sunset.
 - [ ] **T6.6 Review feedback from 5 streamers** before starting v2 (see PRD).
