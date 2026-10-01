@@ -16,6 +16,7 @@
 .editor-header h1 {
   margin: 0;
   font-family: var(--font-heading);
+  line-height: 0;
 }
 
 .editor-header p {

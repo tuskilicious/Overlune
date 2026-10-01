@@ -230,7 +230,9 @@ export default function EditorPage() {
         Skip to your OBS links
       </a>
       <header className="editor-header">
-        <h1>Overlune</h1>
+        <h1>
+          <img src="/images/brand/logo.png" alt="Overlune" width="159" height="48" />
+        </h1>
         <p>Free stream overlays that match. Pick a look, add your text, then paste into OBS.</p>
       </header>
 
