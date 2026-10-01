@@ -322,14 +322,12 @@
   outline-offset: 2px;
 }
 
-.editor-themes,
 .editor-scenes {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.editor-themes label,
 .editor-scenes label {
   flex-direction: row;
   align-items: center;
@@ -337,11 +335,84 @@
   cursor: pointer;
 }
 
-.editor-swatch {
-  width: 32px;
-  height: 20px;
-  border: 2px solid;
-  border-radius: 4px;
+/* Theme picture cards: in the form (radios, T6.17) and on the first-visit welcome (buttons, T6.16). */
+.editor-themes,
+.editor-welcome-looks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+/* Four across (two rows of four looks), two in narrow windows. */
+.editor-welcome-looks {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.editor .editor-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 6px;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.editor .editor-card:hover {
+  border-color: var(--text-muted);
+}
+
+.editor .editor-card:has(:checked) {
+  border-color: var(--accent);
+}
+
+@media (max-width: 800px) {
+  .editor-welcome-looks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.editor-card-name {
+  display: flex;
+  font-size: 14px;
+  align-items: center;
+  gap: 6px;
+}
+
+.editor-welcome .editor-card {
+  font-family: var(--font-heading);
+  font-size: 18px;
+}
+
+/* The scene inside a card is a picture: no clicks, no motion (8 live scenes would be heavy on low-end PCs). */
+.editor-shot .editor-preview {
+  pointer-events: none;
+}
+
+.editor-shot *,
+.editor-shot *::before,
+.editor-shot *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+.editor-welcome h2 {
+  margin: 0 0 4px;
+  font-family: var(--font-heading);
+}
+
+.editor-welcome p {
+  margin: 0 0 20px;
+  color: var(--text-muted);
 }
 
 .editor-social {
