@@ -202,6 +202,7 @@ Found by going through the live site again after T6.13–T6.25. One branch and P
 
 - [ ] **T6.26 Long text fits on screen.** With Arcade 8-Bit, a 60-character title wraps to 5 lines and pushes the countdown's "Starts…" line and the socials off the bottom of the 1920×1080 scene.
   - Accept: on every theme, the longest allowed title and subtitle with a countdown, 3 socials and a logo stay inside 1920×1080 (the title gets smaller as it gets longer). Short titles look the same as now. No link change. e2e check on every theme. OBS test.
+  - *Built 2026-10-02 on `fix/long-text-fit`. `SceneFrame` shrinks the title in 10% steps (down to 35% of the theme size) until the last block's layout bottom is inside the safe margin. It measures layout offsets, so entrance animations can't fool it, and re-fits only when the text or settings change, after web fonts load, and when the logo loads (never on the per-second countdown tick). `tests/e2e/scene-fit.spec.ts` checks every theme with the longest text, a countdown, 3 socials and a logo (5 themes failed before), plus that a short title keeps its size. Waiting for the owner's OBS check.*
 - [ ] **T6.27 Empty socials don't show.** A social with no name shows a bare platform box on stream.
   - Accept: socials with an empty (or spaces-only) name are left out of every scene. The editor still shows the row so it can be filled in. No link change. Test. OBS test.
 - [ ] **T6.28 Characters-left hints.** The title stops at 60 characters with no warning, so "…for the stream" becomes "…for the strea".

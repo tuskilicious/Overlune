@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useCallback, useLayoutEffect, useRef, type ReactNode } from "react";
 import type { Settings } from "../settings/schema";
 import { themes } from "../themes";
 import "../themes/fonts";
@@ -26,8 +26,35 @@ interface Props {
 /** Shared 1920×1080 scene layout for Starting Soon, BRB and Stream Ending. */
 export default function SceneFrame({ settings, title, subtitle, error, children }: Props) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
+  const scene = useRef<HTMLDivElement>(null);
+  const titleEl = useRef<HTMLHeadingElement>(null);
+  /** Long titles shrink until everything fits in 1920×1080 (T6.26): wide fonts like Arcade's wrap to many lines,
+   *  which pushed the countdown and socials off screen. Short titles keep the theme's size. */
+  const fit = useCallback(() => {
+    const box = scene.current;
+    const t = titleEl.current;
+    const last = box?.lastElementChild as HTMLElement | null | undefined;
+    if (!box || !t || !last) return;
+    // Layout offsets, not scroll sizes: entrance animations transform the content and would look like overflow.
+    const bottom = () =>
+      (last.offsetParent === box ? 0 : -box.offsetTop) + last.offsetTop + last.offsetHeight;
+    const room = box.clientHeight - parseFloat(getComputedStyle(box).paddingBottom);
+    t.style.fontSize = "";
+    const base = parseFloat(getComputedStyle(t).fontSize);
+    // ponytail: step search, at most ~10 layouts; binary search if the title limit ever grows a lot
+    for (let size = base; bottom() > room && size > base * 0.35;) {
+      size = Math.round(size * 0.9);
+      t.style.fontSize = `${size}px`;
+    }
+  }, []);
+  // Only when the text or settings change: the countdown ticks every second and must not cost a re-fit.
+  useLayoutEffect(() => {
+    fit();
+    void document.fonts?.ready.then(fit); // web fonts change the wrap once they load
+  }, [fit, title, subtitle, settings]);
   return (
     <div
+      ref={scene}
       className="scene"
       data-enter={theme.enter.id}
       data-bg={theme.bgEffect}
@@ -35,8 +62,12 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
     >
       {error}
       <div className="scene-main">
-        {settings.logo && <img className="scene-logo" src={settings.logo} alt="Channel logo" />}
-        <h1 className="scene-title">{title}</h1>
+        {settings.logo && (
+          <img className="scene-logo" src={settings.logo} alt="Channel logo" onLoad={fit} />
+        )}
+        <h1 ref={titleEl} className="scene-title">
+          {title}
+        </h1>
         {subtitle && <p className="scene-subtitle">{subtitle}</p>}
         {children}
       </div>
