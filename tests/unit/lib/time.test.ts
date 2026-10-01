@@ -4,6 +4,7 @@ import {
   formatEndTime,
   formatStartsAt,
   fromZoneInput,
+  nextRepeatStart,
   secondsLeft,
   toZoneInput,
 } from "../../../src/lib/time";
@@ -108,5 +109,49 @@ describe("datetime-local ⇄ instant in a time zone", () => {
   it("rejects empty or broken input", () => {
     expect(fromZoneInput("", "UTC")).toBeNull();
     expect(fromZoneInput("2026-13-40T99:00", "UTC")).toBeNull();
+  });
+});
+
+describe("nextRepeatStart (repeating countdown)", () => {
+  const kolkata = "Asia/Kolkata";
+  const at = (wall: string, tz = kolkata) => fromZoneInput(wall, tz)!;
+  const daily = { mode: "daily", days: [], time: "20:00" } as const;
+
+  it("is null when repeating is off or no days are picked", () => {
+    expect(nextRepeatStart({ ...daily, mode: "off" }, kolkata, at("2026-10-01T10:00"))).toBeNull();
+    expect(nextRepeatStart({ ...daily, mode: "days" }, kolkata, at("2026-10-01T10:00"))).toBeNull();
+  });
+
+  it("counts to today's stream when it hasn't started yet", () => {
+    expect(nextRepeatStart(daily, kolkata, at("2026-10-01T10:00"))).toBe(at("2026-10-01T20:00"));
+  });
+
+  it("stays on today's stream for 2 hours after it starts (done text), then moves on", () => {
+    expect(nextRepeatStart(daily, kolkata, at("2026-10-01T21:59"))).toBe(at("2026-10-01T20:00"));
+    expect(nextRepeatStart(daily, kolkata, at("2026-10-01T22:00"))).toBe(at("2026-10-02T20:00"));
+  });
+
+  it("keeps the 2-hour window across midnight", () => {
+    const late = { ...daily, time: "23:30" };
+    expect(nextRepeatStart(late, kolkata, at("2026-10-02T00:30"))).toBe(at("2026-10-01T23:30"));
+    expect(nextRepeatStart(late, kolkata, at("2026-10-02T01:30"))).toBe(at("2026-10-02T23:30"));
+  });
+
+  it("only counts to picked weekdays", () => {
+    // Thu 1 Oct 2026. Mondays and Fridays → Fri 2 Oct.
+    const monFri = { mode: "days", days: [1, 5], time: "20:00" } as const;
+    expect(nextRepeatStart(monFri, kolkata, at("2026-10-01T10:00"))).toBe(at("2026-10-02T20:00"));
+    // Thursdays only, after tonight's window → next Thursday.
+    const thu = { mode: "days", days: [4], time: "20:00" } as const;
+    expect(nextRepeatStart(thu, kolkata, at("2026-10-01T23:00"))).toBe(at("2026-10-08T20:00"));
+  });
+
+  it("keeps the streamer's clock time across a DST change", () => {
+    // London: 8 PM is 20:00 UTC on Sat 28 Mar 2026 and 19:00 UTC on Sun 29 Mar (summer time).
+    const london = "Europe/London";
+    // 11 PM Saturday is past Saturday's 2-hour window, so it counts to Sunday.
+    expect(nextRepeatStart(daily, london, at("2026-03-28T23:00", london))).toBe(
+      Date.UTC(2026, 2, 29, 19, 0),
+    );
   });
 });

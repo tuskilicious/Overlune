@@ -79,3 +79,28 @@ export function formatStartsAt(endsAt: number, tz: string, now: number): string 
   }).format(endsAt);
   return `Starts ${date}, ${time}`;
 }
+
+/** How long a repeating countdown shows its done text after the start time, before counting to the next stream. */
+export const LIVE_WINDOW_MS = 2 * 3600_000;
+
+/**
+ * Start of the stream a repeating countdown points at: the latest start less than LIVE_WINDOW_MS ago,
+ * otherwise the next one. Times are wall-clock in `tz`, so DST changes keep "8 PM" at 8 PM.
+ * null when repeating is off or no weekdays are picked.
+ */
+export function nextRepeatStart(
+  repeat: { mode: "off" | "daily" | "days"; days: readonly number[]; time: string },
+  tz: string,
+  now: number,
+): number | null {
+  if (repeat.mode === "off") return null;
+  const today = wallClock(now, tz);
+  // Yesterday (its window can run past midnight) through a week ahead covers every weekday.
+  for (let d = -1; d <= 7; d++) {
+    const day = new Date(today + d * 86_400_000);
+    if (repeat.mode === "days" && !repeat.days.includes(day.getUTCDay())) continue;
+    const start = fromZoneInput(`${day.toISOString().slice(0, 10)}T${repeat.time}`, tz);
+    if (start !== null && start + LIVE_WINDOW_MS > now) return start;
+  }
+  return null;
+}
