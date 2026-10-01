@@ -510,7 +510,9 @@ test("autosave restores the last overlay when the editor opens without a link", 
 });
 
 test("a link in the address wins over the autosave", async ({ page }) => {
+  const before = page.url();
   await page.getByLabel("Title", { exact: true }).fill("From the link");
+  await expect.poll(() => page.url()).not.toBe(before); // the address updates just after the render
   const link = page.url();
   await page.getByLabel("Title", { exact: true }).fill("Autosaved later");
   await page.goto("about:blank");
