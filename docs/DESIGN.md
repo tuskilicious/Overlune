@@ -130,7 +130,7 @@ The editor, setup guide, privacy and terms pages share one quiet, high-contrast 
 | Link row | Name · Width · Height, a faint raw link (48ch max, still selectable), the filled Copy button | copied ("✓ Copied"), stale ("Changed since you copied it"), copy failed ("Press Ctrl+C") | The copy status is a `role="status"` that stays in the DOM. |
 | Steps bar | Sticky `<nav aria-label="Steps">` with three links | current step: accent, 3px underline, `aria-current="step"` | Jumps scroll and move focus; they never change the address, which holds the settings. |
 | Preview | Scaled overlay in a 16:9 (or chat-sized) box | — | `aria-hidden` and `inert`, because it repeats the form. Sticky column above 800px, and never taller than fits under the header, so the scene's title (at the bottom of the frame) is in view on a 768px-tall laptop (T6.49); docked "Show preview" bar at 800px and below. |
-| Callout | Deep Space box with a 4px Lune Violet left bar (square corners on that side) | — | Save reminder, "You're set" line, legal disclaimer. One per region. |
+| Callout | Deep Space box with a faint violet outline all the way round (`--callout-edge`: Lune Violet mixed 45% into Deep Space, 1px) and the usual 12px corners. No thick bar down one side (T6.53) | — | Save reminder, "You're set" line, legal disclaimer. One per region. |
 
 - **Responsive:** one breakpoint at 800px. Wider: a 300–400px form column beside the previews. Narrower: one column, docked preview, gallery 2 across. The editor is for desktop windows, often squeezed next to OBS; there is no mobile editor (PRD).
 - **Long content:** labels wrap, look names wrap to two lines, raw links truncate with an ellipsis, and overlay titles shrink to fit (T6.26).
@@ -156,6 +156,7 @@ Write for a streamer opening OBS for the first time: concise, confident, helpful
 - Don't animate look cards or put video in the chrome.
 - Don't hide a live region with `display: none`, and don't show state with color alone.
 - Don't add fonts, sounds or images to the chrome without recording them in `docs/ASSETS.md`.
+- Don't mark a box with a thick colored bar down one side; use the callout outline (T6.53).
 
 ### Landing page (`/`)
 - The one page built with Tailwind and GSAP (STACK.md). It uses the same brand tokens, exposed as Tailwind colors (`night`, `deep`, `moon`, `haze`, `violet`, …) and fonts (`font-heading`, `font-body`) in `src/landing/landing.css`.
