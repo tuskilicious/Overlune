@@ -3,6 +3,7 @@ import type { Settings } from "../settings/schema";
 import { themes } from "../themes";
 import "../themes/fonts";
 import { applyOverrides, themeVars } from "../themes/vars";
+import SocialIcon from "./social-icons";
 import "./scene.css";
 
 const platformLabel: Record<Settings["socials"][number]["platform"], string> = {
@@ -60,6 +61,7 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
       className="scene"
       data-enter={theme.enter.id}
       data-bg={theme.bgEffect}
+      data-layout={theme.layout ?? "classic"}
       style={themeVars(theme)}
     >
       {error}
@@ -77,7 +79,9 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
         <ul className="scene-socials">
           {socials.map((s, i) => (
             <li key={i}>
-              <span className="scene-platform">{platformLabel[s.platform]}</span> {s.handle}
+              <SocialIcon platform={s.platform} />
+              <span className="scene-platform">{platformLabel[s.platform]}</span>{" "}
+              <span className="scene-handle">{s.handle}</span>
             </li>
           ))}
         </ul>

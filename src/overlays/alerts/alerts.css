@@ -177,3 +177,48 @@
     box-wipe 250ms ease-out backwards,
     alert-out 400ms ease-in calc(var(--alert-ms) - 400ms) forwards;
 }
+
+/* Classic layout (themes not redesigned yet): no event label. */
+.alerts[data-layout="classic"] .alert-kind {
+  display: none;
+}
+
+/* Broadcast layout (T6.35): a wider card with what happened on top, then the streamer's message. */
+.alerts[data-layout="broadcast"] .alert-box {
+  position: relative;
+  min-width: 760px;
+  max-width: 1100px;
+  padding: 40px 56px 44px;
+  overflow: hidden;
+  border-top: var(--border);
+  border-radius: calc(var(--radius) * 2);
+  text-align: left;
+}
+
+.alerts[data-layout="broadcast"] .alert-box::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 6px;
+  background: var(--accent);
+}
+
+.alert-kind {
+  margin: 0 0 14px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.alerts[data-layout="broadcast"] .alert-title {
+  font-size: 56px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.alerts[data-layout="broadcast"] .alert-message {
+  margin-top: 16px;
+  color: var(--text-muted);
+}

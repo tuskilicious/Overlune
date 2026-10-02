@@ -406,3 +406,110 @@
   color: var(--accent);
   font-weight: 600;
 }
+
+/* Classic layout (themes not redesigned yet): platforms stay as words. */
+.scene[data-layout="classic"] .scene-icon {
+  display: none;
+}
+
+/* Broadcast layout (T6.35, docs/DESIGN.md): a composed 1920×1080 frame instead of text floating in the middle.
+   Logo top left, the title block anchored bottom left under a short accent rule, the countdown as its own card
+   on the right, and socials as an icon row along the bottom edge. */
+.scene[data-layout="broadcast"] {
+  padding: 88px 112px 72px;
+  background:
+    radial-gradient(
+      70% 80% at 100% 0%,
+      color-mix(in srgb, var(--accent) 10%, transparent),
+      transparent 70%
+    ),
+    var(--bg);
+}
+
+.scene[data-layout="broadcast"] .scene-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  column-gap: 96px;
+  row-gap: 0;
+  align-items: end;
+  justify-items: start;
+  text-align: left;
+}
+
+.scene[data-layout="broadcast"] .scene-logo {
+  grid-area: 1 / 1;
+  align-self: start;
+  max-width: 160px;
+  max-height: 160px;
+}
+
+.scene[data-layout="broadcast"] .scene-title {
+  grid-area: 3 / 1;
+  font-size: 128px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.scene[data-layout="broadcast"] .scene-title::before {
+  content: "";
+  display: block;
+  width: 96px;
+  height: 8px;
+  margin-bottom: 44px;
+  border-radius: 4px;
+  background: var(--accent);
+}
+
+.scene[data-layout="broadcast"] .scene-subtitle {
+  grid-area: 4 / 1;
+  max-width: 34ch;
+  margin-top: 28px;
+  font-size: 40px;
+  line-height: 1.3;
+}
+
+.scene[data-layout="broadcast"] .scene-socials {
+  margin: 64px 0 0;
+  padding: 32px 0 0;
+  justify-content: flex-start;
+  gap: 20px 64px;
+  font-size: 30px;
+  background: none;
+  border: 0;
+  border-top: 2px solid color-mix(in srgb, var(--text) 14%, transparent);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.scene[data-layout="broadcast"] .scene-socials li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.scene-icon {
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+  fill: currentColor;
+}
+
+.scene[data-layout="broadcast"] .scene-icon {
+  color: var(--accent);
+}
+
+/* The icon says the platform; the word stays for screen readers and copy-paste. */
+.scene[data-layout="broadcast"] .scene-platform {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.scene[data-layout="broadcast"] .scene-handle {
+  font-weight: 600;
+}

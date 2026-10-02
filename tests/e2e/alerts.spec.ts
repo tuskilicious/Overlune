@@ -20,7 +20,9 @@ test("a raid shows the raid alert with the name and viewer count", async ({ page
   await page.goto(link({ chat: { channel: "dallas" } }));
   await expect(box(page)).toHaveCount(0);
   await twitch.send(raid("FriendlyRaider", 15));
-  await expect(box(page)).toHaveText("FriendlyRaider is raiding with 15 viewers!");
+  await expect(box(page).locator(".alert-title")).toHaveText(
+    "FriendlyRaider is raiding with 15 viewers!",
+  );
   await expect(page.getByRole("status")).toHaveCount(0);
 });
 
@@ -40,7 +42,7 @@ test("a burst plays one alert at a time, in order", async ({ page }) => {
   await expect(box(page)).toContainText("second cheered 100 bits!");
   await expect(box(page)).toContainText("cheer100 hi");
   await page.clock.runFor(5_500);
-  await expect(box(page)).toHaveText("Third just subscribed!");
+  await expect(box(page).locator(".alert-title")).toHaveText("Third just subscribed!");
   await page.clock.runFor(5_000);
   await expect(box(page)).toHaveCount(0);
 });
@@ -60,7 +62,7 @@ test("a gift bomb is one alert with the total", async ({ page }) => {
     ),
     ...gifts,
   );
-  await expect(box(page)).toHaveText("Gal gifted 3 subs!");
+  await expect(box(page).locator(".alert-title")).toHaveText("Gal gifted 3 subs!");
   await page.clock.runFor(6_000);
   await expect(box(page)).toHaveCount(0);
 });
@@ -74,7 +76,7 @@ test("custom templates are used, and names are shown as text", async ({ page }) 
     }),
   );
   await twitch.send(raid("Raider", 7));
-  await expect(box(page)).toHaveText("<b>Raider</b> +7");
+  await expect(box(page).locator(".alert-title")).toHaveText("<b>Raider</b> +7");
   await expect(box(page).locator("b")).toHaveCount(0);
 });
 
@@ -164,4 +166,15 @@ test("volume 0 plays no sound", async ({ page }) => {
   await twitch.send(raid("Raider", 3));
   await expect(box(page)).toBeVisible();
   expect(requests.filter((u) => u.includes("/sounds/"))).toEqual([]);
+});
+
+test("redesigned themes label the event above the message; classic themes don't (T6.35)", async ({
+  page,
+}) => {
+  await page.goto(link({ chat: { channel: "dallas" } }, "?test=1"));
+  await expect(box(page).locator(".alert-kind")).toHaveText("Raid");
+  await expect(box(page).locator(".alert-kind")).toBeVisible();
+  await page.goto(link({ theme: "neon-grid", chat: { channel: "dallas" } }, "?test=1"));
+  await expect(box(page)).toHaveCount(1);
+  await expect(box(page).locator(".alert-kind")).toBeHidden();
 });

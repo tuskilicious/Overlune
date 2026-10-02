@@ -143,3 +143,39 @@
     box-wipe var(--enter-ms) ease-out backwards,
     chat-out 400ms ease-in calc(var(--fade-ms) - 400ms) forwards;
 }
+
+/* Broadcast layout (T6.35): one calm panel instead of a card per message. Messages still arrive and leave one at
+   a time; hairlines separate them, and only the ends of the stack are rounded. */
+.chat[data-layout="broadcast"] .chat-list {
+  gap: 0;
+}
+
+.chat[data-layout="broadcast"] .chat-msg {
+  padding: 0.55em 0.85em;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.chat[data-layout="broadcast"] .chat-msg + .chat-msg {
+  border-top: 1px solid color-mix(in srgb, var(--text) 9%, transparent);
+}
+
+.chat[data-layout="broadcast"] .chat-msg:first-child {
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+}
+
+.chat[data-layout="broadcast"] .chat-msg:last-child {
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+
+.chat[data-layout="broadcast"] .chat-badge[data-style="pill"] {
+  padding: 0.12em 0.45em;
+  border-radius: 0.3em;
+  background: color-mix(in srgb, var(--accent) 24%, var(--surface));
+  color: var(--text);
+  font-size: 0.6em;
+  letter-spacing: 0.08em;
+}

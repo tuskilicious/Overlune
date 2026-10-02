@@ -708,7 +708,7 @@ test.describe("alert test buttons", () => {
       .fill("Welcome {user} and {amount} friends!");
     const sound = page.waitForRequest(/\/sounds\/clean-slate\.ogg$/);
     await page.getByRole("button", { name: "Test raid" }).click();
-    await expect(tester(page).locator(".alert-box")).toHaveText(
+    await expect(tester(page).locator(".alert-title")).toHaveText(
       "Welcome FriendlyRaider and 42 friends!",
     );
     await sound;
