@@ -609,7 +609,7 @@ test("autosave restores the last overlay when the editor opens without a link", 
 }) => {
   await page.getByLabel("Title", { exact: true }).fill("Autosaved title");
   await page.goto("about:blank");
-  await page.goto("/");
+  await page.goto("/editor"); // "/" is always the landing page now (T6.67)
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Autosaved title");
   await expect(page.getByRole("status").filter({ hasText: "Welcome back!" })).toBeVisible();
 });
@@ -1024,6 +1024,18 @@ test.describe("three-column shell on wide windows (T6.60)", () => {
     expect(scan.violations).toEqual([]);
   });
 
+  test("each section link marks that section, short ones included (T6.62)", async ({ page }) => {
+    await page.getByRole("button", { name: "Add a social" }).click(); // a short Socials section
+    const list = page.getByRole("navigation", { name: "Sections" });
+    for (const name of ["Text", "Socials", "Chat", "Alerts", "Logo", "Colors", "Links", "Look"]) {
+      await list.getByRole("link", { name }).click();
+      await expect(list.locator('[aria-current="location"]'), name).toHaveText(name);
+    }
+    await list.getByRole("link", { name: "Socials" }).click();
+    // The preview follows: Socials shows the scene, not the chat preview.
+    await expect(preview(page).locator(".scene")).toBeInViewport();
+  });
+
   test("the preview sits between the section list and the settings", async ({ page }) => {
     const x = async (sel: string) => (await page.locator(sel).first().boundingBox())!.x;
     expect(await x(".editor-rail")).toBeLessThan(await x(".editor-side"));
@@ -1063,3 +1075,61 @@ test("each link shows its size as chips (T6.60)", async ({ page }) => {
   const chat = page.locator("#obs-links .editor-link", { hasText: "Chat" });
   await expect(chat.locator(".editor-chip")).toHaveText(["Width 400", "Height 600"]);
 });
+
+test("the alert preview crops to the card, with no empty box under it (T6.63)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const region = page.getByRole("region", { name: "Preview: Alerts" });
+  const frame = region.locator(".editor-preview");
+  await expect(region.locator(".alert-box")).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  const gap = async () => {
+    const f = (await frame.boundingBox())!;
+    const b = (await region.locator(".alert-box").boundingBox())!;
+    return { below: f.y + f.height - (b.y + b.height), height: f.height, width: f.width };
+  };
+  const still = await gap();
+  expect(still.height).toBeLessThan(still.width * 0.3); // not a 16:9 box
+  expect(still.below).toBeGreaterThan(0); // the whole card shows
+  // A longer test alert grows the crop with it.
+  await page.getByRole("button", { name: "Test resub" }).click();
+  await expect(region.locator(".alert-message")).toBeVisible();
+  await expect.poll(async () => (await gap()).below).toBeGreaterThan(0);
+});
+
+test("in the narrow settings column, a link's size chips sit together under its name (T6.64)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const row = page.locator("#obs-links .editor-link", { hasText: "Starting Soon" });
+  const name = (await row.locator("label > span > strong").first().boundingBox())!;
+  const [width, height] = await row.locator(".editor-chip").all();
+  const w = (await width!.boundingBox())!;
+  const h = (await height!.boundingBox())!;
+  expect(w.y).toBeGreaterThan(name.y + name.height - 2); // under the name
+  expect(Math.abs(w.y - h.y)).toBeLessThan(2); // on one line together
+  expect(Math.abs(w.x - name.x)).toBeLessThan(2); // lined up with the name
+  // The text screen readers get is unchanged.
+  await expect(row.locator("label > span").first()).toHaveText(
+    "Starting Soon · Width 1920 · Height 1080",
+  );
+});
+
+for (const width of [900, 1100, 1440]) {
+  test(`at ${width}px the preview never covers the links (T6.66)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+    const side = (await page.locator(".editor-side").boundingBox())!;
+    for (const row of await page.locator("#obs-links .editor-link").all()) {
+      const r = (await row.boundingBox())!;
+      const overlaps =
+        r.x < side.x + side.width &&
+        r.x + r.width > side.x &&
+        r.y < side.y + side.height &&
+        r.y + r.height > side.y;
+      expect(overlaps).toBe(false);
+    }
+    await page.getByRole("button", { name: "Copy Alerts link" }).click(); // reachable, not covered
+  });
+}

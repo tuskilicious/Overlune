@@ -1,4 +1,5 @@
 import { useEffect, useState, type MouseEvent } from "react";
+import { Link } from "react-router";
 import { fromZoneInput, toZoneInput, zoneName } from "../lib/time";
 import { isHttpsUrl } from "../lib/url-safety";
 import StartingSoon from "../overlays/starting/StartingSoon";
@@ -354,11 +355,14 @@ export default function EditorPage() {
     if (welcome) return;
     const update = () => {
       const atBottom = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
-      const above = (id: string) =>
-        (document.getElementById(id)?.getBoundingClientRect().top ?? 0) < innerHeight / 3;
-      const passed = steps.filter(([id]) => above(id));
+      const above = (id: string, line: number) =>
+        (document.getElementById(id)?.getBoundingClientRect().top ?? 0) < line;
+      const passed = steps.filter(([id]) => above(id, innerHeight / 3));
       setCurrentStep(atBottom ? steps[2][0] : (passed.at(-1) ?? steps[0])[0]);
-      const passedSection = sections.filter(([id]) => above(id));
+      // Sections are often short: with the steps' line a third of the way down, the section after one you jumped
+      // to had passed it too and was marked instead. A jump puts a section 16px from the top (scroll-margin), so
+      // the section at the top of the window is the last one past 48px (T6.62).
+      const passedSection = sections.filter(([id]) => above(id, 48));
       setCurrentSection(atBottom ? "obs-links" : (passedSection.at(-1) ?? sections[0])[0]);
     };
     update();
@@ -406,8 +410,11 @@ export default function EditorPage() {
         Skip to your OBS links
       </a>
       <header className="editor-header">
+        {/* The logo leads home, as on the guide and legal pages (T6.67). */}
         <h1>
-          <img src="/images/brand/logo.png" alt="Overlune" width="159" height="48" />
+          <Link to="/">
+            <img src="/images/brand/logo.png" alt="Overlune home" width="159" height="48" />
+          </Link>
         </h1>
         {/* The primary tagline from docs/BRAND.md, then what to do (T6.33). */}
         <p>
