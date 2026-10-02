@@ -103,8 +103,13 @@ test("the alert pictures show whole alert cards, large enough to read (T6.48)", 
   page,
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
+  // Measure the settled cards: with the fallback font, before the web fonts load, Cozy Café's sub alert wraps to
+  // two lines and spills past the fixed crop (T6.59 makes the crop follow the card). Motion off too, since the
+  // bounce overshoots mid-entrance.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await expect(page.locator(".landing-alert .alert-box")).toHaveCount(2);
+  await page.evaluate(() => document.fonts.ready);
   const crops = await page.locator(".landing-alert .editor-preview").evaluateAll((els) =>
     els.map((el) => {
       const crop = el.getBoundingClientRect();
