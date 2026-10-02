@@ -225,14 +225,15 @@ export default function LandingPage() {
                   )}
                 </div>
               </li>
-              <li className="group flex gap-6 overflow-hidden rounded-3xl border border-white/10 bg-deep p-6 md:col-span-2">
+              {/* On phones the chat picture sits under the text, so neither is squeezed (T6.57). */}
+              <li className="group flex flex-col gap-6 overflow-hidden rounded-3xl border border-white/10 bg-deep p-6 md:col-span-2 md:flex-row">
                 <div className="flex-1">
                   <h3 className="font-heading text-2xl font-bold">Chat in your colors</h3>
                   <p className="mt-2 text-haze">
                     Your Twitch chat, styled to match. Bots and commands stay out of it.
                   </p>
                 </div>
-                <div className="landing-still w-36 shrink-0 overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:scale-105">
+                <div className="landing-still w-60 shrink-0 self-center overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:scale-105 md:w-36 md:self-auto">
                   <Preview width={400} height={600}>
                     <ChatView settings={sampleScene("pastel-cloud")} messages={chatSamples} />
                   </Preview>

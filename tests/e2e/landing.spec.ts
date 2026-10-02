@@ -123,8 +123,8 @@ test("the alert pictures show whole alert cards, large enough to read (T6.48)", 
   }
 });
 
-// T6.56: no feature card squeezes its text into a narrow column, from tablets to wide windows.
-for (const width of [768, 1024, 1280, 1440]) {
+// T6.56, T6.57: no feature card squeezes its text into a narrow column, from phones to wide windows.
+for (const width of [390, 768, 1024, 1280, 1440]) {
   test(`at ${width}px every feature card's text has room`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
