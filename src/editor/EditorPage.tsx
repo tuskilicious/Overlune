@@ -555,8 +555,10 @@ export default function EditorPage() {
                 <CharsLeft id="chars-subtitle" value={current.subtitle} max={120} />
                 {scene === "starting" && (
                   <>
+                    {/* The kind of countdown comes first because it decides which time fields follow. Asking
+                        "repeat this countdown?" before any countdown was set read backwards (T6.50). */}
                     <label>
-                      Repeat this countdown every stream
+                      Countdown
                       <select
                         value={starting.repeat.mode}
                         aria-describedby="repeat-hint"
@@ -566,14 +568,14 @@ export default function EditorPage() {
                           })
                         }
                       >
-                        <option value="off">No, just once</option>
-                        <option value="daily">Every day</option>
-                        <option value="days">On these days</option>
+                        <option value="off">One time, on a set date</option>
+                        <option value="daily">Every day, same time</option>
+                        <option value="days">On these days each week</option>
                       </select>
                     </label>
                     <p id="repeat-hint" className="editor-hint">
-                      A repeating countdown always counts to your next stream, so you never re-paste
-                      the link into OBS.
+                      &quot;Every day&quot; and &quot;On these days&quot; always count to your next
+                      stream, so you never re-paste the link into OBS.
                     </p>
                     {starting.repeat.mode === "off" ? (
                       <label>
