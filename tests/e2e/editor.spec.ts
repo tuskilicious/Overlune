@@ -241,6 +241,16 @@ test.describe("first visit (T6.16, T6.17)", () => {
     await expect(preview(page).locator(".scene-socials")).toHaveCount(0);
   });
 
+  test("on a 1366×768 laptop the whole scene preview is in view after picking a look (T6.49)", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await page.getByRole("button", { name: "Bold Esports" }).click();
+    await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
+    const box = (await page.locator(".editor-scene-preview .editor-preview").boundingBox())!;
+    expect(box.y + box.height).toBeLessThanOrEqual(768);
+  });
+
   test("saved work skips the gallery", async ({ page }) => {
     await page.getByRole("button", { name: "Forest Night" }).click();
     await page.reload();

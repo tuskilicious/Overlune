@@ -633,6 +633,13 @@
     padding: 4px; /* room for focus rings inside the scroll box */
     margin: -4px;
   }
+
+  /* Scene titles sit at the bottom of the frame, so the whole preview must fit under the header on a 768px-tall
+     laptop, or a first visit looks like an empty box (T6.49). 390px covers the header, save box, steps bar and
+     preview heading above it at the top of the page (about 320-350px, depending on how the save box wraps). */
+  .editor-scene-preview .editor-preview {
+    max-width: max(320px, calc((100vh - 390px) * 16 / 9));
+  }
 }
 
 .editor-preview-wrap h2 {
