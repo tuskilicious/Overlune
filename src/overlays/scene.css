@@ -603,3 +603,22 @@
 .scene[data-layout="broadcast"][data-bg="clouds"]::after {
   top: 31%;
 }
+
+/* Forest Night on the broadcast layout (T6.40): the moon sits in the open top-right corner (the broadcast
+   background rule would otherwise replace its glow), and the fireflies stay in the sky above the title block, so
+   none sits between the words like a stray full stop. */
+.scene[data-layout="broadcast"][data-bg="fireflies"] {
+  background:
+    radial-gradient(
+      circle at 84% 20%,
+      color-mix(in srgb, var(--primary) 90%, transparent) 0 64px,
+      color-mix(in srgb, var(--primary) 20%, transparent) 68px,
+      transparent 360px
+    ),
+    var(--bg);
+}
+
+.scene[data-layout="broadcast"][data-bg="fireflies"]::before,
+.scene[data-layout="broadcast"][data-bg="fireflies"]::after {
+  mask-image: linear-gradient(to bottom, #000 46%, transparent 56%);
+}
