@@ -20,4 +20,5 @@ export const cozyCafe: Theme = {
   alertAnim: "bounce",
   alertSound: "cozy-cafe.ogg",
   badgeStyle: "pill",
+  layout: "broadcast",
 };
