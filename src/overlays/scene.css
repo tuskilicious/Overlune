@@ -513,3 +513,45 @@
 .scene[data-layout="broadcast"] .scene-handle {
   font-weight: 600;
 }
+
+/* Neon Grid on the broadcast layout (T6.36): the horizon drops to just above the bottom band, so the title and
+   countdown sit in the dark sky and never on the grid. The socials ride on the floor as a glowing panel. */
+.scene[data-layout="broadcast"][data-theme="neon-grid"] {
+  padding-bottom: 232px; /* keeps the title block above the horizon (82%) */
+}
+
+.scene[data-layout="broadcast"][data-bg="grid"]::before,
+.scene[data-layout="broadcast"][data-bg="grid"]::after {
+  top: 82%;
+}
+
+.scene[data-layout="broadcast"][data-bg="grid"]::after {
+  height: 8%; /* a short fade, so the floor stays visible in the low band */
+}
+
+.scene[data-layout="broadcast"][data-bg="grid"]::before {
+  opacity: 0.6;
+}
+
+/* Orbitron is wide: smaller sizes keep "Starting soon" on one line beside the countdown card. */
+.scene[data-layout="broadcast"][data-theme="neon-grid"] .scene-title {
+  font-size: 100px;
+  letter-spacing: -0.01em;
+}
+
+.scene[data-layout="broadcast"][data-theme="neon-grid"] .countdown-time {
+  font-size: 88px;
+  letter-spacing: 0;
+}
+
+.scene[data-layout="broadcast"][data-theme="neon-grid"] .scene-socials {
+  position: absolute;
+  left: 112px;
+  bottom: 56px;
+  margin: 0;
+  padding: 18px 36px;
+  background: var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}

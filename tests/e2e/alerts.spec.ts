@@ -174,7 +174,7 @@ test("redesigned themes label the event above the message; classic themes don't 
   await page.goto(link({ chat: { channel: "dallas" } }, "?test=1"));
   await expect(box(page).locator(".alert-kind")).toHaveText("Raid");
   await expect(box(page).locator(".alert-kind")).toBeVisible();
-  await page.goto(link({ theme: "neon-grid", chat: { channel: "dallas" } }, "?test=1"));
+  await page.goto(link({ theme: "vaporwave-sunset", chat: { channel: "dallas" } }, "?test=1"));
   await expect(box(page)).toHaveCount(1);
-  await expect(box(page).locator(".alert-kind")).toBeHidden();
+  await expect(box(page).locator(".alert-kind")).toHaveCSS("display", "none");
 });

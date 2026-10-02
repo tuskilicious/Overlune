@@ -179,3 +179,16 @@
   font-size: 0.6em;
   letter-spacing: 0.08em;
 }
+
+/* Neon Grid (T6.36): the theme's neon edge around the whole stack, not around each message. */
+.chat[data-layout="broadcast"][data-theme="neon-grid"] .chat-msg {
+  border-inline: var(--border);
+}
+
+.chat[data-layout="broadcast"][data-theme="neon-grid"] .chat-msg:first-child {
+  border-top: var(--border);
+}
+
+.chat[data-layout="broadcast"][data-theme="neon-grid"] .chat-msg:last-child {
+  border-bottom: var(--border);
+}

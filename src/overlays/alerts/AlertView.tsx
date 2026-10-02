@@ -33,6 +33,7 @@ export default function AlertView({ settings, alert, error }: Props) {
       className="alerts"
       data-anim={theme.alertAnim}
       data-layout={theme.layout ?? "classic"}
+      data-theme={theme.id}
       style={style}
     >
       {error}

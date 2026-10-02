@@ -36,7 +36,10 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
   const fit = useCallback(() => {
     const box = scene.current;
     const t = titleEl.current;
-    const last = box?.lastElementChild as HTMLElement | null | undefined;
+    // The last block in the flow; a theme may float its socials over the background (Neon Grid's floor).
+    const last = [...(box?.children ?? [])]
+      .reverse()
+      .find((el) => getComputedStyle(el).position !== "absolute") as HTMLElement | undefined;
     if (!box || !t || !last) return;
     // Layout offsets, not scroll sizes: entrance animations transform the content and would look like overflow.
     const bottom = () =>
@@ -62,6 +65,7 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
       data-enter={theme.enter.id}
       data-bg={theme.bgEffect}
       data-layout={theme.layout ?? "classic"}
+      data-theme={theme.id}
       style={themeVars(theme)}
     >
       {error}
