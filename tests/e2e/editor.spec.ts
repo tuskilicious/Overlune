@@ -1075,3 +1075,25 @@ test("each link shows its size as chips (T6.60)", async ({ page }) => {
   const chat = page.locator("#obs-links .editor-link", { hasText: "Chat" });
   await expect(chat.locator(".editor-chip")).toHaveText(["Width 400", "Height 600"]);
 });
+
+test("the alert preview crops to the card, with no empty box under it (T6.63)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const region = page.getByRole("region", { name: "Preview: Alerts" });
+  const frame = region.locator(".editor-preview");
+  await expect(region.locator(".alert-box")).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  const gap = async () => {
+    const f = (await frame.boundingBox())!;
+    const b = (await region.locator(".alert-box").boundingBox())!;
+    return { below: f.y + f.height - (b.y + b.height), height: f.height, width: f.width };
+  };
+  const still = await gap();
+  expect(still.height).toBeLessThan(still.width * 0.3); // not a 16:9 box
+  expect(still.below).toBeGreaterThan(0); // the whole card shows
+  // A longer test alert grows the crop with it.
+  await page.getByRole("button", { name: "Test resub" }).click();
+  await expect(region.locator(".alert-message")).toBeVisible();
+  await expect.poll(async () => (await gap()).below).toBeGreaterThan(0);
+});
