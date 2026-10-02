@@ -23,5 +23,4 @@ export const cleanSlate: Theme = {
   alertAnim: "slide-fade",
   alertSound: "clean-slate.ogg",
   badgeStyle: "pill",
-  layout: "broadcast",
 };

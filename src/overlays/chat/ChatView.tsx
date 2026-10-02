@@ -41,7 +41,6 @@ export default function ChatView({ settings, messages, error }: Props) {
     <div
       className="chat"
       data-enter={theme.enter.id}
-      data-layout={theme.layout ?? "classic"}
       data-theme={theme.id}
       data-fade={fadeAfter > 0 || undefined}
       style={style}

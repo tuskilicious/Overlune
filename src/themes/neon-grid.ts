@@ -20,5 +20,4 @@ export const neonGrid: Theme = {
   alertAnim: "glitch",
   alertSound: "neon-grid.ogg",
   badgeStyle: "pill",
-  layout: "broadcast",
 };

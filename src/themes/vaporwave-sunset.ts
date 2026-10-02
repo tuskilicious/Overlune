@@ -20,5 +20,4 @@ export const vaporwaveSunset: Theme = {
   alertAnim: "slide-fade",
   alertSound: "vaporwave-sunset.ogg",
   badgeStyle: "pill",
-  layout: "broadcast",
 };

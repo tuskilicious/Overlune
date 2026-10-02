@@ -20,5 +20,4 @@ export const boldEsports: Theme = {
   alertAnim: "wipe",
   alertSound: "bold-esports.ogg",
   badgeStyle: "pill",
-  layout: "broadcast",
 };

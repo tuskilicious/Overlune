@@ -43,24 +43,45 @@
   }
 }
 
+/* A wide card with what happened on top (the event label), then the streamer's message (T6.35). */
 .alert-box {
+  position: relative;
   box-sizing: border-box;
-  max-width: 1200px;
-  padding: 28px 48px;
+  min-width: 760px;
+  max-width: 1100px;
+  padding: 40px 56px 44px;
+  overflow: hidden;
   background: var(--surface);
   border: var(--border);
-  border-top: 6px solid var(--accent);
-  border-radius: var(--radius);
+  border-radius: calc(var(--radius) * 2);
   box-shadow: var(--shadow);
-  text-align: center;
+  text-align: left;
+}
+
+.alert-box::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 6px;
+  background: var(--accent);
+}
+
+.alert-kind {
+  margin: 0 0 14px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 
 .alert-title {
   margin: 0;
   font-family: var(--font-heading);
-  font-size: 48px;
+  font-size: 56px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
 
@@ -70,8 +91,9 @@
 }
 
 .alert-message {
-  margin: 12px 0 0;
+  margin: 16px 0 0;
   font-size: 28px;
+  color: var(--text-muted);
   line-height: 1.35;
   overflow-wrap: anywhere;
   display: -webkit-box;
@@ -171,54 +193,8 @@
 
 /* Bold Esports: an angled box that wipes in fast, then fades out like slide-fade. */
 .alerts[data-anim="wipe"] .alert-box {
-  padding-inline: 72px;
   clip-path: polygon(32px 0, 100% 0, calc(100% - 32px) 100%, 0 100%);
   animation:
     box-wipe 250ms ease-out backwards,
     alert-out 400ms ease-in calc(var(--alert-ms) - 400ms) forwards;
-}
-
-/* Classic layout (themes not redesigned yet): no event label. */
-.alerts[data-layout="classic"] .alert-kind {
-  display: none;
-}
-
-/* Broadcast layout (T6.35): a wider card with what happened on top, then the streamer's message. */
-.alerts[data-layout="broadcast"] .alert-box {
-  position: relative;
-  min-width: 760px;
-  max-width: 1100px;
-  padding: 40px 56px 44px;
-  overflow: hidden;
-  border-top: var(--border);
-  border-radius: calc(var(--radius) * 2);
-  text-align: left;
-}
-
-.alerts[data-layout="broadcast"] .alert-box::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 6px;
-  background: var(--accent);
-}
-
-.alert-kind {
-  margin: 0 0 14px;
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.alerts[data-layout="broadcast"] .alert-title {
-  font-size: 56px;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-}
-
-.alerts[data-layout="broadcast"] .alert-message {
-  margin-top: 16px;
-  color: var(--text-muted);
 }

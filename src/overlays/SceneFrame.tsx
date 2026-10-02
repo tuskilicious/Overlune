@@ -64,7 +64,6 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
       className="scene"
       data-enter={theme.enter.id}
       data-bg={theme.bgEffect}
-      data-layout={theme.layout ?? "classic"}
       data-theme={theme.id}
       style={themeVars(theme)}
     >

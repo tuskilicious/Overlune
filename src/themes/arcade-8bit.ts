@@ -20,5 +20,4 @@ export const arcade8bit: Theme = {
   alertAnim: "steps",
   alertSound: "arcade-8bit.ogg",
   badgeStyle: "pill",
-  layout: "broadcast",
 };
