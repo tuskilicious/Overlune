@@ -117,3 +117,19 @@ test("the alert pictures show whole alert cards, large enough to read (T6.48)", 
     expect(box.bottom).toBeLessThanOrEqual(crop.bottom); // and none of it is cut off
   }
 });
+
+// T6.56: no feature card squeezes its text into a narrow column, from tablets to wide windows.
+for (const width of [768, 1024, 1280, 1440]) {
+  test(`at ${width}px every feature card's text has room`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const cards = page
+      .getByRole("region", { name: /One .*look, every overlay to match/ })
+      .locator("li h3");
+    await expect(cards).toHaveCount(4);
+    for (const w of await cards.evaluateAll((els) =>
+      els.map((el) => el.parentElement!.getBoundingClientRect().width),
+    ))
+      expect(w).toBeGreaterThanOrEqual(200);
+  });
+}

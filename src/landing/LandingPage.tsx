@@ -186,7 +186,8 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Interest: four cards, 4 × 2 cells, no gaps (A 2×2, B 2×1, C 1×1, D 1×1). */}
+        {/* Interest: four cards. From 1280px, 4 × 2 cells with no gaps (A 2×2, B 2×1, C 1×1, D 1×1); from 768px,
+            two columns with A and B full width (T6.56); below that, one column. */}
         <section className="px-6 py-32 md:px-12 md:py-48" aria-labelledby="bento-heading">
           <div className="mx-auto max-w-7xl">
             <h2
@@ -204,8 +205,8 @@ export default function LandingPage() {
               </span>{" "}
               look, every overlay to match.
             </h2>
-            <ul className="mt-16 grid grid-flow-dense grid-cols-1 gap-4 md:grid-cols-4 md:grid-rows-2">
-              <li className="group flex flex-col justify-between gap-6 overflow-hidden rounded-3xl border border-white/10 bg-deep p-6 md:col-span-2 md:row-span-2">
+            <ul className="mt-16 grid grid-flow-dense grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 xl:grid-rows-2">
+              <li className="group flex flex-col justify-between gap-6 overflow-hidden rounded-3xl border border-white/10 bg-deep p-6 md:col-span-2 xl:row-span-2">
                 <div>
                   <h3 className="font-heading text-2xl font-bold">Eight looks, ready to go</h3>
                   <p className="mt-2 text-haze">
