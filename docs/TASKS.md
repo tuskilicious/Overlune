@@ -263,6 +263,7 @@ Found by going through the live site after the overlay redesign (T6.35-T6.43). M
 
 - [ ] **T6.44 Landing gallery on phones and tablets.** Below 1024px, every scene in the "Eight looks" gallery draws at its full 1920px, so each look is a giant cropped "Start" and the page is about 14,500px tall.
   - Accept: at 390, 768 and 1023px wide each gallery scene fits the column and shows the whole scene. Desktop unchanged. e2e check (the existing no-sideways-scroll test missed it because the page clips the overflow).
+  - *Built 2026-10-02 on `fix/landing-gallery-phones`. Below 1024px the gallery grid had no column template, so its one column grew to the scene's unscaled 1920px width (a scaled preview still counts at full size for layout). `grid-cols-1` (a column that can shrink) fixes it, the same way the wide layout's `minmax(0, …)` columns already did. e2e at 390, 768 and 1023px: every look fits its column and is 16:9 (fails without the fix). Waiting for the owner's check.*
 - [ ] **T6.45 Landing hero shows the whole scene.** The hero scene's title now sits at the bottom of the frame: below the fold at 1366×768, and under the theme-name strip at 1920, where "Starting soon" collides with the scrolling names.
   - Accept: at 1366×768 and 1920×1080 the hero scene's title is visible and clear of the theme-name strip; the scene keeps its slight tilt. Phone layout unchanged. e2e check.
 - [ ] **T6.46 The scene pill in the "One look" heading shows something.** The pill is a slice through the middle of a Cozy Café scene, which is now empty background.

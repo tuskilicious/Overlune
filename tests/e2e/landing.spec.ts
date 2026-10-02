@@ -64,3 +64,19 @@ test("at phone width the page has no sideways scroll and stays accessible", asyn
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0);
   expect((await scan(page)).violations).toEqual([]);
 });
+
+// T6.44: the page clips sideways overflow, so the check above can't see a scene drawn at its full 1920px.
+for (const width of [390, 768, 1023]) {
+  test(`at ${width}px every look in the gallery fits its column`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const looks = page.locator("[data-look]");
+    await expect(looks).toHaveCount(8);
+    for (const box of await looks.evaluateAll((els) =>
+      els.map((el) => el.getBoundingClientRect()),
+    )) {
+      expect(box.right).toBeLessThanOrEqual(width);
+      expect(box.height).toBeLessThan(width); // a 16:9 scene, not a 1080px tall one
+    }
+  });
+}

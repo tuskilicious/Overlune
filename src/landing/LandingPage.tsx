@@ -265,7 +265,7 @@ export default function LandingPage() {
           className="relative px-6 md:px-12"
           aria-labelledby="looks-heading"
         >
-          <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
             <div data-gallery-title className="lg:h-screen lg:pt-40">
               <h2
                 id="looks-heading"
