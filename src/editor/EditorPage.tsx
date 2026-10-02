@@ -370,6 +370,7 @@ export default function EditorPage() {
             {madeSomething ? "Changes also save in this browser." : "No accounts needed."}
           </div>
         </div>
+        {/* The buttons stay put; each opens its own panel underneath, one at a time, and Escape closes it (T6.58). */}
         <div className="editor-save-actions">
           <button
             id="load-toggle"
@@ -377,44 +378,39 @@ export default function EditorPage() {
             aria-expanded={loadOpen}
             aria-controls="load-form"
             onClick={() => {
+              setConfirmReset(false);
               setLoadOpen((o) => !o);
               if (!loadOpen) focusSoon("load-input");
             }}
           >
             Load my overlay from a link
           </button>
-          {madeSomething &&
-            (confirmReset ? (
-              <div className="editor-reset" role="group" aria-labelledby="reset-question">
-                <span id="reset-question">
-                  Clear everything and start from the defaults? Keep your link first if you might
-                  want it back.
-                </span>
-                <button type="button" onClick={startOver}>
-                  Yes, start over
-                </button>
-                {/* Focus lands on the safe choice. */}
-                <button
-                  type="button"
-                  autoFocus
-                  onClick={() => {
-                    setConfirmReset(false);
-                    focusSoon("start-over");
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <button id="start-over" type="button" onClick={() => setConfirmReset(true)}>
-                Start over
-              </button>
-            ))}
+          {madeSomething && (
+            <button
+              id="start-over"
+              type="button"
+              aria-expanded={confirmReset}
+              aria-controls="reset-panel"
+              onClick={() => {
+                setLoadOpen(false);
+                setConfirmReset((c) => !c);
+                // Focus lands on the safe choice.
+                if (!confirmReset) focusSoon("reset-cancel");
+              }}
+            >
+              Start over
+            </button>
+          )}
         </div>
         <form
           id="load-form"
           className="editor-load"
           hidden={!loadOpen}
+          onKeyDown={(e) => {
+            if (e.key !== "Escape") return;
+            setLoadOpen(false);
+            focusSoon("load-toggle");
+          }}
           onSubmit={(e) => {
             e.preventDefault();
             load();
@@ -431,6 +427,38 @@ export default function EditorPage() {
           </label>
           <button type="submit">Load</button>
         </form>
+        {madeSomething && (
+          <div
+            id="reset-panel"
+            className="editor-reset"
+            role="group"
+            aria-labelledby="reset-question"
+            hidden={!confirmReset}
+            onKeyDown={(e) => {
+              if (e.key !== "Escape") return;
+              setConfirmReset(false);
+              focusSoon("start-over");
+            }}
+          >
+            <span id="reset-question">
+              Clear everything and start from the defaults? Keep your link first if you might want
+              it back.
+            </span>
+            <button type="button" onClick={startOver}>
+              Yes, start over
+            </button>
+            <button
+              id="reset-cancel"
+              type="button"
+              onClick={() => {
+                setConfirmReset(false);
+                focusSoon("start-over");
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
         <p className="editor-load-status" role="status">
           {loadStatus}
         </p>

@@ -87,16 +87,19 @@
 }
 
 .editor-save .editor-load,
+.editor-save .editor-reset,
 .editor-save .editor-load-status {
   flex: 1 1 100%;
 }
 
-.editor-save .editor-load {
+.editor-save .editor-load,
+.editor-save .editor-reset {
   margin-top: 12px;
 }
 
-/* The grid display below would otherwise override the hidden attribute. */
-.editor-save .editor-load[hidden] {
+/* The grid and flex displays below would otherwise override the hidden attribute. */
+.editor-save .editor-load[hidden],
+.editor-save .editor-reset[hidden] {
   display: none;
 }
 
