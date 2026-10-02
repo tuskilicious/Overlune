@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-for (const path of ["/", "/guide"]) {
+for (const path of ["/", "/guide", "/nope"]) {
   test(`${path} has the footer with privacy, terms and contact`, async ({ page }) => {
     await page.goto(path);
     const footer = page.getByRole("contentinfo");
@@ -43,3 +43,18 @@ for (const [path, title, line] of [
     expect(scan.violations).toEqual([]);
   });
 }
+
+test("an unknown address shows a not-found page with a way back (T6.51)", async ({ page }) => {
+  await page.goto("/nope");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("This page doesn’t exist");
+  await expect(page.getByRole("link", { name: "Overlune home" }).first()).toHaveAttribute(
+    "href",
+    "/",
+  );
+  const scan = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  expect(scan.violations).toEqual([]);
+  await page.getByRole("link", { name: "Make your overlays" }).click();
+  await expect(page).toHaveURL(/\/editor$/);
+});
