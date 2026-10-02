@@ -8,12 +8,14 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 | Runtime | Node.js 24 LTS | Current LTS |
 | Build | Vite | Fast, static output |
 | UI | React + TypeScript (`strict: true`) | Decided in planning |
-| Routing | React Router | Editor + overlay routes |
+| Routing | React Router | Landing (`/`), editor (`/editor`), guide, legal and overlay routes |
 | Validation | zod | Validates URL settings and parsed IRC messages |
 | URL compression | lz-string | Keeps overlay links short |
 | Twitch chat | **Own minimal IRC client** over native `WebSocket` (`wss://irc-ws.chat.twitch.tv`), anonymous `justinfan` login | No heavy dependency; the parser is small and fully unit-testable |
 | Fonts | `@fontsource/*` (self-hosted, SIL OFL) | No Google Fonts CDN calls (privacy), works offline in OBS, licenses recorded |
 | Error tracking | `@sentry/react` | CLAUDE.md §2. PII off, URL fragments stripped |
+| Landing page motion | `gsap` + `@gsap/react` (GSAP's Standard "no charge" license, free for this use) | Approved by the owner 2026-10-02 (T6.34). **Landing page only**: lazy-loaded with it, never in the editor or overlays (e2e check). All animation sits behind `prefers-reduced-motion: no-preference` |
+| Landing page styling | Tailwind CSS v4 (`tailwindcss`, `@tailwindcss/vite`, dev only) | Approved by the owner 2026-10-02 (T6.34). **Landing page only**: `src/landing/landing.css` imports Tailwind's theme and utilities without its preflight reset, and generates classes from `src/landing` only, so the editor's plain CSS is untouched |
 | Platform icons | `simple-icons` (CC0 data; brand logos are their owners' trademarks) | Approved by the owner 2026-10-02 (T6.35). Six named imports (`src/overlays/social-icons.tsx`), tree-shaken into the bundle as inline SVG paths: no CDN, so the CSP is unchanged |
 
 ## Quality and security tooling
@@ -65,6 +67,7 @@ overlune/
 │  └─ sounds/           licensed alert sounds (recorded in ASSETS.md)
 ├─ src/
 │  ├─ main.tsx  App.tsx  routes.tsx
+│  ├─ landing/          landing page at / (Tailwind + GSAP, lazy-loaded)
 │  ├─ editor/           editor UI, preview, copy-link, setup guide
 │  ├─ overlays/         starting/ brb/ ending/ chat/ alerts/ + shared frame & error state
 │  ├─ themes/           types.ts, index.ts, one file per theme

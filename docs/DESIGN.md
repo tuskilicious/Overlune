@@ -150,6 +150,13 @@ Write for a streamer opening OBS for the first time: concise, confident, helpful
 - Don't hide a live region with `display: none`, and don't show state with color alone.
 - Don't add fonts, sounds or images to the chrome without recording them in `docs/ASSETS.md`.
 
+### Landing page (`/`)
+- The one page built with Tailwind and GSAP (STACK.md). It uses the same brand tokens, exposed as Tailwind colors (`night`, `deep`, `moon`, `haze`, `violet`, …) and fonts (`font-heading`, `font-body`) in `src/landing/landing.css`.
+- Images are real Overlune scenes rendered live (the editor's `Preview`), never stock photos. Only the hero scene moves; the rest are held still (`landing-still`).
+- Motion: scroll reveals, a pinned theme gallery (1024px and wider), a word-by-word reveal that starts at 40% opacity so large text keeps 3:1 contrast, and CSS hover zooms. All GSAP runs inside `gsap.matchMedia("(prefers-reduced-motion: no-preference)")`; with reduced motion the page is static and fully visible.
+- One filled button style (Lune Violet, Night text). No meta-labels ("SECTION 01"), no invented reviews or stats.
+- Responsive down to 390px with no sideways scroll (e2e check).
+
 ### UI review checklist
 - [ ] Colors, fonts, sizes and spacing come from the tokens above, with no unexplained raw values.
 - [ ] Every new control has a label and a visible focus ring, and works by keyboard.

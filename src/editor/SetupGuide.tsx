@@ -34,10 +34,10 @@ export default function SetupGuide() {
     <div className="editor guide" style={themeVars(brandChrome)}>
       <header className="editor-header">
         <Link to="/" className="guide-logo">
-          <img src="/images/brand/logo.png" alt="Overlune editor" width="159" height="48" />
+          <img src="/images/brand/logo.png" alt="Overlune home" width="159" height="48" />
         </Link>
         <p>
-          <Link to="/">← Back to the editor</Link>
+          <Link to="/editor">← Back to the editor</Link>
         </p>
         <h1>Set up your overlays in OBS</h1>
         <p>About 5 minutes. You only do this once. After that, your overlays update themselves.</p>
