@@ -208,3 +208,17 @@ for (const theme of themeIds) {
       .toBeLessThanOrEqual(1080);
   });
 }
+
+// T6.54: the card keeps a minimum width so it doesn't jump as it ticks; a short countdown sits in its middle.
+test("a short countdown is centered in its card", async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.emulateMedia({ reducedMotion: "reduce" }); // Cozy Café's bounce entrance scales the content
+  const data = { theme: "cozy-cafe", starting: { endsAt: Date.now() + 10 * 60_000 } };
+  await page.goto(`/o/starting#1.${lz.compressToEncodedURIComponent(JSON.stringify(data))}`);
+  await page.evaluate(() => document.fonts.ready);
+  const card = (await page.locator(".countdown").boundingBox())!;
+  for (const sel of [".countdown-time", ".countdown-at"]) {
+    const box = (await page.locator(sel).boundingBox())!;
+    expect(Math.abs(box.x + box.width / 2 - (card.x + card.width / 2)), sel).toBeLessThan(2);
+  }
+});

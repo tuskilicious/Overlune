@@ -88,7 +88,7 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 
 ### Scene layout (T6.35)
 All 8 themes share one composed layout, rolled out one theme at a time (T6.35-T6.42); the original centered layout was retired in T6.43. Theme ids, settings and links never changed, so pasted links picked up the new design. Per-theme tweaks key on `data-theme` (and `data-bg` for background effects) on `.scene`, `.chat` and `.alerts`.
-- **Scenes:** 88px top / 112px side / 72px bottom margins (inside the 64px safe margin). Logo top left (160px max). Title block anchored bottom left: a 96×8px accent rule, the title (128px, tight tracking, shrinks to fit per T6.26, and fits again when the countdown card widens as it ticks, T6.52), then the subtitle (40px, 34ch max). The countdown is a surface card on the right, bottom-aligned with the title block. Socials run along the bottom edge as an icon row (Simple Icons, accent color) with the handle; a hairline separates them from the content. The platform word stays in the DOM, visually hidden, for screen readers.
+- **Scenes:** 88px top / 112px side / 72px bottom margins (inside the 64px safe margin). Logo top left (160px max). Title block anchored bottom left: a 96×8px accent rule, the title (128px, tight tracking, shrinks to fit per T6.26, and fits again when the countdown card widens as it ticks, T6.52), then the subtitle (40px, 34ch max). The countdown is a surface card on the right, bottom-aligned with the title block, with a minimum width so it doesn't jump as it ticks and its content centered (T6.54). Socials run along the bottom edge as an icon row (Simple Icons, accent color) with the handle; a hairline separates them from the content. The platform word stays in the DOM, visually hidden, for screen readers.
 - **Alerts:** still centered at the top. A wider card (760-1100px) with a 6px accent band, an uppercase event label ("Raid", "New subscriber", "Resub", "Gift subs", "Cheer"), then the streamer's message at 56px; resub and cheer text below in the muted color.
 - **Chat:** one panel instead of a card per message: no borders between cards, hairline separators, only the top and bottom of the stack rounded. Badges are small square-cornered tags tinted with the accent.
 - Each theme can restyle these pieces in its own CSS (fonts, background effect, shapes), keyed on `data-theme`; the composition stays the same so the set reads as one product.
@@ -148,7 +148,7 @@ Write for a streamer opening OBS for the first time: concise, confident, helpful
 - Name what they see: "Link to paste into OBS", not "Browser Source URL"; "Their name", not `{user}`.
 - Buttons are verbs, 1–3 words, sentence case: "Copy link", "Start over", "Load my overlay from a link".
 - Errors say what happened and what to do: "No picture loaded from this link. Check that it opens an image in your browser, not a web page."
-- Say "free" and "no account" plainly. No unmeasured claims (the "under 10 minutes" line waits for T5.7).
+- Say "free" and "no account" plainly. No unmeasured claims and no promised setup times (the owner dropped "under 10 minutes" as unrealistic, 2026-10-02).
 
 ### Anti-patterns
 - Don't add a second filled button style or a new accent color; use outline buttons.

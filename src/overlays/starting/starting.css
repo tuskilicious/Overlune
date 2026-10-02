@@ -1,12 +1,15 @@
-/* The countdown is a card on the right, beside the title block (docs/DESIGN.md "Scene layout (T6.35)"). */
+/* The countdown is a card on the right, beside the title block (docs/DESIGN.md "Scene layout (T6.35)"). The minimum
+   width keeps it from jumping as it ticks, so the content is centered: a short "09:58" left-aligned left the card's
+   right third empty (T6.54). */
 .countdown {
   grid-area: 3 / 2 / span 2;
   min-width: 440px;
   padding: 40px 48px 36px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
+  text-align: center;
   background: var(--surface);
   border: var(--border);
   border-radius: calc(var(--radius) * 2);

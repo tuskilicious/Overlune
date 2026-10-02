@@ -1,6 +1,6 @@
 # Overlune
 
-Free, open-source stream overlays that look professionally designed, set up in OBS in under 10 minutes. No account, no payment.
+Free, open-source stream overlays that look professionally designed. Paste one link per overlay into OBS. No account, no payment.
 
 It includes:
 - Starting Soon, BRB and Stream Ending scenes
