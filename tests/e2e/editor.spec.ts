@@ -229,6 +229,18 @@ test.describe("first visit (T6.16, T6.17)", () => {
     await expect(page.getByRole("heading", { name: "1. Pick a look" })).toBeInViewport();
   });
 
+  test("look pictures show sample content, which never reaches the streamer's scene (T6.47)", async ({
+    page,
+  }) => {
+    // The cards show the whole layout: subtitle, countdown card and socials.
+    await expect(page.locator(".editor-welcome .countdown")).toHaveCount(8);
+    await expect(page.locator(".editor-welcome .scene-socials")).toHaveCount(8);
+    await page.getByRole("button", { name: "Cozy Café" }).click();
+    await expect(page.getByLabel("Subtitle")).toHaveValue("");
+    await expect(preview(page).locator(".countdown")).toHaveCount(0);
+    await expect(preview(page).locator(".scene-socials")).toHaveCount(0);
+  });
+
   test("saved work skips the gallery", async ({ page }) => {
     await page.getByRole("button", { name: "Forest Night" }).click();
     await page.reload();
