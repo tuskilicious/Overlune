@@ -12,6 +12,7 @@ import Alerts from "./overlays/alerts/Alerts";
 import Chat from "./overlays/chat/Chat";
 import FromLink from "./overlays/FromLink";
 import OverlayPlaceholder from "./overlays/OverlayPlaceholder";
+import NotFoundPage from "./editor/NotFoundPage";
 import StartingSoon from "./overlays/starting/StartingSoon";
 import TextScene from "./overlays/TextScene";
 import SentryTestPage from "./components/SentryTestPage";
@@ -76,6 +77,7 @@ export default function App() {
         />
         <Route path="/o/:overlay" element={<OverlayPlaceholder />} />
         {showSentryTest && <Route path="/_sentry-test" element={<SentryTestPage />} />}
+        <Route path="*" element={<NotFoundPage />} />
       </SentryRoutes>
     </BrowserRouter>
   );

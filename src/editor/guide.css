@@ -70,7 +70,7 @@
   text-align: left;
 }
 
-/* /privacy and /terms (T6.13). */
+/* /privacy and /terms (T6.13), and the not-found page (T6.51). */
 .legal h1 {
   margin: 8px 0 16px;
   font-family: var(--font-heading);
