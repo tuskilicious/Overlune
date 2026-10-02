@@ -1097,3 +1097,21 @@ test("the alert preview crops to the card, with no empty box under it (T6.63)", 
   await expect(region.locator(".alert-message")).toBeVisible();
   await expect.poll(async () => (await gap()).below).toBeGreaterThan(0);
 });
+
+test("in the narrow settings column, a link's size chips sit together under its name (T6.64)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const row = page.locator("#obs-links .editor-link", { hasText: "Starting Soon" });
+  const name = (await row.locator("label > span > strong").first().boundingBox())!;
+  const [width, height] = await row.locator(".editor-chip").all();
+  const w = (await width!.boundingBox())!;
+  const h = (await height!.boundingBox())!;
+  expect(w.y).toBeGreaterThan(name.y + name.height - 2); // under the name
+  expect(Math.abs(w.y - h.y)).toBeLessThan(2); // on one line together
+  expect(Math.abs(w.x - name.x)).toBeLessThan(2); // lined up with the name
+  // The text screen readers get is unchanged.
+  await expect(row.locator("label > span").first()).toHaveText(
+    "Starting Soon · Width 1920 · Height 1080",
+  );
+});
