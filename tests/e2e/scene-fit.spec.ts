@@ -61,3 +61,26 @@ test("Neon Grid keeps the title block in the sky, above the horizon (T6.36)", as
     expect(box.y + box.height, sel).toBeLessThanOrEqual(horizon);
   }
 });
+
+for (const theme of themeIds) {
+  test(`${theme}: on the broadcast layout, "Starting soon" stays on one line beside the countdown`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    const data = { theme, starting: { endsAt: Date.now() + 2 * 86_400_000 } };
+    await page.goto(`/o/starting#1.${lz.compressToEncodedURIComponent(JSON.stringify(data))}`);
+    await page.evaluate(() => document.fonts.ready);
+    test.skip(
+      (await page.locator(".scene").getAttribute("data-layout")) !== "broadcast",
+      "not redesigned yet",
+    );
+    // The accent rule is drawn inside the heading (::before), so leave it out of the line count.
+    const lines = await page.locator(".scene-title").evaluate((el) => {
+      const rule = getComputedStyle(el, "::before");
+      const text =
+        el.getBoundingClientRect().height - parseFloat(rule.height) - parseFloat(rule.marginBottom);
+      return text / parseFloat(getComputedStyle(el).lineHeight);
+    });
+    expect(lines).toBeLessThan(1.5);
+  });
+}

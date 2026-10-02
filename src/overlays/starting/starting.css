@@ -57,3 +57,9 @@
   line-height: 1.05;
   letter-spacing: -0.02em;
 }
+
+/* Arcade 8-Bit (T6.38): Press Start 2P is very wide, so the done text gets a pixel-font size. */
+.scene[data-layout="broadcast"][data-theme="arcade-8bit"] .countdown-done {
+  font-size: 44px;
+  line-height: 1.3;
+}
