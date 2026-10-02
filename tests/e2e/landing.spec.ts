@@ -80,3 +80,21 @@ for (const width of [390, 768, 1023]) {
     }
   });
 }
+
+// T6.45: the hero scene's title sits at the bottom of its frame; it must stay above the fold and the name strip.
+for (const [width, height] of [
+  [1366, 768],
+  [1920, 1080],
+]) {
+  test(`at ${width}×${height} the hero scene's title is in view and clear of the theme names`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const title = (await page.locator("figure .scene-title").boundingBox())!;
+    const strip = (await page.getByLabel("Themes").boundingBox())!;
+    expect(title.y + title.height).toBeLessThanOrEqual(height);
+    expect(title.y + title.height).toBeLessThanOrEqual(strip.y);
+  });
+}

@@ -8,7 +8,7 @@ For prompting Google Stitch to make new Overlune site screens (the landing page,
 A night sky with the lights low. Overlune's own chrome is quiet, deep navy and calm so the overlay themes it shows (bright, loud, each with its own look) are always the loudest thing on screen. The mood is friendly and confident, like a streamer friend who knows OBS: rounded type, soft corners, plain words, no hype.
 
 There are two surfaces, each with its own dials:
-- **Landing page:** Art Gallery Airy (density 3), Offset Asymmetric (variance 7), Cinematic Choreography held back for the live demo (motion 7). Big rounded headlines on the left, a real overlay scene tilted slightly and floating in from the bottom right, generous dark space between sections.
+- **Landing page:** Art Gallery Airy (density 3), Offset Asymmetric (variance 7), Cinematic Choreography held back for the live demo (motion 7). Big rounded headlines on the left, a real overlay scene tilted slightly beside them, generous dark space between sections.
 - **Editor, setup guide, legal pages:** Daily App Balanced (density 6), Predictable Symmetric (variance 2), Static Restrained (motion 2). A narrow form column beside large previews. It is a tool for a desktop window squeezed next to OBS; nothing moves except what the streamer changes.
 
 ## 2. Color Palette & Roles
@@ -46,7 +46,7 @@ All screens are dark. Every text pair meets WCAG AA (4.5:1 for text, 3:1 for con
 
 ## 5. Layout Principles
 - CSS grid first. Landing content sits in a 1280px (7xl) centered container with 1.5rem side padding (3rem from 768px up).
-- **Landing hero:** left-aligned text block (headline, one lead paragraph, a filled CTA and at most one outline button that jumps to content on the same page). A live overlay scene floats in from the bottom right, tilted -3 degrees, in its own space: it never covers the headline or buttons. Never a centered hero.
+- **Landing hero:** left-aligned text block (headline, one lead paragraph, a filled CTA and at most one outline button that jumps to content on the same page). A live overlay scene sits beside it on wide screens (below it on narrow ones), tilted -3 degrees and fully in view: scene titles sit at the bottom of the frame, so a scene hanging off the edge would hide its text. It never covers the headline or buttons. Never a centered hero.
 - **Inline image typography:** the signature move. A pill-shaped slice of a real Overlune scene sits inside a heading at type height, like a word. Only real scenes, never stock photos.
 - **Feature grids:** asymmetric bento (4 columns by 2 rows: one 2x2, one 2x1, two 1x1, no empty cells), or a row of panels that widen on hover and focus. Never three equal cards in a row.
 - **Theme gallery:** two columns on wide screens, a sticky title on the left (2 parts) and a tall scroll of scene pictures on the right (3 parts).

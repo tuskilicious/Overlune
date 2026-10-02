@@ -142,34 +142,37 @@ export default function LandingPage() {
       </nav>
 
       <main id="main" tabIndex={-1} className="w-full max-w-full overflow-x-hidden outline-none">
-        {/* Attention: text left, a live overlay floating in from the bottom right. */}
+        {/* Attention: text left, a live overlay beside it. The whole scene stays in view: its title sits at the
+            bottom of the frame, so a scene hanging off the hero would hide it (T6.45). */}
         <section className="landing-ambient relative px-6 pt-40 pb-32 md:px-12 md:pt-48 md:pb-48">
-          <div className="relative z-10 mx-auto max-w-7xl">
-            <h1 className="max-w-5xl font-heading text-[clamp(2.75rem,5.5vw,5.25rem)] leading-[1.05] font-bold">
-              Free stream overlays that look pro.
-            </h1>
-            <p className="mt-8 max-w-xl text-xl leading-relaxed text-haze">
-              Pick a look, add your text, and paste one link per overlay into OBS. Starting Soon, Be
-              Right Back, Stream Ending, chat and alerts, all matching.
-            </p>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <Link to="/editor" className={`${button} bg-violet text-night hover:bg-moon`}>
-                Make your overlays
-              </Link>
-              <a
-                href="#looks"
-                className={`${button} border border-moon/40 text-moon hover:border-moon`}
-              >
-                See the looks
-              </a>
+          <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+            <div>
+              <h1 className="max-w-5xl font-heading text-[clamp(2.75rem,5.5vw,5.25rem)] leading-[1.05] font-bold">
+                Free stream overlays that look pro.
+              </h1>
+              <p className="mt-8 max-w-xl text-xl leading-relaxed text-haze">
+                Pick a look, add your text, and paste one link per overlay into OBS. Starting Soon,
+                Be Right Back, Stream Ending, chat and alerts, all matching.
+              </p>
+              <div className="mt-10 flex flex-wrap gap-4">
+                <Link to="/editor" className={`${button} bg-violet text-night hover:bg-moon`}>
+                  Make your overlays
+                </Link>
+                <a
+                  href="#looks"
+                  className={`${button} border border-moon/40 text-moon hover:border-moon`}
+                >
+                  See the looks
+                </a>
+              </div>
             </div>
+            <figure className="mx-auto w-full max-w-3xl md:rotate-[-3deg]">
+              <div className="overflow-hidden rounded-3xl border border-white/10">
+                <Scene theme="vaporwave-sunset" live />
+              </div>
+              <figcaption className="sr-only">The Vaporwave Sunset Starting Soon scene.</figcaption>
+            </figure>
           </div>
-          <figure className="relative mx-auto mt-16 w-full max-w-3xl md:absolute md:right-[-4rem] md:bottom-[-6rem] md:mt-0 md:w-[46vw] md:rotate-[-3deg]">
-            <div className="overflow-hidden rounded-3xl border border-white/10">
-              <Scene theme="vaporwave-sunset" live />
-            </div>
-            <figcaption className="sr-only">The Vaporwave Sunset Starting Soon scene.</figcaption>
-          </figure>
         </section>
 
         {/* Theme names, scrolling. A second copy makes the loop seamless and is hidden from screen readers. */}
