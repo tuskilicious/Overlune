@@ -27,3 +27,33 @@
   color: var(--accent);
   overflow-wrap: anywhere;
 }
+
+/* Broadcast layout (T6.35): the countdown is a card on the right, beside the title block. */
+.scene[data-layout="broadcast"] .countdown {
+  grid-area: 3 / 2 / span 2;
+  margin: 0;
+  min-width: 440px;
+  padding: 40px 48px 36px;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--surface);
+  border: var(--border);
+  border-radius: calc(var(--radius) * 2);
+  box-shadow: var(--shadow);
+}
+
+.scene[data-layout="broadcast"] .countdown-time {
+  font-size: 120px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.scene[data-layout="broadcast"] .countdown-at {
+  font-size: 28px;
+}
+
+.scene[data-layout="broadcast"] .countdown-done {
+  font-size: 72px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}

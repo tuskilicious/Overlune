@@ -4,6 +4,7 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 
 | Asset | Type | Used in | Source URL | License | Attribution required? | Added |
 |---|---|---|---|---|---|---|
+| Twitch, YouTube, TikTok, Instagram, X and Discord logos (`simple-icons` 16.33.0, path data only) | icon | Socials row on redesigned scenes (T6.35) | https://simpleicons.org | CC0 1.0 for the package; each logo is a trademark of its owner, shown only to identify the streamer's account on that platform | No | 2026-10-02 |
 | Inter (`@fontsource/inter` 5.3.0, weights 400/600/700) | font | Clean Slate, editor | https://fontsource.org/fonts/inter | SIL OFL 1.1 | No | 2026-09-30 |
 | Orbitron (`@fontsource/orbitron` 5.3.0, weights 400/600/700) | font | Advanced font picker; Neon Grid (T5.1) | https://fontsource.org/fonts/orbitron | SIL OFL 1.1 | No | 2026-09-30 |
 | Rajdhani (`@fontsource/rajdhani` 5.3.0, weights 400/600/700) | font | Advanced font picker; Neon Grid (T5.1) | https://fontsource.org/fonts/rajdhani | SIL OFL 1.1 | No | 2026-09-30 |
