@@ -98,6 +98,7 @@ Themes move from the original centered "classic" layout to a composed "broadcast
 - **Pastel Cloud (T6.39):** both clouds drift through the upper sky, clear of a typical title block; the theme's gradient background is kept on the broadcast layout.
 - **Forest Night (T6.40):** a full moon (soft-edged disc with a halo) sits in the open top-right corner; the fireflies fade out above a typical title block, so none lands between the words.
 - **Bold Esports (T6.41):** the angles move onto the new pieces: a slanted accent rule and a parallelogram countdown card, matching the angled alert card and chat messages. The socials row keeps its full-width hairline and wipes in with the content.
+- **Vaporwave Sunset (T6.42):** the content now fills the bottom where the sun used to set, so the striped sun (480px, stripes in its lower half) rises into the open top-right sky with a coral glow, and the right palm crosses it. The sky stays purple behind all text. Smaller Audiowide sizes (title 96px, countdown 88px) keep the title on one line.
 
 ## Editor and site UI
 The editor, setup guide, privacy and terms pages share one quiet, high-contrast chrome in Overlune's brand (`docs/BRAND.md`), so the colorful theme previews stay the loudest thing on the page. Tokens live in `src/editor/brand.ts` and reach CSS as variables on `.editor` (`themeVars`). "Must" rules are hard requirements; "should" rules are defaults.

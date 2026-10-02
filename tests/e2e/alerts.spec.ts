@@ -168,13 +168,8 @@ test("volume 0 plays no sound", async ({ page }) => {
   expect(requests.filter((u) => u.includes("/sounds/"))).toEqual([]);
 });
 
-test("redesigned themes label the event above the message; classic themes don't (T6.35)", async ({
-  page,
-}) => {
+test("alerts label the event above the message (T6.35)", async ({ page }) => {
   await page.goto(link({ chat: { channel: "dallas" } }, "?test=1"));
   await expect(box(page).locator(".alert-kind")).toHaveText("Raid");
   await expect(box(page).locator(".alert-kind")).toBeVisible();
-  await page.goto(link({ theme: "vaporwave-sunset", chat: { channel: "dallas" } }, "?test=1"));
-  await expect(box(page)).toHaveCount(1);
-  await expect(box(page).locator(".alert-kind")).toHaveCSS("display", "none");
 });

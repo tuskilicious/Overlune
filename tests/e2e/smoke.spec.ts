@@ -26,18 +26,13 @@ test("socials with no name are left off the scene (T6.27)", async ({ page }) => 
   await expect(page.locator(".scene-socials")).toHaveCount(0);
 });
 
-test("redesigned themes show socials as platform icons; classic themes as words (T6.35)", async ({
-  page,
-}) => {
+// Every theme is on the broadcast layout since T6.42, so there is no classic theme left to compare with.
+test("socials show as platform icons, with the platform word kept (T6.35)", async ({ page }) => {
   const socials = [{ platform: "twitch", handle: "tusk" }];
   await page.goto(link({ socials }));
   await expect(page.locator(".scene")).toHaveAttribute("data-layout", "broadcast");
   await expect(page.locator(".scene-socials .scene-icon")).toBeVisible();
   await expect(page.locator(".scene-socials .scene-platform")).toHaveText("Twitch"); // kept for screen readers
-  await page.goto(link({ theme: "vaporwave-sunset", socials }));
-  await expect(page.locator(".scene")).toHaveAttribute("data-layout", "classic");
-  await expect(page.locator(".scene-socials .scene-icon")).toBeHidden();
-  await expect(page.locator(".scene-socials .scene-platform")).toBeVisible();
 });
 
 test("a valid link shows no error card", async ({ page }) => {

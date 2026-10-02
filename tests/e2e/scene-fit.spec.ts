@@ -150,3 +150,38 @@ test("Bold Esports keeps its angles on the broadcast layout without cutting the 
   // The slanted box clip from the classic layout would trim the start of the divider line.
   expect(await clip(".scene-socials")).toBe("none");
 });
+
+test("Vaporwave Sunset's sun stays clear of the title, countdown and socials (T6.42)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto(
+    `/o/starting#1.${lz.compressToEncodedURIComponent(
+      JSON.stringify({
+        theme: "vaporwave-sunset",
+        starting: { subtitle: "Ranked grind tonight", endsAt: Date.now() + 86_400_000 },
+        socials: [
+          { platform: "twitch", handle: "somestreamer_tv" },
+          { platform: "youtube", handle: "SomeStreamerYT" },
+          { platform: "x", handle: "somestreamer" },
+        ],
+      }),
+    )}`,
+  );
+  await page.evaluate(() => document.fonts.ready);
+  const sun = await page.locator(".scene").evaluate((el) => {
+    const s = getComputedStyle(el, "::before");
+    const width = parseFloat(s.width);
+    const x = el.clientWidth - parseFloat(s.right) - width;
+    return { x, y: parseFloat(s.top), width, height: parseFloat(s.height) };
+  });
+  for (const sel of [".scene-title", ".countdown", ".scene-socials"]) {
+    const box = (await page.locator(sel).boundingBox())!;
+    const apart =
+      box.x >= sun.x + sun.width ||
+      box.x + box.width <= sun.x ||
+      box.y >= sun.y + sun.height ||
+      box.y + box.height <= sun.y;
+    expect(apart, `${sel} overlaps the sun`).toBe(true);
+  }
+});
