@@ -26,6 +26,11 @@
   display: block;
 }
 
+/* The logo is a link home (T6.67); its focus ring hugs the image. */
+.editor-header h1 a {
+  display: inline-block;
+}
+
 .editor-header p {
   margin: 4px 0 24px;
   color: var(--text-muted);
@@ -911,9 +916,10 @@
   outline: none;
 }
 
-/* The links sit in the body grid: full width below the form and previews, until the shell (below). */
+/* The links sit in the body grid, under the form. Not full width: the preview column is sticky to the end of the
+   grid, so it slid over full-width links on 801-1199px windows and covered the Copy buttons (T6.66). */
 .editor-body > .editor-links {
-  grid-column: 1 / -1;
+  grid-column: 1;
 }
 
 /* Only wide windows have the section list. */

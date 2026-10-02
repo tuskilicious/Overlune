@@ -8,6 +8,7 @@ import SiteFooter from "../components/SiteFooter";
 import { chatSamples } from "../editor/chat-samples";
 import Preview from "../editor/Preview";
 import { sampleScene } from "../editor/scene-samples";
+import { loadSaved } from "../settings/storage";
 import AlertView from "../overlays/alerts/AlertView";
 import ChatView from "../overlays/chat/ChatView";
 import StartingSoon from "../overlays/starting/StartingSoon";
@@ -237,6 +238,8 @@ const button =
 /** The marketing page at / for first-time visitors (T6.34). Saved work and old editor links go to /editor (App.tsx). */
 export default function LandingPage() {
   const root = useRef<HTMLDivElement>(null);
+  /** Work saved in this browser: the hero button picks it up in the editor (T6.67). */
+  const [returning] = useState(() => loadSaved() !== null);
   const current = useSectionInView(sections);
   const navLink = (id: string) => ({
     href: `#${id}`,
@@ -357,7 +360,7 @@ export default function LandingPage() {
                   to="/editor"
                   className={`${button} landing-glow-button bg-violet text-night hover:bg-moon`}
                 >
-                  Make your overlays
+                  {returning ? "Continue your overlay" : "Make your overlays"}
                 </Link>
                 <a
                   href="#looks"

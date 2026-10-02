@@ -1,4 +1,5 @@
 import { useEffect, useState, type MouseEvent } from "react";
+import { Link } from "react-router";
 import { fromZoneInput, toZoneInput, zoneName } from "../lib/time";
 import { isHttpsUrl } from "../lib/url-safety";
 import StartingSoon from "../overlays/starting/StartingSoon";
@@ -409,8 +410,11 @@ export default function EditorPage() {
         Skip to your OBS links
       </a>
       <header className="editor-header">
+        {/* The logo leads home, as on the guide and legal pages (T6.67). */}
         <h1>
-          <img src="/images/brand/logo.png" alt="Overlune" width="159" height="48" />
+          <Link to="/">
+            <img src="/images/brand/logo.png" alt="Overlune home" width="159" height="48" />
+          </Link>
         </h1>
         {/* The primary tagline from docs/BRAND.md, then what to do (T6.33). */}
         <p>
