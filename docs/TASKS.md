@@ -225,3 +225,10 @@ Found by going through the live site again after T6.13–T6.25. One branch and P
   - Accept: the header uses the brand tagline plus a short how-to line. No unsupported claims.
   - *Built 2026-10-02 on `feat/brand-tagline`. Header: "**Free stream overlays that look pro.** Pick a look, add your text, then paste into OBS." The tagline is in Quicksand at full text color, the how-to stays muted. The "under 10 minutes" support line is still left out until T5.7 measures it. Owner checked the batch preview (PR #65). Editor only, so no OBS test.*
 
+### Landing page (2026-10-02)
+Built with the `/gpt-taste` skill. Owner decisions: landing at `/` for new visitors with the editor moving to `/editor`; GSAP and Tailwind approved as new dependencies (landing page only); brand fonts.
+
+- [ ] **T6.34 Landing page at `/`.** First-time visitors see what Overlune is before the editor.
+  - Accept: `/` shows the landing page; the editor is at `/editor`. Old editor bookmarks (`/#1.…`) and visitors with saved work go straight to `/editor` with their settings. Overlay links are unchanged. The guide's and legal pages' "Back to the editor" links point to `/editor`.
+  - Accept: brand tokens and fonts; real Overlune scenes as images (no stock photos, CSP unchanged); every animation has a reduced-motion version; no sideways scroll at 390px; axe clean; GSAP and Tailwind load on the landing page only. No unsupported claims or invented reviews.
+  - *Built 2026-10-02 on `feat/landing-page`. `src/landing/LandingPage.tsx` (lazy route): glass pill nav, text-left hero with a live Vaporwave Sunset scene, theme-name marquee, a gapless 4×2 bento (looks, chat, alerts, "your link is your save file"), a pinned gallery of all 8 looks that grow in and dim out, a three-step hover/focus accordion, a word-by-word promise, and a big call to action. `App.tsx` redirects `/#<version>.…` and saved work to `/editor`. Landing JS is 49 KB gzipped in its own chunk. e2e: `landing.spec.ts` (first visit, old bookmark, saved work, no GSAP in the editor or overlays, reduced motion, 390px, axe); editor, guide and footer tests now use `/editor`. Waiting for the owner's check.*

@@ -25,7 +25,7 @@ The free alternatives are StreamElements and Streamlabs themes, OWN3D freebies a
 4. Built live on stream by a streamer who uses it.
 
 ## Core flows
-1. **Pick a look:** open the editor, browse themes in a full-stream preview, pick one.
+1. **Pick a look:** open the editor (first-time visitors arrive on the landing page at `/` and go on to `/editor`), browse themes in a full-stream preview, pick one.
 2. **Personalize:** enter channel name, title, socials and countdown end time. Optionally paste a logo image URL and use "Advanced" color and font settings.
 3. **Set up OBS:** each overlay shows "Link to paste into OBS" with a copy button and its width and height. A step-by-step guide covers OBS and Streamlabs.
 4. **Go live:** scenes, chat and alerts work on stream.

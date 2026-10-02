@@ -16,7 +16,7 @@ Everything matches one theme. Paste the links into OBS or Streamlabs and you're 
 Overlune is a free, non-commercial hobby project, provided **as is, with no warranty** (see [License](#license)).
 
 ## For streamers
-1. Open **https://overlune.pages.dev**, pick a look and type your text.
+1. Open **https://overlune.pages.dev** and press **Make your overlays** (the editor is at **/editor**). Pick a look and type your text.
 2. Copy each "Link to paste into OBS" into a Browser source, with the width and height shown next to it.
 3. Stuck? Follow the setup guide at **https://overlune.pages.dev/guide**.
 
