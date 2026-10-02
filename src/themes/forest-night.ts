@@ -20,4 +20,5 @@ export const forestNight: Theme = {
   alertAnim: "slide-fade",
   alertSound: "forest-night.ogg",
   badgeStyle: "pill",
+  layout: "broadcast",
 };

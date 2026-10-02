@@ -108,3 +108,25 @@ test("Pastel Cloud's clouds drift above the title block, never through it (T6.39
   const titleTop = (await page.locator(".scene-title").boundingBox())!.y;
   expect(cloudBottom).toBeLessThanOrEqual(titleTop);
 });
+
+test("Forest Night's fireflies fade out above the title block (T6.40)", async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto(
+    `/o/starting#1.${lz.compressToEncodedURIComponent(
+      JSON.stringify({
+        theme: "forest-night",
+        starting: { subtitle: "Ranked grind tonight", endsAt: Date.now() + 86_400_000 },
+        socials: [{ platform: "twitch", handle: "tusk" }],
+      }),
+    )}`,
+  );
+  await page.evaluate(() => document.fonts.ready);
+  // Typical content, as for Pastel Cloud. The firefly layers fade to nothing at the mask's last stop.
+  const fadeEnd = await page.locator(".scene").evaluate((el) => {
+    const mask = getComputedStyle(el, "::before").maskImage;
+    const stops = [...mask.matchAll(/([\d.]+)%/g)].map((m) => parseFloat(m[1]!));
+    return (el.clientHeight * (stops.at(-1) ?? 100)) / 100;
+  });
+  const titleTop = (await page.locator(".scene-title").boundingBox())!.y;
+  expect(fadeEnd).toBeLessThanOrEqual(titleTop);
+});
