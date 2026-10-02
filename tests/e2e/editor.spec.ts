@@ -67,6 +67,35 @@ test.describe("save file box (T6.12)", () => {
     expect(scan.violations).toEqual([]);
   });
 
+  test("keeps its buttons in place, opens one panel at a time, and Escape closes it (T6.58)", async ({
+    page,
+  }) => {
+    await page.getByLabel("Title", { exact: true }).fill("My stream");
+    const load = page.getByRole("button", { name: "Load my overlay from a link" });
+    const reset = page.getByRole("button", { name: "Start over", exact: true });
+    // Where each button sits on the page (not the window, which scrolls when a field takes focus).
+    const spot = (b: typeof load) =>
+      b.evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        return [Math.round(r.x), Math.round(r.y + scrollY)];
+      });
+    const spots = async () => [await spot(load), await spot(reset)];
+    const before = await spots();
+    await load.click();
+    expect(await spots()).toEqual(before);
+    await reset.click();
+    expect(await spots()).toEqual(before);
+    await expect(page.getByLabel("Paste a link from Overlune")).toBeHidden();
+    await expect(page.getByRole("button", { name: "Cancel" })).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("button", { name: "Yes, start over" })).toBeHidden();
+    await expect(reset).toBeFocused();
+    await load.click();
+    await page.keyboard.press("Escape");
+    await expect(page.getByLabel("Paste a link from Overlune")).toBeHidden();
+    await expect(load).toBeFocused();
+  });
+
   test("Load reveals the paste field from the keyboard", async ({ page }) => {
     const load = page.getByRole("button", { name: "Load my overlay from a link" });
     await expect(load).toHaveAttribute("aria-expanded", "false");
