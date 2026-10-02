@@ -306,6 +306,10 @@ Found by going through the live site after T6.44-T6.53. One branch and PR per ta
 - [ ] **T6.58 The save box keeps its shape.** Opening "Load my overlay from a link" or "Start over" rearranges the save box (a button jumps to its own line, the paste field stays open under the start-over question) and grows it by about 150px.
   - Accept: the buttons stay where they are, only one of the two panels is open at a time, Escape closes it and returns focus to its button, and the panel opens under the buttons. e2e.
 
+- [ ] **T6.61 Drop the "under 10 minutes" claim.** The owner called it unrealistic (2026-10-02). It was in the page description and link preview text, the link-preview image and every social banner, the README and the brand and product docs.
+  - Accept: no page, meta tag, image or doc promises a setup time. Banners keep their design with a new second line.
+  - *Built 2026-10-02 on `fix/countdown-card-centered` (with T6.54). Meta description and link-preview text: "Paste one link per overlay into OBS. No account, no payment." The link-preview image and the GitHub, Twitch, X, YouTube and Discord banners had the line erased and redrawn in the same Nunito, size and Haze color as "No account, no payment · overlune.pages.dev" (logo and tagline untouched). README, CLAUDE.md, PRD (the success metric now measures without promising a time), BRAND.md (support tagline and voice), DESIGN.md and the Stitch file updated. The guide's "About 5 minutes" is left for the owner to decide. Waiting for the owner's check.*
+
 ### Mockup ideas, the honest v1 pass (2026-10-02)
 The owner shared AI-generated mockups (dark night palette, crescent moon, glowing panel edges, app-shell editor). Take the good design ideas only, with everything shown true for v1 today: no pricing, upgrade, sign in, My Overlays, template counts, drag and drop, HD or video export, donation alerts, other platforms' chat, AI landscape art, gradient text on every heading, glow on every card, or "Create Stunning…" copy. docs/V2-PLAN.md maps the v2-only screens to their phases.
 

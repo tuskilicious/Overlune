@@ -148,7 +148,7 @@ Write for a streamer opening OBS for the first time: concise, confident, helpful
 - Name what they see: "Link to paste into OBS", not "Browser Source URL"; "Their name", not `{user}`.
 - Buttons are verbs, 1–3 words, sentence case: "Copy link", "Start over", "Load my overlay from a link".
 - Errors say what happened and what to do: "No picture loaded from this link. Check that it opens an image in your browser, not a web page."
-- Say "free" and "no account" plainly. No unmeasured claims (the "under 10 minutes" line waits for T5.7).
+- Say "free" and "no account" plainly. No unmeasured claims and no promised setup times (the owner dropped "under 10 minutes" as unrealistic, 2026-10-02).
 
 ### Anti-patterns
 - Don't add a second filled button style or a new accent color; use outline buttons.

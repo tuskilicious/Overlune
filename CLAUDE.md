@@ -2,7 +2,7 @@
 
 Project rules for Claude Code. Follow these on every task. If a rule conflicts with a request, say so before proceeding.
 
-**Overlune** is a free, open-source stream overlay maker. It gets a new streamer from zero to a stream that looks professionally designed in under 10 minutes.
+**Overlune** is a free, open-source stream overlay maker. It gets a new streamer from zero to a stream that looks professionally designed, with no account and no payment.
 - Product: `docs/PRD.md`
 - Tasks: `docs/TASKS.md`
 - Stack and folders: `docs/STACK.md`

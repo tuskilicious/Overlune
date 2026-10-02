@@ -1,7 +1,7 @@
 # Overlune: Product Requirements (v1)
 
 ## Value proposition
-Free, good-looking, matching stream overlays that a brand-new streamer can set up in OBS in **under 10 minutes**, with no account, no payment and no design skills.
+Free, good-looking, matching stream overlays that a brand-new streamer can set up in OBS on their own, with no account, no payment and no design skills.
 
 ## User pain
 - Custom overlay packs cost $20–100+.
@@ -76,7 +76,7 @@ The free alternatives are StreamElements and Streamlabs themes, OWN3D freebies a
 
 ## Success metrics
 We measure these without tracking users:
-- **Time to first overlay live in OBS: under 10 minutes.** Measured by watching 5 newcomers set it up without help.
+- **First overlay live in OBS without help.** Measured by watching 5 newcomers set it up (T5.7). We note how long it takes, but don't promise a time (the owner dropped the "under 10 minutes" claim as unrealistic, 2026-10-02).
 - **5 real streamers using it live** within 2 weeks of launch. The builder is streamer #1 from week 1.
 - **Zero broken old links.** Enforced by the old-link tests in CI.
 - **Overlay performance:** each overlay under 5% CPU in OBS on a mid-range PC (checked per `docs/OBS-TESTING.md`).

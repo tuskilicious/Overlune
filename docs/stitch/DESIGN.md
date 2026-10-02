@@ -74,7 +74,7 @@ All screens are dark. Every text pair meets WCAG AA (4.5:1 for text, 3:1 for con
 - No centered hero, no three equal cards in a row, no overlapping text.
 - No stock photos or placeholder images: every picture is a real Overlune scene.
 - No meta-labels ("SECTION 01"), no "Scroll to explore", scroll arrows or bouncing chevrons.
-- No invented reviews, user counts, ratings or round-number stats. "Set up in under 10 minutes" waits until it is measured.
+- No invented reviews, user counts, ratings or round-number stats, and no promised setup times.
 - No hype words ("Elevate", "Seamless", "Unleash", "Next-Gen", "premium", "unlock"); nothing that hints at a paywall. Overlune is free with no account, and says so plainly.
 - No jargon a first-time streamer wouldn't know: "Link to paste into OBS", not "Browser Source URL".
 - No custom cursors. No state shown by color alone.
