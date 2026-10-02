@@ -103,9 +103,13 @@ test("the alert pictures show whole alert cards, large enough to read (T6.48)", 
   page,
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
+  // Measure the settled cards: before the web fonts load, the fallback font can wrap an alert to more lines, and
+  // the bounce overshoots mid-entrance. (Since T6.59 the crop follows the card, so it fits either way.)
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const card = page.locator("li", { hasText: "Alerts with sound" });
   await expect(card.locator(".landing-alert .alert-box")).toHaveCount(2);
+  await page.evaluate(() => document.fonts.ready);
   const crops = await card.locator(".landing-alert .editor-preview").evaluateAll((els) =>
     els.map((el) => {
       const crop = el.getBoundingClientRect();
