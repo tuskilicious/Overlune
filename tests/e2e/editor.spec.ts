@@ -6,7 +6,7 @@ const startEditing = (page: import("@playwright/test").Page) =>
   page.getByRole("button", { name: "Clean Slate" }).click();
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await startEditing(page);
 });
 
@@ -98,7 +98,7 @@ test("the whole editor works from the keyboard", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Skip to your OBS links" })).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.locator("#obs-links")).toBeFocused();
-  await expect(page).toHaveURL(/\/#1\./); // the skip link never replaces the settings in the address
+  await expect(page).toHaveURL(/\/editor#1\./); // the skip link never replaces the settings in the address
 
   await page.getByRole("radio", { name: "Starting Soon" }).focus();
   await page.keyboard.press("ArrowRight");
@@ -173,7 +173,7 @@ test("keyboard focus is always visible", async ({ page }) => {
 
 test.describe("first visit (T6.16, T6.17)", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/editor");
   });
 
   test("opens on a gallery of every look, before the editor", async ({ page }) => {
@@ -249,7 +249,7 @@ test.describe("steps (T6.18, T6.20)", () => {
     await expect(page.getByRole("heading", { name: "2. Add your details" })).toBeFocused();
     await bar.getByRole("link", { name: "3. Links to paste into OBS" }).click();
     await expect(page.locator("#obs-links")).toBeFocused();
-    await expect(page).toHaveURL(/\/#1\./); // jumping never replaces the settings in the address
+    await expect(page).toHaveURL(/\/editor#1\./); // jumping never replaces the settings in the address
   });
 
   test("rarely changed chat and alert settings start tucked away", async ({ page }) => {
@@ -510,7 +510,7 @@ test("an old link loads back into the editor", async ({ page, context }) => {
   const link = await page.evaluate(() => navigator.clipboard.readText());
 
   await page.evaluate(() => localStorage.clear()); // a different browser, no autosave
-  await page.goto("/");
+  await page.goto("/editor");
   await startEditing(page);
   await page.getByRole("radio", { name: "Be Right Back" }).check();
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Be right back");
@@ -546,7 +546,7 @@ test("the editor's own address saves the work, so reload or a bookmark keeps it"
   page,
 }) => {
   await page.getByLabel("Title", { exact: true }).fill("Bookmarked title");
-  await expect(page).toHaveURL(/\/#1\./);
+  await expect(page).toHaveURL(/\/editor#1\./);
   await page.reload();
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Bookmarked title");
   await expect(page.getByRole("status").filter({ hasText: "Loaded!" })).toBeVisible();
@@ -581,7 +581,7 @@ test("the editor still works when browser storage is blocked", async ({ page }) 
     Storage.prototype.getItem = blocked;
     Storage.prototype.setItem = blocked;
   });
-  await page.goto("/");
+  await page.goto("/editor");
   await startEditing(page);
   await page.getByLabel("Title", { exact: true }).fill("Still works");
   await expect(previewTitle(page, "Still works")).toBeVisible();
@@ -598,7 +598,7 @@ test("start over asks first, then resets to the defaults", async ({ page }) => {
   await page.getByRole("button", { name: "Yes, start over" }).click();
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Starting soon");
   await page.goto("about:blank");
-  await page.goto("/");
+  await page.goto("/editor");
   // Nothing left to restore, so a new visit opens on the gallery again (T6.16).
   await expect(page.getByRole("region", { name: "Pick a look to start" })).toBeVisible();
 });

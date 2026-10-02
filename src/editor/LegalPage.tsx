@@ -26,10 +26,10 @@ export default function LegalPage({ source }: { source: string }) {
     <div className="editor guide" style={themeVars(brandChrome)}>
       <header className="editor-header">
         <Link to="/" className="guide-logo">
-          <img src="/images/brand/logo.png" alt="Overlune editor" width="159" height="48" />
+          <img src="/images/brand/logo.png" alt="Overlune home" width="159" height="48" />
         </Link>
         <p>
-          <Link to="/">← Back to the editor</Link>
+          <Link to="/editor">← Back to the editor</Link>
         </p>
       </header>
       <main className="legal">

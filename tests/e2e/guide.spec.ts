@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 test("the editor links to the setup guide and back", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await page.getByRole("button", { name: "Clean Slate" }).click(); // first-visit gallery (T6.16)
   await page.getByRole("link", { name: "step-by-step setup guide" }).click();
   await expect(page).toHaveURL(/\/guide$/);
@@ -22,7 +22,7 @@ test("the guide heading doesn't overlap the line under it", async ({ page }) => 
 
 test("the guide has the Overlune logo linking back to the editor (T6.25)", async ({ page }) => {
   await page.goto("/guide");
-  await expect(page.getByRole("link", { name: "Overlune editor" })).toHaveAttribute("href", "/");
+  await expect(page.getByRole("link", { name: "Overlune home" })).toHaveAttribute("href", "/");
   await expect(page.locator(".guide-step")).toHaveCount(3);
 });
 
@@ -40,7 +40,7 @@ test("the guide covers every fix beginners need", async ({ page }) => {
 });
 
 test("the size table matches the editor's links", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await page.getByRole("button", { name: "Clean Slate" }).click(); // first-visit gallery (T6.16)
   const editorSizes = await page.locator("#obs-links .editor-link label > span").allInnerTexts();
 

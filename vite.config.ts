@@ -2,6 +2,7 @@
 import { readFileSync } from "node:fs";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { cspForMeta } from "./src/lib/csp-meta";
 
 // Hosts that ignore public/_headers (Antideploy) still get the CSP and referrer policy.
@@ -23,7 +24,7 @@ const securityMeta: Plugin = {
 };
 
 export default defineConfig({
-  plugins: [react(), securityMeta],
+  plugins: [react(), tailwindcss(), securityMeta],
   build: {
     // Source maps are generated for Sentry but not referenced from the shipped JS.
     // Uploading them to Sentry is a later step (see docs/SENTRY.md).

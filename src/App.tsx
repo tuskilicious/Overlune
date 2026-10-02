@@ -1,5 +1,7 @@
 import * as Sentry from "@sentry/react";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { lazy, Suspense } from "react";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
+import { loadSaved } from "./settings/storage";
 import { sentryEnvironment } from "./lib/sentry";
 import EditorPage from "./editor/EditorPage";
 import SetupGuide from "./editor/SetupGuide";
@@ -17,6 +19,21 @@ import SentryTestPage from "./components/SentryTestPage";
 // Lets Sentry name page-load/navigation traces by route (e.g. /o/:overlay).
 const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
 
+// GSAP and Tailwind live in this chunk only, so the editor and overlays never load them.
+const LandingPage = lazy(() => import("./landing/LandingPage"));
+
+/** "/" is the landing page for first-time visitors (T6.34). The editor used to live here, so its old
+ *  bookmarks ("/#1.…") and anyone with saved work go straight to /editor, keeping the settings. */
+function Home() {
+  const { hash } = useLocation();
+  if (/^#\d+\./.test(hash) || loadSaved()) return <Navigate to={`/editor${hash}`} replace />;
+  return (
+    <Suspense fallback={null}>
+      <LandingPage />
+    </Suspense>
+  );
+}
+
 // The test page exists in development and staging only (CLAUDE.md §7: no debug routes in production).
 const showSentryTest = sentryEnvironment !== "production";
 
@@ -24,7 +41,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <SentryRoutes>
-        <Route path="/" element={<EditorPage />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/editor" element={<EditorPage />} />
         <Route path="/guide" element={<SetupGuide />} />
         <Route path="/privacy" element={<LegalPage source={privacy} />} />
         <Route path="/terms" element={<LegalPage source={terms} />} />
