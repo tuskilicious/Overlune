@@ -85,7 +85,7 @@ for (const width of [390, 768, 1023]) {
 for (const [width, height] of [
   [1366, 768],
   [1920, 1080],
-]) {
+] as const) {
   test(`at ${width}×${height} the hero scene's title is in view and clear of the theme names`, async ({
     page,
   }) => {
