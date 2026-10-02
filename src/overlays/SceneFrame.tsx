@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import type { Settings } from "../settings/schema";
 import { themes } from "../themes";
 import "../themes/fonts";
@@ -58,6 +58,21 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
     fit();
     void document.fonts?.ready.then(fit); // web fonts change the wrap once they load
   }, [fit, title, subtitle, settings]);
+  // ...or when the title's column changes width: the countdown card grows as it ticks ("2d 0h 0m" becomes
+  // "1d 23h 59m"), and the narrower column wraps a long title onto more lines (T6.52). Height changes are the
+  // fit's own doing, so only a new width counts.
+  useEffect(() => {
+    const t = titleEl.current;
+    if (!t) return;
+    let width = t.clientWidth;
+    const ro = new ResizeObserver(() => {
+      if (t.clientWidth === width) return;
+      width = t.clientWidth;
+      fit();
+    });
+    ro.observe(t);
+    return () => ro.disconnect();
+  }, [fit]);
   return (
     <div
       ref={scene}
