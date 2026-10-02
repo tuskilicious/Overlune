@@ -50,9 +50,17 @@ export function LinkRow({
   return (
     <li className="editor-link">
       <label>
+        {/* The size shows as chips (T6.60); the dots stay for screen readers and the guide's size table. */}
         <span>
-          <strong>{name}</strong> · Width <strong>{width}</strong> · Height{" "}
-          <strong>{height}</strong>
+          <strong>{name}</strong>
+          <span className="editor-sep"> · </span>
+          <span className="editor-chip">
+            Width <strong>{width}</strong>
+          </span>
+          <span className="editor-sep"> · </span>
+          <span className="editor-chip">
+            Height <strong>{height}</strong>
+          </span>
         </span>
         <input ref={input} readOnly value={link} onFocus={(e) => e.target.select()} />
       </label>

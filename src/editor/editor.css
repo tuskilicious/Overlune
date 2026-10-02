@@ -703,6 +703,11 @@
   font-size: 16px;
 }
 
+/* The name on its own line when the chips don't fit beside it. */
+.editor-link label > span > strong:first-child {
+  margin-right: 0;
+}
+
 .editor .editor-link input {
   max-width: 48ch;
   padding: 0;
@@ -816,4 +821,173 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px 24px;
+}
+
+/* Look filters (T6.60): pills above the picker; a filtered-out look is hidden, not removed. */
+.editor-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.editor .editor-pills button {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+.editor .editor-pills button[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+.editor .editor-card[hidden] {
+  display: none;
+}
+
+/* Colors as swatch-and-hex rows; the volume slider with a value box (T6.60). */
+.editor .editor-color label {
+  flex: 1;
+}
+
+.editor-hex {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.editor .editor-slider {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 12px;
+}
+
+.editor .editor-slider input {
+  grid-column: 1;
+}
+
+.editor-slider output {
+  grid-column: 2;
+  min-width: 4.5ch;
+  padding: 4px 8px;
+  border: var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Link rows (T6.60): the size as chips. The dots between them stay in the text for screen readers. */
+.editor-chip {
+  display: inline-block;
+  margin: 2px 0 2px 8px;
+  white-space: nowrap;
+  padding: 1px 8px;
+  border: var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.editor-chip strong {
+  color: var(--text);
+}
+
+.editor-sep {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.editor-part:focus {
+  outline: none;
+}
+
+/* The links sit in the body grid: full width below the form and previews, until the shell (below). */
+.editor-body > .editor-links {
+  grid-column: 1 / -1;
+}
+
+/* Only wide windows have the section list. */
+.editor-rail {
+  display: none;
+}
+
+/* Wide windows (T6.60): a three-column shell. The section list on the left, the live preview in the middle
+   (it shows the chat or alert preview while those sections are on screen), and the settings on the right, with
+   the links at the end of the settings. Narrower windows keep the two-column layout and the steps bar. */
+@media (min-width: 1200px) {
+  .editor-steps {
+    display: none;
+  }
+
+  .editor-body {
+    grid-template-columns: 148px minmax(0, 1fr) minmax(340px, 400px);
+    grid-template-areas:
+      "rail side form"
+      "rail side links";
+  }
+
+  .editor-rail {
+    display: block;
+    grid-area: rail;
+    position: sticky;
+    top: 16px;
+  }
+
+  .editor-rail ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 2px;
+  }
+
+  .editor .editor-rail a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .editor .editor-rail a:hover {
+    color: var(--text);
+  }
+
+  .editor .editor-rail a[aria-current="location"] {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, var(--surface));
+  }
+
+  .editor-form {
+    grid-area: form;
+  }
+
+  .editor-side {
+    grid-area: side;
+    top: 16px;
+    max-height: calc(100vh - 32px);
+  }
+
+  .editor-body > .editor-links {
+    grid-area: links;
+  }
+
+  .editor-step,
+  .editor-part,
+  #obs-links {
+    scroll-margin-top: 16px;
+  }
 }
