@@ -103,6 +103,8 @@ test("the alert pictures show whole alert cards, large enough to read (T6.48)", 
   page,
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
+  // Measure the settled cards: Cozy Café's bounce overshoots, so mid-entrance the card looks taller.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await expect(page.locator(".landing-alert .alert-box")).toHaveCount(2);
   const crops = await page.locator(".landing-alert .editor-preview").evaluateAll((els) =>
