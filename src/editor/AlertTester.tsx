@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { testAlerts, type AlertEvent, type AlertKind } from "../alerts/events";
 import { createAlertQueue } from "../alerts/queue";
 import { playSound } from "../alerts/sound";
@@ -50,12 +50,26 @@ export default function AlertTester({ settings }: { settings: Settings }) {
   }, []);
   const testLink = `${location.origin}/o/alerts?test=1&until=${until}#${encode(settings)}`;
 
+  // The preview shows the top of the 1920×1080 canvas, down to just below the card: the alert sits at the top, so
+  // the full canvas was mostly an empty box (T6.63). Layout sizes, so entrance animations don't move the crop.
+  const canvas = useRef<HTMLDivElement>(null);
+  const [cropHeight, setCropHeight] = useState(1080);
+  useLayoutEffect(() => {
+    const box = canvas.current?.querySelector<HTMLElement>(".alert-box");
+    if (!box) return;
+    const measure = () => setCropHeight(Math.min(1080, box.offsetTop + box.offsetHeight + 64));
+    measure();
+    const ro = new ResizeObserver(measure); // web fonts and long messages change the card's height
+    ro.observe(box);
+    return () => ro.disconnect();
+  }, [alert, settings]);
+
   return (
     <section className="editor-preview-wrap editor-alert-tester" aria-labelledby="alerts-preview">
       <h2 id="alerts-preview">Preview: Alerts</h2>
       {/* Between test alerts, a still sample raid fills the box (T6.22); editor-shot turns its motion off. */}
-      <div className={alert ? undefined : "editor-shot"}>
-        <Preview>
+      <div ref={canvas} className={alert ? undefined : "editor-shot"}>
+        <Preview height={cropHeight}>
           <AlertView settings={settings} alert={alert ?? testAlerts[0]!} />
         </Preview>
       </div>
