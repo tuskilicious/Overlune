@@ -622,3 +622,23 @@
 .scene[data-layout="broadcast"][data-bg="fireflies"]::after {
   mask-image: linear-gradient(to bottom, #000 46%, transparent 56%);
 }
+
+/* Bold Esports on the broadcast layout (T6.41): the angles move onto the new pieces. The accent rule and the
+   countdown card are parallelograms like the alert card; the socials row keeps its full-width hairline and wipes
+   in with the content instead of being cut into a slanted box. Static shapes, so they stay under reduced motion. */
+.scene[data-layout="broadcast"][data-theme="bold-esports"] .scene-title::before {
+  width: 120px;
+  height: 10px;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+}
+
+.scene[data-layout="broadcast"][data-theme="bold-esports"] .countdown {
+  padding-inline: 88px; /* 48px plus the 40px slant */
+  clip-path: polygon(40px 0, 100% 0, calc(100% - 40px) 100%, 0 100%);
+}
+
+.scene[data-layout="broadcast"][data-theme="bold-esports"] .scene-socials {
+  padding-inline: 0;
+  clip-path: none;
+  animation-name: scene-wipe;
+}

@@ -130,3 +130,23 @@ test("Forest Night's fireflies fade out above the title block (T6.40)", async ({
   const titleTop = (await page.locator(".scene-title").boundingBox())!.y;
   expect(fadeEnd).toBeLessThanOrEqual(titleTop);
 });
+
+test("Bold Esports keeps its angles on the broadcast layout without cutting the socials divider (T6.41)", async ({
+  page,
+}) => {
+  await page.goto(
+    `/o/starting#1.${lz.compressToEncodedURIComponent(
+      JSON.stringify({
+        theme: "bold-esports",
+        starting: { endsAt: Date.now() + 86_400_000 },
+        socials: [{ platform: "twitch", handle: "tusk" }],
+      }),
+    )}`,
+  );
+  // Read the shapes after the wipe-in, which animates clip-path.
+  await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
+  const clip = (sel: string) => page.locator(sel).evaluate((el) => getComputedStyle(el).clipPath);
+  expect(await clip(".countdown")).toContain("polygon");
+  // The slanted box clip from the classic layout would trim the start of the divider line.
+  expect(await clip(".scene-socials")).toBe("none");
+});
