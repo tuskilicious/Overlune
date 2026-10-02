@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -11,6 +11,7 @@ import { sampleScene } from "../editor/scene-samples";
 import AlertView from "../overlays/alerts/AlertView";
 import ChatView from "../overlays/chat/ChatView";
 import StartingSoon from "../overlays/starting/StartingSoon";
+import TextScene from "../overlays/TextScene";
 import { themes } from "../themes";
 import { themeIds, type ThemeId } from "../themes/types";
 import "../editor/brand"; // brand fonts (Quicksand, Nunito)
@@ -29,6 +30,198 @@ function Scene({ theme, live = false }: { theme: ThemeId; live?: boolean }) {
   );
 }
 
+type KitScene = "starting" | "brb" | "ending";
+
+/** One alert card on its own, cropped to the card's height so long and short alerts both fit (T6.59). The card
+ *  sits at its 1920x1080 canvas's top left (landing.css), and the crop follows it as the width or text changes. */
+function AlertCard({ theme, alert }: { theme: ThemeId; alert: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number>();
+  useLayoutEffect(() => {
+    const box = ref.current!.querySelector(".alert-box");
+    if (!box) return;
+    const ro = new ResizeObserver(() => setHeight(box.getBoundingClientRect().height));
+    ro.observe(box);
+    ro.observe(ref.current!);
+    return () => ro.disconnect();
+  }, [theme, alert]);
+  return (
+    <div ref={ref} className="landing-alert overflow-hidden rounded-xl" style={{ height }}>
+      <Preview width={1000} height={400}>
+        <AlertView settings={sampleScene(theme)} alert={testAlerts[alert]!} />
+      </Preview>
+    </div>
+  );
+}
+
+/** One scene of a look, live (TextScene for BRB and Stream Ending). */
+function SceneOf({ theme, scene }: { theme: ThemeId; scene: KitScene }) {
+  const settings = sampleScene(theme);
+  return scene === "starting" ? (
+    <StartingSoon settings={settings} />
+  ) : (
+    <TextScene scene={scene} settings={settings} />
+  );
+}
+
+const sceneNames: Record<KitScene, string> = {
+  starting: "Starting Soon",
+  brb: "Be Right Back",
+  ending: "Stream Ending",
+};
+
+/** The hero frame's tour: a look and a scene each, so it shows the whole kit over time (T6.59). */
+const tour: [ThemeId, KitScene][] = [
+  ["vaporwave-sunset", "starting"],
+  ["cozy-cafe", "brb"],
+  ["neon-grid", "ending"],
+  ["pastel-cloud", "starting"],
+  ["forest-night", "brb"],
+  ["bold-esports", "ending"],
+  ["arcade-8bit", "starting"],
+  ["clean-slate", "brb"],
+];
+
+/** The hero picture: a live scene in a stream frame, two alerts in the same look, and the scene names. It tours
+ *  the looks every few seconds; with reduced motion it starts paused on one look, and Pause stops it any time
+ *  (WCAG 2.2.2), which also holds the scene's own motion still. */
+function HeroKit() {
+  const [step, setStep] = useState(0);
+  const [playing, setPlaying] = useState(
+    () => matchMedia("(prefers-reduced-motion: no-preference)").matches,
+  );
+  useEffect(() => {
+    if (!playing) return;
+    const id = setInterval(() => setStep((n) => (n + 1) % tour.length), 4500);
+    return () => clearInterval(id);
+  }, [playing]);
+  const [theme, scene] = tour[step]!;
+  const still = playing ? "" : "landing-still";
+  return (
+    <figure className="relative mx-auto w-full max-w-3xl" data-kit={theme}>
+      <div className="landing-glow-frame relative">
+        <div key={step} className={still}>
+          <Preview>
+            <SceneOf theme={theme} scene={scene} />
+          </Preview>
+        </div>
+        <span
+          aria-hidden
+          className="absolute top-3 right-3 rounded-full bg-cyan px-2.5 py-0.5 font-heading text-xs font-bold tracking-wider text-night"
+        >
+          LIVE
+        </span>
+      </div>
+      {/* The alerts float over the frame's empty top-left sky on wide screens, and sit under it on phones. */}
+      <div
+        className={`landing-kit-alerts mt-4 grid grid-cols-2 items-start gap-3 lg:absolute lg:items-stretch lg:top-[-2.5rem] lg:left-[-3.5rem] lg:mt-0 lg:flex lg:w-[50%] lg:flex-col ${still}`}
+      >
+        {[1, 3].map((i) => (
+          <AlertCard key={`${step}-${i}`} theme={theme} alert={i} />
+        ))}
+      </div>
+      <div className="mt-5 flex flex-wrap items-center gap-2">
+        <ul aria-label="Scenes in every look" className="flex flex-wrap gap-2">
+          {(Object.keys(sceneNames) as KitScene[]).map((id) => (
+            <li
+              key={id}
+              aria-current={id === scene || undefined}
+              className="rounded-full border border-white/15 px-3 py-1 text-sm text-haze aria-[current=true]:border-violet aria-[current=true]:bg-violet aria-[current=true]:text-night"
+            >
+              {sceneNames[id]}
+            </li>
+          ))}
+        </ul>
+        <button
+          type="button"
+          onClick={() => setPlaying((p) => !p)}
+          className="ml-auto cursor-pointer rounded-full border border-white/15 bg-transparent px-3 py-1 font-body text-sm text-haze hover:text-moon"
+        >
+          {playing ? "Pause the looks" : "Play the looks"}
+        </button>
+      </div>
+      <figcaption className="sr-only">
+        Live examples of Overlune scenes and alerts, showing {themes[theme].name}.
+      </figcaption>
+    </figure>
+  );
+}
+
+/** The five overlays, each a live thumbnail that opens its part of the editor (T6.59). */
+const elements: { part: string; name: string; line: string; theme: ThemeId }[] = [
+  {
+    part: "starting",
+    name: "Starting Soon",
+    line: "A countdown to your stream.",
+    theme: "clean-slate",
+  },
+  {
+    part: "brb",
+    name: "Be Right Back",
+    line: "For breaks, with your socials.",
+    theme: "pastel-cloud",
+  },
+  {
+    part: "ending",
+    name: "Stream Ending",
+    line: "Thanks, and where to find you.",
+    theme: "neon-grid",
+  },
+  { part: "chat", name: "Chat", line: "Your Twitch chat in the same look.", theme: "cozy-cafe" },
+  {
+    part: "alerts",
+    name: "Alerts",
+    line: "Raids, subs, gift subs and bits.",
+    theme: "bold-esports",
+  },
+];
+
+function ElementShot({ part, theme }: { part: string; theme: ThemeId }) {
+  if (part === "chat")
+    return (
+      <div className="mx-auto w-[36%]">
+        <Preview width={400} height={600}>
+          <ChatView settings={sampleScene(theme)} messages={chatSamples} />
+        </Preview>
+      </div>
+    );
+  if (part === "alerts")
+    return (
+      <div className="mx-auto mt-[14%] w-[86%]">
+        <AlertCard theme={theme} alert={0} />
+      </div>
+    );
+  return (
+    <Preview>
+      <SceneOf theme={theme} scene={part as KitScene} />
+    </Preview>
+  );
+}
+
+/** Which of the page's sections is in the middle of the window, for the nav (T6.59). */
+function useSectionInView(ids: string[]) {
+  const [current, setCurrent] = useState<string | null>(null);
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries)
+          setCurrent((c) => (e.isIntersecting ? e.target.id : c === e.target.id ? null : c));
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    );
+    for (const id of ids) {
+      const el = document.getElementById(id);
+      if (el) io.observe(el);
+    }
+    return () => io.disconnect();
+  }, [ids]);
+  return current;
+}
+
+const sections = ["kit", "looks", "how"];
+
+const facts = ["8 looks", "Scenes, chat and alerts", "One link per overlay", "Free, no account"];
+
 const steps = [
   ["Pick a look", "Eight themes, each with matching scenes, chat and alerts."],
   ["Add your details", "Your title, countdown, socials and Twitch channel name."],
@@ -44,6 +237,13 @@ const button =
 /** The marketing page at / for first-time visitors (T6.34). Saved work and old editor links go to /editor (App.tsx). */
 export default function LandingPage() {
   const root = useRef<HTMLDivElement>(null);
+  const current = useSectionInView(sections);
+  const navLink = (id: string) => ({
+    href: `#${id}`,
+    "aria-current": current === id ? ("location" as const) : undefined,
+    className:
+      "hover:text-moon aria-[current=location]:text-moon aria-[current=location]:underline aria-[current=location]:decoration-violet aria-[current=location]:decoration-2 aria-[current=location]:underline-offset-8",
+  });
 
   useGSAP(
     () => {
@@ -116,14 +316,13 @@ export default function LandingPage() {
         </Link>
         <ul className="hidden items-center gap-7 text-haze md:flex">
           <li>
-            <a className="hover:text-moon" href="#looks">
-              Looks
-            </a>
+            <a {...navLink("kit")}>Overlays</a>
           </li>
           <li>
-            <a className="hover:text-moon" href="#how">
-              How it works
-            </a>
+            <a {...navLink("looks")}>Looks</a>
+          </li>
+          <li>
+            <a {...navLink("how")}>How it works</a>
           </li>
           <li>
             <Link className="hover:text-moon" to="/guide">
@@ -142,7 +341,8 @@ export default function LandingPage() {
       <main id="main" tabIndex={-1} className="w-full max-w-full overflow-x-hidden outline-none">
         {/* Attention: text left, a live overlay beside it. The whole scene stays in view: its title sits at the
             bottom of the frame, so a scene hanging off the hero would hide it (T6.45). */}
-        <section className="landing-ambient relative px-6 pt-40 pb-32 md:px-12 md:pt-48 md:pb-48">
+        <section className="landing-ambient landing-sky relative px-6 pt-40 pb-32 md:px-12 md:pt-48 md:pb-48">
+          <span aria-hidden className="landing-moon" />
           <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
             <div>
               <h1 className="max-w-5xl font-heading text-[clamp(2.75rem,5.5vw,5.25rem)] leading-[1.05] font-bold">
@@ -153,7 +353,10 @@ export default function LandingPage() {
                 Be Right Back, Stream Ending, chat and alerts, all matching.
               </p>
               <div className="mt-10 flex flex-wrap gap-4">
-                <Link to="/editor" className={`${button} bg-violet text-night hover:bg-moon`}>
+                <Link
+                  to="/editor"
+                  className={`${button} landing-glow-button bg-violet text-night hover:bg-moon`}
+                >
                   Make your overlays
                 </Link>
                 <a
@@ -163,13 +366,19 @@ export default function LandingPage() {
                   See the looks
                 </a>
               </div>
+              <ul
+                className="mt-10 flex flex-wrap gap-x-6 gap-y-2 text-haze"
+                aria-label="At a glance"
+              >
+                {facts.map((f) => (
+                  <li key={f} className="flex items-center gap-2">
+                    <span aria-hidden className="size-1.5 rounded-full bg-cyan" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <figure className="mx-auto w-full max-w-3xl md:rotate-[-3deg]">
-              <div className="overflow-hidden rounded-3xl border border-white/10">
-                <Scene theme="vaporwave-sunset" live />
-              </div>
-              <figcaption className="sr-only">The Vaporwave Sunset Starting Soon scene.</figcaption>
-            </figure>
+            <HeroKit />
           </div>
         </section>
 
@@ -185,6 +394,36 @@ export default function LandingPage() {
             ))}
           </div>
         </div>
+
+        {/* The five overlays, each opening its part of the editor (T6.59). */}
+        <section id="kit" className="px-6 pt-32 md:px-12 md:pt-48" aria-labelledby="kit-heading">
+          <div className="mx-auto max-w-7xl">
+            <h2
+              id="kit-heading"
+              data-reveal
+              className="font-heading text-[clamp(2.25rem,4vw,3.5rem)] font-bold"
+            >
+              Five overlays in every look
+            </h2>
+            <p className="mt-4 max-w-xl text-lg text-haze">Open any of them in the editor.</p>
+            <ul className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+              {elements.map((e) => (
+                <li key={e.part}>
+                  <Link
+                    to={`/editor?part=${e.part}`}
+                    className="group block h-full rounded-3xl border border-white/10 bg-deep p-4 transition-colors hover:border-violet"
+                  >
+                    <div className="landing-still aspect-video overflow-hidden rounded-xl bg-night">
+                      <ElementShot part={e.part} theme={e.theme} />
+                    </div>
+                    <h3 className="mt-4 font-heading text-xl font-bold">{e.name}</h3>
+                    <p className="mt-1 text-haze">{e.line}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
 
         {/* Interest: four cards. From 1280px, 4 × 2 cells with no gaps (A 2×2, B 2×1, C 1×1, D 1×1); from 768px,
             two columns with A and B full width (T6.56); below that, one column. */}

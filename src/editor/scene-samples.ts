@@ -13,6 +13,8 @@ export const sampleScene = (theme: ThemeId): Settings => ({
   ...defaultSettings,
   theme,
   starting: { ...defaultSettings.starting, subtitle: "Chill games and good chat", endsAt, tz },
+  brb: { ...defaultSettings.brb, subtitle: "Grabbing a drink" },
+  ending: { ...defaultSettings.ending, subtitle: "See you next stream" },
   socials: [
     { platform: "twitch", handle: "yourname" },
     { platform: "youtube", handle: "yourname" },
