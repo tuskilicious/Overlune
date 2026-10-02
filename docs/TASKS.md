@@ -330,6 +330,7 @@ Found by going through the live site after T6.54-T6.61. One branch and PR per ta
 
 - [ ] **T6.62 The section list marks the right section.** On wide windows, clicking "Socials" marks "Chat" (and the preview jumps to chat), and clicking "Logo" marks "Colors": a short section reaches the top while the next one has also passed the marker line.
   - Accept: the marked section is the one at the top of the window (the one a click jumped to), including short sections; the preview follows it. e2e for every section link.
+  - *Built 2026-10-03 on `fix/section-list-marker`. The section list used the steps bar's line, a third of the way down the window, so after jumping to a short section the next one had passed it too. Sections now use a line 48px from the top (a jump puts a section 16px down), so the marked one is the section at the top. The steps bar on narrower windows keeps its line. e2e: each of the eight links marks its own section with a short Socials section, and after Socials the preview shows the scene (fails without the fix). Waiting for the owner's check.*
 - [ ] **T6.63 The editor's alert preview fits the alert.** The alert card sits in the top quarter of a full 16:9 preview, leaving about 400px of empty box under it.
   - Accept: the preview crops to the alert card's height (like the landing page's alert pictures), and follows the card as the test alerts change. e2e.
 - [ ] **T6.64 Link rows in the narrow settings column.** At 400px the size chips wrap one at a time ("Height 1080" alone under the name) and the raw links are cut short.

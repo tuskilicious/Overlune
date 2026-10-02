@@ -354,11 +354,14 @@ export default function EditorPage() {
     if (welcome) return;
     const update = () => {
       const atBottom = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
-      const above = (id: string) =>
-        (document.getElementById(id)?.getBoundingClientRect().top ?? 0) < innerHeight / 3;
-      const passed = steps.filter(([id]) => above(id));
+      const above = (id: string, line: number) =>
+        (document.getElementById(id)?.getBoundingClientRect().top ?? 0) < line;
+      const passed = steps.filter(([id]) => above(id, innerHeight / 3));
       setCurrentStep(atBottom ? steps[2][0] : (passed.at(-1) ?? steps[0])[0]);
-      const passedSection = sections.filter(([id]) => above(id));
+      // Sections are often short: with the steps' line a third of the way down, the section after one you jumped
+      // to had passed it too and was marked instead. A jump puts a section 16px from the top (scroll-margin), so
+      // the section at the top of the window is the last one past 48px (T6.62).
+      const passedSection = sections.filter(([id]) => above(id, 48));
       setCurrentSection(atBottom ? "obs-links" : (passedSection.at(-1) ?? sections[0])[0]);
     };
     update();

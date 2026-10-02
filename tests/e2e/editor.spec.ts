@@ -1024,6 +1024,18 @@ test.describe("three-column shell on wide windows (T6.60)", () => {
     expect(scan.violations).toEqual([]);
   });
 
+  test("each section link marks that section, short ones included (T6.62)", async ({ page }) => {
+    await page.getByRole("button", { name: "Add a social" }).click(); // a short Socials section
+    const list = page.getByRole("navigation", { name: "Sections" });
+    for (const name of ["Text", "Socials", "Chat", "Alerts", "Logo", "Colors", "Links", "Look"]) {
+      await list.getByRole("link", { name }).click();
+      await expect(list.locator('[aria-current="location"]'), name).toHaveText(name);
+    }
+    await list.getByRole("link", { name: "Socials" }).click();
+    // The preview follows: Socials shows the scene, not the chat preview.
+    await expect(preview(page).locator(".scene")).toBeInViewport();
+  });
+
   test("the preview sits between the section list and the settings", async ({ page }) => {
     const x = async (sel: string) => (await page.locator(sel).first().boundingBox())!.x;
     expect(await x(".editor-rail")).toBeLessThan(await x(".editor-side"));
