@@ -102,3 +102,13 @@
 .landing .site-footer a {
   color: var(--color-violet);
 }
+
+/* The alert card on its own: moved to the canvas's top left so the preview can crop to it (T6.48). */
+.landing-alert .alerts {
+  padding: 0;
+  align-items: flex-start;
+}
+
+.landing-alert .alert-box {
+  width: 1000px; /* fills the 1000px-wide preview, so cards of different lengths line up */
+}

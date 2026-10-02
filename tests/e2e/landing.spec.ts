@@ -98,3 +98,22 @@ for (const [width, height] of [
     expect(title.y + title.height).toBeLessThanOrEqual(strip.y);
   });
 }
+
+test("the alert pictures show whole alert cards, large enough to read (T6.48)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto("/");
+  await expect(page.locator(".landing-alert .alert-box")).toHaveCount(2);
+  const crops = await page.locator(".landing-alert .editor-preview").evaluateAll((els) =>
+    els.map((el) => {
+      const crop = el.getBoundingClientRect();
+      const box = el.querySelector(".alert-box")!.getBoundingClientRect();
+      return { crop, box };
+    }),
+  );
+  for (const { crop, box } of crops) {
+    expect(box.width).toBeGreaterThan(crop.width * 0.9); // the card fills the picture, not a strip in a canvas
+    expect(box.bottom).toBeLessThanOrEqual(crop.bottom); // and none of it is cut off
+  }
+});

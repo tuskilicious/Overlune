@@ -244,11 +244,21 @@ export default function LandingPage() {
                     Raids, subs, gift subs and bits, each with its look’s sound.
                   </p>
                 </div>
-                <div className="landing-still mt-4 overflow-hidden rounded-xl bg-night transition-transform duration-700 ease-out group-hover:scale-105">
-                  {/* Only the top of the 1920×1080 canvas, where the alert sits. */}
-                  <Preview height={300}>
-                    <AlertView settings={sampleScene("bold-esports")} alert={testAlerts[0]!} />
-                  </Preview>
+                <div className="landing-still landing-alert mt-4 flex flex-col gap-3 transition-transform duration-700 ease-out group-hover:scale-105">
+                  {/* Just the alert cards, cropped from their 1920×1080 canvases so the text is readable, in two
+                      looks (T6.48). */}
+                  {(
+                    [
+                      ["bold-esports", 0],
+                      ["cozy-cafe", 1],
+                    ] as const
+                  ).map(([theme, i]) => (
+                    <div key={theme} className="overflow-hidden rounded-xl">
+                      <Preview width={1000} height={200}>
+                        <AlertView settings={sampleScene(theme)} alert={testAlerts[i]!} />
+                      </Preview>
+                    </div>
+                  ))}
                 </div>
               </li>
               <li className="rounded-3xl border border-white/10 bg-violet p-6 text-night">
