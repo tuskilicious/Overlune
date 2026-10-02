@@ -609,7 +609,7 @@ test("autosave restores the last overlay when the editor opens without a link", 
 }) => {
   await page.getByLabel("Title", { exact: true }).fill("Autosaved title");
   await page.goto("about:blank");
-  await page.goto("/");
+  await page.goto("/editor"); // "/" is always the landing page now (T6.67)
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Autosaved title");
   await expect(page.getByRole("status").filter({ hasText: "Welcome back!" })).toBeVisible();
 });

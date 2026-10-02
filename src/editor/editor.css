@@ -26,6 +26,11 @@
   display: block;
 }
 
+/* The logo is a link home (T6.67); its focus ring hugs the image. */
+.editor-header h1 a {
+  display: inline-block;
+}
+
 .editor-header p {
   margin: 4px 0 24px;
   color: var(--text-muted);
