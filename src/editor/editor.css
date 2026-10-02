@@ -7,6 +7,9 @@
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
+  /* Callouts (save reminder, "You're set", legal disclaimer): a faint violet outline all the way round, instead of
+     a thick bar down one side (T6.53). Decorative; the text says what the callout is. */
+  --callout-edge: 1px solid color-mix(in srgb, var(--accent) 45%, var(--surface));
 }
 
 :where(.editor) a {
@@ -34,7 +37,7 @@
 }
 
 /* "Your link is your save file" (PRD): one quiet line until something is made, then the bookmark reminder
-   leads with an accent bar (T6.12). The actions wrap under the text in narrow windows. */
+   becomes a callout (T6.12, T6.53). The actions wrap under the text in narrow windows. */
 .editor-save {
   margin-bottom: 24px;
   padding: 12px 16px;
@@ -51,7 +54,7 @@
 }
 
 .editor-save[data-made] {
-  border-left: 4px solid var(--accent);
+  border: var(--callout-edge);
 }
 
 .editor-save-text {
@@ -737,7 +740,8 @@
 .editor .editor-links-progress {
   margin: 16px 0 0;
   padding: 12px 16px;
-  border-left: 4px solid var(--accent);
+  border: var(--callout-edge);
+  border-radius: var(--radius);
   background: var(--surface);
   color: var(--text);
 }
