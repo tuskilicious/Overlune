@@ -7,7 +7,21 @@ import globals from "globals";
 const HTML_INJECTION = "Chat text is hostile input: render it as React elements (CLAUDE.md).";
 
 export default tseslint.config(
-  { ignores: ["dist", "playwright-report", "test-results"] },
+  {
+    ignores: [
+      "dist",
+      "playwright-report",
+      "test-results",
+      // Local AI tool skill packs, also in .gitignore
+      ".agents",
+      ".codex",
+      ".claude",
+      ".github/skills",
+      ".github/agents",
+      ".github/hooks",
+      "Claude outputs",
+    ],
+  },
   js.configs.recommended,
   tseslint.configs.recommended,
   reactHooks.configs.flat.recommended,

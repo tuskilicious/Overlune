@@ -39,3 +39,15 @@ desktop.ini
 
 # Deploy archives (README, "Antideploy")
 *.tar.gz
+
+# Local AI tool skill packs (not part of Overlune)
+.agents/
+.codex/
+.claude/skills/
+.claude/agents/
+.claude/settings.local.json
+.github/skills/
+.github/agents/
+.github/hooks/
+Claude outputs/
+skills-lock.json
