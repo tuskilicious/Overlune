@@ -94,6 +94,7 @@ Themes move from the original centered "classic" layout to a composed "broadcast
 - Each theme can restyle these pieces in its own CSS (fonts, background effect, shapes), keyed on `data-theme`; the composition stays the same so the set reads as one product.
 - **Neon Grid (T6.36):** horizon at 82% with the content kept above it; socials float on the grid floor as a glowing panel; smaller type for the wide Orbitron; the chat stack has one neon edge.
 - **Cozy Café (T6.37):** the steam wisps rise in the open space (between the title block and the countdown card, and from behind the card) instead of behind the title.
+- **Arcade 8-Bit (T6.38):** pixel-font sizes (title 68px, countdown 56px, done text 44px) so the title and countdown sit side by side; square accent rule; wider subtitle measure for VT323.
 
 ## Editor and site UI
 The editor, setup guide, privacy and terms pages share one quiet, high-contrast chrome in Overlune's brand (`docs/BRAND.md`), so the colorful theme previews stay the loudest thing on the page. Tokens live in `src/editor/brand.ts` and reach CSS as variables on `.editor` (`themeVars`). "Must" rules are hard requirements; "should" rules are defaults.

@@ -566,3 +566,26 @@
   right: 14%;
   bottom: 200px;
 }
+
+/* Arcade 8-Bit on the broadcast layout (T6.38): Press Start 2P is about one em per letter, so the title and the
+   countdown get pixel-font sizes that fit side by side. Square accent rule to match the square corners. */
+.scene[data-layout="broadcast"][data-theme="arcade-8bit"] .scene-title {
+  font-size: 68px;
+  line-height: 1.3;
+  letter-spacing: 0;
+  overflow-wrap: break-word; /* whole words first; only an over-long word breaks */
+}
+
+.scene[data-layout="broadcast"][data-theme="arcade-8bit"] .scene-title::before {
+  border-radius: 0;
+}
+
+.scene[data-layout="broadcast"][data-theme="arcade-8bit"] .countdown-time {
+  font-size: 56px;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+.scene[data-layout="broadcast"][data-theme="arcade-8bit"] .scene-subtitle {
+  max-width: 44ch; /* VT323 is monospace and narrow, so 34ch cut lines short */
+}
