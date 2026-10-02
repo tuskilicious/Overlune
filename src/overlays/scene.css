@@ -589,3 +589,17 @@
 .scene[data-layout="broadcast"][data-theme="arcade-8bit"] .scene-subtitle {
   max-width: 44ch; /* VT323 is monospace and narrow, so 34ch cut lines short */
 }
+
+/* Pastel Cloud on the broadcast layout (T6.39): keep the soft gradient (the broadcast background rule would
+   otherwise replace it), and let both clouds drift through the open sky above the title block. */
+.scene[data-layout="broadcast"][data-bg="clouds"] {
+  background: linear-gradient(160deg, var(--bg), color-mix(in srgb, var(--primary) 18%, #fff));
+}
+
+.scene[data-layout="broadcast"][data-bg="clouds"]::before {
+  top: 7%;
+}
+
+.scene[data-layout="broadcast"][data-bg="clouds"]::after {
+  top: 31%;
+}

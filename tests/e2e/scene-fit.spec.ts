@@ -84,3 +84,27 @@ for (const theme of themeIds) {
     expect(lines).toBeLessThan(1.5);
   });
 }
+
+test("Pastel Cloud's clouds drift above the title block, never through it (T6.39)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto(
+    `/o/starting#1.${lz.compressToEncodedURIComponent(
+      JSON.stringify({
+        theme: "pastel-cloud",
+        starting: { subtitle: "Ranked grind tonight", endsAt: Date.now() + 86_400_000 },
+        socials: [{ platform: "twitch", handle: "tusk" }],
+      }),
+    )}`,
+  );
+  await page.evaluate(() => document.fonts.ready);
+  // Typical content; a 60-character title fills the screen and any background sits behind it.
+  // The lower cloud (::after) is scaled around its center, so its drawn bottom is top + height * (1 + scale) / 2.
+  const cloudBottom = await page.locator(".scene").evaluate((el) => {
+    const c = getComputedStyle(el, "::after");
+    return parseFloat(c.top) + (parseFloat(c.height) * (1 + parseFloat(c.scale))) / 2;
+  });
+  const titleTop = (await page.locator(".scene-title").boundingBox())!.y;
+  expect(cloudBottom).toBeLessThanOrEqual(titleTop);
+});
