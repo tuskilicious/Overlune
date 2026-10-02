@@ -555,3 +555,14 @@
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
+
+/* Cozy Café on the broadcast layout (T6.37): the steam rises in the open space, one wisp in the gap between the
+   title block and the countdown card, one above the card, instead of behind the title. */
+.scene[data-layout="broadcast"][data-bg="steam"]::before {
+  left: 45%;
+}
+
+.scene[data-layout="broadcast"][data-bg="steam"]::after {
+  right: 14%;
+  bottom: 200px;
+}
