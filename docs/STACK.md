@@ -14,6 +14,7 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 | Twitch chat | **Own minimal IRC client** over native `WebSocket` (`wss://irc-ws.chat.twitch.tv`), anonymous `justinfan` login | No heavy dependency; the parser is small and fully unit-testable |
 | Fonts | `@fontsource/*` (self-hosted, SIL OFL) | No Google Fonts CDN calls (privacy), works offline in OBS, licenses recorded |
 | Error tracking | `@sentry/react` | CLAUDE.md §2. PII off, URL fragments stripped |
+| Platform icons | `simple-icons` (CC0 data; brand logos are their owners' trademarks) | Approved by the owner 2026-10-02 (T6.35). Six named imports (`src/overlays/social-icons.tsx`), tree-shaken into the bundle as inline SVG paths: no CDN, so the CSP is unchanged |
 
 ## Quality and security tooling
 | Area | Choice |

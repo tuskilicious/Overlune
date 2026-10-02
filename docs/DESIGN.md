@@ -31,7 +31,7 @@ Every theme defines exactly these tokens (`src/themes/types.ts`):
 The starting palettes below are suggestions. Verify contrast before shipping each theme.
 
 ### Launch set
-**1. Clean Slate:** minimal, one accent color.
+**1. Clean Slate:** minimal, one accent color. First theme on the broadcast layout (T6.35).
 - Colors: bg `#121418`, surface `#1C1F26`, primary `#E8EAED`, accent `#4F8CFF`, muted `#8A919E`
 - Fonts: Inter / Inter
 - Shape: radius 8, subtle slide and fade (300ms)
@@ -85,6 +85,13 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 - Chat default size is 400×600, transparent background, bottom-up.
 - Alerts render centered-top by default, with no background outside the alert box.
 - Error states use the theme's surface and text colors, stay readable, and never flash.
+
+### Broadcast layout (overlay redesign, T6.35)
+Themes move from the original centered "classic" layout to a composed "broadcast" layout one at a time (`layout` in the theme; `data-layout` on `.scene`, `.chat` and `.alerts`). Theme ids, settings and links don't change, so pasted links pick up the new design.
+- **Scenes:** 88px top / 112px side / 72px bottom margins (inside the 64px safe margin). Logo top left (160px max). Title block anchored bottom left: a 96×8px accent rule, the title (128px, tight tracking, shrinks to fit per T6.26), then the subtitle (40px, 34ch max). The countdown is a surface card on the right, bottom-aligned with the title block. Socials run along the bottom edge as an icon row (Simple Icons, accent color) with the handle; a hairline separates them from the content. The platform word stays in the DOM, visually hidden, for screen readers.
+- **Alerts:** still centered at the top. A wider card (760-1100px) with a 6px accent band, an uppercase event label ("Raid", "New subscriber", "Resub", "Gift subs", "Cheer"), then the streamer's message at 56px; resub and cheer text below in the muted color.
+- **Chat:** one panel instead of a card per message: no borders between cards, hairline separators, only the top and bottom of the stack rounded. Badges are small square-cornered tags tinted with the accent.
+- Each theme can restyle these pieces in its own CSS (fonts, background effect, shapes); the composition stays the same so the set reads as one product.
 
 ## Editor and site UI
 The editor, setup guide, privacy and terms pages share one quiet, high-contrast chrome in Overlune's brand (`docs/BRAND.md`), so the colorful theme previews stay the loudest thing on the page. Tokens live in `src/editor/brand.ts` and reach CSS as variables on `.editor` (`themeVars`). "Must" rules are hard requirements; "should" rules are defaults.
