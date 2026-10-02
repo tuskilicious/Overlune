@@ -173,3 +173,16 @@ test("alerts label the event above the message (T6.35)", async ({ page }) => {
   await expect(box(page).locator(".alert-kind")).toHaveText("Raid");
   await expect(box(page).locator(".alert-kind")).toBeVisible();
 });
+
+test("an Arcade 8-Bit raid alert takes at most two lines (T6.55)", async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.emulateMedia({ reducedMotion: "reduce" }); // the stepped entrance scales the box while it plays
+  await page.goto(link({ theme: "arcade-8bit", chat: { channel: "dallas" } }, "?test=1"));
+  const title = box(page).locator(".alert-title");
+  await expect(title).toHaveText("FriendlyRaider is raiding with 42 viewers!");
+  await page.evaluate(() => document.fonts.ready);
+  const lines = await title.evaluate(
+    (el) => el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight),
+  );
+  expect(lines).toBeLessThan(2.5);
+});

@@ -94,7 +94,7 @@ All 8 themes share one composed layout, rolled out one theme at a time (T6.35-T6
 - Each theme can restyle these pieces in its own CSS (fonts, background effect, shapes), keyed on `data-theme`; the composition stays the same so the set reads as one product.
 - **Neon Grid (T6.36):** horizon at 82% with the content kept above it; socials float on the grid floor as a glowing panel; smaller type for the wide Orbitron; the chat stack has one neon edge.
 - **Cozy Café (T6.37):** the steam wisps rise in the open space (between the title block and the countdown card, and from behind the card) instead of behind the title.
-- **Arcade 8-Bit (T6.38):** pixel-font sizes (title 68px, countdown 56px, done text 44px) so the title and countdown sit side by side; square accent rule; wider subtitle measure for VT323.
+- **Arcade 8-Bit (T6.38):** pixel-font sizes (title 68px, countdown 56px, done text 44px, alert title 40px per T6.55) so the title and countdown sit side by side; square accent rule; wider subtitle measure for VT323.
 - **Pastel Cloud (T6.39):** both clouds drift through the upper sky, clear of a typical title block; the theme keeps its own gradient background.
 - **Forest Night (T6.40):** a full moon (soft-edged disc with a halo) sits in the open top-right corner; the fireflies fade out above a typical title block, so none lands between the words. The countdown is 100px, since Lora's wide numerals made the widest day countdown wrap the title (T6.52).
 - **Bold Esports (T6.41):** the angles move onto the new pieces: a slanted accent rule and a parallelogram countdown card, matching the angled alert card and chat messages. The socials row keeps its full-width hairline and wipes in with the content.
