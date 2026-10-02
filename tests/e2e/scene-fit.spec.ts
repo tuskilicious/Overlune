@@ -65,8 +65,12 @@ test("Neon Grid keeps the title block in the sky, above the horizon (T6.36)", as
 for (const theme of themeIds) {
   test(`${theme}: "Starting soon" stays on one line beside the countdown`, async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
-    const data = { theme, starting: { endsAt: Date.now() + 2 * 86_400_000 } };
+    // The widest countdown a stream day shows, "1d 23h 59m", on a fixed clock so the tick can't change it (T6.52).
+    const now = new Date("2026-10-02T12:00:00Z").getTime();
+    await page.clock.setFixedTime(now);
+    const data = { theme, starting: { endsAt: now + 2 * 86_400_000 - 60_000 } };
     await page.goto(`/o/starting#1.${lz.compressToEncodedURIComponent(JSON.stringify(data))}`);
+    await expect(page.locator(".countdown-time")).toHaveText("1d 23h 59m");
     await page.evaluate(() => document.fonts.ready);
     // The accent rule is drawn inside the heading (::before), so leave it out of the line count.
     const lines = await page.locator(".scene-title").evaluate((el) => {
@@ -179,3 +183,28 @@ test("Vaporwave Sunset's sun stays clear of the title, countdown and socials (T6
     expect(apart, `${sel} overlaps the sun`).toBe(true);
   }
 });
+
+// T6.52: the countdown card widens as it ticks ("2d 0h 0m" becomes "1d 23h 59m"), narrowing the title's column.
+for (const theme of themeIds) {
+  test(`${theme}: a long title re-fits when the countdown card widens`, async ({ page }) => {
+    const start = new Date("2026-10-02T12:00:00Z").getTime();
+    await page.clock.setFixedTime(start); // the overlay's timers keep running; only the time is ours
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.route("https://logos.example/logo.png", (r) =>
+      r.fulfill({ path: "public/images/brand/apple-touch-icon.png" }),
+    );
+    const data = longest(theme);
+    data.starting.endsAt = start + 2 * 86_400_000; // "2d 0h 0m", then "1d 23h 59m" a second later
+    await page.goto(`/o/starting#1.${lz.compressToEncodedURIComponent(JSON.stringify(data))}`);
+    await expect(page.locator(".countdown-time")).toHaveText("2d 0h 0m");
+    await page.evaluate(() => document.fonts.ready);
+    await page.clock.setFixedTime(start + 1500);
+    await expect(page.locator(".countdown-time")).toHaveText("1d 23h 59m");
+    await expect
+      .poll(async () => {
+        const box = (await page.locator(".scene-socials").boundingBox())!;
+        return box.y + box.height;
+      })
+      .toBeLessThanOrEqual(1080);
+  });
+}

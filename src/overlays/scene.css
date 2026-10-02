@@ -488,6 +488,12 @@
   box-shadow: var(--shadow);
 }
 
+/* Forest Night (T6.52): Lora's numerals are wide, so the countdown is smaller and "Starting soon" stays on one line
+   beside the widest day countdown ("1d 23h 59m"). */
+.scene[data-theme="forest-night"] .countdown-time {
+  font-size: 100px;
+}
+
 /* Arcade 8-Bit (T6.38): Press Start 2P is about one em per letter, so the title and the
    countdown get pixel-font sizes that fit side by side. Square accent rule to match the square corners. */
 .scene[data-theme="arcade-8bit"] .scene-title {
