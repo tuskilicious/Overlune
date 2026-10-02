@@ -291,3 +291,25 @@ Found by going through the live site after the overlay redesign (T6.35-T6.43). M
 - [x] **T6.53 Subtler callouts.** The design hook (impeccable) flags the callouts' thick violet bar down the left side (save reminder, "You're set" line, legal disclaimer) as a tell of generated UI; the owner chose to replace it with something subtle.
   - Accept: the three callouts lose the side bar and stand out more quietly, the same way everywhere; the design hook no longer flags them; contrast and axe stay clean. DESIGN.md (and the Stitch file) describe the new callout.
   - *Built 2026-10-02 on `fix/subtle-callouts`. One `--callout-edge` on `.editor`: a 1px outline of Lune Violet mixed 45% into Deep Space, all the way round, with the usual 12px corners. The saved-work box switches to it once something is made (its bold "Bookmark this page" line still marks the change, so it doesn't rely on color); the "You're set" line and the legal disclaimer use it too. `docs/DESIGN.md` callout row and anti-patterns, and `docs/stitch/DESIGN.md`, updated. Owner checked the PR #87 preview, 2026-10-02. No overlay change, so no OBS test.*
+
+### From the fourth walkthrough (2026-10-02)
+Found by going through the live site after T6.44-T6.53. One branch and PR per task, stacked. T6.54 and T6.55 change overlays, so they need the OBS test.
+
+- [ ] **T6.54 The countdown card is balanced with short countdowns.** With "09:58" the time sits on the left of the card and its right third is empty, on every look.
+  - Accept: the time and the "Starts at" line are centered in the card; the card keeps its minimum width so it doesn't jump as it ticks. The Linux screenshot baseline is updated from CI. OBS test.
+- [ ] **T6.55 Arcade 8-Bit alerts fit on fewer lines.** "FriendlyRaider is raiding with 42 viewers!" fills three lines of the wide pixel font. The scenes got pixel-font sizes in T6.38; the alerts didn't.
+  - Accept: a typical raid alert in Arcade 8-Bit takes at most two lines; other themes unchanged. e2e. OBS test.
+- [ ] **T6.56 Landing feature cards at tablet width.** From 768 to 1023px the four-column grid squeezes "Alerts with sound" and "Your link is your save file" to two or three words per line and leaves a 400px gap inside "Eight looks".
+  - Accept: two columns from 768px, the four-column layout from 1024px; no card's text column is narrower than about 200px. e2e.
+- [ ] **T6.57 Landing chat card on phones.** At 390px the "Chat in your colors" text runs two or three words per line beside the chat picture.
+  - Accept: below 768px the picture sits under the text at a readable size. e2e.
+- [ ] **T6.58 The save box keeps its shape.** Opening "Load my overlay from a link" or "Start over" rearranges the save box (a button jumps to its own line, the paste field stays open under the start-over question) and grows it by about 150px.
+  - Accept: the buttons stay where they are, only one of the two panels is open at a time, Escape closes it and returns focus to its button, and the panel opens under the buttons. e2e.
+
+### Mockup ideas, the honest v1 pass (2026-10-02)
+The owner shared AI-generated mockups (dark night palette, crescent moon, glowing panel edges, app-shell editor). Take the good design ideas only, with everything shown true for v1 today: no pricing, upgrade, sign in, My Overlays, template counts, drag and drop, HD or video export, donation alerts, other platforms' chat, AI landscape art, gradient text on every heading, glow on every card, or "Create Stunning…" copy. docs/V2-PLAN.md maps the v2-only screens to their phases.
+
+- [ ] **T6.59 Landing page: the whole kit.**
+  - Accept: the hero shows one real scene in a 16:9 stream frame with a small LIVE badge, real alert cards stacked beside it, and Starting Soon / BRB / Stream Ending tags, all rendered live, cycling looks (one still look with reduced motion). A violet-to-cyan edge glow on the hero frame and the hero's primary button only. A four-item fact row under the hero buttons. A row of element cards (Starting Soon, BRB, Stream Ending, Chat, Alerts) with live thumbnails that open the matching part of the editor. A subtle CSS night sky in the hero (crescent, a few stars, a soft arc; no image files). The nav underlines the section in view. Keeps the honest copy, the save-file message, the steps and the promise. Checked at 390, 768 and 1440px; axe clean; e2e.
+- [ ] **T6.60 Editor: the three-column shell.**
+  - Accept: on wide windows a section list on the left (Look, Text, Socials, Chat, Alerts, Logo, Colors, Links), the live preview in the middle (sticky), and the settings on the right; narrower windows keep the current layout. Look filter pills (Calm, Retro, Bold) with names under each card. Colors as swatch-and-hex rows; the volume slider with a value box. Links as one tidy panel per overlay with size chips, a copy button and the copied state, in the beginner wording. Keyboard navigation with visible focus, WCAG AA contrast, reduced motion. Same features; e2e updated where selectors change. Checked at 390, 768 and 1440px.
