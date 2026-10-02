@@ -163,6 +163,32 @@ const steps = [
   ["obs-links", "3. Links to paste into OBS"],
 ] as const;
 
+/** Wide windows (T6.60): the section list on the left. Each jumps to its place in the settings column. */
+const sections = [
+  ["step-look", "Look"],
+  ["part-scenes", "Text"],
+  ["part-socials", "Socials"],
+  ["part-chat", "Chat"],
+  ["part-alerts", "Alerts"],
+  ["part-logo", "Logo"],
+  ["part-colors", "Colors"],
+  ["obs-links", "Links"],
+] as const;
+
+/** Look filters (T6.60). Each look is in one group. */
+const moods = {
+  Calm: ["clean-slate", "cozy-cafe", "pastel-cloud", "forest-night"],
+  Retro: ["arcade-8bit", "vaporwave-sunset"],
+  Bold: ["neon-grid", "bold-esports"],
+} as const satisfies Record<string, readonly ThemeId[]>;
+type Mood = keyof typeof moods | "All";
+
+/** The preview that goes with a section, brought into view in the center column (T6.60). */
+const sectionPreview: Partial<Record<string, string>> = {
+  "part-chat": ".editor-chat-preview",
+  "part-alerts": ".editor-alert-tester",
+};
+
 const loadedMessage = (ok: boolean) =>
   ok
     ? "Loaded! You can keep editing."
@@ -245,6 +271,7 @@ export default function EditorPage() {
   const [loadText, setLoadText] = useState("");
   const [loadStatus, setLoadStatus] = useState(initial.status);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [mood, setMood] = useState<Mood>("All");
   /** The logo link is https: but no picture loaded from it (T6.21). */
   const [logoBroken, setLogoBroken] = useState(false);
   /** The editor shows instead of the welcome gallery (T6.16). Decided once, so setting everything back to the
@@ -321,14 +348,18 @@ export default function EditorPage() {
 
   /** The step whose heading has scrolled past the top third of the window, shown in the steps bar (T6.32). */
   const [currentStep, setCurrentStep] = useState<string>(steps[0][0]);
+  /** The same for the section list on wide windows (T6.60). */
+  const [currentSection, setCurrentSection] = useState<string>(sections[0][0]);
   useEffect(() => {
     if (welcome) return;
     const update = () => {
       const atBottom = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
-      const passed = steps.filter(
-        ([id]) => (document.getElementById(id)?.getBoundingClientRect().top ?? 0) < innerHeight / 3,
-      );
+      const above = (id: string) =>
+        (document.getElementById(id)?.getBoundingClientRect().top ?? 0) < innerHeight / 3;
+      const passed = steps.filter(([id]) => above(id));
       setCurrentStep(atBottom ? steps[2][0] : (passed.at(-1) ?? steps[0])[0]);
+      const passedSection = sections.filter(([id]) => above(id));
+      setCurrentSection(atBottom ? "obs-links" : (passedSection.at(-1) ?? sections[0])[0]);
     };
     update();
     addEventListener("scroll", update, { passive: true });
@@ -342,6 +373,15 @@ export default function EditorPage() {
       document.getElementById(target)?.scrollIntoView({ block: "start" }),
     );
   }, [welcome, part]);
+  // Wide windows: the center column shows the preview that goes with the section on screen (chat, alerts),
+  // and the scene preview otherwise (T6.60).
+  useEffect(() => {
+    const side = document.querySelector<HTMLElement>(".editor-side");
+    if (welcome || !side || !matchMedia("(min-width: 1200px)").matches) return;
+    const target = sectionPreview[currentSection];
+    const el = target ? side.querySelector<HTMLElement>(target) : null;
+    side.scrollTo({ top: el ? el.offsetTop - 4 : 0 });
+  }, [welcome, currentSection]);
   const current = settings[scene];
 
   const updateAdvanced = (patch: Partial<Settings["advanced"]>) =>
@@ -534,14 +574,51 @@ export default function EditorPage() {
             </ol>
           </nav>
           <div className="editor-body">
+            {/* Wide windows only (editor.css); narrower ones use the steps bar above. */}
+            <nav className="editor-rail" aria-label="Sections">
+              <ol>
+                {sections.map(([id, name]) => (
+                  <li key={id}>
+                    <a
+                      href={`#${id}`}
+                      aria-current={currentSection === id ? "location" : undefined}
+                      onClick={(e) => {
+                        const colors = document.getElementById("part-colors");
+                        if (id === "part-colors" && colors instanceof HTMLDetailsElement)
+                          colors.open = true;
+                        jumpTo(e, id);
+                      }}
+                    >
+                      {name}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
             <form className="editor-form" onSubmit={(e) => e.preventDefault()}>
               <h2 id="step-look" className="editor-step" tabIndex={-1}>
                 {steps[0][1]}
               </h2>
               <fieldset aria-labelledby="step-look">
+                <div className="editor-pills" role="group" aria-label="Show looks">
+                  {(["All", "Calm", "Retro", "Bold"] as const).map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      aria-pressed={mood === m}
+                      onClick={() => setMood(m)}
+                    >
+                      {m}
+                    </button>
+                  ))}
+                </div>
                 <div className="editor-themes">
                   {themeIds.map((id) => (
-                    <label key={id} className="editor-card">
+                    <label
+                      key={id}
+                      className="editor-card"
+                      hidden={mood !== "All" && !(moods[mood] as readonly ThemeId[]).includes(id)}
+                    >
                       <ThemeShot id={id} />
                       <span className="editor-card-name">
                         <input
@@ -562,7 +639,7 @@ export default function EditorPage() {
               <h2 id="step-details" className="editor-step" tabIndex={-1}>
                 {steps[1][1]}
               </h2>
-              <fieldset id="part-scenes" className="editor-part">
+              <fieldset id="part-scenes" className="editor-part" tabIndex={-1}>
                 <legend>Scene to edit</legend>
                 <div className="editor-scenes">
                   {(Object.keys(overlays) as Scene[]).map((id) => (
@@ -739,7 +816,7 @@ export default function EditorPage() {
                 )}
               </fieldset>
 
-              <fieldset>
+              <fieldset id="part-socials" className="editor-part" tabIndex={-1}>
                 <legend>Your socials (shown on every scene)</legend>
                 {settings.socials.map((s, i) => (
                   <div key={i} className="editor-social">
@@ -791,7 +868,7 @@ export default function EditorPage() {
                 )}
               </fieldset>
 
-              <fieldset id="part-chat" className="editor-part">
+              <fieldset id="part-chat" className="editor-part" tabIndex={-1}>
                 <legend>Chat</legend>
                 <label>
                   Your Twitch channel name
@@ -896,11 +973,11 @@ export default function EditorPage() {
                 </details>
               </fieldset>
 
-              <fieldset id="part-alerts" className="editor-part">
+              <fieldset id="part-alerts" className="editor-part" tabIndex={-1}>
                 <legend>Alerts</legend>
                 <p className="editor-hint">Alerts use your channel name from Chat.</p>
-                <label>
-                  Alert volume: {settings.alerts.volume}%
+                <label className="editor-slider">
+                  Alert volume
                   <input
                     type="range"
                     min={0}
@@ -915,6 +992,7 @@ export default function EditorPage() {
                       }))
                     }
                   />
+                  <output aria-hidden>{settings.alerts.volume}%</output>
                 </label>
                 <p id="volume-hint" className="editor-hint">
                   0% turns the sound off. In OBS, tick “Control audio via OBS” on the Alerts source
@@ -974,7 +1052,7 @@ export default function EditorPage() {
                 </details>
               </fieldset>
 
-              <fieldset>
+              <fieldset id="part-logo" className="editor-part" tabIndex={-1}>
                 <legend>Logo (optional)</legend>
                 <label>
                   Link to your logo image (starts with https://)
@@ -1014,7 +1092,7 @@ export default function EditorPage() {
                 </p>
               </fieldset>
 
-              <details className="editor-advanced">
+              <details id="part-colors" className="editor-advanced editor-part" tabIndex={-1}>
                 <summary id="advanced-summary">Advanced: colors and fonts</summary>
                 <p className="editor-hint">
                   The theme already looks good. Change these only if you want your own brand colors.
@@ -1036,6 +1114,7 @@ export default function EditorPage() {
                         />
                         {colorNames[token]}
                       </label>
+                      <code className="editor-hex">{asHex(look[token]).toUpperCase()}</code>
                       {settings.advanced.colors[token] && (
                         <button
                           type="button"
@@ -1129,8 +1208,8 @@ export default function EditorPage() {
               </section>
               <AlertTester settings={settings} />
             </div>
+            <ObsLinks settings={settings} heading={steps[2][1]} />
           </div>
-          <ObsLinks settings={settings} heading={steps[2][1]} />
         </>
       )}
       <SiteFooter />

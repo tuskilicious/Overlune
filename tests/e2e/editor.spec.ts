@@ -290,6 +290,7 @@ test.describe("first visit (T6.16, T6.17)", () => {
 
 test.describe("steps (T6.18, T6.20)", () => {
   test("the steps bar jumps to each step and moves focus there", async ({ page }) => {
+    await page.setViewportSize({ width: 1100, height: 800 }); // wider windows have the section list (T6.60)
     const bar = page.getByRole("navigation", { name: "Steps" });
     await expect(bar.getByRole("link")).toHaveText([
       "1. Pick a look",
@@ -425,7 +426,7 @@ test("all 8 looks fit on a laptop screen without scrolling (T6.31)", async ({ pa
 });
 
 test("the steps bar marks the step on screen (T6.32)", async ({ page }) => {
-  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.setViewportSize({ width: 1100, height: 768 }); // wider windows have the section list (T6.60)
   const bar = page.getByRole("navigation", { name: "Steps" });
   const current = bar.locator('[aria-current="step"]');
   await expect(current).toHaveText("1. Pick a look");
@@ -983,4 +984,82 @@ test.describe("narrow editor window (T6.10)", () => {
     await expect(toggle(page)).toBeHidden();
     await expect(preview(page).locator(".scene")).toBeVisible();
   });
+});
+
+test.describe("three-column shell on wide windows (T6.60)", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+  });
+
+  test("the section list jumps to each section and marks it, and the preview follows", async ({
+    page,
+  }) => {
+    await expect(page.getByRole("navigation", { name: "Steps" })).toBeHidden();
+    const list = page.getByRole("navigation", { name: "Sections" });
+    await expect(list.getByRole("link")).toHaveText([
+      "Look",
+      "Text",
+      "Socials",
+      "Chat",
+      "Alerts",
+      "Logo",
+      "Colors",
+      "Links",
+    ]);
+    await list.getByRole("link", { name: "Chat" }).click();
+    await expect(page.locator("#part-chat")).toBeFocused();
+    await expect(list.getByRole("link", { name: "Chat" })).toHaveAttribute(
+      "aria-current",
+      "location",
+    );
+    await expect(page.locator(".editor-chat-preview")).toBeInViewport();
+    await list.getByRole("link", { name: "Colors" }).click();
+    await expect(page.getByLabel("Titles")).toBeVisible(); // the closed Advanced section opens
+    await list.getByRole("link", { name: "Links" }).click();
+    await expect(page.locator("#obs-links")).toBeFocused();
+    await expect(page).toHaveURL(/\/editor#1\./); // jumping never replaces the settings in the address
+    const scan = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(scan.violations).toEqual([]);
+  });
+
+  test("the preview sits between the section list and the settings", async ({ page }) => {
+    const x = async (sel: string) => (await page.locator(sel).first().boundingBox())!.x;
+    expect(await x(".editor-rail")).toBeLessThan(await x(".editor-side"));
+    expect(await x(".editor-side")).toBeLessThan(await x(".editor-form"));
+  });
+});
+
+test("look filters show only that group, with the names under each card (T6.60)", async ({
+  page,
+}) => {
+  const filters = page.getByRole("group", { name: "Show looks" });
+  await filters.getByRole("button", { name: "Retro" }).click();
+  await expect(filters.getByRole("button", { name: "Retro" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(page.locator(".editor-themes .editor-card:visible .editor-card-name")).toHaveText([
+    "Arcade 8-Bit",
+    "Vaporwave Sunset",
+  ]);
+  await filters.getByRole("button", { name: "All" }).click();
+  await expect(page.locator(".editor-themes .editor-card:visible")).toHaveCount(8);
+});
+
+test("colors show their hex value and the volume shows its number (T6.60)", async ({ page }) => {
+  await page.getByText("Advanced: colors and fonts").click();
+  await page.getByLabel("Titles").fill("#ff0000");
+  await expect(
+    page.locator(".editor-color", { hasText: "Titles" }).locator(".editor-hex"),
+  ).toHaveText("#FF0000");
+  const volume = page.getByLabel("Alert volume");
+  await volume.fill("40");
+  await expect(page.locator(".editor-slider output")).toHaveText("40%");
+});
+
+test("each link shows its size as chips (T6.60)", async ({ page }) => {
+  const chat = page.locator("#obs-links .editor-link", { hasText: "Chat" });
+  await expect(chat.locator(".editor-chip")).toHaveText(["Width 400", "Height 600"]);
 });

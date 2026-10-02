@@ -42,7 +42,8 @@ test("the guide covers every fix beginners need", async ({ page }) => {
 test("the size table matches the editor's links", async ({ page }) => {
   await page.goto("/editor");
   await page.getByRole("button", { name: "Clean Slate" }).click(); // first-visit gallery (T6.16)
-  const editorSizes = await page.locator("#obs-links .editor-link label > span").allInnerTexts();
+  // Text content, as screen readers get it: the sizes show as chips, with the dots kept but hidden (T6.60).
+  const editorSizes = await page.locator("#obs-links .editor-link label > span").allTextContents();
 
   await page.goto("/guide");
   const rows = page.getByRole("table", { name: "Sizes to type in" }).locator("tbody tr");
