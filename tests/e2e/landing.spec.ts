@@ -1,0 +1,66 @@
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "@playwright/test";
+import lz from "lz-string";
+
+// T6.34: "/" is the landing page for first-time visitors; the editor lives at /editor.
+
+const scan = (page: import("@playwright/test").Page) =>
+  new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+
+test("a first visit lands on the marketing page, which leads to the editor", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Free stream overlays that look pro.",
+  );
+  expect((await scan(page)).violations).toEqual([]);
+  await page.getByRole("link", { name: "Make your overlays" }).first().click();
+  await expect(page).toHaveURL(/\/editor$/);
+  await expect(page.getByRole("region", { name: "Pick a look to start" })).toBeVisible();
+});
+
+test("an old editor bookmark (/#1.…) opens the editor with its settings", async ({ page }) => {
+  const hash = `#1.${lz.compressToEncodedURIComponent(JSON.stringify({ starting: { title: "From an old bookmark" } }))}`;
+  await page.goto(`/${hash}`);
+  await expect(page).toHaveURL(new RegExp(`/editor#1\\.`));
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("From an old bookmark");
+});
+
+test("returning visitors with saved work skip the landing page", async ({ page }) => {
+  await page.goto("/editor");
+  await page.getByRole("button", { name: "Neon Grid" }).click();
+  await page.goto("about:blank");
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/editor/);
+  await expect(page.getByRole("radio", { name: "Neon Grid" })).toBeChecked();
+});
+
+test("the editor and overlays never load the landing page's animation library", async ({
+  page,
+}) => {
+  const gsap: string[] = [];
+  page.on("request", (r) => /gsap|LandingPage/i.test(r.url()) && gsap.push(r.url()));
+  await page.goto("/editor");
+  await page.getByRole("button", { name: "Clean Slate" }).click();
+  await page.goto("/o/starting");
+  await expect(page.locator(".scene")).toBeVisible();
+  expect(gsap).toEqual([]);
+});
+
+test("with reduced motion the page is still and fully visible", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await page.getByRole("heading", { name: "Live in three steps" }).scrollIntoViewIfNeeded();
+  await expect(page.getByRole("heading", { name: "Live in three steps" })).toHaveCSS(
+    "opacity",
+    "1",
+  );
+  await expect(page.locator(".landing-marquee")).toHaveCSS("animation-name", "none");
+});
+
+test("at phone width the page has no sideways scroll and stays accessible", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0);
+  expect((await scan(page)).violations).toEqual([]);
+});

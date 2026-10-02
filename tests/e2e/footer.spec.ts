@@ -25,7 +25,7 @@ for (const [path, title, line] of [
   ["/terms", "Overlune Terms of Use", "These terms are governed by the laws of"],
 ] as const) {
   test(`${path} shows the legal doc as a page in the site's style (T6.13)`, async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/editor");
     await page.getByRole("button", { name: "Clean Slate" }).click();
     await page
       .getByRole("contentinfo")
@@ -36,7 +36,7 @@ for (const [path, title, line] of [
     await expect(page.getByText("Self-written, not legal advice.")).toBeVisible();
     await expect(page.getByText(line)).toBeVisible();
     await expect(page.locator("main a").first()).toHaveAttribute("href", /^https:\/\//);
-    await expect(page.getByRole("link", { name: "Overlune editor" })).toHaveAttribute("href", "/");
+    await expect(page.getByRole("link", { name: "Overlune home" })).toHaveAttribute("href", "/");
     const scan = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
       .analyze();
