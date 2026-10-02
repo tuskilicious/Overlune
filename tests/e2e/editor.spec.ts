@@ -1115,3 +1115,21 @@ test("in the narrow settings column, a link's size chips sit together under its 
     "Starting Soon · Width 1920 · Height 1080",
   );
 });
+
+for (const width of [900, 1100, 1440]) {
+  test(`at ${width}px the preview never covers the links (T6.66)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+    const side = (await page.locator(".editor-side").boundingBox())!;
+    for (const row of await page.locator("#obs-links .editor-link").all()) {
+      const r = (await row.boundingBox())!;
+      const overlaps =
+        r.x < side.x + side.width &&
+        r.x + r.width > side.x &&
+        r.y < side.y + side.height &&
+        r.y + r.height > side.y;
+      expect(overlaps).toBe(false);
+    }
+    await page.getByRole("button", { name: "Copy Alerts link" }).click(); // reachable, not covered
+  });
+}
