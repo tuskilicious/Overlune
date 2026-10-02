@@ -642,3 +642,48 @@
   clip-path: none;
   animation-name: scene-wipe;
 }
+
+/* Vaporwave Sunset on the broadcast layout (T6.42): the title block, countdown and socials now sit along the
+   bottom, where the sun used to set, so the striped sun rises into the open top-right sky with a warm glow
+   (the broadcast background rule would otherwise replace the sunset gradient). The palms stay at the edges and
+   the right one crosses the sun. Text stays on purple. Audiowide is wide: smaller title and countdown keep
+   "Starting soon" on one line beside the card. */
+.scene[data-layout="broadcast"][data-bg="sunset"] {
+  background:
+    radial-gradient(circle at 78% 31%, rgb(255 107 107 / 0.45), transparent 460px),
+    linear-gradient(var(--bg) 0 60%, color-mix(in srgb, var(--bg) 82%, #000));
+}
+
+.scene[data-layout="broadcast"][data-bg="sunset"]::before {
+  left: auto;
+  right: 180px;
+  top: 96px;
+  bottom: auto;
+  width: 480px;
+  height: 480px;
+  transform: none;
+  /* The whole sun shows now, so the stripes move to its lower half, gaps widening toward the bottom. */
+  mask-image: linear-gradient(
+    #000 0 50%,
+    transparent 50% 52%,
+    #000 52% 59%,
+    transparent 59% 62%,
+    #000 62% 68%,
+    transparent 68% 72%,
+    #000 72% 77%,
+    transparent 77% 83%,
+    #000 83% 87%,
+    transparent 87% 94%,
+    #000 94%
+  );
+}
+
+.scene[data-layout="broadcast"][data-theme="vaporwave-sunset"] .scene-title {
+  font-size: 96px;
+  letter-spacing: 0;
+}
+
+.scene[data-layout="broadcast"][data-theme="vaporwave-sunset"] .countdown-time {
+  font-size: 88px;
+  letter-spacing: 0;
+}
