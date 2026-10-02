@@ -34,7 +34,7 @@ test("redesigned themes show socials as platform icons; classic themes as words 
   await expect(page.locator(".scene")).toHaveAttribute("data-layout", "broadcast");
   await expect(page.locator(".scene-socials .scene-icon")).toBeVisible();
   await expect(page.locator(".scene-socials .scene-platform")).toHaveText("Twitch"); // kept for screen readers
-  await page.goto(link({ theme: "neon-grid", socials }));
+  await page.goto(link({ theme: "vaporwave-sunset", socials }));
   await expect(page.locator(".scene")).toHaveAttribute("data-layout", "classic");
   await expect(page.locator(".scene-socials .scene-icon")).toBeHidden();
   await expect(page.locator(".scene-socials .scene-platform")).toBeVisible();

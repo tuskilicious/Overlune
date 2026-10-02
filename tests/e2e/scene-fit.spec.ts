@@ -45,3 +45,19 @@ test("a short title keeps the theme's full size", async ({ page }) => {
   await page.evaluate(() => document.fonts.ready);
   await expect(page.locator(".scene-title")).not.toHaveAttribute("style", /font-size/);
 });
+
+test("Neon Grid keeps the title block in the sky, above the horizon (T6.36)", async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.route("https://logos.example/logo.png", (r) =>
+    r.fulfill({ path: "public/images/brand/apple-touch-icon.png" }),
+  );
+  await page.goto(
+    `/o/starting#1.${lz.compressToEncodedURIComponent(JSON.stringify(longest("neon-grid")))}`,
+  );
+  await page.evaluate(() => document.fonts.ready);
+  const horizon = 1080 * 0.82;
+  for (const sel of [".scene-title", ".scene-subtitle", ".countdown"]) {
+    const box = (await page.locator(sel).boundingBox())!;
+    expect(box.y + box.height, sel).toBeLessThanOrEqual(horizon);
+  }
+});
