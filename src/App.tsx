@@ -1,7 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
-import { loadSaved } from "./settings/storage";
 import { sentryEnvironment } from "./lib/sentry";
 import EditorPage from "./editor/EditorPage";
 import SetupGuide from "./editor/SetupGuide";
@@ -23,11 +22,12 @@ const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
 // GSAP and Tailwind live in this chunk only, so the editor and overlays never load them.
 const LandingPage = lazy(() => import("./landing/LandingPage"));
 
-/** "/" is the landing page for first-time visitors (T6.34). The editor used to live here, so its old
- *  bookmarks ("/#1.…") and anyone with saved work go straight to /editor, keeping the settings. */
+/** "/" is always the landing page (T6.34, T6.67); returning visitors get a "Continue your overlay" button there.
+ *  The editor used to live here, so its old bookmarks ("/#1.…", a saved overlay) still open /editor with their
+ *  settings: old links never break. */
 function Home() {
   const { hash } = useLocation();
-  if (/^#\d+\./.test(hash) || loadSaved()) return <Navigate to={`/editor${hash}`} replace />;
+  if (/^#\d+\./.test(hash)) return <Navigate to={`/editor${hash}`} replace />;
   return (
     <Suspense fallback={null}>
       <LandingPage />

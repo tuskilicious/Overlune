@@ -25,13 +25,30 @@ test("an old editor bookmark (/#1.…) opens the editor with its settings", asyn
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("From an old bookmark");
 });
 
-test("returning visitors with saved work skip the landing page", async ({ page }) => {
+test("returning visitors land on the landing page and can continue their overlay (T6.67)", async ({
+  page,
+}) => {
   await page.goto("/editor");
   await page.getByRole("button", { name: "Neon Grid" }).click();
   await page.goto("about:blank");
   await page.goto("/");
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Free stream overlays that look pro.",
+  );
+  await page.getByRole("link", { name: "Continue your overlay" }).click();
   await expect(page).toHaveURL(/\/editor/);
   await expect(page.getByRole("radio", { name: "Neon Grid" })).toBeChecked();
+});
+
+test("the editor's logo leads back to the landing page (T6.67)", async ({ page }) => {
+  await page.goto("/editor");
+  await page.getByRole("button", { name: "Cozy Café" }).click();
+  await page.getByRole("link", { name: "Overlune home" }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Free stream overlays that look pro.",
+  );
 });
 
 test("the editor and overlays never load the landing page's animation library", async ({
