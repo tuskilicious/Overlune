@@ -1,39 +1,10 @@
+/* The countdown is a card on the right, beside the title block (docs/DESIGN.md "Scene layout (T6.35)"). */
 .countdown {
-  margin-top: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.countdown-time {
-  font-family: var(--font-heading);
-  font-size: 160px;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-}
-
-.countdown-at {
-  font-size: 32px;
-  color: var(--text-muted);
-}
-
-.countdown-done {
-  font-family: var(--font-heading);
-  font-size: 96px;
-  font-weight: 700;
-  color: var(--accent);
-  overflow-wrap: anywhere;
-}
-
-/* Broadcast layout (T6.35): the countdown is a card on the right, beside the title block. */
-.scene[data-layout="broadcast"] .countdown {
   grid-area: 3 / 2 / span 2;
-  margin: 0;
   min-width: 440px;
   padding: 40px 48px 36px;
+  display: flex;
+  flex-direction: column;
   align-items: flex-start;
   gap: 12px;
   background: var(--surface);
@@ -42,24 +13,33 @@
   box-shadow: var(--shadow);
 }
 
-.scene[data-layout="broadcast"] .countdown-time {
+.countdown-time {
+  font-family: var(--font-heading);
   font-size: 120px;
   font-weight: 700;
+  line-height: 1;
   letter-spacing: -0.03em;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
 }
 
-.scene[data-layout="broadcast"] .countdown-at {
+.countdown-at {
   font-size: 28px;
+  color: var(--text-muted);
 }
 
-.scene[data-layout="broadcast"] .countdown-done {
+.countdown-done {
+  font-family: var(--font-heading);
   font-size: 72px;
+  font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.02em;
+  color: var(--accent);
+  overflow-wrap: anywhere;
 }
 
 /* Arcade 8-Bit (T6.38): Press Start 2P is very wide, so the done text gets a pixel-font size. */
-.scene[data-layout="broadcast"][data-theme="arcade-8bit"] .countdown-done {
+.scene[data-theme="arcade-8bit"] .countdown-done {
   font-size: 44px;
   line-height: 1.3;
 }

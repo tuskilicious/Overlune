@@ -32,18 +32,31 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 0.4em;
+  gap: 0;
   overflow: hidden;
 }
 
+/* One calm panel instead of a card per message (T6.35). Messages still arrive and leave one at a time; hairlines
+   separate them, and only the ends of the stack are rounded. */
 .chat-msg {
   flex: none;
-  padding: 0.4em 0.6em;
+  padding: 0.55em 0.85em;
   background: var(--surface);
-  border: var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
   overflow-wrap: anywhere; /* long words and links wrap instead of widening the box */
+}
+
+.chat-msg + .chat-msg {
+  border-top: 1px solid color-mix(in srgb, var(--text) 9%, transparent);
+}
+
+.chat-msg:first-child {
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+}
+
+.chat-msg:last-child {
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
 }
 
 /* Reduced-motion version: index.css turns these off. Messages still leave on time (Chat.tsx removes them). */
@@ -111,16 +124,17 @@
   font-style: italic;
 }
 
+/* Small square-cornered tags tinted with the accent. */
 .chat-badge[data-style="pill"] {
   display: inline-block;
   margin-right: 0.3em;
-  padding: 0.05em 0.6em;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--surface);
-  font-size: 0.65em;
+  padding: 0.12em 0.45em;
+  border-radius: 0.3em;
+  background: color-mix(in srgb, var(--accent) 24%, var(--surface));
+  color: var(--text);
+  font-size: 0.6em;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   vertical-align: 0.15em;
 }
@@ -131,9 +145,8 @@
   vertical-align: middle;
 }
 
-/* Bold Esports: angled message boxes that wipe in fast. Extra side padding keeps text clear of the slant. */
+/* Bold Esports: angled message boxes that wipe in fast. The side padding keeps text clear of the slant. */
 .chat[data-enter="wipe"] .chat-msg {
-  padding-inline: 1em;
   clip-path: polygon(0.5em 0, 100% 0, calc(100% - 0.5em) 100%, 0 100%);
   animation: box-wipe var(--enter-ms) ease-out backwards;
 }
@@ -144,51 +157,15 @@
     chat-out 400ms ease-in calc(var(--fade-ms) - 400ms) forwards;
 }
 
-/* Broadcast layout (T6.35): one calm panel instead of a card per message. Messages still arrive and leave one at
-   a time; hairlines separate them, and only the ends of the stack are rounded. */
-.chat[data-layout="broadcast"] .chat-list {
-  gap: 0;
-}
-
-.chat[data-layout="broadcast"] .chat-msg {
-  padding: 0.55em 0.85em;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-}
-
-.chat[data-layout="broadcast"] .chat-msg + .chat-msg {
-  border-top: 1px solid color-mix(in srgb, var(--text) 9%, transparent);
-}
-
-.chat[data-layout="broadcast"] .chat-msg:first-child {
-  border-top-left-radius: var(--radius);
-  border-top-right-radius: var(--radius);
-}
-
-.chat[data-layout="broadcast"] .chat-msg:last-child {
-  border-bottom-left-radius: var(--radius);
-  border-bottom-right-radius: var(--radius);
-}
-
-.chat[data-layout="broadcast"] .chat-badge[data-style="pill"] {
-  padding: 0.12em 0.45em;
-  border-radius: 0.3em;
-  background: color-mix(in srgb, var(--accent) 24%, var(--surface));
-  color: var(--text);
-  font-size: 0.6em;
-  letter-spacing: 0.08em;
-}
-
 /* Neon Grid (T6.36): the theme's neon edge around the whole stack, not around each message. */
-.chat[data-layout="broadcast"][data-theme="neon-grid"] .chat-msg {
+.chat[data-theme="neon-grid"] .chat-msg {
   border-inline: var(--border);
 }
 
-.chat[data-layout="broadcast"][data-theme="neon-grid"] .chat-msg:first-child {
+.chat[data-theme="neon-grid"] .chat-msg:first-child {
   border-top: var(--border);
 }
 
-.chat[data-layout="broadcast"][data-theme="neon-grid"] .chat-msg:last-child {
+.chat[data-theme="neon-grid"] .chat-msg:last-child {
   border-bottom: var(--border);
 }

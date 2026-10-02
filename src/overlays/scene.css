@@ -1,12 +1,21 @@
+/* A composed 1920×1080 frame (docs/DESIGN.md "Scene layout (T6.35)"): logo top left, the title block anchored bottom left
+   under a short accent rule, the countdown as its own card on the right, and socials as an icon row along the
+   bottom edge. The margins sit inside the 64px safe margin. */
 .scene {
   box-sizing: border-box;
   width: 1920px;
   height: 1080px;
-  padding: 64px; /* safe margin, docs/DESIGN.md */
+  padding: 88px 112px 72px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
+  background:
+    radial-gradient(
+      70% 80% at 100% 0%,
+      color-mix(in srgb, var(--accent) 10%, transparent),
+      transparent 70%
+    ),
+    var(--bg);
   color: var(--text);
   font-family: var(--font-body);
 }
@@ -17,7 +26,8 @@
 }
 
 /* Neon Grid: a floor grid scrolling toward the viewer. Transform-only animation, so it stays on the GPU.
-   Reduced-motion version: index.css stops it and the grid stands still. */
+   Reduced-motion version: index.css stops it and the grid stands still. The horizon sits at 82%, so the title
+   block stays in the dark sky above it (T6.36). */
 .scene[data-bg="grid"] {
   position: relative;
   isolation: isolate; /* the grid layers sit above the scene background but under the content */
@@ -30,7 +40,7 @@
   z-index: -1;
   left: 0;
   right: 0;
-  top: 55%;
+  top: 82%;
   pointer-events: none;
 }
 
@@ -42,7 +52,7 @@
     linear-gradient(var(--accent) 2px, transparent 2px),
     linear-gradient(90deg, var(--accent) 2px, transparent 2px);
   background-size: 96px 96px;
-  opacity: 0.45;
+  opacity: 0.6;
   transform-origin: 50% 0;
   transform: perspective(480px) rotateX(70deg);
   animation: scene-grid 1.6s linear infinite;
@@ -50,7 +60,7 @@
 
 /* The horizon: a glowing line with the grid fading into the distance below it. */
 .scene[data-bg="grid"]::after {
-  height: 22%;
+  height: 8%; /* a short fade, so the floor stays visible in the low band */
   border-top: 2px solid var(--primary);
   box-shadow: 0 -16px 24px -12px var(--primary); /* glow above the line only */
   background: linear-gradient(var(--bg), transparent);
@@ -62,7 +72,8 @@
   }
 }
 
-/* Cozy Café: soft steam wisps rising from the bottom. Transform and opacity only (no blur filter).
+/* Cozy Café: soft steam wisps rising from the bottom, one in the gap between the title block and the countdown
+   card, one from behind the card (T6.37). Transform and opacity only (no blur filter).
    Reduced-motion version: index.css stops them and the wisps stand still. */
 .scene[data-bg="steam"] {
   position: relative;
@@ -86,11 +97,12 @@
 }
 
 .scene[data-bg="steam"]::before {
-  left: 12%;
+  left: 45%;
 }
 
 .scene[data-bg="steam"]::after {
-  right: 12%;
+  right: 14%;
+  bottom: 200px;
   animation-delay: -4.5s;
 }
 
@@ -160,8 +172,8 @@
   animation: scene-slide-fade var(--enter-ms) steps(4, end) both;
 }
 
-/* Pastel Cloud: a soft diagonal gradient with two puffy clouds drifting across. Transform-only animation.
-   Reduced-motion version: index.css stops them and the clouds stand still. */
+/* Pastel Cloud: a soft diagonal gradient with two puffy clouds drifting across the sky above a typical title
+   block (T6.39). Transform-only animation. Reduced-motion version: index.css stops them and the clouds stand still. */
 .scene[data-bg="clouds"] {
   position: relative;
   isolation: isolate;
@@ -187,12 +199,12 @@
 }
 
 .scene[data-bg="clouds"]::before {
-  top: 9%;
+  top: 7%;
   animation-delay: -20s;
 }
 
 .scene[data-bg="clouds"]::after {
-  top: 58%;
+  top: 31%;
   scale: 0.7;
   animation-duration: 95s;
   animation-delay: -60s;
@@ -204,17 +216,19 @@
   }
 }
 
-/* Forest Night: moonlight glowing in the top corner and fireflies that drift and blink.
-   Two firefly layers on different timings so they don't blink together. Transform and opacity only.
+/* Forest Night: a full moon in the open top-right corner and fireflies that drift and blink (T6.40).
+   Two firefly layers on different timings so they don't blink together, faded out above the title block so none
+   sits between the words like a stray full stop. Transform and opacity only.
    Reduced-motion version: index.css stops them and the fireflies stay lit. */
 .scene[data-bg="fireflies"] {
   position: relative;
   isolation: isolate;
   background:
     radial-gradient(
-      circle at 84% 10%,
-      color-mix(in srgb, var(--primary) 22%, transparent),
-      transparent 32%
+      circle at 84% 20%,
+      color-mix(in srgb, var(--primary) 90%, transparent) 0 64px,
+      color-mix(in srgb, var(--primary) 20%, transparent) 68px,
+      transparent 360px
     ),
     var(--bg);
 }
@@ -226,6 +240,7 @@
   z-index: -1;
   inset: 0;
   pointer-events: none;
+  mask-image: linear-gradient(to bottom, #000 46%, transparent 56%);
   animation: scene-fireflies 7s ease-in-out infinite alternate;
 }
 
@@ -269,16 +284,11 @@
   }
 }
 
-/* Bold Esports: the content wipes in left to right, and the socials bar is a parallelogram.
-   The shape is static, so it stays under reduced motion (index.css only stops the wipe). */
-.scene[data-enter="wipe"] .scene-main {
-  animation: scene-wipe var(--enter-ms) ease-out backwards;
-}
-
+/* Bold Esports: the content and the socials row wipe in left to right. Reduced-motion version: index.css stops
+   the wipe. */
+.scene[data-enter="wipe"] .scene-main,
 .scene[data-enter="wipe"] .scene-socials {
-  padding-inline: 56px;
-  clip-path: polygon(24px 0, 100% 0, calc(100% - 24px) 100%, 0 100%);
-  animation: box-wipe var(--enter-ms) ease-out backwards;
+  animation: scene-wipe var(--enter-ms) ease-out backwards;
 }
 
 @keyframes scene-wipe {
@@ -290,12 +300,15 @@
   }
 }
 
-/* Vaporwave Sunset: a purple sky that turns coral and orange only near the horizon (text stays on purple),
-   a striped sun sinking behind it, and palm silhouettes (public/images/themes). Static, so no reduced-motion version. */
+/* Vaporwave Sunset: a striped sun in the open top-right sky with a coral glow, and palm silhouettes at the edges
+   (public/images/themes), the right one crossing the sun (T6.42). The sky stays purple behind all text.
+   Static, so no reduced-motion version. */
 .scene[data-bg="sunset"] {
   position: relative;
   isolation: isolate;
-  background: linear-gradient(var(--bg) 0 68%, #ff6b6b 90%, #ffb86b);
+  background:
+    radial-gradient(circle at 78% 31%, rgb(255 107 107 / 0.45), transparent 460px),
+    linear-gradient(var(--bg) 0 60%, color-mix(in srgb, var(--bg) 82%, #000));
 }
 
 .scene[data-bg="sunset"]::before,
@@ -307,24 +320,25 @@
 }
 
 .scene[data-bg="sunset"]::before {
-  left: 50%;
-  bottom: -230px;
-  width: 560px;
-  height: 560px;
+  right: 180px;
+  top: 96px;
+  width: 480px;
+  height: 480px;
   border-radius: 50%;
-  transform: translateX(-50%);
   background: linear-gradient(#ffd36b, var(--accent));
-  /* The stripes: gaps that widen toward the bottom of the sun. */
+  /* The stripes, in the lower half: gaps that widen toward the bottom of the sun. */
   mask-image: linear-gradient(
-    #000 0 16%,
-    transparent 16% 18%,
-    #000 18% 24%,
-    transparent 24% 27%,
-    #000 27% 32%,
-    transparent 32% 36%,
-    #000 36% 40%,
-    transparent 40% 45%,
-    #000 45%
+    #000 0 50%,
+    transparent 50% 52%,
+    #000 52% 59%,
+    transparent 59% 62%,
+    #000 62% 68%,
+    transparent 68% 72%,
+    #000 72% 77%,
+    transparent 77% 83%,
+    #000 83% 87%,
+    transparent 87% 94%,
+    #000 94%
   );
 }
 
@@ -333,7 +347,7 @@
   background: url("/images/themes/vaporwave-palms.svg") center bottom / cover no-repeat;
 }
 
-/* Keeps subtitles and the countdown readable if a logo pushes them down over the sun. */
+/* A soft dark edge keeps the text crisp where it crosses the palms. */
 .scene[data-bg="sunset"] .scene-main {
   text-shadow: 0 2px 10px var(--bg);
 }
@@ -356,103 +370,36 @@
 
 .scene-main {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 24px;
-}
-
-.scene-logo {
-  max-width: 240px;
-  max-height: 240px;
-  border-radius: var(--radius);
-}
-
-.scene-title {
-  margin: 0;
-  font-family: var(--font-heading);
-  font-size: 120px;
-  font-weight: 700;
-  line-height: 1.05;
-  color: var(--primary);
-  overflow-wrap: anywhere;
-}
-
-.scene-subtitle {
-  margin: 0;
-  font-size: 44px;
-  color: var(--text-muted);
-  overflow-wrap: anywhere;
-}
-
-.scene-socials {
-  list-style: none;
-  margin: 0 auto;
-  padding: 20px 36px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px 48px;
-  font-size: 32px;
-  background: var(--surface);
-  border: var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-
-.scene-platform {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-/* Classic layout (themes not redesigned yet): platforms stay as words. */
-.scene[data-layout="classic"] .scene-icon {
-  display: none;
-}
-
-/* Broadcast layout (T6.35, docs/DESIGN.md): a composed 1920×1080 frame instead of text floating in the middle.
-   Logo top left, the title block anchored bottom left under a short accent rule, the countdown as its own card
-   on the right, and socials as an icon row along the bottom edge. */
-.scene[data-layout="broadcast"] {
-  padding: 88px 112px 72px;
-  background:
-    radial-gradient(
-      70% 80% at 100% 0%,
-      color-mix(in srgb, var(--accent) 10%, transparent),
-      transparent 70%
-    ),
-    var(--bg);
-}
-
-.scene[data-layout="broadcast"] .scene-main {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto minmax(0, 1fr) auto auto;
-  column-gap: 96px;
-  row-gap: 0;
+  gap: 0 96px;
   align-items: end;
   justify-items: start;
   text-align: left;
 }
 
-.scene[data-layout="broadcast"] .scene-logo {
+.scene-logo {
   grid-area: 1 / 1;
   align-self: start;
   max-width: 160px;
   max-height: 160px;
+  border-radius: var(--radius);
 }
 
-.scene[data-layout="broadcast"] .scene-title {
+.scene-title {
   grid-area: 3 / 1;
+  margin: 0;
+  font-family: var(--font-heading);
   font-size: 128px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.035em;
+  color: var(--primary);
+  overflow-wrap: anywhere;
 }
 
-.scene[data-layout="broadcast"] .scene-title::before {
+.scene-title::before {
   content: "";
   display: block;
   width: 96px;
@@ -462,28 +409,29 @@
   background: var(--accent);
 }
 
-.scene[data-layout="broadcast"] .scene-subtitle {
+.scene-subtitle {
   grid-area: 4 / 1;
   max-width: 34ch;
-  margin-top: 28px;
+  margin: 28px 0 0;
   font-size: 40px;
   line-height: 1.3;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
 }
 
-.scene[data-layout="broadcast"] .scene-socials {
+.scene-socials {
+  list-style: none;
   margin: 64px 0 0;
   padding: 32px 0 0;
+  display: flex;
+  flex-wrap: wrap;
   justify-content: flex-start;
   gap: 20px 64px;
   font-size: 30px;
-  background: none;
-  border: 0;
   border-top: 2px solid color-mix(in srgb, var(--text) 14%, transparent);
-  border-radius: 0;
-  box-shadow: none;
 }
 
-.scene[data-layout="broadcast"] .scene-socials li {
+.scene-socials li {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -494,14 +442,11 @@
   width: 1.15em;
   height: 1.15em;
   fill: currentColor;
-}
-
-.scene[data-layout="broadcast"] .scene-icon {
   color: var(--accent);
 }
 
 /* The icon says the platform; the word stays for screen readers and copy-paste. */
-.scene[data-layout="broadcast"] .scene-platform {
+.scene-platform {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -510,41 +455,28 @@
   white-space: nowrap;
 }
 
-.scene[data-layout="broadcast"] .scene-handle {
+.scene-handle {
   font-weight: 600;
 }
 
-/* Neon Grid on the broadcast layout (T6.36): the horizon drops to just above the bottom band, so the title and
-   countdown sit in the dark sky and never on the grid. The socials ride on the floor as a glowing panel. */
-.scene[data-layout="broadcast"][data-theme="neon-grid"] {
+/* Neon Grid (T6.36): the title and countdown sit in the dark sky, never on the grid. The socials ride on the
+   floor as a glowing panel. */
+.scene[data-theme="neon-grid"] {
   padding-bottom: 232px; /* keeps the title block above the horizon (82%) */
 }
 
-.scene[data-layout="broadcast"][data-bg="grid"]::before,
-.scene[data-layout="broadcast"][data-bg="grid"]::after {
-  top: 82%;
-}
-
-.scene[data-layout="broadcast"][data-bg="grid"]::after {
-  height: 8%; /* a short fade, so the floor stays visible in the low band */
-}
-
-.scene[data-layout="broadcast"][data-bg="grid"]::before {
-  opacity: 0.6;
-}
-
 /* Orbitron is wide: smaller sizes keep "Starting soon" on one line beside the countdown card. */
-.scene[data-layout="broadcast"][data-theme="neon-grid"] .scene-title {
+.scene[data-theme="neon-grid"] .scene-title {
   font-size: 100px;
   letter-spacing: -0.01em;
 }
 
-.scene[data-layout="broadcast"][data-theme="neon-grid"] .countdown-time {
+.scene[data-theme="neon-grid"] .countdown-time {
   font-size: 88px;
   letter-spacing: 0;
 }
 
-.scene[data-layout="broadcast"][data-theme="neon-grid"] .scene-socials {
+.scene[data-theme="neon-grid"] .scene-socials {
   position: absolute;
   left: 112px;
   bottom: 56px;
@@ -556,134 +488,49 @@
   box-shadow: var(--shadow);
 }
 
-/* Cozy Café on the broadcast layout (T6.37): the steam rises in the open space, one wisp in the gap between the
-   title block and the countdown card, one above the card, instead of behind the title. */
-.scene[data-layout="broadcast"][data-bg="steam"]::before {
-  left: 45%;
-}
-
-.scene[data-layout="broadcast"][data-bg="steam"]::after {
-  right: 14%;
-  bottom: 200px;
-}
-
-/* Arcade 8-Bit on the broadcast layout (T6.38): Press Start 2P is about one em per letter, so the title and the
+/* Arcade 8-Bit (T6.38): Press Start 2P is about one em per letter, so the title and the
    countdown get pixel-font sizes that fit side by side. Square accent rule to match the square corners. */
-.scene[data-layout="broadcast"][data-theme="arcade-8bit"] .scene-title {
+.scene[data-theme="arcade-8bit"] .scene-title {
   font-size: 68px;
   line-height: 1.3;
   letter-spacing: 0;
   overflow-wrap: break-word; /* whole words first; only an over-long word breaks */
 }
 
-.scene[data-layout="broadcast"][data-theme="arcade-8bit"] .scene-title::before {
+.scene[data-theme="arcade-8bit"] .scene-title::before {
   border-radius: 0;
 }
 
-.scene[data-layout="broadcast"][data-theme="arcade-8bit"] .countdown-time {
+.scene[data-theme="arcade-8bit"] .countdown-time {
   font-size: 56px;
   letter-spacing: 0;
   line-height: 1.2;
 }
 
-.scene[data-layout="broadcast"][data-theme="arcade-8bit"] .scene-subtitle {
+.scene[data-theme="arcade-8bit"] .scene-subtitle {
   max-width: 44ch; /* VT323 is monospace and narrow, so 34ch cut lines short */
 }
 
-/* Pastel Cloud on the broadcast layout (T6.39): keep the soft gradient (the broadcast background rule would
-   otherwise replace it), and let both clouds drift through the open sky above the title block. */
-.scene[data-layout="broadcast"][data-bg="clouds"] {
-  background: linear-gradient(160deg, var(--bg), color-mix(in srgb, var(--primary) 18%, #fff));
-}
-
-.scene[data-layout="broadcast"][data-bg="clouds"]::before {
-  top: 7%;
-}
-
-.scene[data-layout="broadcast"][data-bg="clouds"]::after {
-  top: 31%;
-}
-
-/* Forest Night on the broadcast layout (T6.40): the moon sits in the open top-right corner (the broadcast
-   background rule would otherwise replace its glow), and the fireflies stay in the sky above the title block, so
-   none sits between the words like a stray full stop. */
-.scene[data-layout="broadcast"][data-bg="fireflies"] {
-  background:
-    radial-gradient(
-      circle at 84% 20%,
-      color-mix(in srgb, var(--primary) 90%, transparent) 0 64px,
-      color-mix(in srgb, var(--primary) 20%, transparent) 68px,
-      transparent 360px
-    ),
-    var(--bg);
-}
-
-.scene[data-layout="broadcast"][data-bg="fireflies"]::before,
-.scene[data-layout="broadcast"][data-bg="fireflies"]::after {
-  mask-image: linear-gradient(to bottom, #000 46%, transparent 56%);
-}
-
-/* Bold Esports on the broadcast layout (T6.41): the angles move onto the new pieces. The accent rule and the
-   countdown card are parallelograms like the alert card; the socials row keeps its full-width hairline and wipes
-   in with the content instead of being cut into a slanted box. Static shapes, so they stay under reduced motion. */
-.scene[data-layout="broadcast"][data-theme="bold-esports"] .scene-title::before {
+/* Bold Esports (T6.41): the accent rule and the countdown card are parallelograms like the alert card.
+   Static shapes, so they stay under reduced motion. */
+.scene[data-theme="bold-esports"] .scene-title::before {
   width: 120px;
   height: 10px;
   clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
 }
 
-.scene[data-layout="broadcast"][data-theme="bold-esports"] .countdown {
+.scene[data-theme="bold-esports"] .countdown {
   padding-inline: 88px; /* 48px plus the 40px slant */
   clip-path: polygon(40px 0, 100% 0, calc(100% - 40px) 100%, 0 100%);
 }
 
-.scene[data-layout="broadcast"][data-theme="bold-esports"] .scene-socials {
-  padding-inline: 0;
-  clip-path: none;
-  animation-name: scene-wipe;
-}
-
-/* Vaporwave Sunset on the broadcast layout (T6.42): the title block, countdown and socials now sit along the
-   bottom, where the sun used to set, so the striped sun rises into the open top-right sky with a warm glow
-   (the broadcast background rule would otherwise replace the sunset gradient). The palms stay at the edges and
-   the right one crosses the sun. Text stays on purple. Audiowide is wide: smaller title and countdown keep
-   "Starting soon" on one line beside the card. */
-.scene[data-layout="broadcast"][data-bg="sunset"] {
-  background:
-    radial-gradient(circle at 78% 31%, rgb(255 107 107 / 0.45), transparent 460px),
-    linear-gradient(var(--bg) 0 60%, color-mix(in srgb, var(--bg) 82%, #000));
-}
-
-.scene[data-layout="broadcast"][data-bg="sunset"]::before {
-  left: auto;
-  right: 180px;
-  top: 96px;
-  bottom: auto;
-  width: 480px;
-  height: 480px;
-  transform: none;
-  /* The whole sun shows now, so the stripes move to its lower half, gaps widening toward the bottom. */
-  mask-image: linear-gradient(
-    #000 0 50%,
-    transparent 50% 52%,
-    #000 52% 59%,
-    transparent 59% 62%,
-    #000 62% 68%,
-    transparent 68% 72%,
-    #000 72% 77%,
-    transparent 77% 83%,
-    #000 83% 87%,
-    transparent 87% 94%,
-    #000 94%
-  );
-}
-
-.scene[data-layout="broadcast"][data-theme="vaporwave-sunset"] .scene-title {
+/* Vaporwave Sunset (T6.42): Audiowide is wide, so a smaller title and countdown stay side by side. */
+.scene[data-theme="vaporwave-sunset"] .scene-title {
   font-size: 96px;
   letter-spacing: 0;
 }
 
-.scene[data-layout="broadcast"][data-theme="vaporwave-sunset"] .countdown-time {
+.scene[data-theme="vaporwave-sunset"] .countdown-time {
   font-size: 88px;
   letter-spacing: 0;
 }

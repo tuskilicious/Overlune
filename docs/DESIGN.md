@@ -31,7 +31,7 @@ Every theme defines exactly these tokens (`src/themes/types.ts`):
 The starting palettes below are suggestions. Verify contrast before shipping each theme.
 
 ### Launch set
-**1. Clean Slate:** minimal, one accent color. First theme on the broadcast layout (T6.35).
+**1. Clean Slate:** minimal, one accent color. Pilot of the scene layout redesign (T6.35).
 - Colors: bg `#121418`, surface `#1C1F26`, primary `#E8EAED`, accent `#4F8CFF`, muted `#8A919E`
 - Fonts: Inter / Inter
 - Shape: radius 8, subtle slide and fade (300ms)
@@ -86,8 +86,8 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 - Alerts render centered-top by default, with no background outside the alert box.
 - Error states use the theme's surface and text colors, stay readable, and never flash.
 
-### Broadcast layout (overlay redesign, T6.35)
-Themes move from the original centered "classic" layout to a composed "broadcast" layout one at a time (`layout` in the theme; `data-layout` on `.scene`, `.chat` and `.alerts`). Theme ids, settings and links don't change, so pasted links pick up the new design.
+### Scene layout (T6.35)
+All 8 themes share one composed layout, rolled out one theme at a time (T6.35-T6.42); the original centered layout was retired in T6.43. Theme ids, settings and links never changed, so pasted links picked up the new design. Per-theme tweaks key on `data-theme` (and `data-bg` for background effects) on `.scene`, `.chat` and `.alerts`.
 - **Scenes:** 88px top / 112px side / 72px bottom margins (inside the 64px safe margin). Logo top left (160px max). Title block anchored bottom left: a 96×8px accent rule, the title (128px, tight tracking, shrinks to fit per T6.26), then the subtitle (40px, 34ch max). The countdown is a surface card on the right, bottom-aligned with the title block. Socials run along the bottom edge as an icon row (Simple Icons, accent color) with the handle; a hairline separates them from the content. The platform word stays in the DOM, visually hidden, for screen readers.
 - **Alerts:** still centered at the top. A wider card (760-1100px) with a 6px accent band, an uppercase event label ("Raid", "New subscriber", "Resub", "Gift subs", "Cheer"), then the streamer's message at 56px; resub and cheer text below in the muted color.
 - **Chat:** one panel instead of a card per message: no borders between cards, hairline separators, only the top and bottom of the stack rounded. Badges are small square-cornered tags tinted with the accent.
@@ -95,7 +95,7 @@ Themes move from the original centered "classic" layout to a composed "broadcast
 - **Neon Grid (T6.36):** horizon at 82% with the content kept above it; socials float on the grid floor as a glowing panel; smaller type for the wide Orbitron; the chat stack has one neon edge.
 - **Cozy Café (T6.37):** the steam wisps rise in the open space (between the title block and the countdown card, and from behind the card) instead of behind the title.
 - **Arcade 8-Bit (T6.38):** pixel-font sizes (title 68px, countdown 56px, done text 44px) so the title and countdown sit side by side; square accent rule; wider subtitle measure for VT323.
-- **Pastel Cloud (T6.39):** both clouds drift through the upper sky, clear of a typical title block; the theme's gradient background is kept on the broadcast layout.
+- **Pastel Cloud (T6.39):** both clouds drift through the upper sky, clear of a typical title block; the theme keeps its own gradient background.
 - **Forest Night (T6.40):** a full moon (soft-edged disc with a halo) sits in the open top-right corner; the fireflies fade out above a typical title block, so none lands between the words.
 - **Bold Esports (T6.41):** the angles move onto the new pieces: a slanted accent rule and a parallelogram countdown card, matching the angled alert card and chat messages. The socials row keeps its full-width hairline and wipes in with the content.
 - **Vaporwave Sunset (T6.42):** the content now fills the bottom where the sun used to set, so the striped sun (480px, stripes in its lower half) rises into the open top-right sky with a coral glow, and the right palm crosses it. The sky stays purple behind all text. Smaller Audiowide sizes (title 96px, countdown 88px) keep the title on one line.

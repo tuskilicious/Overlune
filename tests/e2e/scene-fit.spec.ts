@@ -63,17 +63,11 @@ test("Neon Grid keeps the title block in the sky, above the horizon (T6.36)", as
 });
 
 for (const theme of themeIds) {
-  test(`${theme}: on the broadcast layout, "Starting soon" stays on one line beside the countdown`, async ({
-    page,
-  }) => {
+  test(`${theme}: "Starting soon" stays on one line beside the countdown`, async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     const data = { theme, starting: { endsAt: Date.now() + 2 * 86_400_000 } };
     await page.goto(`/o/starting#1.${lz.compressToEncodedURIComponent(JSON.stringify(data))}`);
     await page.evaluate(() => document.fonts.ready);
-    test.skip(
-      (await page.locator(".scene").getAttribute("data-layout")) !== "broadcast",
-      "not redesigned yet",
-    );
     // The accent rule is drawn inside the heading (::before), so leave it out of the line count.
     const lines = await page.locator(".scene-title").evaluate((el) => {
       const rule = getComputedStyle(el, "::before");
@@ -131,7 +125,7 @@ test("Forest Night's fireflies fade out above the title block (T6.40)", async ({
   expect(fadeEnd).toBeLessThanOrEqual(titleTop);
 });
 
-test("Bold Esports keeps its angles on the broadcast layout without cutting the socials divider (T6.41)", async ({
+test("Bold Esports keeps its angles without cutting the socials divider (T6.41)", async ({
   page,
 }) => {
   await page.goto(
@@ -147,7 +141,7 @@ test("Bold Esports keeps its angles on the broadcast layout without cutting the 
   await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
   const clip = (sel: string) => page.locator(sel).evaluate((el) => getComputedStyle(el).clipPath);
   expect(await clip(".countdown")).toContain("polygon");
-  // The slanted box clip from the classic layout would trim the start of the divider line.
+  // A slanted box clip on the socials row would trim the start of the divider line.
   expect(await clip(".scene-socials")).toBe("none");
 });
 

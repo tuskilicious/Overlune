@@ -38,9 +38,6 @@ export type BgEffect = "none" | "grid" | "steam" | "scanlines" | "clouds" | "fir
 export type AnimId = "slide-fade" | "bounce" | "steps" | "wipe";
 export type AlertAnimId = "slide-fade" | "glitch" | "bounce" | "steps" | "wipe";
 export type BadgeStyle = "pill";
-/** How scenes, chat and alerts are composed (T6.35). "classic" is the original centered layout; themes move to
- *  "broadcast" one at a time as they are redesigned, then "classic" goes away. */
-export type LayoutId = "classic" | "broadcast";
 
 export interface Anim {
   id: AnimId;
@@ -73,6 +70,4 @@ export interface Theme {
   /** File in public/sounds (licensed, see docs/ASSETS.md), or null for a silent theme. */
   alertSound: string | null;
   badgeStyle: BadgeStyle;
-  /** Defaults to "classic". */
-  layout?: LayoutId;
 }

@@ -20,5 +20,4 @@ export const pastelCloud: Theme = {
   alertAnim: "bounce",
   alertSound: "pastel-cloud.ogg",
   badgeStyle: "pill",
-  layout: "broadcast",
 };

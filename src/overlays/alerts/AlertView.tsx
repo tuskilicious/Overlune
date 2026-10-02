@@ -8,7 +8,7 @@ import "../../themes/fonts";
 import { applyOverrides, themeVars } from "../../themes/vars";
 import "./alerts.css";
 
-/** What happened, above the message (broadcast layout). The message itself is the streamer's template. */
+/** What happened, above the message. The message itself is the streamer's template. */
 const kindLabel = {
   raid: "Raid",
   sub: "New subscriber",
@@ -29,13 +29,7 @@ export default function AlertView({ settings, alert, error }: Props) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
   const style = { ...themeVars(theme), "--alert-ms": `${ALERT_MS}ms` } as CSSProperties;
   return (
-    <div
-      className="alerts"
-      data-anim={theme.alertAnim}
-      data-layout={theme.layout ?? "classic"}
-      data-theme={theme.id}
-      style={style}
-    >
+    <div className="alerts" data-anim={theme.alertAnim} data-theme={theme.id} style={style}>
       {error}
       {alert && (
         <div className="alert-box" data-kind={alert.kind}>
