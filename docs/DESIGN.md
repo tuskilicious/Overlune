@@ -160,7 +160,12 @@ Write for a streamer opening OBS for the first time: concise, confident, helpful
 
 ### Landing page (`/`)
 - The one page built with Tailwind and GSAP (STACK.md). It uses the same brand tokens, exposed as Tailwind colors (`night`, `deep`, `moon`, `haze`, `violet`, …) and fonts (`font-heading`, `font-body`) in `src/landing/landing.css`.
-- Images are real Overlune scenes rendered live (the editor's `Preview`) with the same sample content as the look cards, never stock photos. Only the hero scene moves; the rest are held still (`landing-still`).
+- Images are real Overlune scenes rendered live (the editor's `Preview`) with the same sample content as the look cards, never stock photos. Only the hero moves; the rest are held still (`landing-still`).
+- **Hero (T6.59):** the whole kit. A live scene in a 16:9 stream frame with a small Signal Cyan LIVE badge, two real alert cards in the same look (over the frame's empty top-left on wide screens, under it on phones), and the three scene names with the current one filled. It tours a look and a scene every 4.5 seconds. A "Pause the looks" button stops the tour and holds the scene still (WCAG 2.2.2); with reduced motion it starts paused on Vaporwave Sunset. Under the buttons, a fact row: 8 looks, Scenes, chat and alerts, One link per overlay, Free, no account.
+- **Night sky (T6.59):** CSS only, static: a few small stars, a soft violet arc and a crescent moon behind the hero. No image files.
+- **Glow (T6.59):** the page's one gradient is the hero frame's edge (Lune Violet to Signal Cyan) with a soft glow, and the hero's primary button gets a matching glow. No other card or button glows.
+- **Overlay cards (T6.59):** Starting Soon, Be Right Back, Stream Ending, Chat and Alerts, each a live thumbnail that opens its part of the editor (`/editor?part=starting|brb|ending|chat|alerts`; a first visit picks a look first).
+- **Nav (T6.59):** the link for the section in the middle of the window is underlined in Lune Violet (`aria-current="location"`).
 - Motion: scroll reveals, a pinned theme gallery (1024px and wider), a word-by-word reveal that starts at 40% opacity so large text keeps 3:1 contrast, and CSS hover zooms. All GSAP runs inside `gsap.matchMedia("(prefers-reduced-motion: no-preference)")`; with reduced motion the page is static and fully visible.
 - One filled button style (Lune Violet, Night text). No meta-labels ("SECTION 01"), no invented reviews or stats.
 - Responsive down to 390px with no sideways scroll (e2e check).

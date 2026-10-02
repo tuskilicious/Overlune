@@ -104,8 +104,9 @@ test("the alert pictures show whole alert cards, large enough to read (T6.48)", 
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto("/");
-  await expect(page.locator(".landing-alert .alert-box")).toHaveCount(2);
-  const crops = await page.locator(".landing-alert .editor-preview").evaluateAll((els) =>
+  const card = page.locator("li", { hasText: "Alerts with sound" });
+  await expect(card.locator(".landing-alert .alert-box")).toHaveCount(2);
+  const crops = await card.locator(".landing-alert .editor-preview").evaluateAll((els) =>
     els.map((el) => {
       const crop = el.getBoundingClientRect();
       const box = el.querySelector(".alert-box")!.getBoundingClientRect();
@@ -133,3 +134,81 @@ for (const width of [390, 768, 1024, 1280, 1440]) {
       expect(w).toBeGreaterThanOrEqual(200);
   });
 }
+
+// T6.59: the hero shows the whole kit, touring the looks; it can be paused, and reduced motion starts it paused.
+test("the hero kit tours the looks and scenes, and Pause stops it", async ({ page }) => {
+  await page.clock.install();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const kit = page.locator("figure[data-kit]");
+  await expect(kit.locator(".scene")).toHaveCount(1);
+  await expect(kit.getByText("LIVE", { exact: true })).toBeVisible();
+  await expect(kit.locator(".alert-box")).toHaveCount(2);
+  const tags = kit.getByRole("list", { name: "Scenes in every look" }).getByRole("listitem");
+  await expect(tags).toHaveText(["Starting Soon", "Be Right Back", "Stream Ending"]);
+  await expect(tags.first()).toHaveAttribute("aria-current", "true");
+  await expect(kit).toHaveAttribute("data-kit", "vaporwave-sunset");
+
+  await page.clock.runFor(4600);
+  await expect(kit).toHaveAttribute("data-kit", "cozy-cafe");
+  await expect(tags.nth(1)).toHaveAttribute("aria-current", "true");
+
+  await page.getByRole("button", { name: "Pause the looks" }).click();
+  await page.clock.runFor(10_000);
+  await expect(kit).toHaveAttribute("data-kit", "cozy-cafe");
+  await expect(page.getByRole("button", { name: "Play the looks" })).toBeVisible();
+});
+
+test("with reduced motion the hero kit starts paused on one look", async ({ page }) => {
+  await page.clock.install();
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const kit = page.locator("figure[data-kit]");
+  await expect(page.getByRole("button", { name: "Play the looks" })).toBeVisible();
+  await page.clock.runFor(10_000);
+  await expect(kit).toHaveAttribute("data-kit", "vaporwave-sunset");
+});
+
+test("the hero lists four facts, all true for v1", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("list", { name: "At a glance" }).getByRole("listitem")).toHaveText([
+    "8 looks",
+    "Scenes, chat and alerts",
+    "One link per overlay",
+    "Free, no account",
+  ]);
+});
+
+test("each overlay card opens its part of the editor", async ({ page }) => {
+  await page.goto("/");
+  const cards = page.getByRole("region", { name: "Five overlays in every look" }).getByRole("link");
+  await expect(cards).toHaveCount(5);
+  const hrefs = await cards.evaluateAll((els) => els.map((el) => el.getAttribute("href")));
+  expect(hrefs).toEqual(
+    ["starting", "brb", "ending", "chat", "alerts"].map((p) => `/editor?part=${p}`),
+  );
+
+  await cards.filter({ hasText: "Be Right Back" }).click();
+  // A first visit picks a look first; the part opens after that.
+  await page.getByRole("button", { name: "Cozy Café" }).click();
+  await expect(page.getByRole("radio", { name: "Be Right Back" })).toBeChecked();
+  await expect(page.locator("#part-scenes")).toBeInViewport();
+});
+
+test("the chat card opens the chat settings", async ({ page }) => {
+  await page.goto("/editor?part=chat");
+  await page.getByRole("button", { name: "Neon Grid" }).click();
+  await expect(page.locator("#part-chat")).toBeInViewport();
+});
+
+test("the nav marks the section in view", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const how = page
+    .getByRole("navigation", { name: "Main" })
+    .getByRole("link", { name: "How it works" });
+  await expect(how).not.toHaveAttribute("aria-current");
+  await page.locator("#how").scrollIntoViewIfNeeded();
+  await page.evaluate(() => scrollBy(0, -200));
+  await expect(how).toHaveAttribute("aria-current", "location");
+});

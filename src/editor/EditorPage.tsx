@@ -174,6 +174,15 @@ const freshSettings = (): Settings => ({
 });
 const freshJson = JSON.stringify(freshSettings());
 
+/** Where each ?part= value lands (T6.59). */
+const partTargets: Record<string, string> = {
+  starting: "part-scenes",
+  brb: "part-scenes",
+  ending: "part-scenes",
+  chat: "part-chat",
+  alerts: "part-alerts",
+};
+
 /** Survives a trip to the setup guide and back, so the gallery isn't shown twice in one visit. */
 let pickedThisVisit = false;
 
@@ -220,7 +229,11 @@ function initialState(): { settings: Settings; status: string } {
 export default function EditorPage() {
   const [initial] = useState(initialState);
   const [settings, setSettings] = useState<Settings>(initial.settings);
-  const [scene, setScene] = useState<Scene>("starting");
+  /** A landing-page card can open one part of the editor: /editor?part=brb (T6.59). Read once. */
+  const [part] = useState(() => new URLSearchParams(location.search).get("part"));
+  const [scene, setScene] = useState<Scene>(
+    part === "brb" || part === "ending" ? part : "starting",
+  );
   /** Narrow windows only: whether the docked preview is expanded. */
   const [previewOpen, setPreviewOpen] = useState(false);
   /** The long time zone list stays hidden until "Change" (T6.11). */
@@ -321,6 +334,14 @@ export default function EditorPage() {
     addEventListener("scroll", update, { passive: true });
     return () => removeEventListener("scroll", update);
   }, [welcome]);
+  // Bring that part into view once the editor shows (after the gallery on a first visit).
+  useEffect(() => {
+    const target = part && partTargets[part];
+    if (welcome || !target) return;
+    requestAnimationFrame(() =>
+      document.getElementById(target)?.scrollIntoView({ block: "start" }),
+    );
+  }, [welcome, part]);
   const current = settings[scene];
 
   const updateAdvanced = (patch: Partial<Settings["advanced"]>) =>
@@ -484,7 +505,7 @@ export default function EditorPage() {
                     // Open at the top with the preview in view; focus still lands on the picked look (T6.29).
                     requestAnimationFrame(() => {
                       document.getElementById(`theme-${id}`)?.focus({ preventScroll: true });
-                      scrollTo(0, 0);
+                      if (!part) scrollTo(0, 0); // ?part= scrolls to its own place
                     });
                   }}
                 >
@@ -541,7 +562,7 @@ export default function EditorPage() {
               <h2 id="step-details" className="editor-step" tabIndex={-1}>
                 {steps[1][1]}
               </h2>
-              <fieldset>
+              <fieldset id="part-scenes" className="editor-part">
                 <legend>Scene to edit</legend>
                 <div className="editor-scenes">
                   {(Object.keys(overlays) as Scene[]).map((id) => (
@@ -770,7 +791,7 @@ export default function EditorPage() {
                 )}
               </fieldset>
 
-              <fieldset>
+              <fieldset id="part-chat" className="editor-part">
                 <legend>Chat</legend>
                 <label>
                   Your Twitch channel name
@@ -875,7 +896,7 @@ export default function EditorPage() {
                 </details>
               </fieldset>
 
-              <fieldset>
+              <fieldset id="part-alerts" className="editor-part">
                 <legend>Alerts</legend>
                 <p className="editor-hint">Alerts use your channel name from Chat.</p>
                 <label>

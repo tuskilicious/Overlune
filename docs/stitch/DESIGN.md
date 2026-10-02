@@ -2,7 +2,7 @@
 
 For prompting Google Stitch to make new Overlune site screens (the landing page, editor, setup guide and legal pages). The full rules live in `docs/DESIGN.md` and `docs/BRAND.md`; this file restates them in Stitch's descriptive style. If the two disagree, `docs/DESIGN.md` wins.
 
-**Brand overrides.** Overlune's brand is violet on deep navy, set by the owner. Where generic taste rules ban purple or ask for Inter alternatives like Geist, the brand wins: Lune Violet is the one accent, and Quicksand and Nunito are the fonts. What stays banned is how purple usually goes wrong: glows, neon gradients, gradient buttons and gradient text.
+**Brand overrides.** Overlune's brand is violet on deep navy, set by the owner. Where generic taste rules ban purple or ask for Inter alternatives like Geist, the brand wins: Lune Violet is the one accent, and Quicksand and Nunito are the fonts. What stays banned is how purple usually goes wrong: glows (beyond the one hero frame and its button), neon gradients, gradient buttons and gradient text.
 
 ## 1. Visual Theme & Atmosphere
 A night sky with the lights low. Overlune's own chrome is quiet, deep navy and calm so the overlay themes it shows (bright, loud, each with its own look) are always the loudest thing on screen. The mood is friendly and confident, like a streamer friend who knows OBS: rounded type, soft corners, plain words, no hype.
@@ -68,7 +68,7 @@ All screens are dark. Every text pair meets WCAG AA (4.5:1 for text, 3:1 for con
 - No emojis.
 - No Inter, no serif fonts, no third font.
 - No pure black (#000000); the darkest color is Night (#05061A).
-- No glows, neon outer shadows, or purple button glows. No drop shadows on cards.
+- No glows or neon outer shadows, except the landing hero's stream frame edge and its primary button. No drop shadows on cards.
 - No gradient text, gradient buttons, or the crescent gradient outside the logo.
 - No second accent color and no second filled-button style.
 - No centered hero, no three equal cards in a row, no overlapping text.
