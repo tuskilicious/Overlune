@@ -33,6 +33,7 @@ import { channelFromInput } from "../twitch/irc";
 import AlertTester from "./AlertTester";
 import ObsLinks, { overlays, type OverlayId as Scene } from "./ObsLinks";
 import Preview from "./Preview";
+import { sampleScene } from "./scene-samples";
 import SiteFooter from "../components/SiteFooter";
 import "./editor.css";
 
@@ -176,10 +177,11 @@ const freshJson = JSON.stringify(freshSettings());
 /** Survives a trip to the setup guide and back, so the gallery isn't shown twice in one visit. */
 let pickedThisVisit = false;
 
-/** Each theme's Starting Soon scene with fresh settings, for the picture cards (T6.16, T6.17). */
-const shots = Object.fromEntries(
-  themeIds.map((id) => [id, { ...freshSettings(), theme: id }]),
-) as Record<ThemeId, Settings>;
+/** Each theme's Starting Soon scene with sample content, for the picture cards (T6.16, T6.17, T6.47). */
+const shots = Object.fromEntries(themeIds.map((id) => [id, sampleScene(id)])) as Record<
+  ThemeId,
+  Settings
+>;
 
 /** A theme's Starting Soon scene as a still picture: animations stay off (editor.css), so 8 cards stay light. */
 const ThemeShot = ({ id }: { id: ThemeId }) => (

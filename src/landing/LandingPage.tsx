@@ -7,10 +7,10 @@ import { testAlerts } from "../alerts/events";
 import SiteFooter from "../components/SiteFooter";
 import { chatSamples } from "../editor/chat-samples";
 import Preview from "../editor/Preview";
+import { sampleScene } from "../editor/scene-samples";
 import AlertView from "../overlays/alerts/AlertView";
 import ChatView from "../overlays/chat/ChatView";
 import StartingSoon from "../overlays/starting/StartingSoon";
-import { defaultSettings, type Settings } from "../settings/schema";
 import { themes } from "../themes";
 import { themeIds, type ThemeId } from "../themes/types";
 import "../editor/brand"; // brand fonts (Quicksand, Nunito)
@@ -18,14 +18,12 @@ import "./landing.css";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const look = (theme: ThemeId): Settings => ({ ...defaultSettings, theme });
-
 /** A theme's real Starting Soon scene as a picture. `live` keeps its motion (the hero); the rest hold still. */
 function Scene({ theme, live = false }: { theme: ThemeId; live?: boolean }) {
   return (
     <div className={live ? undefined : "landing-still"}>
       <Preview>
-        <StartingSoon settings={look(theme)} />
+        <StartingSoon settings={sampleScene(theme)} />
       </Preview>
     </div>
   );
@@ -235,7 +233,7 @@ export default function LandingPage() {
                 </div>
                 <div className="landing-still w-36 shrink-0 overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:scale-105">
                   <Preview width={400} height={600}>
-                    <ChatView settings={look("pastel-cloud")} messages={chatSamples} />
+                    <ChatView settings={sampleScene("pastel-cloud")} messages={chatSamples} />
                   </Preview>
                 </div>
               </li>
@@ -249,7 +247,7 @@ export default function LandingPage() {
                 <div className="landing-still mt-4 overflow-hidden rounded-xl bg-night transition-transform duration-700 ease-out group-hover:scale-105">
                   {/* Only the top of the 1920×1080 canvas, where the alert sits. */}
                   <Preview height={300}>
-                    <AlertView settings={look("bold-esports")} alert={testAlerts[0]!} />
+                    <AlertView settings={sampleScene("bold-esports")} alert={testAlerts[0]!} />
                   </Preview>
                 </div>
               </li>
