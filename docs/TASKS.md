@@ -257,3 +257,23 @@ Started with the `/design-taste-frontend` skill after an audit of all 8 themes: 
   - Accept (T6.36-T6.42): same rules as T6.35 for that theme, the theme's own character carried into the new composition, contrast test still passes, OBS test.
 - [x] **T6.43 Retire the classic layout.** Once all 8 are on broadcast, remove the `layout` field, the classic-only CSS and the hidden platform words' classic display.
   - *Built 2026-10-02 on `feat/retire-classic-layout` (stacked on Vaporwave Sunset). The `layout` field, `LayoutId` and the `data-layout` attribute are gone. The broadcast rules are now the base rules in `scene.css`, `starting.css`, `chat.css` and `alerts.css`; per-theme fixes moved into each background effect (grid horizon, steam, clouds, moon and fireflies, sun). Also removed: classic rules the broadcast ones had been overriding (the slanted socials box and the extra wipe padding on chat and alerts). 220 fewer lines of CSS. Checked pixel for pixel: all 8 themes × 7 views (Starting Soon, BRB, Stream Ending, long text, countdown done, alert, chat) render byte-identical before and after (reduced motion, fixed clock). Tests drop the classic-layout skip. Passed in OBS (2026-10-02) in the PR #74-#77 batch (PR #77).*
+
+### From the third walkthrough (2026-10-02)
+Found by going through the live site after the overlay redesign (T6.35-T6.43). Most come from the new scene layout: titles now sit at the bottom of the frame, and the places that show scenes as pictures were set up for the old centered layout. One branch and PR per task, stacked. None changes an overlay, so the owner checks the preview instead of OBS.
+
+- [ ] **T6.44 Landing gallery on phones and tablets.** Below 1024px, every scene in the "Eight looks" gallery draws at its full 1920px, so each look is a giant cropped "Start" and the page is about 14,500px tall.
+  - Accept: at 390, 768 and 1023px wide each gallery scene fits the column and shows the whole scene. Desktop unchanged. e2e check (the existing no-sideways-scroll test missed it because the page clips the overflow).
+- [ ] **T6.45 Landing hero shows the whole scene.** The hero scene's title now sits at the bottom of the frame: below the fold at 1366×768, and under the theme-name strip at 1920, where "Starting soon" collides with the scrolling names.
+  - Accept: at 1366×768 and 1920×1080 the hero scene's title is visible and clear of the theme-name strip; the scene keeps its slight tilt. Phone layout unchanged. e2e check.
+- [ ] **T6.46 The scene pill in the "One look" heading shows something.** The pill is a slice through the middle of a Cozy Café scene, which is now empty background.
+  - Accept: the pill shows a recognizable part of a real scene (not plain background). Still decorative and hidden from screen readers.
+- [ ] **T6.47 Sample scenes show the whole layout.** The landing gallery, the "Eight looks" card and the editor's "Pick a look to start" gallery show only "Starting soon" in a corner of an empty frame.
+  - Accept: those previews use sample content (a subtitle, a countdown and two socials) so each look shows its real composition. The streamer's own preview and links are unchanged. Sample text follows the content rules (no invented stats or names that look real).
+- [ ] **T6.48 Readable alert picture on the landing page.** The "Alerts with sound" card shows the alert as a strip about 250px wide.
+  - Accept: the card shows the alert card large enough to read the event label and message.
+- [ ] **T6.49 Editor preview fits the window.** On a 1366×768 laptop the preview is about 490px tall, so the title at the bottom of the scene is cut off below the fold and a first visit looks like an empty box.
+  - Accept: at 1366×768 the whole Starting Soon preview is visible without scrolling after picking a look. Wider and narrower windows keep working (T6.10 dock). e2e check.
+- [ ] **T6.50 Countdown fields in a natural order.** "Repeat this countdown every stream" comes before "Countdown ends at".
+  - Accept: the time comes first, then the repeat choice, with hints and keyboard order following. Tests updated.
+- [ ] **T6.51 A page for unknown addresses.** A mistyped address (for example /nope) shows a blank white page.
+  - Accept: unknown addresses show a short page in the Overlune chrome ("This page doesn't exist") with links to the editor and the setup guide. Overlay links (/o/...) keep their own placeholder. axe clean. e2e check.
