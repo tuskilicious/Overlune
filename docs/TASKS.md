@@ -297,6 +297,7 @@ Found by going through the live site after T6.44-T6.53. One branch and PR per ta
 
 - [ ] **T6.54 The countdown card is balanced with short countdowns.** With "09:58" the time sits on the left of the card and its right third is empty, on every look.
   - Accept: the time and the "Starts at" line are centered in the card; the card keeps its minimum width so it doesn't jump as it ticks. The Linux screenshot baseline is updated from CI. OBS test.
+  - *Built 2026-10-02 on `fix/countdown-card-centered`. `.countdown` centers its content (`align-items` and `text-align`); the 440px minimum width stays. Checked on Cozy Café, Bold Esports (the slanted card is symmetric), Arcade 8-Bit and Clean Slate. e2e: a 10-minute countdown's time and "Starts at" line are centered in the card (fails without the fix). Waiting for the owner's OBS check.*
 - [ ] **T6.55 Arcade 8-Bit alerts fit on fewer lines.** "FriendlyRaider is raiding with 42 viewers!" fills three lines of the wide pixel font. The scenes got pixel-font sizes in T6.38; the alerts didn't.
   - Accept: a typical raid alert in Arcade 8-Bit takes at most two lines; other themes unchanged. e2e. OBS test.
 - [ ] **T6.56 Landing feature cards at tablet width.** From 768 to 1023px the four-column grid squeezes "Alerts with sound" and "Your link is your save file" to two or three words per line and leaves a 400px gap inside "Eight looks".
