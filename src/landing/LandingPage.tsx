@@ -196,10 +196,12 @@ export default function LandingPage() {
               data-reveal
               className="max-w-5xl font-heading text-[clamp(2.25rem,4.5vw,4rem)] leading-tight font-bold"
             >
-              One {/* A slice through the middle of a real scene, inside the heading. */}
-              <span className="mx-1 inline-flex h-[0.8em] w-[2.4em] items-center overflow-hidden rounded-full align-middle">
+              One{" "}
+              {/* A slice of a real scene inside the heading: Neon Grid's lower half, with the title, the glowing
+                  horizon and the grid floor. Scenes are empty in the middle since the redesign (T6.46). */}
+              <span className="mx-1 inline-flex h-[0.8em] w-[2.4em] items-end overflow-hidden rounded-full border border-white/10 align-middle">
                 <span className="w-full shrink-0">
-                  <Scene theme="cozy-cafe" />
+                  <Scene theme="neon-grid" />
                 </span>
               </span>{" "}
               look, every overlay to match.
