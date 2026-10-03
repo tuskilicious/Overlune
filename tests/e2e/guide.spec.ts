@@ -72,3 +72,14 @@ test("every guide screenshot loads", async ({ page }) => {
     expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
   }
 });
+
+test("the guide covers silent alerts and wrong sizes (T6.72)", async ({ page }) => {
+  await page.goto("/guide");
+  await expect(
+    page.getByRole("heading", { name: "Fix: alerts are silent or don’t show" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Fix: the overlay is the wrong size or cut off" }),
+  ).toBeVisible();
+  await expect(page.getByText("Transform → Fit to screen")).toBeVisible();
+});
