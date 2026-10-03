@@ -1026,6 +1026,30 @@ export default function EditorPage() {
                   0% turns the sound off. In OBS, tick “Control audio via OBS” on the Alerts source
                   so your viewers hear it.
                 </p>
+                <label>
+                  Show each alert for
+                  <select
+                    value={settings.alerts.seconds}
+                    aria-describedby="alert-place-hint"
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        alerts: { ...s.alerts, seconds: Number(e.target.value) },
+                      }))
+                    }
+                  >
+                    {[3, 5, 8, 10, 15].map((n) => (
+                      <option key={n} value={n}>
+                        {n} seconds
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {/* Streamers looked for position and size settings; those belong to the OBS source (T6.75). */}
+                <p id="alert-place-hint" className="editor-hint">
+                  To change where alerts appear or how big they are, move and resize the Alerts
+                  source in OBS.
+                </p>
                 <details className="editor-more">
                   <summary>Change alert messages</summary>
                   <p id="alerts-hint" className="editor-hint">
