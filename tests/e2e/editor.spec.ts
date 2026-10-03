@@ -1157,7 +1157,9 @@ for (const width of [900, 1100, 1440]) {
 test("the editor says chat and alerts are Twitch only, and links never change (T6.69)", async ({
   page,
 }) => {
-  await expect(page.getByText("Chat and alerts work with Twitch only.")).toBeVisible();
+  await expect(
+    page.getByText("Chat and alerts work with Twitch only; YouTube isn’t supported yet."),
+  ).toBeVisible();
   await expect(page.locator("#obs-links")).toContainText("Your links never change.");
 });
 

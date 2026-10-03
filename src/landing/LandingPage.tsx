@@ -296,11 +296,11 @@ const goodToKnow = [
   ],
   [
     "Works in OBS and Streamlabs",
-    "Each overlay is a Browser source, so your scenes work wherever you stream.",
+    "Each overlay is a Browser source, so your scenes work on Twitch, YouTube or wherever you stream.",
   ],
   [
     "Chat and alerts are for Twitch",
-    "They read your Twitch channel. Follow alerts need a Twitch login, so they come in a later version.",
+    "They read your Twitch channel. YouTube chat and alerts aren’t supported yet, and follow alerts need a Twitch login, so both come in a later version.",
   ],
   [
     "Your links never break",

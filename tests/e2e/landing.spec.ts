@@ -245,7 +245,9 @@ test("the landing page says what works where (T6.69)", async ({ page }) => {
     "Chat and alerts are for Twitch",
     "Your links never break",
   ]);
-  await expect(know).toContainText("Follow alerts need a Twitch login");
+  await expect(know).toContainText("follow alerts need a Twitch login");
+  await expect(know).toContainText("your scenes work on Twitch, YouTube or wherever you stream");
+  await expect(know).toContainText("YouTube chat and alerts aren’t supported yet");
 });
 
 test("previews off screen are built after load, without scrolling (T6.78)", async ({ page }) => {

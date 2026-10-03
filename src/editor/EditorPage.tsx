@@ -1008,7 +1008,8 @@ export default function EditorPage() {
               <fieldset id="part-alerts" className="editor-part" tabIndex={-1}>
                 <legend>Alerts</legend>
                 <p className="editor-hint">
-                  Alerts use your channel name from Chat. Chat and alerts work with Twitch only.
+                  Alerts use your channel name from Chat. Chat and alerts work with Twitch only;
+                  YouTube isn’t supported yet.
                 </p>
                 <label className="editor-slider">
                   Alert volume
