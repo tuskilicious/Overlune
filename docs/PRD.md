@@ -74,6 +74,8 @@ The free alternatives are StreamElements and Streamlabs themes, OWN3D freebies a
 4. Remaining polish: logo-to-palette, theme import/export, community gallery with artist credits.
 5. YouTube and Kick chat.
 
+The realistic plan beyond this list (v1.x goals, v2 phases on Supabase, open decisions): `docs/FUTURE-SCOPE.md`.
+
 ## Success metrics
 We measure these without tracking users:
 - **First overlay live in OBS without help.** Measured by watching 5 newcomers set it up (T5.7). We note how long it takes, but don't promise a time (the owner dropped the "under 10 minutes" claim as unrealistic, 2026-10-02).
