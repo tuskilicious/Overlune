@@ -52,8 +52,9 @@ export default function SetupGuide() {
             </li>
             <li>
               In OBS, find the <strong>Sources</strong> box at the bottom. Press <strong>+</strong>.
-              In the list on the left, choose <strong>Browser</strong>. Give it a name, like
-              “Starting Soon”, and press <strong>OK</strong>.
+              In the list on the left, choose <strong>Browser</strong>, then press{" "}
+              <strong>Add a new Browser</strong> at the top. Give it a name, like “Starting Soon”,
+              and press <strong>OK</strong>.
             </li>
             <li>
               Delete what is in the <strong>URL</strong> box and paste your link.
@@ -65,7 +66,7 @@ export default function SetupGuide() {
           </ol>
           <Shot
             file="obs-add-browser.png"
-            alt="The OBS Add Source window, with Browser in the list on the left."
+            alt="The OBS Add Source window, with Browser chosen in the list on the left and Add a new Browser at the top."
           />
           <table className="guide-sizes">
             <caption>Sizes to type in</caption>
