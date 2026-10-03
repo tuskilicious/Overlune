@@ -1133,3 +1133,10 @@ for (const width of [900, 1100, 1440]) {
     await page.getByRole("button", { name: "Copy Alerts link" }).click(); // reachable, not covered
   });
 }
+
+test("the editor says chat and alerts are Twitch only, and links never change (T6.69)", async ({
+  page,
+}) => {
+  await expect(page.getByText("Chat and alerts work with Twitch only.")).toBeVisible();
+  await expect(page.locator("#obs-links")).toContainText("Your links never change.");
+});
