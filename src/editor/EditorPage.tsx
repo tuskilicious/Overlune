@@ -429,6 +429,14 @@ export default function EditorPage() {
         className="editor-save"
         aria-labelledby="save-heading"
         data-made={madeSomething || undefined}
+        // Escape closes whichever panel is open, wherever focus is in the box: right after a click, focus
+        // reaches the panel a frame later, and an Escape in between was lost (T6.58).
+        onKeyDown={(e) => {
+          if (e.key !== "Escape" || !(loadOpen || confirmReset)) return;
+          focusSoon(loadOpen ? "load-toggle" : "start-over");
+          setLoadOpen(false);
+          setConfirmReset(false);
+        }}
       >
         <div className="editor-save-text">
           {madeSomething && (
@@ -493,11 +501,6 @@ export default function EditorPage() {
           id="load-form"
           className="editor-load"
           hidden={!loadOpen}
-          onKeyDown={(e) => {
-            if (e.key !== "Escape") return;
-            setLoadOpen(false);
-            focusSoon("load-toggle");
-          }}
           onSubmit={(e) => {
             e.preventDefault();
             load();
@@ -521,11 +524,6 @@ export default function EditorPage() {
             role="group"
             aria-labelledby="reset-question"
             hidden={!confirmReset}
-            onKeyDown={(e) => {
-              if (e.key !== "Escape") return;
-              setConfirmReset(false);
-              focusSoon("start-over");
-            }}
           >
             <span id="reset-question">
               Clear everything and start from the defaults? Keep your link first if you might want
