@@ -40,7 +40,7 @@ export default function SetupGuide() {
           <Link to="/editor">← Back to the editor</Link>
         </p>
         <h1>Set up your overlays in OBS</h1>
-        <p>About 5 minutes. You only do this once. After that, your overlays update themselves.</p>
+        <p>You only do this once. After that, your overlays update themselves.</p>
       </header>
 
       <main>

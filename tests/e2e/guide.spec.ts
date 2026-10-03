@@ -15,7 +15,7 @@ test("the editor links to the setup guide and back", async ({ page }) => {
 test("the guide heading doesn't overlap the line under it", async ({ page }) => {
   await page.goto("/guide");
   const h1 = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
-  const intro = (await page.getByText("About 5 minutes.").boundingBox())!;
+  const intro = (await page.getByText("You only do this once.").boundingBox())!;
   expect(h1.height).toBeGreaterThan(0);
   expect(intro.y).toBeGreaterThanOrEqual(h1.y + h1.height);
 });
