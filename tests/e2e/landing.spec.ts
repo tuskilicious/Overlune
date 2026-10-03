@@ -125,6 +125,7 @@ test("the alert pictures show whole alert cards, large enough to read (T6.48)", 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const card = page.locator("li", { hasText: "Alerts with sound" });
+  await card.scrollIntoViewIfNeeded(); // previews are built when they come near the screen (T6.78)
   await expect(card.locator(".landing-alert .alert-box")).toHaveCount(2);
   await page.evaluate(() => document.fonts.ready);
   const crops = await card.locator(".landing-alert .editor-preview").evaluateAll((els) =>
@@ -245,4 +246,13 @@ test("the landing page says what works where (T6.69)", async ({ page }) => {
     "Your links never break",
   ]);
   await expect(know).toContainText("Follow alerts need a Twitch login");
+});
+
+test("previews off screen are built after load, without scrolling (T6.78)", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await expect(page.locator("figure[data-kit] .scene")).toHaveCount(1); // the hero right away
+  // The rest are built one per idle moment, so they're ready before anyone scrolls to them.
+  await expect(page.locator("[data-look]").last().locator(".scene")).toHaveCount(1);
+  await expect(page.locator("[data-look] .scene")).toHaveCount(8);
 });
