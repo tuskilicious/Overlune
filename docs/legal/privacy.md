@@ -2,9 +2,9 @@
 
 > **Self-written, not legal advice.** Overlune is a free, non-commercial hobby project. This document was written by the maintainer, has not been reviewed by a lawyer, and does not guarantee compliance with any law.
 
-_Last updated: 2026-10-01_
+_Last updated: 2026-10-03_
 
-Overlune is a free, open-source stream overlay maker at overlune.pages.dev. This page describes, in plain language, what the app actually does with data.
+Overlune is a free, open-source stream overlay maker at overlune.in. This page describes, in plain language, what the app actually does with data.
 
 ## The short version
 - **No accounts.** You never sign up or log in.
@@ -39,6 +39,9 @@ The app removes the part of every address after `#` and never sends console outp
 
 ## Hosting (Cloudflare)
 The site is hosted on Cloudflare Pages. Like any web host, Cloudflare processes basic request data (such as IP address and browser type) to deliver the site and protect it from attacks. Cloudflare's privacy policy: https://www.cloudflare.com/privacypolicy/
+
+## Supporting Overlune (GitHub Sponsors)
+The "Support Overlune" link goes to GitHub Sponsors. Supporting is optional and unlocks nothing: every part of Overlune is free for everyone. Overlune never sees or handles payments. If you sponsor, GitHub processes it under its own privacy statement: https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement
 
 ## Cookies
 Overlune sets no cookies and uses no trackers, so there is no cookie banner.

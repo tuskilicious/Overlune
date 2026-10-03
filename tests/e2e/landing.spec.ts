@@ -262,3 +262,14 @@ test("previews off screen are built after load, without scrolling (T6.78)", asyn
   await expect(page.locator("[data-look]").last().locator(".scene")).toHaveCount(1);
   await expect(page.locator("[data-look] .scene")).toHaveCount(8);
 });
+
+test("the landing page offers optional support and says Overlune stays free (T6.80)", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.getByText("Overlune is free and stays free.")).toBeVisible();
+  await expect(page.getByRole("link", { name: "support it on GitHub Sponsors" })).toHaveAttribute(
+    "href",
+    "https://github.com/sponsors/tuskilicious",
+  );
+});

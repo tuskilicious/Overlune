@@ -4,7 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { testAlerts } from "../alerts/events";
-import SiteFooter, { repoUrl } from "../components/SiteFooter";
+import SiteFooter, { repoUrl, supportUrl } from "../components/SiteFooter";
 import { chatSamples } from "../editor/chat-samples";
 import Preview from "../editor/Preview";
 import { sampleScene } from "../editor/scene-samples";
@@ -832,6 +832,17 @@ export default function LandingPage() {
             Make your overlays
           </Link>
           <p className="mt-6 text-haze">Free. No account. Works with OBS and Streamlabs.</p>
+          {/* Optional, quiet, and after the call to action: nothing is locked (T6.80). */}
+          <p className="mx-auto mt-3 max-w-xl text-sm text-haze">
+            Overlune is free and stays free. If it helped your stream, you can{" "}
+            <a
+              href={supportUrl}
+              className="underline decoration-haze/50 underline-offset-4 hover:text-moon"
+            >
+              support it on GitHub Sponsors
+            </a>
+            .
+          </p>
         </section>
       </main>
       <SiteFooter />

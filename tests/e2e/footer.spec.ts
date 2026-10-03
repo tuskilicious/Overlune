@@ -16,6 +16,11 @@ for (const path of ["/", "/guide", "/nope"]) {
       "href",
       "https://github.com/tuskilicious/Overlune/issues/new",
     );
+    // T6.80: optional support, on GitHub Sponsors.
+    await expect(footer.getByRole("link", { name: "Support Overlune" })).toHaveAttribute(
+      "href",
+      "https://github.com/sponsors/tuskilicious",
+    );
     await expect(footer.getByRole("link", { name: "support@overlune.in" })).toHaveAttribute(
       "href",
       "mailto:support@overlune.in",
