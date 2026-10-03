@@ -1037,3 +1037,36 @@
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
   font-size: 12px;
 }
+
+/* "How to paste a link into OBS" beside the links (T6.71). */
+.editor-obs-help {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+}
+
+.editor-obs-help summary {
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.editor-obs-help ol {
+  margin: 12px 0;
+  padding-left: 1.4em;
+  display: grid;
+  gap: 6px;
+}
+
+.editor-obs-help img {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  border-radius: 8px;
+}
+
+.editor .editor-obs-help p {
+  margin: 12px 0 0;
+}

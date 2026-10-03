@@ -238,6 +238,7 @@ test("the landing page says what works where (T6.69)", async ({ page }) => {
   await page.goto("/");
   const know = page.getByRole("region", { name: "Good to know" });
   await expect(know.locator("dt")).toHaveText([
+    "What you’ll need",
     "Works in OBS and Streamlabs",
     "Chat and alerts are for Twitch",
     "Your links never break",

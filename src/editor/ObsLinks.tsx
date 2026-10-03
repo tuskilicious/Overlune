@@ -118,9 +118,42 @@ export default function ObsLinks({ settings, heading }: { settings: Settings; he
     <section id="obs-links" tabIndex={-1} className="editor-links" aria-labelledby="links-heading">
       <h2 id="links-heading">{heading}</h2>
       <p>
-        In OBS, add a <strong>Browser</strong> source, paste the link, and enter the width and
-        height shown. New to OBS? Follow the <Link to="/guide">step-by-step setup guide</Link>.
+        <strong>What you’ll need:</strong> OBS Studio or Streamlabs Desktop. For chat and alerts,
+        also your Twitch channel name.
       </p>
+      {/* The OBS steps right next to the links, in plain words (T6.71). Open at first: beginners need it. */}
+      <details className="editor-obs-help" open>
+        <summary>How to paste a link into OBS</summary>
+        <ol>
+          <li>
+            In OBS, find <strong>Sources</strong> at the bottom, press <strong>+</strong> and choose{" "}
+            <strong>Browser</strong>. A Browser source shows a web page on your stream, like this
+            overlay.
+          </li>
+          <li>
+            Delete what’s in <strong>URL</strong> and paste your link.
+          </li>
+          <li>
+            Type the <strong>Width</strong> and <strong>Height</strong> shown next to the link: the
+            overlay’s size in pixels, so it fits your stream exactly.
+          </li>
+          <li>
+            For Alerts, tick <strong>Control audio via OBS</strong> so your viewers hear the alert
+            sound. Then press <strong>OK</strong>.
+          </li>
+        </ol>
+        <img
+          src="/images/guide/obs-properties.png"
+          alt="OBS Browser source properties with the link pasted into URL, width 1920, height 1080 and Control audio via OBS ticked."
+          width="791"
+          height="618"
+          loading="lazy"
+        />
+        <p>
+          The <Link to="/guide">step-by-step setup guide</Link> has more pictures, Streamlabs steps
+          and fixes.
+        </p>
+      </details>
       {/* Streamers asked whether a look's update would break their setup (T6.69). */}
       <p>
         Your links never change. When a look gets an update, your overlays pick it up on their own.
