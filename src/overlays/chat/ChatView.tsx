@@ -29,7 +29,7 @@ interface Props {
 /** The chat box, newest message at the bottom. All chat text renders as React text or <img>; never as HTML. */
 export default function ChatView({ settings, messages, error }: Props) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
-  const { width, height, fontScale, fadeAfter } = settings.chat;
+  const { width, height, fontScale, fadeAfter, showBadges } = settings.chat;
   const style = {
     ...themeVars(theme),
     width,
@@ -49,15 +49,16 @@ export default function ChatView({ settings, messages, error }: Props) {
       <ol className="chat-list">
         {messages.map((m) => (
           <li key={m.id} className="chat-msg">
-            {roles.map(
-              ([badge, label]) =>
-                (m.badges[badge] !== undefined ||
-                  (badge === "subscriber" && m.badges.founder !== undefined)) && (
-                  <span key={badge} className="chat-badge" data-style={theme.badgeStyle}>
-                    {label}
-                  </span>
-                ),
-            )}
+            {showBadges &&
+              roles.map(
+                ([badge, label]) =>
+                  (m.badges[badge] !== undefined ||
+                    (badge === "subscriber" && m.badges.founder !== undefined)) && (
+                    <span key={badge} className="chat-badge" data-style={theme.badgeStyle}>
+                      {label}
+                    </span>
+                  ),
+              )}
             <span
               className="chat-name"
               style={{ color: readableOn(m.color ?? theme.accent, theme.surface, theme.text) }}

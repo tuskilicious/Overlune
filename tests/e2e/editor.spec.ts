@@ -1237,3 +1237,13 @@ test("the alert time goes into the Alerts link, and the hint says where position
   await page.goto(link);
   await expect(page.locator(".alerts")).toHaveAttribute("style", /--alert-ms: 10000ms/);
 });
+
+test("Show badges under More chat options hides them in the chat preview (T6.76)", async ({
+  page,
+}) => {
+  const chat = page.locator(".editor-chat-preview");
+  await expect(chat.locator(".chat-badge").first()).toBeVisible();
+  await page.getByText("More chat options").click();
+  await page.getByLabel("Show badges (Mod, Sub, VIP) before names").uncheck();
+  await expect(chat.locator(".chat-badge")).toHaveCount(0);
+});

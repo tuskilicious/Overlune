@@ -115,6 +115,8 @@ export const settingsV1 = z.object({
       fontScale: z.number().min(0.75).max(2).default(1),
       /** Seconds before a message fades away; 0 keeps messages (T3.5). */
       fadeAfter: z.number().int().min(0).max(600).default(0),
+      /** Role badges (Mod, Sub, VIP…) before names (T6.76). Old links have no field and keep them. */
+      showBadges: z.boolean().default(true),
     })
     .prefault({}),
   /** Alert messages (T4.3). {user}, {amount} and {s} are filled in; "" means the default. */
