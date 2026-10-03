@@ -248,14 +248,11 @@ test("the landing page says what works where (T6.69)", async ({ page }) => {
   await expect(know).toContainText("Follow alerts need a Twitch login");
 });
 
-test("previews off screen are built only when they come near (T6.78)", async ({ page }) => {
+test("previews off screen are built after load, without scrolling (T6.78)", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  await expect(page.locator("figure[data-kit] .scene")).toHaveCount(1); // the hero is built right away
-  const looks = page.locator("[data-look]");
-  await expect(looks.last().locator(".scene")).toHaveCount(0); // the last look waits, holding its 16:9 place
-  const box = (await looks.last().boundingBox())!;
-  expect(box.height).toBeGreaterThan(box.width * 0.5);
-  await looks.last().scrollIntoViewIfNeeded();
-  await expect(looks.last().locator(".scene")).toHaveCount(1);
+  await expect(page.locator("figure[data-kit] .scene")).toHaveCount(1); // the hero right away
+  // The rest are built one per idle moment, so they're ready before anyone scrolls to them.
+  await expect(page.locator("[data-look]").last().locator(".scene")).toHaveCount(1);
+  await expect(page.locator("[data-look] .scene")).toHaveCount(8);
 });

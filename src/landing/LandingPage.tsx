@@ -20,9 +20,25 @@ import "./landing.css";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-/** A preview that's built only when it comes near the screen (T6.78). The page shows about 20 live previews;
- *  building them all at load blocked a weak CPU for 1 to 1.7 seconds. Until then, an empty box of the same shape
- *  holds its place, so the layout and the scroll animations don't jump. */
+/** Previews still waiting, built one per idle moment after the page has loaded, so they're ready before anyone
+ *  scrolls to them without blocking the load or a scroll (T6.78). */
+const waiting: (() => void)[] = [];
+let idleScheduled = false;
+function buildWhenIdle() {
+  if (idleScheduled || !waiting.length) return;
+  idleScheduled = true;
+  const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 200)); // Safari has none
+  idle(() => {
+    idleScheduled = false;
+    waiting.shift()?.();
+    buildWhenIdle();
+  });
+}
+
+/** A preview that's built later (T6.78): when the browser is idle after loading, or as soon as it comes near the
+ *  screen, whichever is first. The page shows about 20 live previews; building them all at load blocked a weak CPU
+ *  for 1 to 1.7 seconds. Until then, an empty box of the same shape holds its place, so the layout and the scroll
+ *  animations don't jump. */
 function LazyPreview({
   width = 1920,
   height = 1080,
@@ -46,7 +62,14 @@ function LazyPreview({
       { rootMargin: "100% 0px" }, // a screen ahead, so it's ready before it scrolls in
     );
     io.observe(el);
-    return () => io.disconnect();
+    const build = () => setNear(true);
+    waiting.push(build);
+    buildWhenIdle();
+    return () => {
+      io.disconnect();
+      const i = waiting.indexOf(build);
+      if (i >= 0) waiting.splice(i, 1);
+    };
   }, [near]);
   if (near)
     return (
