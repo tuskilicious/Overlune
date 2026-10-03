@@ -236,16 +236,22 @@ test("the nav marks the section in view", async ({ page }) => {
   await expect(how).toHaveAttribute("aria-current", "location");
 });
 
-test("the landing page says what works where (T6.69)", async ({ page }) => {
+test("the landing page says what works where (T6.69, T6.79)", async ({ page }) => {
   await page.goto("/");
   const know = page.getByRole("region", { name: "Good to know" });
   await expect(know.locator("dt")).toHaveText([
     "What you’ll need",
     "Works in OBS and Streamlabs",
-    "Chat and alerts are for Twitch",
     "Your links never break",
   ]);
-  await expect(know).toContainText("Follow alerts need a Twitch login");
+  // One row per overlay, one column per platform, in words.
+  const table = page.getByRole("table", { name: "Which overlays work on which platform" });
+  const row = (name: string) => table.getByRole("row").filter({ hasText: name }).locator("td");
+  await expect(row("Scenes")).toHaveText(["Yes", "Yes", "Yes"]);
+  await expect(row("Chat")).toHaveText(["Yes", "Not yet", "Not yet"]);
+  await expect(row("Raids, subs")).toHaveText(["Yes", "Not yet", "No"]);
+  await expect(row("Follow alerts")).toHaveText(["Not yet", "No", "No"]);
+  await expect(page.getByText("“Not yet” means it’s planned for a later version")).toBeVisible();
 });
 
 test("previews off screen are built after load, without scrolling (T6.78)", async ({ page }) => {
