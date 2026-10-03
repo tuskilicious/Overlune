@@ -111,7 +111,7 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 - **Accessibility:** editor meets WCAG AA contrast, has full keyboard navigation with visible focus, and has meaningful alt text. Overlays support reduced motion.
 
 ## Pre-launch checklist
-Signed off 2026-10-01 for v1 (T5.6). Re-check every item before any later launch or when a change touches it.
+Signed off 2026-10-01 for v1 (T5.6). Re-checked 2026-10-03 for the 1.0.0 release (T6.83). Re-check every item before any later launch or when a change touches it.
 - [x] 1. Rotate any exposed keys. Secret scanning is on locally and in CI. *(Owner confirmed no key was exposed. gitleaks pre-commit and CI; GitHub secret scanning and push protection on.)*
 - [x] 2. RLS and access-control tests: **N/A for v1** (no database). Confirm this is still true. *(Still true: no server, Pages Functions, database, cookies or fetch calls.)*
 - [x] 3. Backups: **N/A for v1** (no data). The repo is the source of truth.
