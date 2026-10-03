@@ -224,6 +224,10 @@ const sections = ["kit", "looks", "how"];
 /** What works where, said plainly (T6.69): streamers couldn't tell which platforms are supported. */
 const goodToKnow = [
   [
+    "What you’ll need",
+    "OBS Studio or Streamlabs Desktop. For chat and alerts, also your Twitch channel name.",
+  ],
+  [
     "Works in OBS and Streamlabs",
     "Each overlay is a Browser source, so your scenes work wherever you stream.",
   ],

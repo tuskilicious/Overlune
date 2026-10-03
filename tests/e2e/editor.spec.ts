@@ -375,12 +375,12 @@ test("copied links are marked, and the last copy says what's next (T6.24)", asyn
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   const links = page.getByRole("region", { name: "Links to paste into OBS" });
   await links.getByRole("button", { name: "Copy Starting Soon link" }).click();
-  await expect(links.getByRole("listitem").first()).toContainText("✓ Copied");
+  await expect(links.locator(".editor-link").first()).toContainText("✓ Copied");
   await expect(links.getByText("1 of 5 links copied.")).toBeVisible();
 
   // Editing changes every link, so the copy in OBS is out of date.
   await page.getByLabel("Title", { exact: true }).fill("Soon!");
-  await expect(links.getByRole("listitem").first()).toContainText(
+  await expect(links.locator(".editor-link").first()).toContainText(
     "Changed since you copied it. Copy it again.",
   );
 
@@ -537,7 +537,9 @@ test("a countdown days away shows days and names the start day", async ({ page }
 });
 
 test("each overlay link shows the size to enter in OBS", async ({ page }) => {
-  const rows = page.getByRole("region", { name: "Links to paste into OBS" }).getByRole("listitem");
+  const rows = page
+    .getByRole("region", { name: "Links to paste into OBS" })
+    .locator(".editor-link");
   await expect(rows).toHaveCount(5);
   for (const row of (await rows.all()).slice(0, 3))
     await expect(row).toContainText("Width 1920 · Height 1080");
@@ -739,7 +741,9 @@ test("chat size and text options update the link row and the chat preview", asyn
   await page.getByLabel("Text size").selectOption("1.5");
   await page.getByLabel("Hide messages after").selectOption("30");
 
-  const rows = page.getByRole("region", { name: "Links to paste into OBS" }).getByRole("listitem");
+  const rows = page
+    .getByRole("region", { name: "Links to paste into OBS" })
+    .locator(".editor-link");
   await expect(rows.nth(3)).toContainText("Chat · Width 500 · Height 800");
   await expect(preview.locator(".chat")).toHaveCSS("width", "500px");
   await expect(preview.locator(".chat")).toHaveCSS("font-size", "30px");
@@ -1171,4 +1175,18 @@ test("Copy my save link copies the editor link once something is made (T6.70)", 
   await page.goto("about:blank");
   await page.goto(link);
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Saved for later");
+});
+
+test("the links section says what you need and how to paste into OBS (T6.71)", async ({ page }) => {
+  const links = page.locator("#obs-links");
+  await expect(links).toContainText("What you’ll need: OBS Studio or Streamlabs Desktop.");
+  const help = links.locator("details", { hasText: "How to paste a link into OBS" });
+  await expect(help).toHaveAttribute("open", ""); // open at first
+  await expect(help.locator("li")).toHaveCount(4);
+  await expect(help.getByRole("img", { name: /Control audio via OBS ticked/ })).toBeVisible();
+  const scan = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .include("#obs-links")
+    .analyze();
+  expect(scan.violations).toEqual([]);
 });
