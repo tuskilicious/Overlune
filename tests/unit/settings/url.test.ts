@@ -129,8 +129,65 @@ describe("settings link", () => {
     );
     expect(ok).toBe(false);
     expect(settings.theme).toBe("clean-slate");
-    expect(settings.starting).toEqual(defaultSettings.starting);
+    // Only the bad parts go: the titles stay. The repeating countdown goes whole, since in UTC it would be wrong.
+    expect(settings.starting).toEqual({
+      ...sample.starting,
+      endsAt: null,
+      tz: "UTC",
+      repeat: defaultSettings.starting.repeat,
+    });
     expect(settings.logo).toBe(sample.logo);
+  });
+
+  it("keeps a fixed countdown when only its time zone is unknown (older OBS)", () => {
+    const starting = { ...sample.starting, tz: "Mars/Olympus", repeat: { mode: "off" } };
+    const { settings, ok } = decode(raw({ ...sample, starting }));
+    expect(ok).toBe(false);
+    expect(settings.starting).toEqual({
+      ...sample.starting,
+      tz: "UTC",
+      repeat: defaultSettings.starting.repeat,
+    });
+  });
+
+  it("drops a bad social but keeps the others", () => {
+    const socials = [
+      { platform: "twitch", handle: "a" },
+      { platform: "myspace", handle: "b" },
+      { platform: "x", handle: 5 },
+      { platform: "discord", handle: "c" },
+    ];
+    const { settings, ok } = decode(raw({ ...sample, socials }));
+    expect(ok).toBe(false);
+    expect(settings.socials).toEqual([
+      { platform: "twitch", handle: "a" },
+      { platform: "discord", handle: "c" },
+    ]);
+  });
+
+  it("keeps the rest of a group when one setting in it is bad", () => {
+    const { settings, ok } = decode(raw({ ...sample, alerts: { ...sample.alerts, seconds: 99 } }));
+    expect(ok).toBe(false);
+    expect(settings.alerts).toEqual({ ...sample.alerts, seconds: 5 });
+    expect(settings.chat).toEqual(sample.chat);
+  });
+
+  it.each([null, 5, "text", []])("uses defaults when the settings are %j", (data) => {
+    expect(decode(raw(data))).toEqual({ settings: defaultSettings, ok: false });
+  });
+
+  it("copes with a link where everything is bad", () => {
+    const bad = {
+      theme: 1,
+      logo: 2,
+      socials: 3,
+      starting: 4,
+      brb: { title: 5 },
+      chat: { bots: Array(50).fill(6) },
+    };
+    // 50 bad bot names are 50 separate drops, each one parsed again.
+    const chat = { ...defaultSettings.chat, bots: [] };
+    expect(decode(raw(bad))).toEqual({ settings: { ...defaultSettings, chat }, ok: false });
   });
 
   it("drops extra socials beyond the limit", () => {
@@ -232,15 +289,21 @@ describe("chat filters (T3.4)", () => {
     expect(decode(raw({ chat: { bots: ["mybot"] } })).settings.chat.bots).toEqual(["mybot"]);
   });
 
-  it.each([[["Nightbot"]], [["bad name"]], [Array.from({ length: 51 }, (_, i) => `bot${i}`)]])(
-    "reject bot list %j",
-    (bots) => {
-      const { settings, ok } = decode(raw({ brb: { title: "Kept" }, chat: { bots } }));
-      expect(ok).toBe(false);
-      expect(settings.chat.bots).toEqual([...defaultBots]);
-      expect(settings.brb.title).toBe("Kept");
-    },
-  );
+  it("drop bad bot names and keep the rest", () => {
+    const bots = ["mybot", "Nightbot", "bad name", "otherbot"];
+    const { settings, ok } = decode(raw({ brb: { title: "Kept" }, chat: { bots } }));
+    expect(ok).toBe(false);
+    expect(settings.chat.bots).toEqual(["mybot", "otherbot"]);
+    expect(settings.brb.title).toBe("Kept");
+  });
+
+  it("reject a bot list that is too long", () => {
+    const bots = Array.from({ length: 51 }, (_, i) => `bot${i}`);
+    const { settings, ok } = decode(raw({ brb: { title: "Kept" }, chat: { bots } }));
+    expect(ok).toBe(false);
+    expect(settings.chat.bots).toEqual([...defaultBots]);
+    expect(settings.brb.title).toBe("Kept");
+  });
 });
 
 describe("chat options (T3.5)", () => {
@@ -262,7 +325,7 @@ describe("chat options (T3.5)", () => {
       raw({ brb: { title: "Kept" }, chat: { channel: "dallas", ...bad } }),
     );
     expect(ok).toBe(false);
-    expect(settings.chat).toEqual(defaultSettings.chat);
+    expect(settings.chat).toEqual({ ...defaultSettings.chat, channel: "dallas" });
     expect(settings.brb.title).toBe("Kept");
   });
 });
