@@ -1,6 +1,6 @@
 /// <reference types="vitest/config" />
 import { readFileSync } from "node:fs";
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { cspForMeta } from "./src/lib/csp-meta";
@@ -23,17 +23,27 @@ const securityMeta: Plugin = {
   ],
 };
 
-export default defineConfig({
-  plugins: [react(), tailwindcss(), securityMeta],
-  build: {
-    // Source maps are generated for Sentry but not referenced from the shipped JS.
-    // Uploading them to Sentry is a later step (see docs/SENTRY.md).
-    sourcemap: "hidden",
-    // Never inline small fonts or images as data: URLs. The CSP (font-src/img-src) blocks them.
-    assetsInlineLimit: 0,
-  },
-  test: {
-    environment: "node",
-    include: ["tests/unit/**/*.test.ts"],
-  },
+const { version } = JSON.parse(readFileSync("package.json", "utf8")) as { version: string };
+
+export default defineConfig(({ mode }) => {
+  // Sentry release, e.g. overlune@1.0.0+319afe4: the version, plus the commit when Cloudflare Pages builds it.
+  // A VITE_SENTRY_RELEASE set in the environment still wins.
+  const env = loadEnv(mode, ".", ["VITE_SENTRY_RELEASE", "CF_PAGES_COMMIT_SHA"]);
+  const commit = env.CF_PAGES_COMMIT_SHA?.slice(0, 7);
+  const release = env.VITE_SENTRY_RELEASE || `overlune@${version}${commit ? `+${commit}` : ""}`;
+  return {
+    plugins: [react(), tailwindcss(), securityMeta],
+    define: { "import.meta.env.VITE_SENTRY_RELEASE": JSON.stringify(release) },
+    build: {
+      // Source maps are generated for Sentry but not referenced from the shipped JS.
+      // Uploading them to Sentry is a later step (see docs/SENTRY.md).
+      sourcemap: "hidden",
+      // Never inline small fonts or images as data: URLs. The CSP (font-src/img-src) blocks them.
+      assetsInlineLimit: 0,
+    },
+    test: {
+      environment: "node",
+      include: ["tests/unit/**/*.test.ts"],
+    },
+  };
 });

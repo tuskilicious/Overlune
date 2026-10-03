@@ -32,6 +32,5 @@ Sentry follows the official React guide (https://docs.sentry.io/platforms/javasc
 
 ## Later (not done yet)
 - **Source maps:** run `npx @sentry/wizard@latest -i sourcemaps`. `SENTRY_AUTH_TOKEN` is CI-only. The build already emits hidden source maps.
-- **Release:** set `VITE_SENTRY_RELEASE` to the git commit SHA in CI.
 - **CSP (T0.7):** allow the EU ingest host in `connect-src`: `https://*.ingest.de.sentry.io`.
 - **Privacy policy:** "Error reports are processed by Sentry and stored in the EU. They do not include your overlay settings or chat messages."

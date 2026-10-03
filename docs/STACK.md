@@ -60,9 +60,9 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 ## Folder structure
 ```
 overlune/
-├─ CLAUDE.md  README.md  LICENSE  .gitignore  .env.example
+├─ CLAUDE.md  README.md  CHANGELOG.md  LICENSE  .gitignore  .env.example
 ├─ docs/
-│  ├─ PRD.md  TASKS.md  STACK.md  DESIGN.md  BRAND.md  ASSETS.md  OBS-TESTING.md
+│  ├─ PRD.md  TASKS.md  STACK.md  DESIGN.md  BRAND.md  ASSETS.md  OBS-TESTING.md  FUTURE-SCOPE.md
 │  ├─ brand/            logo, icon and social exports (BRAND.md)
 │  └─ legal/            privacy.md, terms.md
 ├─ public/
