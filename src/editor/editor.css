@@ -1014,3 +1014,26 @@
     margin-left: 0;
   }
 }
+
+/* "Copy all links" (T6.70): an outline button above the rows (the filled style stays for each row's Copy link),
+   with its status beside it. If the clipboard is blocked, the links show in a box to copy by hand. */
+.editor-copy-all {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.editor-copy-all [role="status"] {
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.editor .editor-copy-all-text {
+  width: 100%;
+  min-height: 8em;
+  margin-bottom: 12px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 12px;
+}

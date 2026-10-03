@@ -95,6 +95,25 @@ export default function ObsLinks({ settings, heading }: { settings: Settings; he
   const [copied, setCopied] = useState<Record<string, string>>({});
   const linkFor = (id: string) => `${location.origin}/o/${id}#${hash}`;
   const done = links.filter((l) => copied[l.id] === linkFor(l.id)).length;
+
+  // "Copy all links" (T6.70): one text block with each overlay's name, size and link, to keep in a note while
+  // setting up OBS. If the clipboard is blocked, the block shows in a box, selected, to copy by hand.
+  const allText = links
+    .map((l) => `${l.name} (width ${l.width}, height ${l.height})\n${linkFor(l.id)}`)
+    .join("\n\n");
+  const [allStatus, setAllStatus] = useState("");
+  const [allFallback, setAllFallback] = useState(false);
+  const copyAll = async () => {
+    try {
+      await navigator.clipboard.writeText(allText);
+      setAllFallback(false);
+      setAllStatus(`Copied all ${links.length} links with their sizes.`);
+      setCopied(Object.fromEntries(links.map((l) => [l.id, linkFor(l.id)])));
+    } catch {
+      setAllFallback(true);
+      setAllStatus("Press Ctrl+C to copy the selected links.");
+    }
+  };
   return (
     <section id="obs-links" tabIndex={-1} className="editor-links" aria-labelledby="links-heading">
       <h2 id="links-heading">{heading}</h2>
@@ -106,6 +125,21 @@ export default function ObsLinks({ settings, heading }: { settings: Settings; he
       <p>
         Your links never change. When a look gets an update, your overlays pick it up on their own.
       </p>
+      <div className="editor-copy-all">
+        <button type="button" onClick={copyAll}>
+          Copy all links
+        </button>
+        <span role="status">{allStatus}</span>
+      </div>
+      {allFallback && (
+        <textarea
+          className="editor-copy-all-text"
+          aria-label="All your links, to copy"
+          readOnly
+          value={allText}
+          ref={(el) => el?.select()}
+        />
+      )}
       <ul>
         {links.map((l) => (
           <LinkRow

@@ -440,6 +440,24 @@ export default function EditorPage() {
         </div>
         {/* The buttons stay put; each opens its own panel underneath, one at a time, and Escape closes it (T6.58). */}
         <div className="editor-save-actions">
+          {/* The editor link is the save file; this keeps it somewhere other than the browser (T6.70). */}
+          {madeSomething && (
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(location.href);
+                  setLoadStatus(
+                    "Save link copied. Keep it in a note or bookmark, and paste it into Load to come back.",
+                  );
+                } catch {
+                  setLoadStatus("Copy the address from your browser’s address bar to keep it.");
+                }
+              }}
+            >
+              Copy my save link
+            </button>
+          )}
           <button
             id="load-toggle"
             type="button"
