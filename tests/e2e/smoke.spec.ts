@@ -90,3 +90,27 @@ for (const [route, heading] of [
     await expect(page.getByRole("heading", { name: heading })).toBeVisible();
   });
 }
+
+// T6.68: each page has its own tab title and canonical address on overlune.in; overlays have no canonical.
+for (const [path, title] of [
+  ["/", "Overlune: free stream overlays for OBS"],
+  ["/editor", "Make your overlays · Overlune"],
+  ["/guide", "Set up your overlays in OBS · Overlune"],
+  ["/privacy", "Privacy · Overlune"],
+  ["/nope", "Page not found · Overlune"],
+] as const) {
+  test(`${path} has its own title and canonical address`, async ({ page }) => {
+    await page.goto(path);
+    await expect(page).toHaveTitle(title);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      `https://overlune.in${path}`,
+    );
+  });
+}
+
+test("overlays have no canonical address", async ({ page }) => {
+  await page.goto("/o/starting");
+  await expect(page.locator(".scene")).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+});
