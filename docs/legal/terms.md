@@ -2,12 +2,12 @@
 
 > **Self-written, not legal advice.** Overlune is a free, non-commercial hobby project. This document was written by the maintainer, has not been reviewed by a lawyer, and does not guarantee compliance with any law.
 
-_Last updated: 2026-10-01_
+_Last updated: 2026-10-03_
 
-These terms cover your use of the Overlune website and overlays at overlune.pages.dev ("Overlune"). By using Overlune, you agree to them.
+These terms cover your use of the Overlune website and overlays at overlune.in ("Overlune"). By using Overlune, you agree to them.
 
 ## 1. What Overlune is
-Overlune is a free tool for making stream overlays. There are no accounts and no payments. The source code is open source under the MIT License: https://github.com/tuskilicious/Overlune/blob/main/LICENSE
+Overlune is a free tool for making stream overlays. There are no accounts, and Overlune takes no payments. You can choose to support the project on GitHub Sponsors; that is optional, handled by GitHub, and unlocks nothing. The source code is open source under the MIT License: https://github.com/tuskilicious/Overlune/blob/main/LICENSE
 
 ## 2. Your content and your stream
 - You are responsible for what you put in your overlays (titles, social handles, logo links, alert messages) and for what appears on your stream, including your viewers' chat messages shown by the Chat overlay.

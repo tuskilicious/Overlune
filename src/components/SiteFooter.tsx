@@ -3,6 +3,8 @@ import { Link } from "react-router";
 export const contactEmail = "support@overlune.in";
 /** The public repo (T6.77): the code, and the place to report a problem. */
 export const repoUrl = "https://github.com/tuskilicious/Overlune";
+/** Optional support (T6.80). Overlune never handles money; GitHub Sponsors does, and it unlocks nothing. */
+export const supportUrl = "https://github.com/sponsors/tuskilicious";
 
 /** Footer for the editor and guide pages (never on overlays, which are shown on stream). */
 export default function SiteFooter() {
@@ -23,6 +25,9 @@ export default function SiteFooter() {
         </li>
         <li>
           <a href={`${repoUrl}/issues/new`}>Report a problem</a>
+        </li>
+        <li>
+          <a href={supportUrl}>Support Overlune</a>
         </li>
         <li>
           Contact: <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
