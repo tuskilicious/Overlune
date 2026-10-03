@@ -94,6 +94,11 @@ test.describe("save file box (T6.12)", () => {
     await page.keyboard.press("Escape");
     await expect(page.getByLabel("Paste a link from Overlune")).toBeHidden();
     await expect(load).toBeFocused();
+    // Escape works even before focus has moved into the panel (the CI flake in run 37125681641).
+    await load.click();
+    await load.focus();
+    await page.keyboard.press("Escape");
+    await expect(page.getByLabel("Paste a link from Overlune")).toBeHidden();
   });
 
   test("Load reveals the paste field from the keyboard", async ({ page }) => {
