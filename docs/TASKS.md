@@ -118,7 +118,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *Passed in OBS (2026-10-01) on the PR #38 preview. `src/themes/bold-esports.ts`: new `wipe` entrance and alert. Content wipes in left to right in 250ms, and the socials bar, chat messages and alert box are static parallelograms (clip-path), so the shape stays under reduced motion. Shared `box-wipe` keyframes in `index.css`. Plain background (DESIGN.md lists no effect), Anton / Barlow, Kenney Digital Audio `zapThreeToneUp` (CC0) as `bold-esports.ogg`. Fixture `v1/bold-esports.json`.*
 - [x] **T6.5 Vaporwave Sunset theme.**
   - *Passed in OBS (2026-10-01) on the PR #39 preview. `src/themes/vaporwave-sunset.ts`: static `sunset` background (purple sky fading to coral and orange at the horizon, striped sun via `mask-image`, palm silhouettes from `public/images/themes/vaporwave-palms.svg`), chrome titles (`background-clip: text` with a band of `primary`), a soft dark text shadow so scene text stays readable over the sun, `slide-fade` entrance and alerts, Audiowide / Space Grotesk, Kenney Digital Audio `threeTone1` (CC0) as `vaporwave-sunset.ogg`. Fixture `v1/vaporwave-sunset.json`; e2e checks that the palms image loads.*
-- [ ] **T6.6 Review feedback from 5 streamers** before starting v2 (see PRD).
+- [x] **T6.6 Review feedback from 5 streamers** before starting v2 (see PRD).
+  - *Reviewed 2026-10-03: 38 points from the owner's 5 streamers. Already in place: Make/Continue button (T6.67), sticky preview that follows the section, preview switching with "Scene to edit", socials starting empty, Streamlabs steps in the guide, the link as the backup, chat text size, theme contrast and keyboard checks. Built as T6.68-T6.78 below. Saved for later (v2 or the PRD's out-of-scope list): logo upload, follow alerts, goal bars and latest-follower labels, offline banner and Twitch panels, per-page link previews (crawlers need server-rendered pages), a gameplay scene and a webcam frame (owner to decide whether the frame comes to v1), more looks (a light theme, seasonal ones), Hindi and other languages, a showcase of real streamers (needs their permission), a Discord (owner).*
 
 ### From the new-streamer walkthrough (2026-10-01)
 v1 fixes from watching someone set Overlune up as a brand-new streamer. These are not v2 features. One branch and PR per task.
@@ -345,3 +346,31 @@ Found by going through the live site after T6.54-T6.61. One branch and PR per ta
   - *Built 2026-10-03 on `fix/links-under-preview` (stacked on T6.64). The links take the form column (column 1) instead of the full width, so the sticky preview stays beside them. 1200px and up already put them in the settings column; 800px and below is one column. e2e: no link row overlaps the preview column at 900, 1100 and 1440px, and Copy is clickable (900 and 1100 fail without the fix). Owner merged PR #98 (2026-10-03); checked on production the same day. No overlay change, so no OBS test.*
 - [x] **T6.67 overlune.in always opens the landing page.** The owner landed on the editor: since T6.34, anyone with saved work in their browser was sent straight to /editor, so they could never see the landing page again.
   - *Built 2026-10-03 on `feat/landing-always` (stacked on T6.66). "/" always shows the landing page; with saved work the hero button reads "Continue your overlay" and opens it in the editor. Old editor bookmarks ("/#1.…", a saved overlay) still open the editor with their settings, so no old link breaks. The editor's logo now links home, like the guide and legal pages. e2e updated: returning visitors land on the landing page and can continue; the logo leads home; the autosave test opens /editor directly. Owner merged PR #99 (2026-10-03); checked on production the same day. No overlay change, so no OBS test.*
+
+### From the streamers' feedback (2026-10-03)
+The quick v1 fixes from T6.6. One branch and PR per task, stacked. T6.74-T6.76 change overlays, so they need the OBS test.
+
+- [x] **T6.68 Search and link previews on overlune.in.** `og:url` and `og:image` still point at overlune.pages.dev, there's no canonical address, and every tab is titled "Overlune".
+  - Accept: link previews and the canonical address use overlune.in; each page has its own tab title and canonical address (overlays have none). e2e.
+  - *Built 2026-10-03 on `feat/seo-meta`. `index.html`: title "Overlune: free stream overlays for OBS" (not "Twitch overlays": the scenes work for any platform), `og:url` and `og:image` on overlune.in, and a canonical link. `PageMeta` in `App.tsx` sets each page's tab title and canonical address as the route changes (one `index.html` serves every route), and drops the canonical on overlay links. Per-page link previews stay saved for later: crawlers don't run JavaScript. e2e: title and canonical for /, /editor, /guide, /privacy and a missing page; none on an overlay. Owner checked the batch preview (PR #111), 2026-10-03. No overlay change, so no OBS test.*
+- [ ] **T6.69 Say what works where.** Streamers couldn't tell which platforms are supported, and the landing page doesn't say follow alerts are coming. Also say that links never break when a look gets an update.
+  - Accept: the landing page and the editor say plainly: works in OBS and Streamlabs; chat and alerts are Twitch only; follow alerts need a Twitch login and come later; your links never change, and a look's updates reach them automatically. No unmeasured claims. e2e.
+- [ ] **T6.70 Copy all links, and copy my save link.** Copying five links one by one is tedious, and there's no button to keep the save link.
+  - Accept: "Copy all links" copies one text block with each overlay's name, size and link; "Copy my save link" in the save box copies the editor link, with a short reminder to keep it. Both show a copied state and fall back to selecting text. e2e.
+- [ ] **T6.71 Plain-English help next to the links.** Newcomers don't know "Browser source", width and height, or "Control audio via OBS", and the OBS steps are only on the separate guide page.
+  - Accept: a "What you'll need" line (OBS or Streamlabs; your Twitch channel name for chat and alerts), a short "How to paste into OBS" box next to the links with the four steps and a picture, and plain hints for the three terms. No time promises. e2e.
+- [ ] **T6.72 More fixes in the setup guide.** The guide covers a black box and empty chat, but not silent alerts or a wrong size.
+  - Accept: "Fix: alerts are silent" and "Fix: the overlay is the wrong size or cut off" sections, in the guide's style. e2e.
+- [ ] **T6.73 Clearer logo help.** Streamers didn't know how to get an image link for their logo (upload is out of scope for v1).
+  - Accept: the logo field explains, step by step, how to get an image link (Twitch profile picture, Discord, or any image already online) and what to do when it doesn't load. e2e.
+- [ ] **T6.74 A "Less motion" option.** Overlays calm down with `?rm=1`, but nothing in the editor sets it, and OBS doesn't always pass on the computer's reduced-motion setting.
+  - Accept: a "Less motion" checkbox adds `?rm=1` to every overlay link (an existing part of the link format, so old links are unchanged). e2e. OBS test.
+- [ ] **T6.75 Alert duration.** Alerts always show for 5 seconds, and streamers didn't know position and size are set in OBS.
+  - Accept: an alert-duration setting (a new optional link field; old links keep 5 seconds), checked against the link schema, and a note that position and size come from moving and resizing the source in OBS. Unit and e2e tests; old-link fixtures still load. OBS test.
+- [ ] **T6.76 Show or hide chat badges.**
+  - Accept: a "Show badges" option under "More chat options" (a new optional link field; old links keep badges). Unit and e2e tests; old-link fixtures still load. OBS test.
+- [ ] **T6.77 Open source and feedback links.** The GitHub repo isn't linked anywhere, and the only feedback path is email.
+  - Accept: the footer links to the GitHub repo and to "Report a problem" (GitHub issues), on every site page and the landing page. e2e.
+- [ ] **T6.78 Landing page speed on weak devices.** Check whether the live previews slow the landing page down on a weak PC or phone.
+  - Accept: measured with the CPU slowed down; if it's slow, previews off screen render only when they come into view. The result is recorded here.
+

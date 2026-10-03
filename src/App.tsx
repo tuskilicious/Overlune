@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/react";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
 import { sentryEnvironment } from "./lib/sentry";
 import EditorPage from "./editor/EditorPage";
@@ -35,12 +35,37 @@ function Home() {
   );
 }
 
+/** Each page's browser-tab title (T6.68). Overlays aren't listed: OBS never shows their title. */
+const pageTitles: Record<string, string> = {
+  "/": "Overlune: free stream overlays for OBS",
+  "/editor": "Make your overlays · Overlune",
+  "/guide": "Set up your overlays in OBS · Overlune",
+  "/privacy": "Privacy · Overlune",
+  "/terms": "Terms · Overlune",
+};
+
+/** The tab title and canonical address follow the route, so search engines file each page under its own
+ *  overlune.in address (one index.html serves every route). Overlay links get no canonical: they're for OBS. */
+function PageMeta() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    const overlay = pathname.startsWith("/o/");
+    document.title = pageTitles[pathname] ?? (overlay ? "Overlune" : "Page not found · Overlune");
+    const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonical) return;
+    if (overlay) canonical.remove();
+    else canonical.href = `https://overlune.in${pathname}`;
+  }, [pathname]);
+  return null;
+}
+
 // The test page exists in development and staging only (CLAUDE.md §7: no debug routes in production).
 const showSentryTest = sentryEnvironment !== "production";
 
 export default function App() {
   return (
     <BrowserRouter>
+      <PageMeta />
       <SentryRoutes>
         <Route path="/" element={<Home />} />
         <Route path="/editor" element={<EditorPage />} />
