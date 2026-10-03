@@ -104,8 +104,8 @@ Work one task at a time, top to bottom. A task is done when its acceptance crite
   - *Done 2026-10-01. Added a "For streamers" section, themes, setup guide, real clone URL, build/preview, CI summary, contributing notes (link contract, adding a theme), full docs list, contact and an as-is/no-warranty note (MIT `LICENSE`). Env table corrected: `VITE_SENTRY_RELEASE` is not set yet, `SENTRY_AUTH_TOKEN` is planned but unused, and the unused `CLOUDFLARE_*` names were removed (also from `.env.example`). Privacy policy now describes all Sentry data: error reports with breadcrumbs, a session ping per page load, and 5% performance samples that can include the logo link.*
 - [x] **T5.6 Pre-launch checklist** in CLAUDE.md, all items checked.
   - *Signed off 2026-10-01 after PR #30 brought T2.8–T5.5 to `main`. All 10 items checked in CLAUDE.md; production headers re-verified; `npm audit` clean after the vitest 4.1.11 merge. CLAUDE.md §9 changed to self-reviewed legal docs, governing law India. **Left for later:** the two Streamlabs screenshots in the setup guide (from T5.3).*
-- [ ] **T5.7 Launch:** use it live on the owner's stream and hand it to 5 streamers.
-  - *On hold (2026-10-01): the owner wants the site more approachable and better looking first (T6.15–T6.25 and T6.13).*
+- [x] **T5.7 Launch:** use it live on the owner's stream and hand it to 5 streamers.
+  - *On hold from 2026-10-01 while the site was made more approachable and better looking (T6.13–T6.67). Owner reported it done on 2026-10-03; details of the streams and the 5 streamers weren't recorded here. Their feedback is T6.6.*
 
 ## Post-launch
 - [x] **T6.1 Arcade 8-Bit theme.**
