@@ -4,7 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { testAlerts } from "../alerts/events";
-import SiteFooter from "../components/SiteFooter";
+import SiteFooter, { repoUrl } from "../components/SiteFooter";
 import { chatSamples } from "../editor/chat-samples";
 import Preview from "../editor/Preview";
 import { sampleScene } from "../editor/scene-samples";
@@ -399,6 +399,16 @@ export default function LandingPage() {
                     {f}
                   </li>
                 ))}
+                {/* Open source, higher on the page than the footer (T6.77). */}
+                <li className="flex items-center gap-2">
+                  <span aria-hidden className="size-1.5 rounded-full bg-cyan" />
+                  <a
+                    href={repoUrl}
+                    className="underline decoration-haze/50 underline-offset-4 hover:text-moon"
+                  >
+                    Open source
+                  </a>
+                </li>
               </ul>
             </div>
             <HeroKit />
