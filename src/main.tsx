@@ -12,6 +12,19 @@ initSentry();
 if (new URLSearchParams(location.search).get("rm") === "1")
   document.documentElement.dataset.rm = "";
 
+// A tab opened before a new deploy asks for page files the deploy replaced. Reload to get the new ones,
+// at most once in 10 seconds so a broken deploy can't loop.
+window.addEventListener("vite:preloadError", (event) => {
+  try {
+    if (Date.now() - Number(sessionStorage.getItem("overlune-reloaded")) < 10_000) return;
+    sessionStorage.setItem("overlune-reloaded", String(Date.now()));
+  } catch {
+    return;
+  }
+  event.preventDefault();
+  location.reload();
+});
+
 const container = document.getElementById("root");
 if (!container) throw new Error("Root element #root not found");
 
