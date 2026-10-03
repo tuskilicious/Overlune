@@ -183,6 +183,59 @@ export default function SetupGuide() {
           </ul>
         </section>
 
+        {/* Two more fixes streamers asked for (T6.72). */}
+        <section aria-labelledby="silent-heading">
+          <h2 id="silent-heading">Fix: alerts are silent or don’t show</h2>
+          <ul>
+            <li>
+              <strong>Control audio via OBS.</strong> Open the Alerts source’s{" "}
+              <strong>Properties</strong> and tick it. Without it, OBS doesn’t pick up the sound.
+            </li>
+            <li>
+              <strong>Check the Audio Mixer.</strong> The Alerts source must not be muted, and its
+              slider should be up (step 3 above).
+            </li>
+            <li>
+              <strong>Check the volume.</strong> In the editor, under Alerts, 0% turns the sound
+              off. After changing it, copy a fresh Alerts link into OBS.
+            </li>
+            <li>
+              <strong>Test it.</strong> Paste the editor’s{" "}
+              <strong>Link to test your alerts in OBS</strong> into your Alerts source, then switch
+              back to the normal link.
+            </li>
+            <li>
+              <strong>No alert at all?</strong> Alerts use your channel name from Chat in the
+              editor, and they are for raids, subs, gift subs and bits. Follow alerts need a Twitch
+              login, so they come in a later version.
+            </li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="size-heading">
+          <h2 id="size-heading">Fix: the overlay is the wrong size or cut off</h2>
+          <ul>
+            <li>
+              <strong>Check the size.</strong> In the source’s <strong>Properties</strong>, Width
+              and Height must match the sizes in the table above: 1920 and 1080 for the scenes and
+              Alerts, and the size you picked for Chat.
+            </li>
+            <li>
+              <strong>Fit it to the screen.</strong> For a scene or Alerts, right-click the source
+              and choose <strong>Transform → Fit to screen</strong>.
+            </li>
+            <li>
+              <strong>Check your canvas.</strong> In OBS, go to <strong>Settings → Video</strong>.
+              If <strong>Base (Canvas) Resolution</strong> isn’t 1920x1080, Fit to screen still
+              makes the scenes fill it.
+            </li>
+            <li>
+              <strong>Chat cut off?</strong> Change the chat box size under Chat in the editor, copy
+              a fresh Chat link, and type the same width and height in OBS.
+            </li>
+          </ul>
+        </section>
+
         <section aria-labelledby="streamlabs-heading">
           <h2 id="streamlabs-heading">Using Streamlabs Desktop?</h2>
           <p>It works the same way, with slightly different names:</p>
