@@ -43,6 +43,7 @@ const sample: Settings = {
     },
     volume: 40,
   },
+  lessMotion: true,
   advanced: {
     colors: { accent: "#ff2bd6", surface: "#101010" },
     fontHeading: "Orbitron",
@@ -55,6 +56,11 @@ describe("settings link", () => {
     const hash = encode(sample);
     expect(hash).toMatch(/^1\./);
     expect(decode(`#${hash}`)).toEqual({ settings: sample, ok: true });
+  });
+
+  it("keeps full motion for links made before the Less motion option (T6.74)", () => {
+    expect(decode(raw({ theme: "neon-grid" })).settings.lessMotion).toBe(false);
+    expect(decode(raw({ theme: "neon-grid", lessMotion: true })).settings.lessMotion).toBe(true);
   });
 
   it("fills in BRB and Ending defaults for links made before those scenes existed", () => {

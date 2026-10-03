@@ -1012,6 +1012,7 @@ test.describe("three-column shell on wide windows (T6.60)", () => {
       "Chat",
       "Alerts",
       "Logo",
+      "Motion",
       "Colors",
       "Links",
     ]);
@@ -1036,7 +1037,17 @@ test.describe("three-column shell on wide windows (T6.60)", () => {
   test("each section link marks that section, short ones included (T6.62)", async ({ page }) => {
     await page.getByRole("button", { name: "Add a social" }).click(); // a short Socials section
     const list = page.getByRole("navigation", { name: "Sections" });
-    for (const name of ["Text", "Socials", "Chat", "Alerts", "Logo", "Colors", "Links", "Look"]) {
+    for (const name of [
+      "Text",
+      "Socials",
+      "Chat",
+      "Alerts",
+      "Logo",
+      "Motion",
+      "Colors",
+      "Links",
+      "Look",
+    ]) {
       await list.getByRole("link", { name }).click();
       await expect(list.locator('[aria-current="location"]'), name).toHaveText(name);
     }
@@ -1202,4 +1213,19 @@ test("the logo field explains how to get an image link (T6.73)", async ({ page }
   await expect(help.locator("li")).toHaveCount(3);
   await expect(help).toContainText("Copy image address");
   await expect(help).toContainText("Discord stop working after a day");
+});
+
+test("Less motion goes into every overlay link and turns the motion off (T6.74)", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.getByLabel("Less motion").check();
+  await expect(page.locator(".editor-side")).toHaveClass(/editor-shot/); // the preview holds still too
+  await page.getByRole("button", { name: "Copy Starting Soon link" }).click();
+  const link = await page.evaluate(() => navigator.clipboard.readText());
+  await page.goto(link);
+  await expect(page.locator(".scene")).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("data-rm", "");
+  await expect(page.locator(".scene-main")).toHaveCSS("animation-name", "none");
 });

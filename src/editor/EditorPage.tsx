@@ -172,6 +172,7 @@ const sections = [
   ["part-chat", "Chat"],
   ["part-alerts", "Alerts"],
   ["part-logo", "Logo"],
+  ["part-motion", "Motion"],
   ["part-colors", "Colors"],
   ["obs-links", "Links"],
 ] as const;
@@ -1142,6 +1143,25 @@ export default function EditorPage() {
                 </p>
               </fieldset>
 
+              {/* OBS doesn't always pass on the computer's reduced-motion setting, so it's a choice here (T6.74). */}
+              <fieldset id="part-motion" className="editor-part" tabIndex={-1}>
+                <legend>Motion</legend>
+                <label className="editor-check">
+                  <input
+                    type="checkbox"
+                    checked={settings.lessMotion}
+                    aria-describedby="motion-hint"
+                    onChange={(e) => update({ lessMotion: e.target.checked })}
+                  />
+                  Less motion
+                </label>
+                <p id="motion-hint" className="editor-hint">
+                  Turns off entrances and moving backgrounds in all your overlays. Good if movement
+                  bothers you or your viewers, or if your PC is slow. The preview here holds still
+                  too.
+                </p>
+              </fieldset>
+
               <details id="part-colors" className="editor-advanced editor-part" tabIndex={-1}>
                 <summary id="advanced-summary">Advanced: colors and fonts</summary>
                 <p className="editor-hint">
@@ -1217,7 +1237,7 @@ export default function EditorPage() {
               </details>
             </form>
 
-            <div className="editor-side">
+            <div className={`editor-side${settings.lessMotion ? " editor-shot" : ""}`}>
               {/* In narrow windows this docks to the bottom behind a "Show preview" bar (editor.css). */}
               <section
                 className="editor-preview-wrap editor-scene-preview"
