@@ -137,3 +137,12 @@ for (const [name, fixture] of Object.entries({
     await expect(page.getByRole("status")).toHaveCount(0);
   });
 }
+
+test("badges can be hidden, and old links keep them (T6.76)", async ({ page }) => {
+  const twitch = await fakeTwitch(page);
+  await page.goto(link({ channel: "dallas", showBadges: false }));
+  await twitch.send(priv("1", "ronni", "hi", ";badges=moderator/1,subscriber/3"));
+  await expect(messages(page)).toHaveCount(1);
+  await expect(messages(page).first()).toHaveText("ronni: hi");
+  await expect(page.locator(".chat-badge")).toHaveCount(0);
+});

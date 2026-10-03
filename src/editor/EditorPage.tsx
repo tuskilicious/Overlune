@@ -920,6 +920,14 @@ export default function EditorPage() {
                 {/* Rarely changed, so tucked away (T6.20). */}
                 <details className="editor-more">
                   <summary>More chat options</summary>
+                  <label className="editor-check">
+                    <input
+                      type="checkbox"
+                      checked={settings.chat.showBadges}
+                      onChange={(e) => updateChat({ showBadges: e.target.checked })}
+                    />
+                    Show badges (Mod, Sub, VIP) before names
+                  </label>
                   <label>
                     Bots to hide (one name per line)
                     <textarea

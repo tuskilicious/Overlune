@@ -32,6 +32,7 @@ const sample: Settings = {
     height: 800,
     fontScale: 1.5,
     fadeAfter: 30,
+    showBadges: false,
   },
   alerts: {
     templates: {
@@ -57,6 +58,11 @@ describe("settings link", () => {
     const hash = encode(sample);
     expect(hash).toMatch(/^1\./);
     expect(decode(`#${hash}`)).toEqual({ settings: sample, ok: true });
+  });
+
+  it("keeps chat badges for links made before the badges option (T6.76)", () => {
+    expect(decode(raw({ theme: "neon-grid" })).settings.chat.showBadges).toBe(true);
+    expect(decode(raw({ chat: { showBadges: false } })).settings.chat.showBadges).toBe(false);
   });
 
   it("keeps 5-second alerts for links made before the alert time option (T6.75)", () => {
