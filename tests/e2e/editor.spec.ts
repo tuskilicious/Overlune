@@ -1145,3 +1145,35 @@ test("the editor says chat and alerts are Twitch only, and links never change (T
   await expect(page.getByText("Chat and alerts work with Twitch only.")).toBeVisible();
   await expect(page.locator("#obs-links")).toContainText("Your links never change.");
 });
+
+test("Copy all links copies every link with its size, and marks them copied (T6.70)", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.getByRole("button", { name: "Copy all links" }).click();
+  await expect(page.locator(".editor-copy-all [role=status]")).toHaveText(
+    "Copied all 5 links with their sizes.",
+  );
+  const text = await page.evaluate(() => navigator.clipboard.readText());
+  // Windows' clipboard turns line breaks into \r\n.
+  expect(text).toMatch(/Starting Soon \(width 1920, height 1080\)\r?\n/);
+  expect(text).toMatch(/Chat \(width 400, height 600\)\r?\n/);
+  expect(text.match(/\/o\/(starting|brb|ending|chat|alerts)#1\./g)).toHaveLength(5);
+  await expect(page.locator(".editor-links-progress")).toContainText("You’re set");
+});
+
+test("Copy my save link copies the editor link once something is made (T6.70)", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await expect(page.getByRole("button", { name: "Copy my save link" })).toHaveCount(0);
+  await page.getByLabel("Title", { exact: true }).fill("Saved for later");
+  await page.getByRole("button", { name: "Copy my save link" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Save link copied." })).toBeVisible();
+  const link = await page.evaluate(() => navigator.clipboard.readText());
+  await page.goto("about:blank");
+  await page.goto(link);
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Saved for later");
+});
