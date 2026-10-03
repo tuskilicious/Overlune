@@ -1,6 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { AlertEvent } from "../../alerts/events";
-import { ALERT_MS } from "../../alerts/queue";
 import { fillTemplate } from "../../alerts/templates";
 import type { Settings } from "../../settings/schema";
 import { themes } from "../../themes";
@@ -27,7 +26,11 @@ interface Props {
 /** 1920×1080 transparent canvas with one alert box centered at the top. Names and templates render as text only. */
 export default function AlertView({ settings, alert, error }: Props) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
-  const style = { ...themeVars(theme), "--alert-ms": `${ALERT_MS}ms` } as CSSProperties;
+  // The fade-out starts just before the alert's time is up (alerts.css).
+  const style = {
+    ...themeVars(theme),
+    "--alert-ms": `${settings.alerts.seconds * 1000}ms`,
+  } as CSSProperties;
   return (
     <div className="alerts" data-anim={theme.alertAnim} data-theme={theme.id} style={style}>
       {error}

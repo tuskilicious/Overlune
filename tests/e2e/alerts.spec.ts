@@ -186,3 +186,29 @@ test("an Arcade 8-Bit raid alert takes at most two lines (T6.55)", async ({ page
   );
   expect(lines).toBeLessThan(2.5);
 });
+
+// T6.75: each alert stays as long as the link says; old links keep 5 seconds.
+for (const [seconds, goneBy] of [
+  [3, true],
+  [undefined, false],
+] as const) {
+  test(`an alert set to ${seconds ?? "the default"} seconds is ${goneBy ? "gone" : "still there"} after 3.2s`, async ({
+    page,
+  }) => {
+    // A paused fake clock: time only moves when the test says (an installed clock otherwise keeps ticking).
+    const start = new Date("2026-10-03T12:00:00Z").getTime();
+    await page.clock.install({ time: start });
+    await page.clock.pauseAt(start + 1000);
+    const alerts = seconds ? { seconds } : {};
+    await page.goto(link({ chat: { channel: "dallas" }, alerts }, "?test=1"));
+    // Step the fake clock until the first sample is on screen, then time it from there.
+    await expect
+      .poll(async () => {
+        await page.clock.runFor(50);
+        return box(page).count();
+      })
+      .toBe(1);
+    await page.clock.runFor(3200);
+    await expect(box(page)).toHaveCount(goneBy ? 0 : 1);
+  });
+}

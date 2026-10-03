@@ -131,6 +131,8 @@ export const settingsV1 = z.object({
         .prefault({}),
       /** Alert sound volume in percent; 0 is silent (T4.4). */
       volume: z.number().int().min(0).max(100).default(70),
+      /** How long each alert stays on screen (T6.75). Old links have no field and keep 5 seconds. */
+      seconds: z.number().int().min(3).max(15).default(5),
     })
     .prefault({}),
   /** Less motion in every overlay (T6.74): the same as the ?rm=1 flag, kept in the link so the editor remembers

@@ -42,6 +42,7 @@ const sample: Settings = {
       bits: "{user} {amount} bits",
     },
     volume: 40,
+    seconds: 8,
   },
   lessMotion: true,
   advanced: {
@@ -56,6 +57,13 @@ describe("settings link", () => {
     const hash = encode(sample);
     expect(hash).toMatch(/^1\./);
     expect(decode(`#${hash}`)).toEqual({ settings: sample, ok: true });
+  });
+
+  it("keeps 5-second alerts for links made before the alert time option (T6.75)", () => {
+    expect(decode(raw({ theme: "neon-grid" })).settings.alerts.seconds).toBe(5);
+    expect(decode(raw({ alerts: { seconds: 10 } })).settings.alerts.seconds).toBe(10);
+    // Out of range falls back to the default instead of breaking the link.
+    expect(decode(raw({ alerts: { seconds: 999 } })).settings.alerts.seconds).toBe(5);
   });
 
   it("keeps full motion for links made before the Less motion option (T6.74)", () => {

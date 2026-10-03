@@ -31,15 +31,20 @@ export default function AlertTester({ settings }: { settings: Settings }) {
     soundRef.current = sound;
   });
 
+  // A new queue when the alert time changes, so test alerts last as long as they will on stream (T6.75).
+  const seconds = settings.alerts.seconds;
   useEffect(() => {
-    const q = createAlertQueue((a) => {
-      setAlert(a);
-      const { file, volume } = soundRef.current;
-      if (a && file) playSound(file, volume);
-    });
+    const q = createAlertQueue(
+      (a) => {
+        setAlert(a);
+        const { file, volume } = soundRef.current;
+        if (a && file) playSound(file, volume);
+      },
+      { durationMs: seconds * 1000 },
+    );
     queue.current = q;
     return () => q.stop();
-  }, []);
+  }, [seconds]);
 
   // The test link stops playing samples 15 minutes after it's copied (docs/STACK.md). Restamped every minute,
   // so it has about 15 minutes left however it's copied.

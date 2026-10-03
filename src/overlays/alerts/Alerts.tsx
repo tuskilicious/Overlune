@@ -20,6 +20,7 @@ export default function Alerts({ settings, error }: { settings: Settings; error?
   // Absent: an old link, plays forever. Present but not a number counts as expired, so no fake alerts.
   const until = params.has("until") ? Number(params.get("until")) || 0 : null;
   const [alert, setAlert] = useState<AlertEvent | null>(null);
+  const { seconds } = settings.alerts; // fixed by the link, so it never reconnects chat in practice
   const [status, setStatus] = useState<ChatStatus>("connecting");
   // Read through a ref so changing the sound or volume never reconnects.
   const sound = { file: themes[settings.theme].alertSound, volume: settings.alerts.volume };
@@ -29,11 +30,14 @@ export default function Alerts({ settings, error }: { settings: Settings; error?
   });
 
   useEffect(() => {
-    const queue = createAlertQueue((a) => {
-      setAlert(a);
-      const { file, volume } = soundRef.current;
-      if (a && file) playSound(file, volume);
-    });
+    const queue = createAlertQueue(
+      (a) => {
+        setAlert(a);
+        const { file, volume } = soundRef.current;
+        if (a && file) playSound(file, volume);
+      },
+      { durationMs: seconds * 1000 },
+    );
     const toAlert = createAlertMapper();
     // A tick later, so an effect that is set up and torn down at once (React dev mode) plays nothing.
     const playSamples = test && (until === null || Date.now() < until * 1000);
@@ -52,7 +56,7 @@ export default function Alerts({ settings, error }: { settings: Settings; error?
       clearTimeout(testTimer);
       queue.stop();
     };
-  }, [channel, test, until]);
+  }, [channel, test, until, seconds]);
 
   return (
     <AlertView
