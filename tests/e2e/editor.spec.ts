@@ -332,7 +332,7 @@ test("the logo field shows the logo, or a friendly message when no picture loads
     r.fulfill({ contentType: "text/html", body: "<p>not a picture</p>" }),
   );
   const logo = page.getByLabel("Link to your logo image");
-  await expect(page.getByText("Copy image address")).toBeVisible();
+  await expect(page.getByText("Copy image address").first()).toBeVisible();
 
   await logo.fill("https://logos.example/page");
   await expect(page.locator("#logo-error")).toHaveText(/^No picture loaded from this link/);
@@ -1189,4 +1189,12 @@ test("the links section says what you need and how to paste into OBS (T6.71)", a
     .include("#obs-links")
     .analyze();
   expect(scan.violations).toEqual([]);
+});
+
+test("the logo field explains how to get an image link (T6.73)", async ({ page }) => {
+  await page.getByText("How to get a link to your logo").click();
+  const help = page.locator("details", { hasText: "How to get a link to your logo" });
+  await expect(help.locator("li")).toHaveCount(3);
+  await expect(help).toContainText("Copy image address");
+  await expect(help).toContainText("Discord stop working after a day");
 });

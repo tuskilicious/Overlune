@@ -1070,3 +1070,11 @@
 .editor .editor-obs-help p {
   margin: 12px 0 0;
 }
+
+/* Step lists inside the editor's help disclosures (T6.73). */
+.editor-steps-list {
+  margin: 8px 0;
+  padding-left: 1.4em;
+  display: grid;
+  gap: 6px;
+}
