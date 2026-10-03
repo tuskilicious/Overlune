@@ -48,12 +48,15 @@ test("a short title keeps the theme's full size", async ({ page }) => {
 
 test("Neon Grid keeps the title block in the sky, above the horizon (T6.36)", async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
+  // Measure the settled layout: the entrance slides the content up 24px, so under load it could read low.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.route("https://logos.example/logo.png", (r) =>
     r.fulfill({ path: "public/images/brand/apple-touch-icon.png" }),
   );
   await page.goto(
     `/o/starting#1.${lz.compressToEncodedURIComponent(JSON.stringify(longest("neon-grid")))}`,
   );
+  await expect(page.locator(".scene-logo")).toBeVisible(); // the title re-fits once the logo has loaded
   await page.evaluate(() => document.fonts.ready);
   const horizon = 1080 * 0.82;
   for (const sel of [".scene-title", ".scene-subtitle", ".countdown"]) {
