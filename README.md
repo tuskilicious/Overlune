@@ -11,14 +11,14 @@ It includes:
 
 Everything matches one theme. Paste the links into OBS or Streamlabs and you're live.
 
-> Status: pre-v1, in development. See `docs/TASKS.md`.
+> Status: v1.0.0, live at **https://overlune.in**. What changed: `CHANGELOG.md`. Work in progress: `docs/TASKS.md`. What's next: `docs/FUTURE-SCOPE.md`.
 
 Overlune is a free, non-commercial hobby project, provided **as is, with no warranty** (see [License](#license)).
 
 ## For streamers
-1. Open **https://overlune.pages.dev** and press **Make your overlays** (the editor is at **/editor**). Pick a look and type your text.
+1. Open **https://overlune.in** and press **Make your overlays** (the editor is at **/editor**). Pick a look and type your text.
 2. Copy each "Link to paste into OBS" into a Browser source, with the width and height shown next to it.
-3. Stuck? Follow the setup guide at **https://overlune.pages.dev/guide**.
+3. Stuck? Follow the setup guide at **https://overlune.in/guide**.
 
 Your settings live in your links and your browser. There is nothing to sign up for.
 
@@ -56,7 +56,7 @@ All are optional for local development. Without `VITE_SENTRY_DSN`, Sentry stays 
 |---|---|---|
 | `VITE_SENTRY_DSN` | client (public) | Sentry error tracking |
 | `VITE_SENTRY_ENVIRONMENT` | client (public) | `development`, `staging` or `production` |
-| `VITE_SENTRY_RELEASE` | client (public) | Release name for Sentry events. Optional and **not set yet**, so events currently have no release. |
+| `VITE_SENTRY_RELEASE` | client (public) | Release name for Sentry events. Optional: by default the build uses `overlune@<package.json version>`, plus the commit on Cloudflare Pages (e.g. `overlune@1.0.0+319afe4`). |
 | `SENTRY_AUTH_TOKEN` | CI only | **Planned, not used yet:** uploading source maps to Sentry (see `docs/SENTRY.md`) |
 
 Deploys use the Cloudflare Pages Git integration, so no Cloudflare token is needed.
