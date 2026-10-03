@@ -296,17 +296,37 @@ const goodToKnow = [
   ],
   [
     "Works in OBS and Streamlabs",
-    "Each overlay is a Browser source, so your scenes work on Twitch, YouTube or wherever you stream.",
-  ],
-  [
-    "Chat and alerts are for Twitch",
-    "They read your Twitch channel. YouTube chat and alerts aren’t supported yet, and follow alerts need a Twitch login, so both come in a later version.",
+    "Each overlay is a Browser source in OBS Studio or Streamlabs Desktop, whatever platform you stream to.",
   ],
   [
     "Your links never break",
     "Paste a link once. When a look gets an update, your overlays pick it up on their own.",
   ],
 ] as const;
+
+type Support = "Yes" | "Not yet" | "No";
+
+/** What works on which platform (T6.79), said as plainly as a table can. "Not yet" is only for what's planned
+ *  (PRD v2: follow alerts, YouTube and Kick chat; YouTube alerts were saved for later with them). */
+const platforms = ["Twitch", "YouTube", "Kick and others"] as const;
+const support: { overlay: string; detail: string; on: [Support, Support, Support] }[] = [
+  {
+    overlay: "Scenes",
+    detail: "Starting Soon, Be Right Back, Stream Ending",
+    on: ["Yes", "Yes", "Yes"],
+  },
+  { overlay: "Chat", detail: "Your chat, in your look", on: ["Yes", "Not yet", "Not yet"] },
+  {
+    overlay: "Alerts",
+    detail: "Raids, subs, gift subs and bits",
+    on: ["Yes", "Not yet", "No"],
+  },
+  {
+    overlay: "Follow alerts",
+    detail: "Need a Twitch login",
+    on: ["Not yet", "No", "No"],
+  },
+];
 
 const facts = ["8 looks", "Scenes, chat and alerts", "One link per overlay", "Free, no account"];
 
@@ -682,7 +702,80 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Good to know: what works where (T6.69). A heading beside a ruled list, not three equal cards. */}
+        {/* What works where (T6.79): one row per overlay, one column per platform, said in words. */}
+        <section
+          id="works"
+          className="px-6 pb-24 md:px-12 md:pb-32"
+          aria-labelledby="works-heading"
+        >
+          <div className="mx-auto max-w-7xl">
+            <h2
+              id="works-heading"
+              data-reveal
+              className="font-heading text-[clamp(2.25rem,4vw,3.5rem)] font-bold"
+            >
+              What works where
+            </h2>
+            <p className="mt-4 max-w-2xl text-lg text-haze">
+              Every overlay runs as a Browser source in OBS Studio or Streamlabs Desktop. The scenes
+              work wherever you stream; chat and alerts read your Twitch channel.
+            </p>
+            <div className="mt-10 overflow-x-auto rounded-3xl border border-white/10 bg-deep">
+              <table className="w-full min-w-[22rem] border-collapse text-left">
+                <caption className="sr-only">Which overlays work on which platform</caption>
+                <thead>
+                  <tr className="border-b border-white/10">
+                    <th
+                      scope="col"
+                      className="p-3 font-heading text-sm text-haze md:p-4 md:px-6 md:text-base"
+                    >
+                      Overlay
+                    </th>
+                    {platforms.map((name) => (
+                      <th
+                        key={name}
+                        scope="col"
+                        className="p-3 font-heading text-sm md:p-4 md:px-6 md:text-base"
+                      >
+                        {name}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {support.map((row) => (
+                    <tr key={row.overlay} className="border-b border-white/10 last:border-b-0">
+                      <th scope="row" className="p-3 align-top font-normal md:p-4 md:px-6">
+                        <span className="block font-heading text-lg font-bold">{row.overlay}</span>
+                        <span className="text-sm text-haze">{row.detail}</span>
+                      </th>
+                      {row.on.map((s, i) => (
+                        <td
+                          key={platforms[i]}
+                          data-support={s}
+                          className="p-3 align-top data-[support=No]:text-haze/80 data-[support=Not_yet]:text-haze md:p-4 md:px-6"
+                        >
+                          {s === "Yes" && (
+                            <span
+                              aria-hidden
+                              className="mr-2 inline-block size-2 rounded-full bg-cyan align-middle"
+                            />
+                          )}
+                          {s}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-4 max-w-2xl text-sm text-haze">
+              “Not yet” means it’s planned for a later version, not that it works today.
+            </p>
+          </div>
+        </section>
+
+        {/* Good to know (T6.69). A heading beside a ruled list, not three equal cards. */}
         <section className="px-6 pb-32 md:px-12 md:pb-48" aria-labelledby="know-heading">
           <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
             <h2
