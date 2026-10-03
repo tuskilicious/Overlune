@@ -39,15 +39,47 @@ export function decode(hash: string): Decoded {
     return { settings: defaultSettings, ok: false };
   }
 
-  const parsed = settingsV1.safeParse(data);
+  let parsed = settingsV1.safeParse(data);
   if (parsed.success) return { settings: parsed.data, ok: true };
 
-  // Keep every top-level field that is still valid, so one bad logo doesn't wipe the titles.
-  const input = typeof data === "object" && data !== null ? (data as Record<string, unknown>) : {};
-  const kept: Record<string, unknown> = {};
-  for (const [key, field] of Object.entries(settingsV1.shape)) {
-    const r = field.safeParse(input[key]);
-    if (r.success) kept[key] = r.data;
+  // Drop only the bad parts, one at a time, so a time zone this OBS doesn't know keeps the titles.
+  // Capped, since a hand-made link could hold any number of bad parts.
+  for (let tries = 0; tries < 100 && !parsed.success; tries++) {
+    const path = parsed.error.issues[0]?.path ?? [];
+    // A repeating countdown in the wrong zone or at a made-up time would be wrong on stream, so it goes whole.
+    const countdown =
+      path[0] === "starting" &&
+      (path[1] === "tz" || path[1] === "repeat") &&
+      ["daily", "days"].includes(String(at(data, ["starting", "repeat", "mode"])));
+    const paths = countdown ? ["endsAt", "tz", "repeat"].map((key) => ["starting", key]) : [path];
+    if (!paths.map((p) => drop(data, p)).some(Boolean)) break;
+    parsed = settingsV1.safeParse(data);
   }
-  return { settings: settingsV1.parse(kept), ok: false };
+  return { settings: parsed.success ? parsed.data : defaultSettings, ok: false };
+}
+
+/** Removes the value at `path`, or the whole list item when the path goes into one. false if nothing changed. */
+function drop(data: unknown, path: readonly PropertyKey[]): boolean {
+  const item = path.findIndex((key) => typeof key === "number");
+  const cut = item === -1 ? path : path.slice(0, item + 1);
+  const last = cut[cut.length - 1];
+  if (last === undefined) return false;
+  const parent = at(data, cut.slice(0, -1));
+  if (Array.isArray(parent) && typeof last === "number" && last < parent.length) {
+    parent.splice(last, 1);
+    return true;
+  }
+  if (typeof parent !== "object" || parent === null || !Object.hasOwn(parent, last)) return false;
+  delete (parent as Record<PropertyKey, unknown>)[last];
+  return true;
+}
+
+/** The value at `path`, or undefined. */
+function at(data: unknown, path: readonly PropertyKey[]): unknown {
+  let value = data;
+  for (const key of path) {
+    if (typeof value !== "object" || value === null) return undefined;
+    value = (value as Record<PropertyKey, unknown>)[key];
+  }
+  return value;
 }
