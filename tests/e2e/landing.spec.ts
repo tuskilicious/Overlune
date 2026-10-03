@@ -120,25 +120,45 @@ test("the alert pictures show whole alert cards, large enough to read (T6.48)", 
   page,
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-  // Measure the settled cards: before the web fonts load, the fallback font can wrap an alert to more lines, and
-  // the bounce overshoots mid-entrance. (Since T6.59 the crop follows the card, so it fits either way.)
+  // Settled cards only: no bounce mid-entrance. The web fonts can swap in after the cards are built (the fallback
+  // font wraps an alert to more lines), so poll until they have.
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const card = page.locator("li", { hasText: "Alerts with sound" });
   await card.scrollIntoViewIfNeeded(); // previews are built when they come near the screen (T6.78)
   await expect(card.locator(".landing-alert .alert-box")).toHaveCount(2);
-  await page.evaluate(() => document.fonts.ready);
-  const crops = await card.locator(".landing-alert .editor-preview").evaluateAll((els) =>
-    els.map((el) => {
-      const crop = el.getBoundingClientRect();
-      const box = el.querySelector(".alert-box")!.getBoundingClientRect();
-      return { crop, box };
-    }),
-  );
-  for (const { crop, box } of crops) {
-    expect(box.width).toBeGreaterThan(crop.width * 0.9); // the card fills the picture, not a strip in a canvas
-    expect(box.bottom).toBeLessThanOrEqual(crop.bottom); // and none of it is cut off
-  }
+  const fits = () =>
+    card.locator(".landing-alert .editor-preview").evaluateAll((els) =>
+      els.every((el) => {
+        const crop = el.getBoundingClientRect();
+        const box = el.querySelector(".alert-box")!.getBoundingClientRect();
+        // The card fills the picture, not a strip in a canvas, and none of it is cut off.
+        return box.width > crop.width * 0.9 && box.bottom <= crop.bottom;
+      }),
+    );
+  await expect.poll(fits).toBe(true);
+});
+
+test("the cropped alert pictures fit their cards, with no empty space under them (T6.85)", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  // The hero's two alerts and the looks section's one, each cropped to its card's height (T6.59). The crop was
+  // lost when previews started building after load (T6.78): it measured before the card existed.
+  const crops = page.locator("div.landing-alert.overflow-hidden");
+  await expect(crops).toHaveCount(3);
+  await crops.last().scrollIntoViewIfNeeded();
+  await expect(crops.locator(".alert-box")).toHaveCount(3);
+  const gaps = () =>
+    crops.evaluateAll((els) =>
+      els.map((el) => {
+        const crop = el.getBoundingClientRect();
+        const box = el.querySelector(".alert-box")!.getBoundingClientRect();
+        return Math.round(crop.bottom - box.bottom) || 0; // no -0
+      }),
+    );
+  await expect.poll(gaps).toEqual([0, 0, 0]);
 });
 
 // T6.56, T6.57: no feature card squeezes its text into a narrow column, from phones to wide windows.
