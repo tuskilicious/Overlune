@@ -980,7 +980,9 @@ export default function EditorPage() {
 
               <fieldset id="part-alerts" className="editor-part" tabIndex={-1}>
                 <legend>Alerts</legend>
-                <p className="editor-hint">Alerts use your channel name from Chat.</p>
+                <p className="editor-hint">
+                  Alerts use your channel name from Chat. Chat and alerts work with Twitch only.
+                </p>
                 <label className="editor-slider">
                   Alert volume
                   <input

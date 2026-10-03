@@ -221,6 +221,22 @@ function useSectionInView(ids: string[]) {
 
 const sections = ["kit", "looks", "how"];
 
+/** What works where, said plainly (T6.69): streamers couldn't tell which platforms are supported. */
+const goodToKnow = [
+  [
+    "Works in OBS and Streamlabs",
+    "Each overlay is a Browser source, so your scenes work wherever you stream.",
+  ],
+  [
+    "Chat and alerts are for Twitch",
+    "They read your Twitch channel. Follow alerts need a Twitch login, so they come in a later version.",
+  ],
+  [
+    "Your links never break",
+    "Paste a link once. When a look gets an update, your overlays pick it up on their own.",
+  ],
+] as const;
+
 const facts = ["8 looks", "Scenes, chat and alerts", "One link per overlay", "Free, no account"];
 
 const steps = [
@@ -582,6 +598,30 @@ export default function LandingPage() {
                 </li>
               ))}
             </ol>
+          </div>
+        </section>
+
+        {/* Good to know: what works where (T6.69). A heading beside a ruled list, not three equal cards. */}
+        <section className="px-6 pb-32 md:px-12 md:pb-48" aria-labelledby="know-heading">
+          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+            <h2
+              id="know-heading"
+              data-reveal
+              className="font-heading text-[clamp(2.25rem,4vw,3.5rem)] font-bold"
+            >
+              Good to know
+            </h2>
+            <dl className="divide-y divide-white/10 border-y border-white/10">
+              {goodToKnow.map(([term, text]) => (
+                <div
+                  key={term}
+                  className="grid gap-2 py-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:gap-8"
+                >
+                  <dt className="font-heading text-xl font-bold">{term}</dt>
+                  <dd className="m-0 text-haze">{text}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </section>
 

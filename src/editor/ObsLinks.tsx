@@ -102,6 +102,10 @@ export default function ObsLinks({ settings, heading }: { settings: Settings; he
         In OBS, add a <strong>Browser</strong> source, paste the link, and enter the width and
         height shown. New to OBS? Follow the <Link to="/guide">step-by-step setup guide</Link>.
       </p>
+      {/* Streamers asked whether a look's update would break their setup (T6.69). */}
+      <p>
+        Your links never change. When a look gets an update, your overlays pick it up on their own.
+      </p>
       <ul>
         {links.map((l) => (
           <LinkRow
