@@ -7,6 +7,15 @@ for (const path of ["/", "/guide", "/nope"]) {
     const footer = page.getByRole("contentinfo");
     await expect(footer.getByRole("link", { name: "Privacy" })).toHaveAttribute("href", "/privacy");
     await expect(footer.getByRole("link", { name: "Terms" })).toHaveAttribute("href", "/terms");
+    // T6.77: the open-source repo and a way to report a problem beyond email.
+    await expect(footer.getByRole("link", { name: "Open source on GitHub" })).toHaveAttribute(
+      "href",
+      "https://github.com/tuskilicious/Overlune",
+    );
+    await expect(footer.getByRole("link", { name: "Report a problem" })).toHaveAttribute(
+      "href",
+      "https://github.com/tuskilicious/Overlune/issues/new",
+    );
     await expect(footer.getByRole("link", { name: "support@overlune.in" })).toHaveAttribute(
       "href",
       "mailto:support@overlune.in",

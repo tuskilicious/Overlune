@@ -197,6 +197,7 @@ test("the hero lists four facts, all true for v1", async ({ page }) => {
     "Scenes, chat and alerts",
     "One link per overlay",
     "Free, no account",
+    "Open source",
   ]);
 });
 
