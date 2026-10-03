@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -20,13 +20,57 @@ import "./landing.css";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
+/** A preview that's built only when it comes near the screen (T6.78). The page shows about 20 live previews;
+ *  building them all at load blocked a weak CPU for 1 to 1.7 seconds. Until then, an empty box of the same shape
+ *  holds its place, so the layout and the scroll animations don't jump. */
+function LazyPreview({
+  width = 1920,
+  height = 1080,
+  children,
+}: {
+  width?: number;
+  height?: number;
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || near) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        setNear(true);
+        io.disconnect();
+      },
+      { rootMargin: "100% 0px" }, // a screen ahead, so it's ready before it scrolls in
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [near]);
+  if (near)
+    return (
+      <Preview width={width} height={height}>
+        {children}
+      </Preview>
+    );
+  return (
+    <div
+      ref={ref}
+      className="editor-preview"
+      aria-hidden
+      style={{ aspectRatio: `${width} / ${height}` }}
+    />
+  );
+}
+
 /** A theme's real Starting Soon scene as a picture. `live` keeps its motion (the hero); the rest hold still. */
 function Scene({ theme, live = false }: { theme: ThemeId; live?: boolean }) {
   return (
     <div className={live ? undefined : "landing-still"}>
-      <Preview>
+      <LazyPreview>
         <StartingSoon settings={sampleScene(theme)} />
-      </Preview>
+      </LazyPreview>
     </div>
   );
 }
@@ -48,9 +92,9 @@ function AlertCard({ theme, alert }: { theme: ThemeId; alert: number }) {
   }, [theme, alert]);
   return (
     <div ref={ref} className="landing-alert overflow-hidden rounded-xl" style={{ height }}>
-      <Preview width={1000} height={400}>
+      <LazyPreview width={1000} height={400}>
         <AlertView settings={sampleScene(theme)} alert={testAlerts[alert]!} />
-      </Preview>
+      </LazyPreview>
     </div>
   );
 }
@@ -181,9 +225,9 @@ function ElementShot({ part, theme }: { part: string; theme: ThemeId }) {
   if (part === "chat")
     return (
       <div className="mx-auto w-[36%]">
-        <Preview width={400} height={600}>
+        <LazyPreview width={400} height={600}>
           <ChatView settings={sampleScene(theme)} messages={chatSamples} />
-        </Preview>
+        </LazyPreview>
       </div>
     );
   if (part === "alerts")
@@ -193,9 +237,9 @@ function ElementShot({ part, theme }: { part: string; theme: ThemeId }) {
       </div>
     );
   return (
-    <Preview>
+    <LazyPreview>
       <SceneOf theme={theme} scene={part as KitScene} />
-    </Preview>
+    </LazyPreview>
   );
 }
 
@@ -506,9 +550,9 @@ export default function LandingPage() {
                   </p>
                 </div>
                 <div className="landing-still w-60 shrink-0 self-center overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:scale-105 md:w-36 md:self-auto">
-                  <Preview width={400} height={600}>
+                  <LazyPreview width={400} height={600}>
                     <ChatView settings={sampleScene("pastel-cloud")} messages={chatSamples} />
-                  </Preview>
+                  </LazyPreview>
                 </div>
               </li>
               <li className="group flex flex-col justify-between gap-4 overflow-hidden rounded-3xl border border-white/10 bg-deep p-6">
@@ -528,9 +572,9 @@ export default function LandingPage() {
                     ] as const
                   ).map(([theme, i]) => (
                     <div key={theme} className="overflow-hidden rounded-xl">
-                      <Preview width={1000} height={200}>
+                      <LazyPreview width={1000} height={200}>
                         <AlertView settings={sampleScene(theme)} alert={testAlerts[i]!} />
-                      </Preview>
+                      </LazyPreview>
                     </div>
                   ))}
                 </div>
