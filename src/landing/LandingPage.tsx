@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -43,13 +43,19 @@ function LazyPreview({
   width = 1920,
   height = 1080,
   children,
+  onBuilt,
 }: {
   width?: number;
   height?: number;
   children: ReactNode;
+  /** Called once the preview is built, for parents that measure what's inside. */
+  onBuilt?: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
+  useEffect(() => {
+    if (near) onBuilt?.();
+  }, [near, onBuilt]);
   useEffect(() => {
     const el = ref.current;
     if (!el || near) return;
@@ -105,6 +111,9 @@ type KitScene = "starting" | "brb" | "ending";
 function AlertCard({ theme, alert }: { theme: ThemeId; alert: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState<number>();
+  // The card only exists once its preview is built (T6.78), so measure from then on (T6.85).
+  const [built, setBuilt] = useState(false);
+  const onBuilt = useCallback(() => setBuilt(true), []);
   useLayoutEffect(() => {
     const box = ref.current!.querySelector(".alert-box");
     if (!box) return;
@@ -112,10 +121,10 @@ function AlertCard({ theme, alert }: { theme: ThemeId; alert: number }) {
     ro.observe(box);
     ro.observe(ref.current!);
     return () => ro.disconnect();
-  }, [theme, alert]);
+  }, [theme, alert, built]);
   return (
     <div ref={ref} className="landing-alert overflow-hidden rounded-xl" style={{ height }}>
-      <LazyPreview width={1000} height={400}>
+      <LazyPreview width={1000} height={400} onBuilt={onBuilt}>
         <AlertView settings={sampleScene(theme)} alert={testAlerts[alert]!} />
       </LazyPreview>
     </div>
