@@ -2,16 +2,10 @@ import * as Sentry from "@sentry/react";
 import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
 import { sentryEnvironment } from "./lib/sentry";
-import EditorPage from "./editor/EditorPage";
-import SetupGuide from "./editor/SetupGuide";
-import LegalPage from "./editor/LegalPage";
-import privacy from "../docs/legal/privacy.md?raw";
-import terms from "../docs/legal/terms.md?raw";
 import Alerts from "./overlays/alerts/Alerts";
 import Chat from "./overlays/chat/Chat";
 import FromLink from "./overlays/FromLink";
 import OverlayPlaceholder from "./overlays/OverlayPlaceholder";
-import NotFoundPage from "./editor/NotFoundPage";
 import StartingSoon from "./overlays/starting/StartingSoon";
 import TextScene from "./overlays/TextScene";
 import SentryTestPage from "./components/SentryTestPage";
@@ -21,6 +15,11 @@ const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
 
 // GSAP and Tailwind live in this chunk only, so the editor and overlays never load them.
 const LandingPage = lazy(() => import("./landing/LandingPage"));
+// The site pages load on their own too, so an overlay in OBS only loads what it shows (T6.82).
+const EditorPage = lazy(() => import("./editor/EditorPage"));
+const SetupGuide = lazy(() => import("./editor/SetupGuide"));
+const LegalPage = lazy(() => import("./editor/LegalPage"));
+const NotFoundPage = lazy(() => import("./editor/NotFoundPage"));
 
 /** "/" is always the landing page (T6.34, T6.67); returning visitors get a "Continue your overlay" button there.
  *  The editor used to live here, so its old bookmarks ("/#1.…", a saved overlay) still open /editor with their
@@ -28,11 +27,7 @@ const LandingPage = lazy(() => import("./landing/LandingPage"));
 function Home() {
   const { hash } = useLocation();
   if (/^#\d+\./.test(hash)) return <Navigate to={`/editor${hash}`} replace />;
-  return (
-    <Suspense fallback={null}>
-      <LandingPage />
-    </Suspense>
-  );
+  return <LandingPage />;
 }
 
 /** Each page's browser-tab title (T6.68). Overlays aren't listed: OBS never shows their title. */
@@ -66,44 +61,48 @@ export default function App() {
   return (
     <BrowserRouter>
       <PageMeta />
-      <SentryRoutes>
-        <Route path="/" element={<Home />} />
-        <Route path="/editor" element={<EditorPage />} />
-        <Route path="/guide" element={<SetupGuide />} />
-        <Route path="/privacy" element={<LegalPage source={privacy} />} />
-        <Route path="/terms" element={<LegalPage source={terms} />} />
-        <Route
-          path="/o/starting"
-          element={<FromLink>{(s, error) => <StartingSoon settings={s} error={error} />}</FromLink>}
-        />
-        <Route
-          path="/o/brb"
-          element={
-            <FromLink>
-              {(s, error) => <TextScene scene="brb" settings={s} error={error} />}
-            </FromLink>
-          }
-        />
-        <Route
-          path="/o/ending"
-          element={
-            <FromLink>
-              {(s, error) => <TextScene scene="ending" settings={s} error={error} />}
-            </FromLink>
-          }
-        />
-        <Route
-          path="/o/chat"
-          element={<FromLink>{(s, error) => <Chat settings={s} error={error} />}</FromLink>}
-        />
-        <Route
-          path="/o/alerts"
-          element={<FromLink>{(s, error) => <Alerts settings={s} error={error} />}</FromLink>}
-        />
-        <Route path="/o/:overlay" element={<OverlayPlaceholder />} />
-        {showSentryTest && <Route path="/_sentry-test" element={<SentryTestPage />} />}
-        <Route path="*" element={<NotFoundPage />} />
-      </SentryRoutes>
+      <Suspense fallback={null}>
+        <SentryRoutes>
+          <Route path="/" element={<Home />} />
+          <Route path="/editor" element={<EditorPage />} />
+          <Route path="/guide" element={<SetupGuide />} />
+          <Route path="/privacy" element={<LegalPage page="privacy" />} />
+          <Route path="/terms" element={<LegalPage page="terms" />} />
+          <Route
+            path="/o/starting"
+            element={
+              <FromLink>{(s, error) => <StartingSoon settings={s} error={error} />}</FromLink>
+            }
+          />
+          <Route
+            path="/o/brb"
+            element={
+              <FromLink>
+                {(s, error) => <TextScene scene="brb" settings={s} error={error} />}
+              </FromLink>
+            }
+          />
+          <Route
+            path="/o/ending"
+            element={
+              <FromLink>
+                {(s, error) => <TextScene scene="ending" settings={s} error={error} />}
+              </FromLink>
+            }
+          />
+          <Route
+            path="/o/chat"
+            element={<FromLink>{(s, error) => <Chat settings={s} error={error} />}</FromLink>}
+          />
+          <Route
+            path="/o/alerts"
+            element={<FromLink>{(s, error) => <Alerts settings={s} error={error} />}</FromLink>}
+          />
+          <Route path="/o/:overlay" element={<OverlayPlaceholder />} />
+          {showSentryTest && <Route path="/_sentry-test" element={<SentryTestPage />} />}
+          <Route path="*" element={<NotFoundPage />} />
+        </SentryRoutes>
+      </Suspense>
     </BrowserRouter>
   );
 }

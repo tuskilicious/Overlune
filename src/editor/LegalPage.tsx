@@ -3,8 +3,12 @@ import SiteFooter from "../components/SiteFooter";
 import { parseMarkdown, type Inline } from "../lib/markdown";
 import { brandChrome } from "./brand";
 import { themeVars } from "../themes/vars";
+import privacy from "../../docs/legal/privacy.md?raw";
+import terms from "../../docs/legal/terms.md?raw";
 import "./editor.css";
 import "./guide.css";
+
+const sources = { privacy, terms };
 
 const renderInline = (parts: Inline[]) =>
   parts.map((p, i) => {
@@ -21,7 +25,8 @@ const renderInline = (parts: Inline[]) =>
   });
 
 /** /privacy and /terms (T6.13): docs/legal/*.md stays the one source, rendered as React elements in the guide's style. */
-export default function LegalPage({ source }: { source: string }) {
+export default function LegalPage({ page }: { page: keyof typeof sources }) {
+  const source = sources[page];
   return (
     <div className="editor guide" style={themeVars(brandChrome)}>
       <header className="editor-header">
