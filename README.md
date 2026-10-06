@@ -6,12 +6,15 @@ It includes:
 - Starting Soon, BRB and Stream Ending scenes
 - A Twitch chat skin
 - Alerts for raids, subs, gift subs and bits, with sound
+- A webcam frame in your look
+- Twitch panels and an offline banner, downloaded as pictures
+- One file that imports every scene into OBS Studio
 - 9 looks: Clean Slate, Neon Grid, Cozy Café, Arcade 8-Bit, Pastel Cloud, Forest Night, Bold Esports, Vaporwave Sunset and Daylight
 - A step-by-step setup guide for OBS and Streamlabs
 
 Everything matches one theme. Paste the links into OBS or Streamlabs and you're live.
 
-> Status: v1.0.0, live at **https://overlune.in**. What changed: `CHANGELOG.md`. Work in progress: `docs/TASKS.md`. What's next: `docs/FUTURE-SCOPE.md`.
+> Status: v1.1.0, live at **https://overlune.in**. What changed: `CHANGELOG.md`. Work in progress: `docs/TASKS.md`. What's next: `docs/FUTURE-SCOPE.md`.
 
 Overlune is a free, non-commercial hobby project, provided **as is, with no warranty** (see [License](#license)).
 

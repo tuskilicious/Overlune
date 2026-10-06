@@ -2,7 +2,9 @@
 
 What changed in each Overlune release. Overlay links from every release keep working: the link format only ever gains optional settings.
 
-## Unreleased
+## 1.1.0 (2026-10-07)
+
+More to make, a faster start in OBS, and a privacy fix. Every 1.0 link keeps working as it was.
 
 ### New
 - **Channel page pictures:** Twitch panel headers (your own names) and an offline banner in your look, downloaded as PNG from the editor.
@@ -14,8 +16,16 @@ What changed in each Overlune release. Overlay links from every release keep wor
 ### Faster
 - Overlays start about a fifth faster on slow PCs: error reporting now loads after the overlay has drawn.
 
+### Privacy
+- **Fixed:** your overlay settings could reach our error reports. When an overlay loaded, the error tracker's performance sample (taken for about 1 in 20 loads) stored the full link, settings included. Now every field of every report is cleaned before it's sent, and a report is dropped rather than sent if cleaning ever fails. A second rule in the error tracker removes settings on its side too.
+- The site's source maps are no longer public. They go only to the error tracker, so its reports point at the right file and line.
+
 ### Fixed
 - The alert pictures on the home page crop to their cards again.
+
+### Under the hood
+- Updated React Router (8), Vite (8), Vitest (5), TypeScript (6.0) and Sentry (11), keeping exactly the same data settings and scrubbing as before.
+- The second copy at overlune.antideploy.app has been retired. overlune.in is the only address.
 
 ## 1.0.0 (2026-10-03)
 
