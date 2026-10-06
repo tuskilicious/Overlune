@@ -12,6 +12,7 @@ export const themeIds = [
   "vaporwave-sunset",
   "daylight",
   "abyss",
+  "session",
 ] as const;
 /** Bundled @fontsource families (OFL, docs/ASSETS.md). Loaded by src/themes/fonts.ts. Only add to the end. */
 export const fontIds = [
@@ -32,6 +33,8 @@ export const fontIds = [
   "Space Grotesk",
   "Unbounded",
   "Manrope",
+  "Archivo Black",
+  "Archivo",
 ] as const;
 export type FontId = (typeof fontIds)[number];
 /** Theme colors a streamer can override under "Advanced". */
@@ -39,7 +42,7 @@ export const colorTokens = ["bg", "surface", "primary", "accent", "text", "textM
 export type ColorToken = (typeof colorTokens)[number];
 export type ThemeId = (typeof themeIds)[number];
 export type BgEffect =
-  "none" | "grid" | "steam" | "scanlines" | "clouds" | "fireflies" | "sunset" | "abyss";
+  "none" | "grid" | "steam" | "scanlines" | "clouds" | "fireflies" | "sunset" | "abyss" | "session";
 export type AnimId = "slide-fade" | "bounce" | "steps" | "wipe";
 export type AlertAnimId = "slide-fade" | "glitch" | "bounce" | "steps" | "wipe";
 export type BadgeStyle = "pill";

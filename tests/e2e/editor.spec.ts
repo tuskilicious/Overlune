@@ -1083,6 +1083,7 @@ test("look filters show only that group, with the names under each card (T6.60)"
   await expect(page.locator(".editor-themes .editor-card:visible .editor-card-name")).toHaveText([
     "Arcade 8-Bit",
     "Vaporwave Sunset",
+    "Session",
   ]);
   await filters.getByRole("button", { name: "All" }).click();
   await expect(page.locator(".editor-themes .editor-card:visible")).toHaveCount(themeIds.length);

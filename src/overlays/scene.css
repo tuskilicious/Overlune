@@ -697,3 +697,64 @@
     text-shadow: 0 0 44px color-mix(in srgb, var(--accent) 60%, transparent);
   }
 }
+
+/* Session (T6.110): a jazz-session anime title card. A flat mustard field sliced by a teal bar and a thin brick bar
+   running hard and diagonal across the open top (clear of a three-line title), with print grain over every color (public/images/themes). The bars
+   stay above the content's top, so text only ever sits on mustard. Static, so no reduced-motion version. */
+.scene[data-bg="session"] {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(
+      -9deg,
+      transparent 0 72%,
+      #b23a2e 72% 74.5%,
+      transparent 74.5% 77%,
+      #146b6e 77% 91%,
+      transparent 91%
+    ),
+    var(--bg);
+}
+
+/* The grain sits over the bars and the cards alike, under nothing but the text. */
+.scene[data-bg="session"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: url("/images/themes/print-grain.svg");
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+}
+
+/* Huge ink caps set tight enough that the lines crash together. */
+.scene[data-theme="session"] .scene-title {
+  font-size: 168px;
+  font-weight: 400; /* Archivo Black has one weight */
+  line-height: 0.84;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+}
+
+.scene[data-theme="session"] .scene-title::before {
+  width: 140px;
+  height: 14px;
+  border-radius: 0;
+  background: var(--text);
+}
+
+.scene[data-theme="session"] .scene-subtitle {
+  font-weight: 600;
+}
+
+.scene[data-theme="session"] .countdown-time {
+  font-size: 84px;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+
+.scene[data-theme="session"] .scene-icon {
+  background: var(--text);
+  color: var(--bg);
+}

@@ -7,6 +7,7 @@ import { daylight } from "./daylight";
 import { forestNight } from "./forest-night";
 import { neonGrid } from "./neon-grid";
 import { pastelCloud } from "./pastel-cloud";
+import { session } from "./session";
 import { vaporwaveSunset } from "./vaporwave-sunset";
 import type { Theme, ThemeId } from "./types";
 
@@ -21,6 +22,7 @@ export const themes: Record<ThemeId, Theme> = {
   "vaporwave-sunset": vaporwaveSunset,
   daylight,
   abyss,
+  session,
 };
 
 export const defaultThemeId: ThemeId = "clean-slate";
