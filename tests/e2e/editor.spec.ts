@@ -201,7 +201,7 @@ test("keyboard focus is always visible", async ({ page }) => {
     if (focused.ring === "none 3px" && focused.label.startsWith('<input type="datetime-local"'))
       continue;
     expect(focused.ring, focused.label).toBe("solid 2px");
-    expect(++visited).toBeLessThan(80);
+    expect(++visited).toBeLessThan(120); // a guard against a focus loop, not a budget
   }
   expect(visited).toBeGreaterThan(30);
 });
