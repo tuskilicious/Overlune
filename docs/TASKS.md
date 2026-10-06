@@ -442,5 +442,6 @@ The owner asked for everything in `docs/FUTURE-SCOPE.md` that doesn't need Supab
 - [ ] **T6.96 Vitest 5.** Full suite.
   - *Built 2026-10-07 on `chore/vitest-5` (stacked on T6.95): 4.1.11 → 5.0.3. Read the 5.0.0 breaking changes first: Node 22 and Vite 6.4+ (we have 24 and 8); the rest (pretty-format messages, `$` titles without quotes, mocks cleared by default, removed `sequential`, browser-mode changes) don't affect our plain Node unit tests. No code changes; typecheck, lint, all 298 unit tests and the audit pass. Unit tests only, so no OBS test.*
 - [ ] **T6.97 TypeScript 7.** Typecheck and full suite.
+  - *Built 2026-10-07 on `chore/typescript-7` (stacked on T6.96), as **TypeScript 6.0** instead: 5.8.3 → 6.0.3. TypeScript 7 (the native rewrite, 7.0.2) isn't supported by typescript-eslint yet (8.71.1 supports `<6.1.0`), so it would break linting. 6.0 is the last release on the old compiler and the bridge to 7; it raised no errors or deprecations with our tsconfig. Typecheck, lint, 298 unit tests, the build and the audit pass. TypeScript 7 waits for typescript-eslint support (noted in FUTURE-SCOPE.md). No runtime change, so no OBS test.*
 - [ ] **T6.98 Sentry 11.** Scrubbing tests still pass; an event checked in staging.
 
