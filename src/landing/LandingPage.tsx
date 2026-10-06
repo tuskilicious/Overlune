@@ -381,6 +381,123 @@ const promise =
 const button =
   "inline-flex items-center justify-center rounded-full px-7 py-3.5 font-heading text-lg font-bold transition-colors duration-300";
 
+/** One orbit every 30 seconds while the pointer is over the ring (T6.105). */
+const ORBIT_SPEED = (Math.PI * 2) / 30;
+
+/**
+ * The nine looks orbiting their heading (T6.105), an original take on the "headline ringed by plates" idea, with the
+ * real looks as the plates. From 1024px the cards sit on an ellipse round the copy: front ones pass over it, back ones
+ * dim behind it, and every card keeps facing you. The ring rests until the pointer is over it, eases up to one orbit
+ * every 30 seconds and eases back to a stop on leave. Reduced motion: it stays still. Narrower windows: a plain grid.
+ */
+function LooksRing() {
+  const stage = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = stage.current!;
+    const cards = [...root.querySelectorAll<HTMLElement>("[data-ring-card]")];
+    const wide = matchMedia("(min-width: 1024px)");
+    const still = matchMedia("(prefers-reduced-motion: reduce)");
+    let angle = 0,
+      speed = 0,
+      target = 0,
+      frame = 0,
+      last = 0,
+      visible = false;
+    const place = () => {
+      if (!wide.matches) {
+        for (const c of cards) c.removeAttribute("style");
+        return;
+      }
+      const rx = Math.min(480, root.clientWidth / 2 - 160);
+      // The back half rises higher than the front half dips, so cards behind the copy clear the headline.
+      const front = 230,
+        back = 330;
+      // The ring sits lower than the copy so front cards pass under its button; the pair is raised together (the
+      // copy's padding below) so the group is centered in the stage.
+      const dy = 18;
+      cards.forEach((c, i) => {
+        const a = angle + (i / cards.length) * Math.PI * 2;
+        const depth = Math.cos(a); // 1 in front (bottom), -1 at the back (top)
+        const t = (depth + 1) / 2;
+        const y = depth * (depth > 0 ? front : back) + dy;
+        c.style.transform = `translate(-50%, -50%) translate(${Math.sin(a) * rx}px, ${y}px) scale(${0.55 + 0.45 * t})`;
+        // Dimmed, not faded: a faded card would show the cards and labels behind it.
+        c.style.filter = `brightness(${0.3 + 0.7 * t})`;
+        c.style.zIndex = String(depth > 0 ? 20 + Math.round(t * 10) : 1 + Math.round(t * 4));
+      });
+    };
+    const tick = (now: number) => {
+      const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+      last = now;
+      speed += (target - speed) * Math.min(1, dt * 2.5); // ease towards the target speed
+      angle += speed * dt;
+      place();
+      frame = visible && (target > 0 || speed > 0.0005) ? requestAnimationFrame(tick) : 0;
+      if (!frame) last = 0;
+    };
+    const run = () => {
+      if (!frame && visible) frame = requestAnimationFrame(tick);
+    };
+    const enter = () => {
+      if (still.matches || !wide.matches) return;
+      target = ORBIT_SPEED;
+      run();
+    };
+    const leave = () => {
+      target = 0;
+      run();
+    };
+    const io = new IntersectionObserver(([e]) => {
+      visible = Boolean(e?.isIntersecting);
+      if (visible) run();
+    });
+    io.observe(root);
+    root.addEventListener("pointerenter", enter);
+    root.addEventListener("pointerleave", leave);
+    wide.addEventListener("change", place);
+    place();
+    return () => {
+      cancelAnimationFrame(frame);
+      io.disconnect();
+      root.removeEventListener("pointerenter", enter);
+      root.removeEventListener("pointerleave", leave);
+      wide.removeEventListener("change", place);
+    };
+  }, []);
+  return (
+    <div ref={stage} className="landing-ring relative mx-auto max-w-7xl lg:h-[48rem]">
+      <div className="relative z-10 text-center lg:pointer-events-none lg:absolute lg:inset-0 lg:flex lg:flex-col lg:items-center lg:justify-center lg:pb-[94px]">
+        <h2
+          id="looks-heading"
+          className="mx-auto max-w-[34rem] font-heading text-[clamp(2.25rem,4vw,3.5rem)] leading-tight font-bold"
+        >
+          Nine looks. Every scene matches.
+        </h2>
+        <p className="mx-auto mt-6 max-w-md text-lg text-haze">
+          Pick one and your Starting Soon, Be Right Back and Stream Ending scenes, chat and alerts
+          all change together. Switch any time.
+        </p>
+        <Link
+          to="/editor"
+          className={`${button} mt-8 border border-moon/40 text-moon hover:border-moon lg:pointer-events-auto`}
+        >
+          Try them in the editor
+        </Link>
+      </div>
+      <ul className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:mt-0">
+        {themeIds.map((id) => (
+          <li key={id} data-ring-card className="landing-ring-card">
+            <div data-look className="overflow-hidden rounded-2xl border border-white/10">
+              <Scene theme={id} />
+            </div>
+            <p className="mt-3 font-heading text-xl font-bold">{themes[id].name}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 /** The marketing page at / for first-time visitors (T6.34). Saved work and old editor links go to /editor (App.tsx). */
 export default function LandingPage() {
   const root = useRef<HTMLDivElement>(null);
@@ -423,25 +540,6 @@ export default function LandingPage() {
             },
           },
         );
-        // Each look grows in as it arrives and dims as it leaves.
-        gsap.utils.toArray<HTMLElement>("[data-look]").forEach((el) =>
-          gsap
-            .timeline({
-              scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true },
-            })
-            .fromTo(el, { scale: 0.8, opacity: 0.4 }, { scale: 1, opacity: 1, ease: "none" })
-            .to(el, { opacity: 0.2, ease: "none" }, 0.75),
-        );
-      });
-      // Pinning needs room: only on wide windows.
-      mm.add("(prefers-reduced-motion: no-preference) and (min-width: 1024px)", () => {
-        ScrollTrigger.create({
-          trigger: "[data-gallery]",
-          start: "top top",
-          end: "bottom bottom",
-          pin: "[data-gallery-title]",
-          pinSpacing: false,
-        });
       });
     },
     { scope: root },
@@ -674,43 +772,10 @@ export default function LandingPage() {
         {/* Desire: the title stays put while every look scrolls past. */}
         <section
           id="looks"
-          data-gallery
-          className="relative px-6 md:px-12"
+          className="relative px-6 py-32 md:px-12 md:py-40"
           aria-labelledby="looks-heading"
         >
-          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-            <div data-gallery-title className="lg:h-screen lg:pt-40">
-              <h2
-                id="looks-heading"
-                className="font-heading text-[clamp(2.25rem,4vw,3.5rem)] leading-tight font-bold"
-              >
-                Nine looks. Every scene matches.
-              </h2>
-              <p className="mt-6 max-w-md text-lg text-haze">
-                Pick one and your Starting Soon, Be Right Back and Stream Ending scenes, chat and
-                alerts all change together. Switch any time.
-              </p>
-              <Link
-                to="/editor"
-                className={`${button} mt-8 border border-moon/40 text-moon hover:border-moon`}
-              >
-                Try them in the editor
-              </Link>
-            </div>
-            <ul className="flex flex-col gap-16 pb-32 lg:py-40">
-              {themeIds.map((id) => (
-                <li key={id} className="group">
-                  {/* Only the picture grows and dims; the name stays at full contrast. */}
-                  <div data-look className="overflow-hidden rounded-3xl border border-white/10">
-                    <div className="transition-transform duration-700 ease-out group-hover:scale-105">
-                      <Scene theme={id} />
-                    </div>
-                  </div>
-                  <p className="mt-4 font-heading text-2xl font-bold">{themes[id].name}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <LooksRing />
         </section>
 
         {/* How it works: slices that widen on hover or focus. */}
