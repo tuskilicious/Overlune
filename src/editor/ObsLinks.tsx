@@ -17,12 +17,15 @@ export interface LinkInfo {
   name: string;
   width: number;
   height: number;
+  /** Not every stream needs it (the webcam frame), so it doesn't count toward "You're set". */
+  optional?: boolean;
 }
 
 export function LinkRow({
   name,
   width,
   height,
+  optional,
   link,
   copiedLink,
   onCopied,
@@ -53,6 +56,7 @@ export function LinkRow({
         {/* The size shows as chips (T6.60); the dots stay for screen readers and the guide's size table. */}
         <span>
           <strong>{name}</strong>
+          {optional && <span className="editor-optional"> (optional)</span>}
           <span className="editor-sep"> · </span>
           <span className="editor-chip">
             Width <strong>{width}</strong>
@@ -85,16 +89,24 @@ export function LinkRow({
 /** "Link to paste into OBS" for each overlay. Every link carries all settings. */
 export default function ObsLinks({ settings, heading }: { settings: Settings; heading: string }) {
   const hash = encode(settings);
-  // Every overlay that gets a link: the scenes, chat (sized in the editor) and alerts.
+  // Every overlay that gets a link: the scenes, chat (sized in the editor), alerts and the webcam frame (T6.88).
   const links: LinkInfo[] = [
     ...(Object.keys(overlays) as OverlayId[]).map((id) => ({ id, ...overlays[id] })),
     { id: "chat", name: "Chat", width: settings.chat.width, height: settings.chat.height },
     { id: "alerts", name: "Alerts", width: 1920, height: 1080 },
+    {
+      id: "frame",
+      name: "Webcam frame",
+      width: settings.frame.width,
+      height: settings.frame.height,
+      optional: true,
+    },
   ];
   /** Each link as last copied this visit; kept in memory only (no tracking, no storage). */
   const [copied, setCopied] = useState<Record<string, string>>({});
   const linkFor = (id: string) => `${location.origin}/o/${id}#${hash}`;
-  const done = links.filter((l) => copied[l.id] === linkFor(l.id)).length;
+  const needed = links.filter((l) => !l.optional);
+  const done = needed.filter((l) => copied[l.id] === linkFor(l.id)).length;
 
   // "Copy all links" (T6.70): one text block with each overlay's name, size and link, to keep in a note while
   // setting up OBS. If the clipboard is blocked, the block shows in a box, selected, to copy by hand.
@@ -186,13 +198,13 @@ export default function ObsLinks({ settings, heading }: { settings: Settings; he
       </ul>
       {done > 0 && (
         <p className="editor-links-progress">
-          {done === links.length ? (
+          {done === needed.length ? (
             <>
-              <strong>You’re set: all {links.length} links copied.</strong> Paste each one into its
+              <strong>You’re set: all {needed.length} links copied.</strong> Paste each one into its
               own Browser source in OBS. The <Link to="/guide">setup guide</Link> shows how.
             </>
           ) : (
-            `${done} of ${links.length} links copied.`
+            `${done} of ${needed.length} links copied.`
           )}
         </p>
       )}

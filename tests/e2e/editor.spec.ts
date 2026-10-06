@@ -545,11 +545,12 @@ test("each overlay link shows the size to enter in OBS", async ({ page }) => {
   const rows = page
     .getByRole("region", { name: "Links to paste into OBS" })
     .locator(".editor-link");
-  await expect(rows).toHaveCount(5);
+  await expect(rows).toHaveCount(6);
   for (const row of (await rows.all()).slice(0, 3))
     await expect(row).toContainText("Width 1920 · Height 1080");
   await expect(rows.nth(3)).toContainText("Chat · Width 400 · Height 600");
   await expect(rows.nth(4)).toContainText("Alerts · Width 1920 · Height 1080");
+  await expect(rows.nth(5)).toContainText("Webcam frame (optional) · Width 640 · Height 360");
 });
 
 test("a pasted Twitch link becomes the channel name in the chat link", async ({ page }) => {
@@ -1011,6 +1012,7 @@ test.describe("three-column shell on wide windows (T6.60)", () => {
       "Socials",
       "Chat",
       "Alerts",
+      "Webcam frame",
       "Logo",
       "Motion",
       "Colors",
@@ -1042,6 +1044,7 @@ test.describe("three-column shell on wide windows (T6.60)", () => {
       "Socials",
       "Chat",
       "Alerts",
+      "Webcam frame",
       "Logo",
       "Motion",
       "Colors",
@@ -1170,13 +1173,14 @@ test("Copy all links copies every link with its size, and marks them copied (T6.
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.getByRole("button", { name: "Copy all links" }).click();
   await expect(page.locator(".editor-copy-all [role=status]")).toHaveText(
-    "Copied all 5 links with their sizes.",
+    "Copied all 6 links with their sizes.",
   );
   const text = await page.evaluate(() => navigator.clipboard.readText());
   // Windows' clipboard turns line breaks into \r\n.
   expect(text).toMatch(/Starting Soon \(width 1920, height 1080\)\r?\n/);
   expect(text).toMatch(/Chat \(width 400, height 600\)\r?\n/);
-  expect(text.match(/\/o\/(starting|brb|ending|chat|alerts)#1\./g)).toHaveLength(5);
+  expect(text).toMatch(/Webcam frame \(width 640, height 360\)\r?\n/);
+  expect(text.match(/\/o\/(starting|brb|ending|chat|alerts|frame)#1\./g)).toHaveLength(6);
   await expect(page.locator(".editor-links-progress")).toContainText("You’re set");
 });
 
@@ -1253,4 +1257,29 @@ test("Show badges under More chat options hides them in the chat preview (T6.76)
   await page.getByText("More chat options").click();
   await page.getByLabel("Show badges (Mod, Sub, VIP) before names").uncheck();
   await expect(chat.locator(".chat-badge")).toHaveCount(0);
+});
+
+test("the webcam frame: size, name and preview in the editor, and its link (T6.88)", async ({
+  page,
+}) => {
+  const part = page.locator("#part-frame");
+  await part.getByLabel("Frame width").fill("800");
+  await part.getByLabel("Frame height").fill("450");
+  await part.getByLabel("Name on the frame (optional)").fill("ronnistreams");
+  await expect(part.locator(".frame-label")).toHaveText("ronnistreams");
+  const row = page.locator(".editor-link").filter({ hasText: "Webcam frame" });
+  await expect(row).toContainText("Width 800 · Height 450");
+  const link = await row.getByRole("textbox").inputValue();
+  expect(link).toMatch(/\/o\/frame#1\./);
+
+  // The overlay: that size, the name, and a clear middle (only the edge is painted).
+  await page.goto(link.replace(/^https?:\/\/[^/]+/, ""));
+  const frame = page.locator(".frame");
+  await expect(frame).toHaveCSS("width", "800px");
+  await expect(frame).toHaveCSS("height", "450px");
+  await expect(page.locator(".frame-label")).toHaveText("ronnistreams");
+  const edge = page.locator(".frame-edge");
+  await expect(edge).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(edge).toHaveCSS("border-top-width", "19px"); // 450 / 24, between 8 and 28
+  await expect(page.locator("html")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
 });

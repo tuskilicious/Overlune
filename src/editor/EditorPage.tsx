@@ -28,6 +28,7 @@ import { applyOverrides, themeVars } from "../themes/vars";
 import { testAlerts, type AlertKind } from "../alerts/events";
 import { fillTemplate } from "../alerts/templates";
 import ChatView from "../overlays/chat/ChatView";
+import Frame from "../overlays/frame/Frame";
 import { botsFromInput } from "../overlays/chat/filters";
 import { chatSamples } from "./chat-samples";
 import { channelFromInput } from "../twitch/irc";
@@ -171,6 +172,7 @@ const sections = [
   ["part-socials", "Socials"],
   ["part-chat", "Chat"],
   ["part-alerts", "Alerts"],
+  ["part-frame", "Webcam frame"],
   ["part-logo", "Logo"],
   ["part-motion", "Motion"],
   ["part-colors", "Colors"],
@@ -319,6 +321,8 @@ export default function EditorPage() {
     setSettings((s) => ({ ...s, [key]: { ...s[key], ...patch } }));
   const updateChat = (patch: Partial<Settings["chat"]>) =>
     setSettings((s) => ({ ...s, chat: { ...s.chat, ...patch } }));
+  const updateFrame = (patch: Partial<Settings["frame"]>) =>
+    setSettings((s) => ({ ...s, frame: { ...s.frame, ...patch } }));
   const updateTemplate = (kind: AlertKind, value: string) =>
     setSettings((s) => ({
       ...s,
@@ -1109,6 +1113,49 @@ export default function EditorPage() {
                     {" {s}"} adds an “s” when the amount isn’t 1.
                   </p>
                 </details>
+              </fieldset>
+
+              <fieldset id="part-frame" className="editor-part" tabIndex={-1}>
+                <legend>Webcam frame</legend>
+                <p className="editor-hint">
+                  A border in your look to put around your camera. In OBS, add its link as its own
+                  Browser source above your camera, and line the two up.
+                </p>
+                <div className="editor-size">
+                  <NumberField
+                    label="Frame width"
+                    value={settings.frame.width}
+                    min={160}
+                    max={1920}
+                    describedBy="frame-size-hint"
+                    onChange={(width) => updateFrame({ width })}
+                  />
+                  <NumberField
+                    label="Frame height"
+                    value={settings.frame.height}
+                    min={120}
+                    max={1080}
+                    describedBy="frame-size-hint"
+                    onChange={(height) => updateFrame({ height })}
+                  />
+                </div>
+                <p id="frame-size-hint" className="editor-hint">
+                  Make it the size of your camera in OBS, and enter the same numbers there. They’re
+                  shown next to the Webcam frame link.
+                </p>
+                <label>
+                  Name on the frame (optional)
+                  <input
+                    value={settings.frame.label}
+                    maxLength={40}
+                    onChange={(e) => updateFrame({ label: e.target.value })}
+                  />
+                </label>
+                <div className="editor-frame-preview">
+                  <Preview width={settings.frame.width} height={settings.frame.height}>
+                    <Frame settings={settings} />
+                  </Preview>
+                </div>
               </fieldset>
 
               <fieldset id="part-logo" className="editor-part" tabIndex={-1}>
