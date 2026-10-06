@@ -155,8 +155,12 @@ const focusSoon = (id: string) => requestAnimationFrame(() => document.getElemen
 const jumpTo = (e: MouseEvent, id: string) => {
   e.preventDefault();
   const target = document.getElementById(id);
-  target?.scrollIntoView();
-  target?.focus();
+  // A smooth scroll shows where the section is (T6.103); reduced motion jumps straight there.
+  const still =
+    matchMedia("(prefers-reduced-motion: reduce)").matches ||
+    "rm" in document.documentElement.dataset;
+  target?.scrollIntoView({ behavior: still ? "auto" : "smooth" });
+  target?.focus({ preventScroll: true });
 };
 
 /** The editor's three steps (T6.18), in the steps bar and as section headings. */

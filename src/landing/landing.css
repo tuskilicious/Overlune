@@ -208,7 +208,7 @@
 
 /* A plain stand-in for a camera behind the webcam frame picture. */
 .landing-camera .editor-preview {
-  background: linear-gradient(135deg, #3b4150, #1b1e26);
+  background: linear-gradient(135deg, #6b7486, #3a414f);
 }
 
 .landing .editor-preview > .frame {

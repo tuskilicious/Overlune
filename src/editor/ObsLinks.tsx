@@ -56,8 +56,11 @@ export function LinkRow({
       <label>
         {/* The size shows as chips (T6.60); the dots stay for screen readers and the guide's size table. */}
         <span>
-          <strong>{name}</strong>
-          {optional && <span className="editor-optional"> (optional)</span>}
+          {/* Kept on one line, so "(optional)" never drops below the name (T6.103). */}
+          <span className="editor-link-name">
+            <strong>{name}</strong>
+            {optional && <span className="editor-optional"> (optional)</span>}
+          </span>
           <span className="editor-sep"> · </span>
           <span className="editor-chip">
             Width <strong>{width}</strong>
