@@ -5,6 +5,7 @@ What changed in each Overlune release. Overlay links from every release keep wor
 ## Unreleased
 
 ### New
+- **Import into OBS in one go:** download one file and import it in OBS Studio (Scene Collection → Import) to get every Overlune scene with your links and sizes already in. Streamlabs keeps the manual steps.
 - **Daylight:** a ninth look, and the first light one: cool paper, ink type and a vermilion accent.
 - **Webcam frame:** a border in your look to put around your camera, with an optional name tab. Set its size in the editor; its link is optional.
 - **Link previews:** sharing a link to the guide, the editor or the legal pages now shows that page's own title and description.

@@ -143,6 +143,19 @@ export default function SetupGuide() {
           />
         </section>
 
+        <section aria-labelledby="import-heading">
+          <h2 id="import-heading">Faster: import every scene at once (OBS Studio)</h2>
+          <p>
+            Instead of adding each link by hand, press{" "}
+            <strong>Download OBS scene collection</strong> in the editor’s links section. Then in
+            OBS, open the <strong>Scene Collection</strong> menu, choose <strong>Import</strong>,
+            pick the file and press <strong>Import</strong>, and switch to the{" "}
+            <strong>Overlune</strong> collection. Every scene arrives with your links and sizes, and
+            Alerts already has Control audio via OBS ticked. Add your game and camera to{" "}
+            <strong>Overlune: Live</strong>. Streamlabs can’t import it: use the steps above.
+          </p>
+        </section>
+
         <section aria-labelledby="black-heading">
           <h2 id="black-heading">Fix: a black or white box</h2>
           <ul>

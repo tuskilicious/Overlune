@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
@@ -1282,4 +1283,24 @@ test("the webcam frame: size, name and preview in the editor, and its link (T6.8
   await expect(edge).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(edge).toHaveCSS("border-top-width", "19px"); // 450 / 24, between 8 and 28
   await expect(page.locator("html")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+});
+
+test("Download OBS scene collection saves every scene with the streamer's links (T6.90)", async ({
+  page,
+}) => {
+  await page.getByLabel("Title", { exact: true }).fill("Soon!");
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: "Download OBS scene collection" }).click(),
+  ]);
+  expect(download.suggestedFilename()).toBe("overlune-scenes.json");
+  const file = JSON.parse(readFileSync(await download.path(), "utf8"));
+  const urls = file.sources
+    .filter((s: { id: string }) => s.id === "browser_source")
+    .map((s: { settings: { url: string } }) => s.settings.url);
+  expect(urls).toHaveLength(6);
+  // The same links as the rows below it.
+  const starting = await page.getByRole("textbox", { name: /^Starting Soon/ }).inputValue();
+  expect(urls).toContain(starting);
+  expect(file.scene_order.map((s: { name: string }) => s.name)).toContain("Overlune: Live");
 });
