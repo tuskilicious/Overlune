@@ -709,7 +709,7 @@
 }
 
 /* The name on its own line when the chips don't fit beside it. */
-.editor-link label > span > strong:first-child {
+.editor-link label > span > .editor-link-name {
   margin-right: 0;
 }
 
@@ -804,11 +804,12 @@
   font-weight: 400;
 }
 
-/* Webcam frame preview (T6.88): a plain stand-in for the camera, so the clear middle reads as clear. */
+/* Webcam frame preview (T6.88): a plain stand-in for the camera, so the clear middle reads as clear. Mid-grey, so
+   dark frames (Clean Slate, Bold Esports) still show against it (T6.103). */
 .editor-frame-preview .editor-preview {
   max-width: 420px;
   margin-top: 12px;
-  background: linear-gradient(135deg, #3b4150, #1b1e26);
+  background: linear-gradient(135deg, #6b7486, #3a414f);
 }
 
 .editor-preview > .chat,
@@ -1036,12 +1037,12 @@
 }
 
 @container (max-width: 480px) {
-  .editor-link label > span > strong:first-child {
+  .editor-link label > span > .editor-link-name {
     display: block;
     margin-bottom: 4px;
   }
 
-  .editor-link label > span > strong:first-child + .editor-sep + .editor-chip {
+  .editor-link label > span > .editor-link-name + .editor-sep + .editor-chip {
     margin-left: 0;
   }
 }
@@ -1108,4 +1109,40 @@
   padding-left: 1.4em;
   display: grid;
   gap: 6px;
+}
+
+/* Redesign pass (T6.103). Buttons answer the pointer: a quick tint on hover and a 1px press. Plain :where() keeps
+   these below every specific button style (look cards, filter pills, Copy link), so those keep their colors.
+   Reduced motion: index.css turns the transitions off. */
+:where(.editor) button {
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 80ms ease;
+}
+
+:where(.editor) button:hover:not(:disabled) {
+  border-color: var(--accent);
+  background-color: color-mix(in srgb, var(--accent) 14%, var(--bg));
+}
+
+.editor .editor-link button:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--accent) 80%, var(--text));
+}
+
+:where(.editor) button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.editor-link-name {
+  white-space: nowrap;
+}
+
+/* Even headline lines, no one-word last lines in hints. */
+.editor :is(h1, h2, h3, legend) {
+  text-wrap: balance;
+}
+
+.editor p {
+  text-wrap: pretty;
 }

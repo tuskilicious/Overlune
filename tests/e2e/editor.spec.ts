@@ -1130,7 +1130,7 @@ test("in the narrow settings column, a link's size chips sit together under its 
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   const row = page.locator("#obs-links .editor-link", { hasText: "Starting Soon" });
-  const name = (await row.locator("label > span > strong").first().boundingBox())!;
+  const name = (await row.locator("label .editor-link-name").first().boundingBox())!;
   const [width, height] = await row.locator(".editor-chip").all();
   const w = (await width!.boundingBox())!;
   const h = (await height!.boundingBox())!;

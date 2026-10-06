@@ -111,20 +111,23 @@ export default function ChannelPage({ settings }: { settings: Settings }) {
       <ul className="editor-panels">
         {panels.map((p, i) => (
           <li key={`${i}-${p}`}>
-            <div
-              className="channel-panel"
-              data-theme={theme.id}
-              style={{ ...themeVars(theme), "--panel-font": `${panelFont}px` } as CSSProperties}
-            >
-              <span className="channel-panel-bar" />
-              <span className="channel-panel-title">{p}</span>
+            {/* Shown smaller here so the list stays short; the download is full size (T6.103). */}
+            <div className="channel-panel-thumb">
+              <div
+                className="channel-panel"
+                data-theme={theme.id}
+                style={{ ...themeVars(theme), "--panel-font": `${panelFont}px` } as CSSProperties}
+              >
+                <span className="channel-panel-bar" />
+                <span className="channel-panel-title">{p}</span>
+              </div>
             </div>
             <button
               type="button"
               aria-label={`Download the ${p} panel`}
               onClick={(e) =>
                 save(
-                  e.currentTarget.previousElementSibling as HTMLElement,
+                  e.currentTarget.parentElement?.querySelector<HTMLElement>(".channel-panel"),
                   `panel-${fileName(p)}`,
                   PANEL.width,
                   PANEL.height,
