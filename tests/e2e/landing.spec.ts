@@ -224,11 +224,11 @@ test("the hero lists four facts, all true for v1", async ({ page }) => {
 
 test("each overlay card opens its part of the editor", async ({ page }) => {
   await page.goto("/");
-  const cards = page.getByRole("region", { name: "Five overlays in every look" }).getByRole("link");
-  await expect(cards).toHaveCount(5);
+  const cards = page.getByRole("region", { name: "Six overlays in every look" }).getByRole("link");
+  await expect(cards).toHaveCount(6);
   const hrefs = await cards.evaluateAll((els) => els.map((el) => el.getAttribute("href")));
   expect(hrefs).toEqual(
-    ["starting", "brb", "ending", "chat", "alerts"].map((p) => `/editor?part=${p}`),
+    ["starting", "brb", "ending", "chat", "frame", "alerts"].map((p) => `/editor?part=${p}`),
   );
 
   await cards.filter({ hasText: "Be Right Back" }).click();
@@ -242,6 +242,12 @@ test("the chat card opens the chat settings", async ({ page }) => {
   await page.goto("/editor?part=chat");
   await page.getByRole("button", { name: "Neon Grid" }).click();
   await expect(page.locator("#part-chat")).toBeInViewport();
+});
+
+test("the webcam frame card opens the frame settings (T6.102)", async ({ page }) => {
+  await page.goto("/editor?part=frame");
+  await page.getByRole("button", { name: "Neon Grid" }).click();
+  await expect(page.locator("#part-frame")).toBeInViewport();
 });
 
 test("the nav marks the section in view", async ({ page }) => {
@@ -262,6 +268,7 @@ test("the landing page says what works where (T6.69, T6.79)", async ({ page }) =
   await expect(know.locator("dt")).toHaveText([
     "What you’ll need",
     "Works in OBS and Streamlabs",
+    "Extras for your channel",
     "Your links never break",
   ]);
   // One row per overlay, one column per platform, in words.
@@ -269,6 +276,7 @@ test("the landing page says what works where (T6.69, T6.79)", async ({ page }) =
   const row = (name: string) => table.getByRole("row").filter({ hasText: name }).locator("td");
   await expect(row("Scenes")).toHaveText(["Yes", "Yes", "Yes"]);
   await expect(row("Chat")).toHaveText(["Yes", "Not yet", "Not yet"]);
+  await expect(row("Webcam frame")).toHaveText(["Yes", "Yes", "Yes"]);
   await expect(row("Raids, subs")).toHaveText(["Yes", "Not yet", "No"]);
   await expect(row("Follow alerts")).toHaveText(["Not yet", "No", "No"]);
   await expect(page.getByText("“Not yet” means it’s planned for a later version")).toBeVisible();

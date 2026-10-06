@@ -13,6 +13,7 @@ import AlertView from "../overlays/alerts/AlertView";
 import ChatView from "../overlays/chat/ChatView";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
+import Frame from "../overlays/frame/Frame";
 import { themes } from "../themes";
 import { themeIds, type ThemeId } from "../themes/types";
 import "../editor/brand"; // brand fonts (Quicksand, Nunito)
@@ -247,6 +248,12 @@ const elements: { part: string; name: string; line: string; theme: ThemeId }[] =
   },
   { part: "chat", name: "Chat", line: "Your Twitch chat in the same look.", theme: "cozy-cafe" },
   {
+    part: "frame",
+    name: "Webcam frame",
+    line: "A border for your camera, if you use one.",
+    theme: "vaporwave-sunset",
+  },
+  {
     part: "alerts",
     name: "Alerts",
     line: "Raids, subs, gift subs and bits.",
@@ -260,6 +267,20 @@ function ElementShot({ part, theme }: { part: string; theme: ThemeId }) {
       <div className="mx-auto w-[36%]">
         <LazyPreview width={400} height={600}>
           <ChatView settings={sampleScene(theme)} messages={chatSamples} />
+        </LazyPreview>
+      </div>
+    );
+  if (part === "frame")
+    return (
+      // A plain stand-in for the camera behind it, so the clear middle reads as clear (T6.88).
+      <div className="landing-camera mx-auto mt-[9%] w-[72%]">
+        <LazyPreview width={640} height={360}>
+          <Frame
+            settings={{
+              ...sampleScene(theme),
+              frame: { width: 640, height: 360, label: "yourname" },
+            }}
+          />
         </LazyPreview>
       </div>
     );
@@ -309,6 +330,10 @@ const goodToKnow = [
     "Each overlay is a Browser source in OBS Studio or Streamlabs Desktop, whatever platform you stream to.",
   ],
   [
+    "Extras for your channel",
+    "Twitch panels and an offline banner in your look, downloaded as pictures from the editor.",
+  ],
+  [
     "Your links never break",
     "Paste a link once. When a look gets an update, your overlays pick it up on their own.",
   ],
@@ -326,6 +351,7 @@ const support: { overlay: string; detail: string; on: [Support, Support, Support
     on: ["Yes", "Yes", "Yes"],
   },
   { overlay: "Chat", detail: "Your chat, in your look", on: ["Yes", "Not yet", "Not yet"] },
+  { overlay: "Webcam frame", detail: "A border for your camera", on: ["Yes", "Yes", "Yes"] },
   {
     overlay: "Alerts",
     detail: "Raids, subs, gift subs and bits",
@@ -341,9 +367,12 @@ const support: { overlay: string; detail: string; on: [Support, Support, Support
 const facts = ["9 looks", "Scenes, chat and alerts", "One link per overlay", "Free, no account"];
 
 const steps = [
-  ["Pick a look", "Eight themes, each with matching scenes, chat and alerts."],
+  ["Pick a look", "Nine looks, each with matching scenes, chat and alerts."],
   ["Add your details", "Your title, countdown, socials and Twitch channel name."],
-  ["Paste into OBS", "Copy each link into a Browser source. The setup guide shows how."],
+  [
+    "Paste into OBS",
+    "Copy each link into a Browser source, or import every scene at once in OBS Studio. The setup guide shows how.",
+  ],
 ] as const;
 
 const promise =
@@ -525,7 +554,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* The five overlays, each opening its part of the editor (T6.59). */}
+        {/* The six overlays, each opening its part of the editor (T6.59), in two rows of three. */}
         <section id="kit" className="px-6 pt-32 md:px-12 md:pt-48" aria-labelledby="kit-heading">
           <div className="mx-auto max-w-7xl">
             <h2
@@ -533,10 +562,10 @@ export default function LandingPage() {
               data-reveal
               className="font-heading text-[clamp(2.25rem,4vw,3.5rem)] font-bold"
             >
-              Five overlays in every look
+              Six overlays in every look
             </h2>
             <p className="mt-4 max-w-xl text-lg text-haze">Open any of them in the editor.</p>
-            <ul className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+            <ul className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
               {elements.map((e) => (
                 <li key={e.part}>
                   <Link
@@ -655,7 +684,7 @@ export default function LandingPage() {
                 id="looks-heading"
                 className="font-heading text-[clamp(2.25rem,4vw,3.5rem)] leading-tight font-bold"
               >
-                Eight looks. Every scene matches.
+                Nine looks. Every scene matches.
               </h2>
               <p className="mt-6 max-w-md text-lg text-haze">
                 Pick one and your Starting Soon, Be Right Back and Stream Ending scenes, chat and
@@ -694,18 +723,20 @@ export default function LandingPage() {
             >
               Live in three steps
             </h2>
-            <ol className="mt-12 flex flex-col gap-4 md:h-80 md:flex-row">
+            <ol className="mt-12 flex flex-col gap-4 md:flex-row">
               {steps.map(([title, text], i) => (
                 <li
                   key={title}
                   tabIndex={0}
-                  className="group flex flex-col justify-end rounded-3xl border border-white/10 bg-deep p-8 transition-[flex-grow] duration-500 ease-out hover:grow-[2.5] focus:grow-[2.5] md:grow"
+                  className="group flex flex-col gap-10 rounded-3xl border border-white/10 bg-deep p-8 transition-[flex-grow] duration-500 ease-out hover:grow-[2.5] focus:grow-[2.5] md:grow"
                 >
                   <span aria-hidden className="font-heading text-6xl font-bold text-violet">
                     {i + 1}
                   </span>
-                  <h3 className="mt-4 font-heading text-2xl font-bold">{title}</h3>
-                  <p className="mt-2 max-w-sm text-haze">{text}</p>
+                  <div>
+                    <h3 className="font-heading text-2xl font-bold">{title}</h3>
+                    <p className="mt-2 max-w-sm text-haze">{text}</p>
+                  </div>
                 </li>
               ))}
             </ol>
@@ -825,7 +856,7 @@ export default function LandingPage() {
 
         {/* Action. */}
         <section
-          className="landing-ambient px-6 py-32 text-center md:px-12 md:py-48"
+          className="landing-ambient px-6 pt-16 pb-32 text-center md:px-12 md:pt-24 md:pb-48"
           aria-labelledby="cta-heading"
         >
           <h2

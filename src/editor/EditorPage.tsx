@@ -213,6 +213,7 @@ const partTargets: Record<string, string> = {
   ending: "part-scenes",
   chat: "part-chat",
   alerts: "part-alerts",
+  frame: "part-frame",
 };
 
 /** Survives a trip to the setup guide and back, so the gallery isn't shown twice in one visit. */

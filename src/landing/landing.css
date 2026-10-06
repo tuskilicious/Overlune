@@ -196,3 +196,22 @@
 .landing-kit-alerts > * {
   filter: drop-shadow(0 12px 24px rgb(5 6 26 / 0.6));
 }
+
+/* Even line lengths (redesign pass, T6.102): headlines don't strand a word, paragraphs avoid one-word last lines. */
+.landing :is(h1, h2, h3) {
+  text-wrap: balance;
+}
+
+.landing p {
+  text-wrap: pretty;
+}
+
+/* A plain stand-in for a camera behind the webcam frame picture. */
+.landing-camera .editor-preview {
+  background: linear-gradient(135deg, #3b4150, #1b1e26);
+}
+
+.landing .editor-preview > .frame {
+  transform: scale(var(--scale));
+  transform-origin: 0 0;
+}
