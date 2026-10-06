@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Link } from "react-router";
 import type { Settings } from "../settings/schema";
 import { encode } from "../settings/url";
+import { sceneCollection } from "./scene-collection";
 
 /** The full-screen scenes, with the Browser Source size to enter in OBS. */
 export const overlays = {
@@ -86,6 +87,16 @@ export function LinkRow({
   );
 }
 
+/** Saves the OBS scene collection (T6.90) as a file. */
+function downloadCollection(settings: Settings) {
+  const json = JSON.stringify(sceneCollection(settings, location.origin), null, 2);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([json], { type: "application/json" }));
+  a.download = "overlune-scenes.json";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
 /** "Link to paste into OBS" for each overlay. Every link carries all settings. */
 export default function ObsLinks({ settings, heading }: { settings: Settings; heading: string }) {
   const hash = encode(settings);
@@ -166,6 +177,36 @@ export default function ObsLinks({ settings, heading }: { settings: Settings; he
           and fixes.
         </p>
       </details>
+      {/* One file instead of six pastes (T6.90). OBS Studio only: Streamlabs can't import it. */}
+      <div className="editor-collection">
+        <h3>Faster in OBS Studio: import every scene at once</h3>
+        <p>One file makes all your Overlune scenes in OBS, with your links and sizes already in.</p>
+        <button type="button" onClick={() => downloadCollection(settings)}>
+          Download OBS scene collection
+        </button>
+        <ol>
+          <li>
+            In OBS, open the <strong>Scene Collection</strong> menu at the top and choose{" "}
+            <strong>Import</strong>.
+          </li>
+          <li>
+            Press <strong>…</strong> next to Collection Path, pick{" "}
+            <strong>overlune-scenes.json</strong> and press <strong>Import</strong>.
+          </li>
+          <li>
+            In the <strong>Scene Collection</strong> menu, choose <strong>Overlune</strong>.
+          </li>
+          <li>
+            In <strong>Overlune: Live</strong>, add your game and camera with <strong>+</strong>{" "}
+            under Sources, then drag them to the bottom of the list.
+          </li>
+        </ol>
+        <p className="editor-hint">
+          Made for OBS’s usual 1920×1080 canvas; on another size, right-click a source and choose
+          Transform → Fit to screen. Changed something here? Download it again. Streamlabs can’t
+          import this file, so paste the links below instead.
+        </p>
+      </div>
       {/* Streamers asked whether a look's update would break their setup (T6.69). */}
       <p>
         Your links never change. When a look gets an update, your overlays pick it up on their own.

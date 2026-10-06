@@ -781,6 +781,24 @@
   background: var(--bg);
 }
 
+/* Scene collection download (T6.90): one quiet box above the links. */
+.editor-collection {
+  margin: 16px 0;
+  padding: 16px 20px;
+  border: var(--border);
+  border-radius: var(--radius);
+}
+
+.editor-collection h3 {
+  margin: 0 0 4px;
+  font-size: 17px;
+}
+
+.editor-collection ol {
+  margin: 12px 0 0;
+  padding-left: 22px;
+}
+
 .editor-optional {
   color: var(--text-muted);
   font-weight: 400;
