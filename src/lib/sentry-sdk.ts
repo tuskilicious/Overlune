@@ -11,7 +11,26 @@ export function initSentry(dsn: string, environment: string) {
     dsn,
     environment,
     release: import.meta.env.VITE_SENTRY_RELEASE,
-    sendDefaultPii: false,
+    // Sentry 11 replaced sendDefaultPii with dataCollection, and leaving it unset collects MORE (user info, cookies,
+    // bodies). This is the documented v10 baseline, written out, so nothing new is collected (T6.98).
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+      httpHeaders: {
+        request: { deny: ["forwarded", "-ip", "remote-", "via", "-user"] },
+        response: { deny: ["forwarded", "-ip", "remote-", "via", "-user"] },
+      },
+      httpBodies: [],
+      urlQueryParams: { deny: ["forwarded", "-ip", "remote-", "via", "-user"] },
+      genAI: { inputs: false, outputs: false },
+      databaseQueryData: false,
+      queues: false,
+      graphQL: { document: false, variables: false },
+    },
+    // Sentry 11 streams spans by default, and then beforeSendTransaction never runs, so the scrubber below would never
+    // see page-load spans, whose url.full carries the settings (T6.99). The static lifecycle keeps every span going
+    // through it. Move to beforeSendSpan only with a test that proves the same.
+    traceLifecycle: "static",
     // Transactions are named by path (/o/chat, /editor): the same as the route patterns, as Overlune has no params
     // worth grouping except /o/:overlay.
     integrations: [Sentry.browserTracingIntegration()],
