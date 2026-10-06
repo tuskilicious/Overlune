@@ -29,7 +29,7 @@ test("returning visitors land on the landing page and can continue their overlay
   page,
 }) => {
   await page.goto("/editor");
-  await page.getByRole("button", { name: "Neon Grid" }).click();
+  await page.getByRole("button", { name: "Neon Grid", exact: true }).click();
   await page.goto("about:blank");
   await page.goto("/");
   await expect(page).toHaveURL(/\/$/);
@@ -43,7 +43,7 @@ test("returning visitors land on the landing page and can continue their overlay
 
 test("the editor's logo leads back to the landing page (T6.67)", async ({ page }) => {
   await page.goto("/editor");
-  await page.getByRole("button", { name: "Cozy Café" }).click();
+  await page.getByRole("button", { name: "Cozy Café", exact: true }).click();
   await page.getByRole("link", { name: "Overlune home" }).click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
@@ -57,7 +57,7 @@ test("the editor and overlays never load the landing page's animation library", 
   const gsap: string[] = [];
   page.on("request", (r) => /gsap|LandingPage/i.test(r.url()) && gsap.push(r.url()));
   await page.goto("/editor");
-  await page.getByRole("button", { name: "Clean Slate" }).click();
+  await page.getByRole("button", { name: "Clean Slate", exact: true }).click();
   await page.goto("/o/starting");
   await expect(page.locator(".scene")).toBeVisible();
   expect(gsap).toEqual([]);
@@ -233,20 +233,20 @@ test("each overlay card opens its part of the editor", async ({ page }) => {
 
   await cards.filter({ hasText: "Be Right Back" }).click();
   // A first visit picks a look first; the part opens after that.
-  await page.getByRole("button", { name: "Cozy Café" }).click();
+  await page.getByRole("button", { name: "Cozy Café", exact: true }).click();
   await expect(page.getByRole("radio", { name: "Be Right Back" })).toBeChecked();
   await expect(page.locator("#part-scenes")).toBeInViewport();
 });
 
 test("the chat card opens the chat settings", async ({ page }) => {
   await page.goto("/editor?part=chat");
-  await page.getByRole("button", { name: "Neon Grid" }).click();
+  await page.getByRole("button", { name: "Neon Grid", exact: true }).click();
   await expect(page.locator("#part-chat")).toBeInViewport();
 });
 
 test("the webcam frame card opens the frame settings (T6.102)", async ({ page }) => {
   await page.goto("/editor?part=frame");
-  await page.getByRole("button", { name: "Neon Grid" }).click();
+  await page.getByRole("button", { name: "Neon Grid", exact: true }).click();
   await expect(page.locator("#part-frame")).toBeInViewport();
 });
 
