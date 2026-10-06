@@ -1,13 +1,3 @@
-import * as Sentry from "@sentry/react";
-import { useEffect } from "react";
-import {
-  createRoutesFromChildren,
-  matchRoutes,
-  useLocation,
-  useNavigationType,
-} from "react-router";
-import { scrubBreadcrumb, scrubEvent } from "./sentry-scrub";
-
 const dsn = import.meta.env.VITE_SENTRY_DSN;
 
 export const sentryEnvironment: string =
@@ -15,40 +5,50 @@ export const sentryEnvironment: string =
 
 export const sentryEnabled = Boolean(dsn);
 
+type Capture = (error: unknown, componentStack?: string) => void;
+
 /**
- * Sentry setup follows the official React guide (errors + tracing),
- * with Overlune's privacy rules from CLAUDE.md applied:
- * no PII, no URL fragments (settings), no console breadcrumbs (chat text).
- * If VITE_SENTRY_DSN is not set (e.g. local dev), Sentry stays off.
+ * Holds errors until Sentry has loaded, then hands them over (T6.93). The SDK is about 150 kB, so it loads after the
+ * overlay has drawn instead of before. A short queue, so an error loop can't grow it without end.
  */
-export function initSentry(): void {
+export function createReporter() {
+  let capture: Capture | null = null;
+  const queue: [unknown, string | undefined][] = [];
+  return {
+    report(error: unknown, componentStack?: string) {
+      if (capture) capture(error, componentStack);
+      else if (queue.length < 20) queue.push([error, componentStack]);
+    },
+    ready(c: Capture) {
+      capture = c;
+      for (const [error, stack] of queue.splice(0)) c(error, stack);
+    },
+  };
+}
+
+const reporter = createReporter();
+
+/** Reports an error to Sentry, now or once it has loaded. Does nothing when Sentry is off (no DSN). */
+export function reportError(error: unknown, componentStack?: string): void {
+  if (sentryEnabled) reporter.report(error, componentStack);
+}
+
+/** Starts Sentry after the page's load event. Window errors from before then are queued, not lost. */
+export function startSentry(): void {
   if (!dsn) return;
-
-  Sentry.init({
-    dsn,
-    environment: sentryEnvironment,
-    release: import.meta.env.VITE_SENTRY_RELEASE,
-    sendDefaultPii: false,
-
-    integrations: [
-      Sentry.reactRouterV7BrowserTracingIntegration({
-        useEffect,
-        useLocation,
-        useNavigationType,
-        createRoutesFromChildren,
-        matchRoutes,
-      }),
-    ],
-
-    // Overlays run for hours on every streamer's PC, so production samples lightly
-    // to stay inside the free quota. Staging/dev trace everything.
-    tracesSampleRate: sentryEnvironment === "production" ? 0.05 : 1.0,
-
-    // There is no Overlune backend. Never attach trace headers to third parties (Twitch).
-    tracePropagationTargets: [],
-
-    beforeSend: (event) => scrubEvent(event),
-    beforeSendTransaction: (event) => scrubEvent(event),
-    beforeBreadcrumb: (breadcrumb) => scrubBreadcrumb(breadcrumb),
-  });
+  const early = (e: ErrorEvent | PromiseRejectionEvent) =>
+    reportError("reason" in e ? e.reason : (e.error ?? e.message));
+  addEventListener("error", early);
+  addEventListener("unhandledrejection", early);
+  const load = () =>
+    import("./sentry-sdk")
+      .then(({ initSentry }) => {
+        // From here Sentry's own handlers catch window errors.
+        removeEventListener("error", early);
+        removeEventListener("unhandledrejection", early);
+        reporter.ready(initSentry(dsn, sentryEnvironment));
+      })
+      .catch(() => {}); // a blocked or failed chunk must never break the overlay
+  if (document.readyState === "complete") setTimeout(load);
+  else addEventListener("load", () => setTimeout(load), { once: true });
 }
