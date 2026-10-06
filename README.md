@@ -88,18 +88,6 @@ Cloudflare Pages:
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on every PR and push to `main`: lint, typecheck, unit tests, build, `npm audit`, Playwright tests and a gitleaks scan.
 
-### Antideploy (second copy)
-A second copy runs at https://overlune.antideploy.app (app id in `.antideploy.json`). It lacks some security headers, so streamers should use the Cloudflare address (see `docs/STACK.md`). Deploys are manual. After `main` changes, run this from the repo with your Antideploy token in `~/.antideploy/config.json`:
-
-```bash
-git archive --format=tar.gz -o overlune.tar.gz origin/main
-TOKEN=$(node -p 'const p=require("path"),o=require("os");require(p.join(o.homedir(),".antideploy","config.json")).token')
-curl -sS -X POST "https://antideploy.com/api/v1/deploy?applicationId=c6edee97-b764-48be-a4a4-4fdfca0d28cf" -H "authorization: Bearer $TOKEN" -F "archive=@overlune.tar.gz"
-rm overlune.tar.gz
-```
-
-`git archive` packs only committed files, so `.env*` files and `node_modules` are never uploaded. Sentry for this copy: set `VITE_SENTRY_DSN` and `VITE_SENTRY_ENVIRONMENT=antideploy` in the Antideploy dashboard.
-
 ### Cloudflare Pages settings
 Pages settings: build command `npm run build`, output `dist`, Node from `.nvmrc`. Environment variables (Settings → Variables):
 

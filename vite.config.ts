@@ -4,26 +4,7 @@ import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
-import { cspForMeta } from "./src/lib/csp-meta.ts";
 import { pageHtml, pages } from "./src/lib/page-meta.ts";
-
-// Hosts that ignore public/_headers (Antideploy) still get the CSP and referrer policy.
-// Build only: the dev server relies on inline scripts and styles that this CSP blocks.
-const securityMeta: Plugin = {
-  name: "overlune-security-meta",
-  apply: "build",
-  transformIndexHtml: () => [
-    {
-      tag: "meta",
-      attrs: {
-        "http-equiv": "Content-Security-Policy",
-        content: cspForMeta(readFileSync("public/_headers", "utf8")),
-      },
-      injectTo: "head-prepend",
-    },
-    { tag: "meta", attrs: { name: "referrer", content: "no-referrer" }, injectTo: "head-prepend" },
-  ],
-};
 
 // Link previews (T6.87): a copy of index.html per site page with its own title and tags. Cloudflare Pages serves
 // guide.html at /guide, so addresses don't change.
@@ -63,7 +44,6 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       tailwindcss(),
-      securityMeta,
       pagePreviews,
       upload &&
         sentryVitePlugin({

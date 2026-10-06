@@ -35,10 +35,7 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 - **Cloudflare Pages** (free). We chose it over GitHub Pages because GitHub Pages cannot set the security headers CLAUDE.md §7 requires.
 - Production is the `main` branch. Staging is the automatic preview deploy for each branch or PR.
 - Headers: `public/_headers`. SPA fallback: built in (Pages serves `index.html` for unknown paths when there is no `404.html`), so no `_redirects`.
-- **Antideploy** (free for static sites), a second copy at https://overlune.antideploy.app, added 2026-10-01 alongside Cloudflare. Cloudflare stays production, and every overlay link points there. The app id is in `.antideploy.json` (no secret).
-  - Antideploy ignores `public/_headers`. The build adds the CSP and `no-referrer` as `<meta>` tags instead (`vite.config.ts`, CSP read from `_headers`). HSTS, `nosniff`, `Permissions-Policy` and `frame-ancestors` cannot be set this way, and HTTP is not redirected to HTTPS, so this copy is weaker than Cloudflare's. Don't give streamers this address until that changes.
-  - A `public/` folder with the same name as a page (e.g. `public/guide/`) shadows the page there. Keep static files under `public/images/`, `public/sounds/` and so on.
-  - Deploys are manual: the owner uploads a `git archive` of `main` (README, "Deploy").
+- **Antideploy:** a second copy ran at overlune.antideploy.app from 2026-10-01; the owner scrapped it on 2026-10-07. Cloudflare Pages is the only host, so the security headers in `public/_headers` are the only place the CSP lives.
 
 ## Twitch data without login
 - Chat, sub, resub, gift sub, raid and bits events arrive over anonymous IRC: `PRIVMSG` and `USERNOTICE` (which carries `msg-id`), plus the `bits` tag.
