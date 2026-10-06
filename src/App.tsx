@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/react";
 import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
 import { pages } from "./lib/page-meta";
@@ -11,9 +10,6 @@ import OverlayPlaceholder from "./overlays/OverlayPlaceholder";
 import StartingSoon from "./overlays/starting/StartingSoon";
 import TextScene from "./overlays/TextScene";
 import SentryTestPage from "./components/SentryTestPage";
-
-// Lets Sentry name page-load/navigation traces by route (e.g. /o/:overlay).
-const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
 
 // GSAP and Tailwind live in this chunk only, so the editor and overlays never load them.
 const LandingPage = lazy(() => import("./landing/LandingPage"));
@@ -56,7 +52,7 @@ export default function App() {
     <BrowserRouter>
       <PageMeta />
       <Suspense fallback={null}>
-        <SentryRoutes>
+        <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/editor" element={<EditorPage />} />
           <Route path="/guide" element={<SetupGuide />} />
@@ -99,7 +95,7 @@ export default function App() {
           <Route path="/o/:overlay" element={<OverlayPlaceholder />} />
           {showSentryTest && <Route path="/_sentry-test" element={<SentryTestPage />} />}
           <Route path="*" element={<NotFoundPage />} />
-        </SentryRoutes>
+        </Routes>
       </Suspense>
     </BrowserRouter>
   );

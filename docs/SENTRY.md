@@ -40,3 +40,6 @@ Error reports show real file names and lines once source maps are uploaded. The 
 - Without the token (local builds, CI, preview deploys) no maps are built at all.
 - **Owner setup:** in Sentry, Settings → Auth Tokens → create an **organization token** (it only needs to upload). In Cloudflare Pages → Settings → Variables and Secrets, add `SENTRY_AUTH_TOKEN` as an encrypted **Secret** for **Production** only, then redeploy. The token is build-only, like a CI secret (CLAUDE.md §3): never in client code, never in a link.
 
+## Loading (T6.93)
+The SDK (about 150 kB) lives in `src/lib/sentry-sdk.ts`, its own chunk, and loads after the page's load event (`startSentry` in `src/lib/sentry.ts`), so overlays draw before it arrives. Errors from before then (React's error hooks and window errors) wait in a queue of up to 20 and are sent once it loads. Performance transactions are named by path (`/o/chat`, `/editor`) with `browserTracingIntegration`; the React Router integration is gone, since every route is a fixed path.
+

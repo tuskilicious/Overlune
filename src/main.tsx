@@ -1,12 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import * as Sentry from "@sentry/react";
-import { initSentry } from "./lib/sentry";
+import { reportError, startSentry } from "./lib/sentry";
 import App from "./App";
 import "./index.css";
 
-// Initialize Sentry before rendering anything.
-initSentry();
+// Sentry loads after the page has drawn (T6.93); errors before then are queued.
+startSentry();
 
 // ?rm=1 forces reduced motion (public link contract, docs/STACK.md). OBS doesn't always pass on the OS setting.
 if (new URLSearchParams(location.search).get("rm") === "1")
@@ -30,11 +29,12 @@ if (!container) throw new Error("Root element #root not found");
 
 // React 19 error hooks report render errors to Sentry.
 createRoot(container, {
-  onUncaughtError: Sentry.reactErrorHandler((error, errorInfo) => {
-    console.warn("Uncaught error", error, errorInfo.componentStack);
-  }),
-  onCaughtError: Sentry.reactErrorHandler(),
-  onRecoverableError: Sentry.reactErrorHandler(),
+  onUncaughtError: (error, info) => {
+    console.warn("Uncaught error", error, info.componentStack);
+    reportError(error, info.componentStack);
+  },
+  onCaughtError: (error, info) => reportError(error, info.componentStack),
+  onRecoverableError: (error, info) => reportError(error, info.componentStack),
 }).render(
   <StrictMode>
     <App />

@@ -11,6 +11,9 @@ What changed in each Overlune release. Overlay links from every release keep wor
 - **Webcam frame:** a border in your look to put around your camera, with an optional name tab. Set its size in the editor; its link is optional.
 - **Link previews:** sharing a link to the guide, the editor or the legal pages now shows that page's own title and description.
 
+### Faster
+- Overlays start about a fifth faster on slow PCs: error reporting now loads after the overlay has drawn.
+
 ### Fixed
 - The alert pictures on the home page crop to their cards again.
 
