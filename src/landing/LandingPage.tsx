@@ -157,6 +157,7 @@ const tour: [ThemeId, KitScene][] = [
   ["bold-esports", "ending"],
   ["arcade-8bit", "starting"],
   ["clean-slate", "brb"],
+  ["daylight", "ending"],
 ];
 
 /** The hero picture: a live scene in a stream frame, two alerts in the same look, and the scene names. It tours
@@ -337,7 +338,7 @@ const support: { overlay: string; detail: string; on: [Support, Support, Support
   },
 ];
 
-const facts = ["8 looks", "Scenes, chat and alerts", "One link per overlay", "Free, no account"];
+const facts = ["9 looks", "Scenes, chat and alerts", "One link per overlay", "Free, no account"];
 
 const steps = [
   ["Pick a look", "Eight themes, each with matching scenes, chat and alerts."],
@@ -576,7 +577,7 @@ export default function LandingPage() {
             <ul className="mt-16 grid grid-flow-dense grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 xl:grid-rows-2">
               <li className="group flex flex-col justify-between gap-6 overflow-hidden rounded-3xl border border-white/10 bg-deep p-6 md:col-span-2 xl:row-span-2">
                 <div>
-                  <h3 className="font-heading text-2xl font-bold">Eight looks, ready to go</h3>
+                  <h3 className="font-heading text-2xl font-bold">Nine looks, ready to go</h3>
                   <p className="mt-2 text-haze">
                     Every theme is free, with fonts and sounds licensed for streaming.
                   </p>

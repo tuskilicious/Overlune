@@ -88,7 +88,7 @@ for (const width of [390, 768, 1023]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const looks = page.locator("[data-look]");
-    await expect(looks).toHaveCount(8);
+    await expect(looks).toHaveCount(9);
     for (const box of await looks.evaluateAll((els) =>
       els.map((el) => el.getBoundingClientRect()),
     )) {
@@ -214,7 +214,7 @@ test("with reduced motion the hero kit starts paused on one look", async ({ page
 test("the hero lists four facts, all true for v1", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("list", { name: "At a glance" }).getByRole("listitem")).toHaveText([
-    "8 looks",
+    "9 looks",
     "Scenes, chat and alerts",
     "One link per overlay",
     "Free, no account",
@@ -280,7 +280,7 @@ test("previews off screen are built after load, without scrolling (T6.78)", asyn
   await expect(page.locator("figure[data-kit] .scene")).toHaveCount(1); // the hero right away
   // The rest are built one per idle moment, so they're ready before anyone scrolls to them.
   await expect(page.locator("[data-look]").last().locator(".scene")).toHaveCount(1);
-  await expect(page.locator("[data-look] .scene")).toHaveCount(8);
+  await expect(page.locator("[data-look] .scene")).toHaveCount(9);
 });
 
 test("the landing page offers optional support and says Overlune stays free (T6.80)", async ({

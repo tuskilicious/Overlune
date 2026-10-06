@@ -6,7 +6,7 @@ It includes:
 - Starting Soon, BRB and Stream Ending scenes
 - A Twitch chat skin
 - Alerts for raids, subs, gift subs and bits, with sound
-- 8 themes: Clean Slate, Neon Grid, Cozy Café, Arcade 8-Bit, Pastel Cloud, Forest Night, Bold Esports and Vaporwave Sunset
+- 9 looks: Clean Slate, Neon Grid, Cozy Café, Arcade 8-Bit, Pastel Cloud, Forest Night, Bold Esports, Vaporwave Sunset and Daylight
 - A step-by-step setup guide for OBS and Streamlabs
 
 Everything matches one theme. Paste the links into OBS or Streamlabs and you're live.

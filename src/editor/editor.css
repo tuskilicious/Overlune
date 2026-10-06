@@ -422,7 +422,7 @@
   display: grid;
 }
 
-/* The editor's picker is three across with smaller names, so all 8 looks fit on a laptop screen (T6.31). */
+/* The editor's picker is three across with smaller names, so all the looks fit on a laptop screen (T6.31). */
 .editor-themes {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
