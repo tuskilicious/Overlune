@@ -63,14 +63,20 @@ The free alternatives are StreamElements and Streamlabs themes, OWN3D freebies a
 - TTS, now-playing, webcam cutout, goal bars, latest-follower labels
 - YouTube and Kick chat
 - Community gallery, theme marketplace, logo-to-palette extraction
-- OBS scene-collection import file, static exports (panels, banners)
 - Mobile editor, Tauri desktop app
 - File uploads (logos are pasted as image URLs)
 
+## After 1.0, still no backend (approved 2026-10-06)
+The owner moved these into scope for v1.x (T6.86). They keep v1's rules: a static site, no accounts, old links never break.
+- OBS scene collection file: one import makes every scene with its link and size. OBS only; Streamlabs keeps the guide.
+- Webcam frame: a new overlay, a themed border with a clear middle. (A webcam *cutout* stays out of scope.)
+- Twitch panels and an offline banner in each look, downloaded as PNG.
+- A light look.
+- Link previews for each page when it's shared.
+
 ## v2 order (only after 5+ real streamers use v1 live)
 1. Follow alerts via Twitch OAuth or a StreamElements/Streamer.bot bridge. Tokens never go in URLs. Activates CLAUDE.md sections 4, 5 and 8 as needed.
-2. OBS scene-collection import file.
-3. Static exports from the theme: Twitch panels, offline banner, profile banner.
+2. ~~OBS scene-collection import file~~ and 3. ~~static exports (panels, offline banner)~~: moved to v1.x above (2026-10-06). A profile banner can follow the panels.
 4. Remaining polish: logo-to-palette, theme import/export, community gallery with artist credits.
 5. YouTube and Kick chat.
 

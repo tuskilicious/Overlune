@@ -21,6 +21,8 @@ Sizes are rough, for one maintainer working with Claude: **S** a day or two, **M
 ## v1.x: more value with no backend
 These fit today's rules (a static site) and can ship one at a time, in any order.
 
+**Approved 2026-10-06 (T6.86):** the scene collection file, webcam frame, panels and offline banner (with `html-to-image`), a light look and page previews, plus all the upkeep below. Hindi waits. Tasks T6.87 to T6.98.
+
 | Goal | Size | Why | Notes |
 |---|---|---|---|
 | **OBS scene collection file** | M | Setup today means pasting 5 links one by one. One import would make every scene with its link and size. | PRD v2 #2. OBS only: Streamlabs uses a different format, so it keeps the guide. Test the import in OBS on Windows and Mac. |
