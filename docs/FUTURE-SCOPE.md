@@ -34,6 +34,7 @@ These fit today's rules (a static site) and can ship one at a time, in any order
 | **Hindi, then other languages** | L | Asked for in feedback. | The editor, guide and default overlay text. Needs a fluent reviewer for each language; ongoing work. |
 
 ### Upkeep
+- **TypeScript 7:** waits for typescript-eslint to support it (8.71 supports up to 6.0). We're on 6.0 (T6.97).
 - **Dependency majors**, one PR each with the full test suite and an OBS check: React Router 8, Vite 8, Vitest 5, TypeScript 7, Sentry 11, `@vitejs/plugin-react` 6.
 - **Sentry source maps:** upload them in CI so error reports show real file names (`docs/SENTRY.md`). Needs `SENTRY_AUTH_TOKEN` as a CI secret.
 - **Overlay size:** Sentry is about 150 kB of an overlay's 540 kB of code (T6.82). Check whether a lighter setup keeps the same error reports.
