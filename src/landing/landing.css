@@ -215,3 +215,35 @@
   transform: scale(var(--scale));
   transform-origin: 0 0;
 }
+
+/* The looks ring (T6.105): from 1024px the cards are placed on an ellipse by LooksRing; below that, a grid. */
+@media (min-width: 1024px) {
+  /* The ring's own list only: the scenes inside have lists too (their socials). */
+  .landing-ring > ul {
+    position: absolute;
+    inset: 0;
+    display: block;
+    margin: 0;
+  }
+
+  .landing-ring-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 280px;
+    will-change: transform, filter;
+  }
+
+  /* A soft dark halo behind the copy: cards fade into it as they pass behind the text. */
+  .landing-ring > div:first-child::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 46rem;
+    height: 30rem;
+    transform: translate(-50%, -62%);
+    background: radial-gradient(closest-side, var(--color-night) 55%, transparent);
+    z-index: -1;
+  }
+}

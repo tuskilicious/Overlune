@@ -301,3 +301,39 @@ test("the landing page offers optional support and says Overlune stays free (T6.
     "https://github.com/sponsors/tuskilicious",
   );
 });
+
+// T6.105: the looks orbit their heading while the pointer is over them; still for reduced motion; a grid when narrow.
+test("the looks ring orbits on hover, holds still for reduced motion, and is a grid on narrow windows", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const ring = page.locator("#looks");
+  await ring.scrollIntoViewIfNeeded();
+  const card = page.locator("[data-ring-card]").first();
+  const at = () => card.evaluate((el) => el.style.transform);
+  const rest = await at();
+  expect(rest).toContain("translate(");
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(600);
+  expect(await at()).toBe(rest); // resting until the pointer arrives
+  const box = (await ring.boundingBox())!;
+  await page.mouse.move(box.x + box.width * 0.3, box.y + box.height / 2); // clear of the fixed nav
+  await expect.poll(at).not.toBe(rest);
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await ring.scrollIntoViewIfNeeded();
+  const still = await at();
+  const b2 = (await ring.boundingBox())!;
+  await page.mouse.move(b2.x + b2.width * 0.3, b2.y + b2.height / 2);
+  await page.waitForTimeout(1200);
+  expect(await at()).toBe(still);
+
+  await page.setViewportSize({ width: 800, height: 900 });
+  await expect
+    .poll(() =>
+      page.locator("[data-ring-card]").evaluateAll((els) => els.map((el) => el.style.transform)),
+    )
+    .toEqual(Array(9).fill(""));
+});
