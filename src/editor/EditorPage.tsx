@@ -33,6 +33,7 @@ import { botsFromInput } from "../overlays/chat/filters";
 import { chatSamples } from "./chat-samples";
 import { channelFromInput } from "../twitch/irc";
 import AlertTester from "./AlertTester";
+import ChannelPage from "./ChannelPage";
 import ObsLinks, { overlays, type OverlayId as Scene } from "./ObsLinks";
 import Preview from "./Preview";
 import { sampleScene } from "./scene-samples";
@@ -173,6 +174,7 @@ const sections = [
   ["part-chat", "Chat"],
   ["part-alerts", "Alerts"],
   ["part-frame", "Webcam frame"],
+  ["part-channel", "Channel page"],
   ["part-logo", "Logo"],
   ["part-motion", "Motion"],
   ["part-colors", "Colors"],
@@ -1157,6 +1159,8 @@ export default function EditorPage() {
                   </Preview>
                 </div>
               </fieldset>
+
+              <ChannelPage settings={settings} />
 
               <fieldset id="part-logo" className="editor-part" tabIndex={-1}>
                 <legend>Logo (optional)</legend>

@@ -1014,6 +1014,7 @@ test.describe("three-column shell on wide windows (T6.60)", () => {
       "Chat",
       "Alerts",
       "Webcam frame",
+      "Channel page",
       "Logo",
       "Motion",
       "Colors",
@@ -1046,6 +1047,7 @@ test.describe("three-column shell on wide windows (T6.60)", () => {
       "Chat",
       "Alerts",
       "Webcam frame",
+      "Channel page",
       "Logo",
       "Motion",
       "Colors",
@@ -1303,4 +1305,37 @@ test("Download OBS scene collection saves every scene with the streamer's links 
   const starting = await page.getByRole("textbox", { name: /^Starting Soon/ }).inputValue();
   expect(urls).toContain(starting);
   expect(file.scene_order.map((s: { name: string }) => s.name)).toContain("Overlune: Live");
+});
+
+test("channel page pictures download at Twitch's sizes (T6.91)", async ({ page }) => {
+  const part = page.locator("#part-channel");
+  await part.getByLabel("Panel names (one per line)").fill("About me\nSchedule");
+  await expect(part.locator(".channel-panel")).toHaveText(["About me", "Schedule"]);
+  // A PNG's width and height sit in its header, at bytes 16 and 20.
+  const size = async (name: string) => {
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      part.getByRole("button", { name }).click(),
+    ]);
+    const bytes = readFileSync(await download.path());
+    const view = new DataView(bytes.buffer, bytes.byteOffset);
+    return {
+      file: download.suggestedFilename(),
+      width: view.getUint32(16),
+      height: view.getUint32(20),
+    };
+  };
+  expect(await size("Download the Schedule panel")).toEqual({
+    file: "overlune-panel-schedule.png",
+    width: 320,
+    height: 96,
+  });
+  await part.getByLabel("Banner title").fill("Back tomorrow");
+  await expect(part.locator(".scene-title")).toHaveText("Back tomorrow");
+  expect(await size("Download offline banner")).toEqual({
+    file: "overlune-offline-banner.png",
+    width: 1920,
+    height: 1080,
+  });
+  await expect(part.getByRole("status")).toHaveText("Saved. Check your downloads.");
 });
