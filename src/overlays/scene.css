@@ -20,8 +20,7 @@
   font-family: var(--font-body);
 }
 
-.scene[data-enter="slide-fade"] .scene-main,
-.scene[data-enter="slide-fade"] .scene-socials {
+.scene[data-enter="slide-fade"] .scene-main {
   animation: scene-slide-fade var(--enter-ms) ease-out both;
 }
 
@@ -120,8 +119,7 @@
   }
 }
 
-.scene[data-enter="bounce"] .scene-main,
-.scene[data-enter="bounce"] .scene-socials {
+.scene[data-enter="bounce"] .scene-main {
   animation: scene-bounce var(--enter-ms) cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
@@ -167,8 +165,7 @@
   }
 }
 
-.scene[data-enter="steps"] .scene-main,
-.scene[data-enter="steps"] .scene-socials {
+.scene[data-enter="steps"] .scene-main {
   animation: scene-slide-fade var(--enter-ms) steps(4, end) both;
 }
 
@@ -240,7 +237,11 @@
   z-index: -1;
   inset: 0;
   pointer-events: none;
-  mask-image: linear-gradient(to bottom, #000 46%, transparent 56%);
+  mask-image: linear-gradient(
+    to bottom,
+    #000 36%,
+    transparent 47%
+  ); /* above the two-line title (T6.107) */
   animation: scene-fireflies 7s ease-in-out infinite alternate;
 }
 
@@ -284,10 +285,9 @@
   }
 }
 
-/* Bold Esports: the content and the socials row wipe in left to right. Reduced-motion version: index.css stops
+/* Bold Esports: the content wipes in left to right. Reduced-motion version: index.css stops
    the wipe. */
-.scene[data-enter="wipe"] .scene-main,
-.scene[data-enter="wipe"] .scene-socials {
+.scene[data-enter="wipe"] .scene-main {
   animation: scene-wipe var(--enter-ms) ease-out backwards;
 }
 
@@ -321,9 +321,9 @@
 
 .scene[data-bg="sunset"]::before {
   right: 180px;
-  top: 96px;
-  width: 480px;
-  height: 480px;
+  top: 40px;
+  width: 420px;
+  height: 420px;
   border-radius: 50%;
   background: linear-gradient(#ffd36b, var(--accent));
   /* The stripes, in the lower half: gaps that widen toward the bottom of the sun. */
@@ -368,12 +368,15 @@
   }
 }
 
+/* Shared layout v2 (T6.107), after the maintainer's broadcast kits: a two-line display headline on the left with
+   its last word in the accent, and one column on the right holding the countdown and the socials as a list.
+   Both sit on the bottom, so the open sky above keeps each theme's motif (sun, moon, clouds). */
 .scene-main {
   flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto minmax(0, 1fr) auto auto;
-  gap: 0 96px;
+  gap: 0 112px;
   align-items: end;
   justify-items: start;
   text-align: left;
@@ -391,12 +394,17 @@
   grid-area: 3 / 1;
   margin: 0;
   font-family: var(--font-heading);
-  font-size: 128px;
+  font-size: 184px;
   font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.035em;
+  line-height: 0.94;
+  letter-spacing: -0.04em;
   color: var(--primary);
   overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.scene-title-end {
+  color: var(--accent);
 }
 
 .scene-title::before {
@@ -404,100 +412,102 @@
   display: block;
   width: 96px;
   height: 8px;
-  margin-bottom: 44px;
+  margin-bottom: 48px;
   border-radius: 4px;
   background: var(--accent);
 }
 
 .scene-subtitle {
   grid-area: 4 / 1;
-  max-width: 34ch;
-  margin: 28px 0 0;
+  max-width: 30ch;
+  margin: 36px 0 0;
   font-size: 40px;
   line-height: 1.3;
   color: var(--text-muted);
   overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+/* The right column: the countdown (Starting Soon) over the socials. */
+.scene-side {
+  grid-area: 2 / 2 / span 3;
+  align-self: end;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  min-width: 480px;
 }
 
 .scene-socials {
   list-style: none;
-  margin: 64px 0 0;
-  padding: 32px 0 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 20px 64px;
-  font-size: 30px;
-  border-top: 2px solid color-mix(in srgb, var(--text) 14%, transparent);
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 24px;
 }
 
+/* Icon tile, then the platform over the handle. */
 .scene-socials li {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 24px;
   align-items: center;
-  gap: 16px;
 }
 
 .scene-icon {
-  flex: none;
-  width: 1.15em;
-  height: 1.15em;
+  grid-row: span 2;
+  box-sizing: border-box;
+  width: 72px;
+  height: 72px;
+  padding: 18px;
   fill: currentColor;
   color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-radius: min(var(--radius), 14px);
 }
 
-/* The icon says the platform; the word stays for screen readers and copy-paste. */
 .scene-platform {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .scene-handle {
-  font-weight: 600;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text);
+  overflow-wrap: anywhere;
 }
 
-/* Neon Grid (T6.36): the title and countdown sit in the dark sky, never on the grid. The socials ride on the
-   floor as a glowing panel. */
+/* Neon Grid (T6.36): the content sits in the dark sky, never on the grid. */
 .scene[data-theme="neon-grid"] {
   padding-bottom: 232px; /* keeps the title block above the horizon (82%) */
 }
 
 /* Orbitron is wide: smaller sizes keep "Starting soon" on one line beside the countdown card. */
 .scene[data-theme="neon-grid"] .scene-title {
-  font-size: 100px;
+  font-size: 136px;
   letter-spacing: -0.01em;
 }
 
 .scene[data-theme="neon-grid"] .countdown-time {
-  font-size: 88px;
+  font-size: 80px;
   letter-spacing: 0;
-}
-
-.scene[data-theme="neon-grid"] .scene-socials {
-  position: absolute;
-  left: 112px;
-  bottom: 56px;
-  margin: 0;
-  padding: 18px 36px;
-  background: var(--surface);
-  border: var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
 }
 
 /* Forest Night (T6.52): Lora's numerals are wide, so the countdown is smaller and "Starting soon" stays on one line
    beside the widest day countdown ("1d 23h 59m"). */
 .scene[data-theme="forest-night"] .countdown-time {
-  font-size: 100px;
+  font-size: 88px;
 }
 
 /* Arcade 8-Bit (T6.38): Press Start 2P is about one em per letter, so the title and the
    countdown get pixel-font sizes that fit side by side. Square accent rule to match the square corners. */
 .scene[data-theme="arcade-8bit"] .scene-title {
-  font-size: 68px;
+  font-size: 104px;
   line-height: 1.3;
   letter-spacing: 0;
   overflow-wrap: break-word; /* whole words first; only an over-long word breaks */
@@ -508,13 +518,20 @@
 }
 
 .scene[data-theme="arcade-8bit"] .countdown-time {
-  font-size: 56px;
+  font-size: 52px;
   letter-spacing: 0;
   line-height: 1.2;
 }
 
 .scene[data-theme="arcade-8bit"] .scene-subtitle {
   max-width: 44ch; /* VT323 is monospace and narrow, so 34ch cut lines short */
+}
+
+/* Bold Esports (T6.107): Anton is condensed, so the title carries a poster scale on two lines. */
+.scene[data-theme="bold-esports"] .scene-title {
+  font-size: 240px;
+  line-height: 0.9;
+  letter-spacing: -0.01em;
 }
 
 /* Bold Esports (T6.41): the accent rule and the countdown card are parallelograms like the alert card.
@@ -532,11 +549,11 @@
 
 /* Vaporwave Sunset (T6.42): Audiowide is wide, so a smaller title and countdown stay side by side. */
 .scene[data-theme="vaporwave-sunset"] .scene-title {
-  font-size: 96px;
+  font-size: 140px;
   letter-spacing: 0;
 }
 
 .scene[data-theme="vaporwave-sunset"] .countdown-time {
-  font-size: 88px;
+  font-size: 80px;
   letter-spacing: 0;
 }
