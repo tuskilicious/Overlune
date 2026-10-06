@@ -408,6 +408,31 @@ The quick v1 fixes from T6.6. One branch and PR per task, stacked. T6.74-T6.76 c
   - Accept: each cropped alert picture is exactly its card's height again; the T6.48 test no longer fails when the web fonts load late. e2e that fails without the fix.
   - *Built 2026-10-03 on `fix/landing-alert-crop`. `LazyPreview` takes an optional `onBuilt`, and `AlertCard` measures its card once it's built. The "Alerts with sound" pictures use a fixed frame and weren't affected; their T6.48 test failed in CI because `document.fonts.ready` can resolve before the alert's fonts are even requested, so it measured the fallback font. It now polls until the cards fit. New e2e: the three cropped pictures have no space under their cards (fails without the fix: 37, 37 and 34px). Both tests passed 3 runs in a row. Owner checked the PR #120 preview, 2026-10-04. No overlay change, so no OBS test.*
 
+### No-backend improvements (2026-10-06)
+The owner asked for everything in `docs/FUTURE-SCOPE.md` that doesn't need Supabase, except Hindi. One branch and PR per task, in this order.
+
+- [x] **T6.86 Move the no-backend goals into scope.** The scene collection file and panel/banner exports were on the PRD's out-of-scope list.
+  - Accept: PRD lists the approved v1.x goals and drops them from out of scope; STACK.md records `html-to-image`; FUTURE-SCOPE.md and this list say what was approved.
+  - *Done 2026-10-06 on `docs/no-backend-scope`, recording the owner's answers that day: build the scene collection file, webcam frame, panels and offline banner, a light look and page previews; `html-to-image` approved for the PNGs; all upkeep now; Hindi later. Docs only.*
+- [ ] **T6.87 Link previews for each page.** A shared /guide or /editor link shows the home page's title and picture.
+  - Accept: the build writes a copy of `index.html` per page with its own title, description, canonical and `og:` tags; overlays get none. e2e on the built files.
+- [ ] **T6.88 Webcam frame.** Streamers asked for a camera border that matches their look.
+  - Accept: a new overlay `/o/frame` in every look, a themed border with a clear middle, its size set in the editor (a new optional link field; old links unchanged), a link row with its size, reduced-motion version. Unit, e2e and old-link fixtures. OBS test.
+- [ ] **T6.89 A light look.** Streamers asked for a light theme.
+  - Accept: a ninth look with a light palette: every scene, chat and alert, contrast checks (WCAG AA for text), its fonts and sounds recorded in ASSETS.md, in the editor and landing page. e2e. OBS test.
+- [ ] **T6.90 OBS scene collection file.** Pasting five links one by one was the hardest part of setup.
+  - Accept: the editor downloads a scene collection file that OBS imports (Scene Collection → Import), making each scene with its Browser source, link, size and "Control audio via OBS" on Alerts; the guide explains it; Streamlabs keeps the manual steps. Unit test on the file. Tested by importing in OBS.
+- [ ] **T6.91 Twitch panels and offline banner.** Streamers asked for a channel page that matches their overlays.
+  - Accept: the editor shows panels (About, Schedule, Rules, Socials; the streamer's own words) and an offline banner in their look, and downloads each as PNG at Twitch's sizes (panels 320 wide, banner 1920×1080) using `html-to-image`, loaded only on demand. e2e checks the files' sizes.
+- [ ] **T6.92 Sentry source maps.** Error reports show minified file names.
+  - Accept: CI uploads the hidden source maps to Sentry for production builds when `SENTRY_AUTH_TOKEN` is set (owner adds it as a GitHub secret), and skips cleanly when it isn't. Maps are never served to visitors.
+- [ ] **T6.93 Lighter overlays.** Sentry is about 150 kB of every overlay's code.
+  - Accept: measured before and after; error reports still arrive with the same scrubbing. Only if the saving is real.
+- [ ] **T6.94 React Router 8.** Full suite and an OBS check.
+- [ ] **T6.95 Vite 8 and `@vitejs/plugin-react` 6.** Full suite, build output compared, an OBS check.
+- [ ] **T6.96 Vitest 5.** Full suite.
+- [ ] **T6.97 TypeScript 7.** Typecheck and full suite.
+- [ ] **T6.98 Sentry 11.** Scrubbing tests still pass; an event checked in staging.
 ### Privacy fix (2026-10-06)
 - [ ] **T6.99 Settings reached Sentry in performance samples.** Found while measuring T6.93: Sentry's page-load sample stores the full address, settings fragment included, in its span data (`url.full`). The scrubber only cleaned the error's address and breadcrumbs, so about 1 in 20 overlay loads in production (the 5% sample rate) sent that streamer's settings to Sentry, against CLAUDE.md §7 and the privacy policy.
   - Accept: no URL fragment or settings payload anywhere in any event; if scrubbing fails, the event is dropped instead of sent. Unit tests, and checked end to end on a production build with Sentry intercepted.
