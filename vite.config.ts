@@ -2,6 +2,7 @@
 import { readFileSync } from "node:fs";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { cspForMeta } from "./src/lib/csp-meta";
 import { pageHtml, pages } from "./src/lib/page-meta";
@@ -47,16 +48,37 @@ const { version } = JSON.parse(readFileSync("package.json", "utf8")) as { versio
 export default defineConfig(({ mode }) => {
   // Sentry release, e.g. overlune@1.0.0+319afe4: the version, plus the commit when Cloudflare Pages builds it.
   // A VITE_SENTRY_RELEASE set in the environment still wins.
-  const env = loadEnv(mode, ".", ["VITE_SENTRY_RELEASE", "CF_PAGES_COMMIT_SHA"]);
+  // SENTRY_AUTH_TOKEN is read here at build time only: nothing from `env` reaches the browser except the release name.
+  const env = loadEnv(mode, ".", [
+    "VITE_SENTRY_RELEASE",
+    "CF_PAGES_COMMIT_SHA",
+    "SENTRY_AUTH_TOKEN",
+  ]);
   const commit = env.CF_PAGES_COMMIT_SHA?.slice(0, 7);
   const release = env.VITE_SENTRY_RELEASE || `overlune@${version}${commit ? `+${commit}` : ""}`;
+  // Source maps for Sentry (T6.92): only when the token is set (Cloudflare's production build). They're uploaded, then
+  // deleted, so visitors never download them. Without the token, no maps are made at all.
+  const upload = Boolean(env.SENTRY_AUTH_TOKEN);
   return {
-    plugins: [react(), tailwindcss(), securityMeta, pagePreviews],
+    plugins: [
+      react(),
+      tailwindcss(),
+      securityMeta,
+      pagePreviews,
+      upload &&
+        sentryVitePlugin({
+          org: "overlune",
+          project: "javascript-react",
+          authToken: env.SENTRY_AUTH_TOKEN,
+          release: { name: release },
+          sourcemaps: { filesToDeleteAfterUpload: ["./dist/**/*.map"] },
+          telemetry: false,
+        }),
+    ],
     define: { "import.meta.env.VITE_SENTRY_RELEASE": JSON.stringify(release) },
     build: {
-      // Source maps are generated for Sentry but not referenced from the shipped JS.
-      // Uploading them to Sentry is a later step (see docs/SENTRY.md).
-      sourcemap: "hidden",
+      // Hidden: not referenced from the shipped JS, and only made when they'll be uploaded (see `upload`).
+      sourcemap: upload ? "hidden" : false,
       // Never inline small fonts or images as data: URLs. The CSP (font-src/img-src) blocks them.
       assetsInlineLimit: 0,
     },
