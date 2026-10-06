@@ -81,6 +81,7 @@ test.describe("save file box (T6.12)", () => {
         return [Math.round(r.x), Math.round(r.y + scrollY)];
       });
     const spots = async () => [await spot(load), await spot(reset)];
+    await page.evaluate(() => document.fonts.ready); // a late web font shifted the header by 1px
     const before = await spots();
     await load.click();
     expect(await spots()).toEqual(before);
