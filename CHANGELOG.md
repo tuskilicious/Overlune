@@ -2,6 +2,16 @@
 
 What changed in each Overlune release. Overlay links from every release keep working: the link format only ever gains optional settings.
 
+## Unreleased
+
+### New
+- **Daylight:** a ninth look, and the first light one: cool paper, ink type and a vermilion accent.
+- **Webcam frame:** a border in your look to put around your camera, with an optional name tab. Set its size in the editor; its link is optional.
+- **Link previews:** sharing a link to the guide, the editor or the legal pages now shows that page's own title and description.
+
+### Fixed
+- The alert pictures on the home page crop to their cards again.
+
 ## 1.0.0 (2026-10-03)
 
 The first release. Free, open source, no account and no payment.

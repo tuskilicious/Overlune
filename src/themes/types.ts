@@ -10,6 +10,7 @@ export const themeIds = [
   "forest-night",
   "bold-esports",
   "vaporwave-sunset",
+  "daylight",
 ] as const;
 /** Bundled @fontsource families (OFL, docs/ASSETS.md). Loaded by src/themes/fonts.ts. Only add to the end. */
 export const fontIds = [

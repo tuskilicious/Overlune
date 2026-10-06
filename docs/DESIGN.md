@@ -27,7 +27,7 @@ Every theme defines exactly these tokens (`src/themes/types.ts`):
 | `alertSound` | Default sound file (in `public/sounds`, licensed) |
 | `badgeStyle` | How role badges render in this theme |
 
-## The 8 themes
+## The 9 themes
 The starting palettes below are suggestions. Verify contrast before shipping each theme.
 
 ### Launch set
@@ -80,6 +80,12 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 - Effects: chrome headings, striped sun, palm silhouettes
 - Shipped: bg `#2B0F4C` stays purple to 68% of the height, then fades to coral and orange at the horizon, so text never sits on the light part. Opaque surface (hex, for the contrast checks), primary `#01CDFE` (the band across the chrome titles), accent `#FF71CE`, muted `#C9B6E4`, radius 6, pink glow. Palms are `public/images/themes/vaporwave-palms.svg` (the CSP blocks `data:` images). Static, so no reduced-motion version is needed.
 
+**9. Daylight** (T6.89, the light look streamers asked for)
+- Colors: bg `#EEF1F6` (cool paper), surface `#FFFFFF`, titles and text ink `#141821`, accent vermilion `#C93A1C`, muted `#5B6272`
+- Fonts: Space Grotesk / Nunito Sans
+- Effects: none; a soft shadow under surfaces, hairline border `#D9DEE7`, radius 14
+- Contrast: text, muted and accent all pass AA on both bg and surface (accent 4.5:1 on bg, 5.1:1 on white). Reuses Clean Slate's alert sound.
+
 ## Overlay layout rules
 - Canvas is always 1920×1080. Keep a 64px safe margin on scenes.
 - Chat default size is 400×600, transparent background, bottom-up.
@@ -87,7 +93,7 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 - Error states use the theme's surface and text colors, stay readable, and never flash.
 
 ### Scene layout (T6.35)
-All 8 themes share one composed layout, rolled out one theme at a time (T6.35-T6.42); the original centered layout was retired in T6.43. Theme ids, settings and links never changed, so pasted links picked up the new design. Per-theme tweaks key on `data-theme` (and `data-bg` for background effects) on `.scene`, `.chat` and `.alerts`.
+All the themes share one composed layout, rolled out one theme at a time (T6.35-T6.42); the original centered layout was retired in T6.43. Theme ids, settings and links never changed, so pasted links picked up the new design. Per-theme tweaks key on `data-theme` (and `data-bg` for background effects) on `.scene`, `.chat` and `.alerts`.
 - **Scenes:** 88px top / 112px side / 72px bottom margins (inside the 64px safe margin). Logo top left (160px max). Title block anchored bottom left: a 96×8px accent rule, the title (128px, tight tracking, shrinks to fit per T6.26, and fits again when the countdown card widens as it ticks, T6.52), then the subtitle (40px, 34ch max). The countdown is a surface card on the right, bottom-aligned with the title block, with a minimum width so it doesn't jump as it ticks and its content centered (T6.54). Socials run along the bottom edge as an icon row (Simple Icons, accent color) with the handle; a hairline separates them from the content. The platform word stays in the DOM, visually hidden, for screen readers.
 - **Alerts:** still centered at the top. A wider card (760-1100px) with a 6px accent band, an uppercase event label ("Raid", "New subscriber", "Resub", "Gift subs", "Cheer"), then the streamer's message at 56px; resub and cheer text below in the muted color.
 - **Chat:** one panel instead of a card per message: no borders between cards, hairline separators, only the top and bottom of the stack rounded. Badges are small square-cornered tags tinted with the accent.
