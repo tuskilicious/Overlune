@@ -29,5 +29,7 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 | `public/sounds/bold-esports.ogg` (Kenney Digital Audio 1.0, `zapThreeToneUp.ogg`, unchanged) | sound | Bold Esports alert sound | https://kenney.nl/assets/digital-audio | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
 | Audiowide (`@fontsource/audiowide` 5.3.0, weight 400) | font | Advanced font picker; Vaporwave Sunset (T6.5) | https://fontsource.org/fonts/audiowide | SIL OFL 1.1 | No | 2026-10-01 |
 | Space Grotesk (`@fontsource/space-grotesk` 5.3.0, weights 400/600/700) | font | Advanced font picker; Vaporwave Sunset (T6.5); Daylight headings (T6.89) | https://fontsource.org/fonts/space-grotesk | SIL OFL 1.1 | No | 2026-10-01 |
+| Unbounded (`@fontsource/unbounded` 5.3.0, weights 400/500/700) | font | Advanced font picker; Abyss headings (T6.109) | https://fontsource.org/fonts/unbounded | SIL OFL 1.1 | No | 2026-10-07 |
+| Manrope (`@fontsource/manrope` 5.3.0, weights 400/600/700) | font | Advanced font picker; Abyss body text (T6.109) | https://fontsource.org/fonts/manrope | SIL OFL 1.1 | No | 2026-10-07 |
 | `public/sounds/vaporwave-sunset.ogg` (Kenney Digital Audio 1.0, `threeTone1.ogg`, unchanged) | sound | Vaporwave Sunset alert sound | https://kenney.nl/assets/digital-audio | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
 | `public/images/themes/vaporwave-palms.svg` (palm silhouettes, simple paths) | image | Vaporwave Sunset scene background | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-01 |

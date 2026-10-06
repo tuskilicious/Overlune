@@ -187,7 +187,7 @@ const sections = [
 
 /** Look filters (T6.60). Each look is in one group. */
 const moods = {
-  Calm: ["clean-slate", "cozy-cafe", "pastel-cloud", "forest-night", "daylight"],
+  Calm: ["clean-slate", "cozy-cafe", "pastel-cloud", "forest-night", "daylight", "abyss"],
   Retro: ["arcade-8bit", "vaporwave-sunset"],
   Bold: ["neon-grid", "bold-esports"],
 } as const satisfies Record<string, readonly ThemeId[]>;

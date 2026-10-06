@@ -557,3 +557,143 @@
   font-size: 80px;
   letter-spacing: 0;
 }
+
+/* Abyss (T6.109): the stream as a dive. Water that darkens with depth, the last surface light slanting in from the
+   top left (fading into the water), and marine snow sinking through the frame in two layers, a few motes glowing in
+   the accent. Each snow layer is one full-width tile taller than the scene that slides down one tile height, so the
+   loop never jumps.
+   Transform only. Reduced-motion version: index.css stops the drift and the snow stands still. */
+.scene[data-bg="abyss"] {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(transparent 25%, var(--bg) 78%),
+    linear-gradient(
+      106deg,
+      transparent 6%,
+      rgb(150 225 235 / 0.07) 11%,
+      transparent 17%,
+      transparent 23%,
+      rgb(150 225 235 / 0.05) 27%,
+      transparent 33%,
+      rgb(150 225 235 / 0.06) 40%,
+      transparent 47%,
+      transparent 57%,
+      rgb(150 225 235 / 0.035) 61%,
+      transparent 67%
+    ),
+    linear-gradient(#0b2233, var(--bg) 58%);
+}
+
+.scene[data-bg="abyss"]::before,
+.scene[data-bg="abyss"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: calc(var(--tile) * -1);
+  bottom: 0;
+  pointer-events: none;
+  background-size: 100% var(--tile);
+  animation: scene-snow linear infinite;
+}
+
+/* Far snow: fine, faint, slow. Each tile spans the full width, so the flakes never line up in columns. */
+.scene[data-bg="abyss"]::before {
+  --tile: 720px;
+  background-image:
+    radial-gradient(circle at 43% 21%, rgb(214 230 238 / 0.5) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 8% 11%, rgb(214 230 238 / 0.4) 0 1px, transparent 2px),
+    radial-gradient(circle at 76% 9%, rgb(214 230 238 / 0.3) 0 1px, transparent 2px),
+    radial-gradient(circle at 13% 57%, rgb(214 230 238 / 0.3) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 32% 13%, rgb(214 230 238 / 0.3) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 74% 17%, rgb(214 230 238 / 0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 82% 76%, rgb(214 230 238 / 0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 76% 52%, rgb(214 230 238 / 0.3) 0 1px, transparent 2px),
+    radial-gradient(circle at 7% 73%, rgb(214 230 238 / 0.4) 0 1px, transparent 2px),
+    radial-gradient(circle at 55% 20%, rgb(214 230 238 / 0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 41% 73%, rgb(214 230 238 / 0.3) 0 1px, transparent 2px),
+    radial-gradient(circle at 76% 75%, rgb(214 230 238 / 0.4) 0 1px, transparent 2px),
+    radial-gradient(circle at 14% 72%, rgb(214 230 238 / 0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 9% 81%, rgb(214 230 238 / 0.4) 0 1px, transparent 2px),
+    radial-gradient(circle at 89% 70%, rgb(214 230 238 / 0.4) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 61% 76%, rgb(214 230 238 / 0.4) 0 1.5px, transparent 2.5px);
+  animation-duration: 80s;
+}
+
+/* Near snow: bigger flakes, and three living motes with a soft halo. */
+.scene[data-bg="abyss"]::after {
+  --tile: 1080px;
+  background-image:
+    radial-gradient(circle at 14% 34%, var(--accent) 0 3px, transparent 4px),
+    radial-gradient(
+      circle at 14% 34%,
+      color-mix(in srgb, var(--accent) 16%, transparent) 0 12px,
+      transparent 30px
+    ),
+    radial-gradient(circle at 63% 71%, var(--accent) 0 2.5px, transparent 3.5px),
+    radial-gradient(
+      circle at 63% 71%,
+      color-mix(in srgb, var(--accent) 16%, transparent) 0 10px,
+      transparent 25px
+    ),
+    radial-gradient(circle at 86% 18%, var(--accent) 0 2px, transparent 3px),
+    radial-gradient(
+      circle at 86% 18%,
+      color-mix(in srgb, var(--accent) 16%, transparent) 0 8px,
+      transparent 20px
+    ),
+    radial-gradient(circle at 40% 33%, rgb(214 230 238 / 0.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 33% 12%, rgb(214 230 238 / 0.55) 0 2.5px, transparent 3.5px),
+    radial-gradient(circle at 65% 45%, rgb(214 230 238 / 0.5) 0 2.5px, transparent 3.5px),
+    radial-gradient(circle at 79% 11%, rgb(214 230 238 / 0.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 55% 23%, rgb(214 230 238 / 0.4) 0 2.5px, transparent 3.5px),
+    radial-gradient(circle at 64% 55%, rgb(214 230 238 / 0.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 11% 73%, rgb(214 230 238 / 0.5) 0 2.5px, transparent 3.5px),
+    radial-gradient(circle at 90% 46%, rgb(214 230 238 / 0.55) 0 2.5px, transparent 3.5px),
+    radial-gradient(circle at 60% 10%, rgb(214 230 238 / 0.5) 0 2px, transparent 3px),
+    radial-gradient(circle at 62% 91%, rgb(214 230 238 / 0.4) 0 2px, transparent 3px),
+    radial-gradient(circle at 95% 91%, rgb(214 230 238 / 0.55) 0 2.5px, transparent 3.5px),
+    radial-gradient(circle at 75% 89%, rgb(214 230 238 / 0.5) 0 2.5px, transparent 3.5px);
+  animation-duration: 54s;
+}
+
+@keyframes scene-snow {
+  to {
+    transform: translateY(var(--tile));
+  }
+}
+
+/* Unbounded is wide, so the headline is set smaller and a little lighter than the shared size. */
+.scene[data-theme="abyss"] .scene-title {
+  font-size: 136px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.scene[data-theme="abyss"] .scene-title::before {
+  height: 4px;
+  border-radius: 0;
+}
+
+.scene[data-theme="abyss"] .countdown {
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+
+/* The countdown is alive: accent digits that breathe. Reduced motion: index.css holds the glow still. */
+.scene[data-theme="abyss"] .countdown-time {
+  font-size: 84px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  text-shadow: 0 0 28px color-mix(in srgb, var(--accent) 35%, transparent);
+  animation: abyss-breathe 4.5s ease-in-out infinite alternate;
+}
+
+@keyframes abyss-breathe {
+  to {
+    text-shadow: 0 0 44px color-mix(in srgb, var(--accent) 60%, transparent);
+  }
+}

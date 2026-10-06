@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { themeIds } from "../../src/themes/types";
 
 /** A first visit opens on the gallery of looks (T6.16). Clean Slate keeps the editor's fresh defaults. */
 const startEditing = (page: import("@playwright/test").Page) =>
@@ -214,7 +215,7 @@ test.describe("first visit (T6.16, T6.17)", () => {
 
   test("opens on a gallery of every look, before the editor", async ({ page }) => {
     const gallery = page.getByRole("region", { name: "Pick a look to start" });
-    await expect(gallery.getByRole("button")).toHaveCount(9);
+    await expect(gallery.getByRole("button")).toHaveCount(themeIds.length);
     for (const name of [
       "Clean Slate",
       "Neon Grid",
@@ -228,7 +229,7 @@ test.describe("first visit (T6.16, T6.17)", () => {
       await expect(gallery.getByRole("button", { name, exact: true })).toBeVisible();
     await expect(page.getByLabel("Title", { exact: true })).toHaveCount(0);
     // Each card is the theme's real Starting Soon scene, held still.
-    await expect(page.locator(".editor-welcome .scene")).toHaveCount(9);
+    await expect(page.locator(".editor-welcome .scene")).toHaveCount(themeIds.length);
     await expect(page.locator(".editor-welcome .scene-title").first()).toHaveCSS(
       "animation-name",
       "none",
@@ -269,8 +270,8 @@ test.describe("first visit (T6.16, T6.17)", () => {
     page,
   }) => {
     // The cards show the whole layout: subtitle, countdown card and socials.
-    await expect(page.locator(".editor-welcome .countdown")).toHaveCount(9);
-    await expect(page.locator(".editor-welcome .scene-socials")).toHaveCount(9);
+    await expect(page.locator(".editor-welcome .countdown")).toHaveCount(themeIds.length);
+    await expect(page.locator(".editor-welcome .scene-socials")).toHaveCount(themeIds.length);
     await page.getByRole("button", { name: "Cozy Café" }).click();
     await expect(page.getByLabel("Subtitle")).toHaveValue("");
     await expect(preview(page).locator(".countdown")).toHaveCount(0);
@@ -450,7 +451,7 @@ test("the look picker shows each theme as a picture you can click", async ({ pag
     .locator(".editor-shot")
     .click();
   await expect(page.getByRole("radio", { name: "Vaporwave Sunset" })).toBeChecked();
-  await expect(page.locator(".editor-themes .scene")).toHaveCount(9);
+  await expect(page.locator(".editor-themes .scene")).toHaveCount(themeIds.length);
 });
 
 test("the editor shows Starting Soon in the preview by default", async ({ page }) => {
@@ -1084,7 +1085,7 @@ test("look filters show only that group, with the names under each card (T6.60)"
     "Vaporwave Sunset",
   ]);
   await filters.getByRole("button", { name: "All" }).click();
-  await expect(page.locator(".editor-themes .editor-card:visible")).toHaveCount(9);
+  await expect(page.locator(".editor-themes .editor-card:visible")).toHaveCount(themeIds.length);
 });
 
 test("colors show their hex value and the volume shows its number (T6.60)", async ({ page }) => {

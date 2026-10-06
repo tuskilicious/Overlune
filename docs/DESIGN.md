@@ -27,7 +27,7 @@ Every theme defines exactly these tokens (`src/themes/types.ts`):
 | `alertSound` | Default sound file (in `public/sounds`, licensed) |
 | `badgeStyle` | How role badges render in this theme |
 
-## The 9 themes
+## The themes
 The starting palettes below are suggestions. Verify contrast before shipping each theme.
 
 ### Launch set
@@ -85,6 +85,17 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 - Fonts: Space Grotesk / Nunito Sans
 - Effects: none; a soft shadow under surfaces, hairline border `#D9DEE7`, radius 14
 - Contrast: text, muted and accent all pass AA on both bg and surface (accent 4.5:1 on bg, 5.1:1 on white). Reuses Clean Slate's alert sound.
+
+### Kit-inspired looks (T6.109-T6.111)
+Built to the bar of the maintainer's own kits (Tuskilicious, ICARUS): each look is a world with one signature motif, not a palette swap. Directions came from impeccable's direction round (seed `c833f7e1`), picked by the owner.
+
+**10. Abyss** (T6.109): the stream as a dive. The water is unlit and the only light is alive.
+- Colors: bg `#040B14` (the effect lightens the top to `#0B2233`), surface `#071521`, titles `#E3F2F4`, text `#D6E6EE`, muted `#8FB3C1`, accent bioluminescent `#5CF2D6`
+- Fonts: Unbounded (headline 136px, weight 500; countdown 84px) / Manrope
+- Shape: radius 4; surfaces split by a hairline seam (`#16343A`), never a shadow or glow
+- Light rule: the accent (and any glow) is kept for living things: the headline's last word, the countdown (digits breathe, 4.5s), the newest chat message (a faint accent wash), the alert (accent seam and a soft glow below), glowing motes in the snow
+- Effect (`abyss`): last surface light slanting in from the top left and fading into the water; marine snow sinking in two full-width layers (far 80s, near 54s), three motes glowing. Transform only; still under reduced motion.
+- Sound: reuses Forest Night's alert sound.
 
 ## Overlay layout rules
 - Canvas is always 1920×1080. Keep a 64px safe margin on scenes.

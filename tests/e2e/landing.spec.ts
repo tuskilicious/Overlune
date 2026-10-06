@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { themeIds } from "../../src/themes/types";
 import lz from "lz-string";
 
 // T6.34: "/" is the landing page for first-time visitors; the editor lives at /editor.
@@ -88,7 +89,7 @@ for (const width of [390, 768, 1023]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const looks = page.locator("[data-look]");
-    await expect(looks).toHaveCount(9);
+    await expect(looks).toHaveCount(themeIds.length);
     for (const box of await looks.evaluateAll((els) =>
       els.map((el) => el.getBoundingClientRect()),
     )) {
@@ -288,7 +289,7 @@ test("previews off screen are built after load, without scrolling (T6.78)", asyn
   await expect(page.locator("figure[data-kit] .scene")).toHaveCount(1); // the hero right away
   // The rest are built one per idle moment, so they're ready before anyone scrolls to them.
   await expect(page.locator("[data-look]").last().locator(".scene")).toHaveCount(1);
-  await expect(page.locator("[data-look] .scene")).toHaveCount(9);
+  await expect(page.locator("[data-look] .scene")).toHaveCount(themeIds.length);
 });
 
 test("the landing page offers optional support and says Overlune stays free (T6.80)", async ({
@@ -335,5 +336,5 @@ test("the looks ring orbits on hover, holds still for reduced motion, and is a g
     .poll(() =>
       page.locator("[data-ring-card]").evaluateAll((els) => els.map((el) => el.style.transform)),
     )
-    .toEqual(Array(9).fill(""));
+    .toEqual(Array(themeIds.length).fill(""));
 });
