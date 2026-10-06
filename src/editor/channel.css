@@ -1,0 +1,61 @@
+/* Channel page pictures (T6.91). A panel is a 320×96 header strip in the look: its surface, outline and corners,
+   an accent bar, and the title in the heading font. The banner reuses the scene layout. */
+.channel-panel {
+  box-sizing: border-box;
+  width: 320px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 22px;
+  background: var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+}
+
+.channel-panel-bar {
+  flex: none;
+  width: 8px;
+  height: 44px;
+  border-radius: 4px;
+  background: var(--accent);
+}
+
+.channel-panel-title {
+  font: 700 var(--panel-font, 30px) / 1.1 var(--font-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* While a banner is captured, a real element stands in for the scene's ::after picture (ChannelPage.tsx). */
+.editor-banner .scene[data-shot]::after {
+  display: none;
+}
+
+.editor-panels {
+  list-style: none;
+  margin: 12px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.editor-panels li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.editor-banner .editor-preview {
+  max-width: 480px;
+  margin: 8px 0;
+}
+
+.editor-subhead {
+  margin: 20px 0 6px;
+  font-size: 16px;
+}
