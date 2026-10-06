@@ -4,8 +4,8 @@ import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
-import { cspForMeta } from "./src/lib/csp-meta";
-import { pageHtml, pages } from "./src/lib/page-meta";
+import { cspForMeta } from "./src/lib/csp-meta.ts";
+import { pageHtml, pages } from "./src/lib/page-meta.ts";
 
 // Hosts that ignore public/_headers (Antideploy) still get the CSP and referrer policy.
 // Build only: the dev server relies on inline scripts and styles that this CSP blocks.
@@ -76,6 +76,13 @@ export default defineConfig(({ mode }) => {
         }),
     ],
     define: { "import.meta.env.VITE_SENTRY_RELEASE": JSON.stringify(release) },
+    // Compile the lazily loaded pages when the dev server starts, so a first visit to /guide or /privacy is quick
+    // (on a busy machine, compiling on demand made e2e tests time out under Vite 8).
+    server: {
+      warmup: {
+        clientFiles: ["./src/editor/*.tsx", "./src/landing/*.tsx", "./src/lib/sentry-sdk.ts"],
+      },
+    },
     build: {
       // Hidden: not referenced from the shipped JS, and only made when they'll be uploaded (see `upload`).
       sourcemap: upload ? "hidden" : false,

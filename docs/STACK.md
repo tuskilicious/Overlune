@@ -6,7 +6,7 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 | Area | Choice | Why |
 |---|---|---|
 | Runtime | Node.js 24 LTS | Current LTS |
-| Build | Vite | Fast, static output |
+| Build | Vite 8 (Rolldown) | Fast, static output. Its default target is Chrome 111+, which the overlays' CSS already needs (`color-mix()`), so OBS 31 or newer (Chromium 127) |
 | UI | React + TypeScript (`strict: true`) | Decided in planning |
 | Routing | React Router | Landing (`/`), editor (`/editor`), guide, legal and overlay routes |
 | Validation | zod | Validates URL settings and parsed IRC messages |
