@@ -50,7 +50,8 @@ test("the size table matches the editor's links", async ({ page }) => {
   await expect(rows).toHaveCount(editorSizes.length);
   for (const [i, text] of editorSizes.entries()) {
     const [, name, width, height] = /^(.+) · Width (\d+) · Height (\d+)$/.exec(text)!;
-    await expect(rows.nth(i)).toContainText(`${name}${width}${height}`);
+    // The guide says "optional" in its note column instead (the webcam frame, T6.88).
+    await expect(rows.nth(i)).toContainText(`${name.replace(" (optional)", "")}${width}${height}`);
   }
 });
 

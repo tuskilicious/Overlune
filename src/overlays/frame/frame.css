@@ -1,0 +1,57 @@
+/* Webcam frame (T6.88). Only the edge is drawn; the middle stays transparent so the camera shows through. Built from
+   the look's tokens: surface for the edge, its border and glow outside, the accent as a thin inner line. */
+.frame {
+  position: relative;
+  box-sizing: border-box;
+  font-family: var(--font-body);
+  color: var(--text);
+  animation: frame-in var(--enter-ms, 400ms) ease-out both;
+}
+
+.frame-edge {
+  position: absolute;
+  inset: 0;
+  border: var(--edge) solid var(--surface);
+  border-radius: calc(var(--radius) + var(--edge) / 2);
+  box-shadow:
+    var(--shadow),
+    inset 0 0 0 2px var(--accent);
+}
+
+/* The look's own outline, just outside the edge (none for looks without one). */
+.frame-edge::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--edge) * -1);
+  border: var(--border);
+  border-radius: inherit;
+}
+
+.frame-label {
+  position: absolute;
+  left: calc(var(--edge) * 1.5);
+  bottom: 0;
+  margin: 0;
+  max-width: calc(100% - var(--edge) * 3);
+  padding: calc(var(--edge) * 0.3) calc(var(--edge) * 0.8);
+  border-radius: var(--radius) var(--radius) 0 0;
+  border-top: 3px solid var(--accent);
+  background: var(--surface);
+  font: 700 clamp(16px, calc(var(--edge) * 1.5), 32px) / 1.2 var(--font-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.frame .overlay-error {
+  position: absolute;
+  inset: calc(var(--edge) * 2) calc(var(--edge) * 2) auto;
+}
+
+/* Reduced motion: index.css turns this off. */
+@keyframes frame-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}

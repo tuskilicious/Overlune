@@ -45,6 +45,7 @@ const sample: Settings = {
     volume: 40,
     seconds: 8,
   },
+  frame: { width: 800, height: 450, label: "Ronni" },
   lessMotion: true,
   advanced: {
     colors: { accent: "#ff2bd6", surface: "#101010" },
@@ -385,4 +386,27 @@ describe("repeating countdown (T6.8)", () => {
     expect(ok).toBe(false);
     expect(settings.starting.repeat.mode).toBe("off");
   });
+});
+
+describe("webcam frame (T6.88)", () => {
+  it("gets the defaults in links made before the frame existed", () => {
+    const { settings, ok } = decode(raw({ brb: { title: "Hi" } }));
+    expect(ok).toBe(true);
+    expect(settings.frame).toEqual({ width: 640, height: 360, label: "" });
+  });
+
+  it("cuts a long name to 40 characters", () => {
+    const { settings, ok } = decode(raw({ frame: { label: "x".repeat(100) } }));
+    expect(ok).toBe(true);
+    expect(settings.frame.label).toBe("x".repeat(40));
+  });
+
+  it.each([{ width: 100 }, { width: 5000 }, { height: 50 }, { height: 12.5 }])(
+    "rejects %j and keeps the rest",
+    (bad) => {
+      const { settings, ok } = decode(raw({ frame: { label: "Ronni", ...bad } }));
+      expect(ok).toBe(false);
+      expect(settings.frame).toEqual({ width: 640, height: 360, label: "Ronni" });
+    },
+  );
 });

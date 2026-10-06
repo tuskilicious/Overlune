@@ -29,6 +29,12 @@ export default function SetupGuide() {
       note: "or the size you picked in the editor",
     },
     { name: "Alerts", width: 1920, height: 1080, note: "" },
+    {
+      name: "Webcam frame",
+      width: defaultSettings.frame.width,
+      height: defaultSettings.frame.height,
+      note: "optional; or the size you picked. Put it above your camera and line them up",
+    },
   ];
   return (
     <div className="editor guide" style={themeVars(brandChrome)}>
@@ -219,7 +225,7 @@ export default function SetupGuide() {
             <li>
               <strong>Check the size.</strong> In the source’s <strong>Properties</strong>, Width
               and Height must match the sizes in the table above: 1920 and 1080 for the scenes and
-              Alerts, and the size you picked for Chat.
+              Alerts, and the size you picked for Chat and the Webcam frame.
             </li>
             <li>
               <strong>Fit it to the screen.</strong> For a scene or Alerts, right-click the source

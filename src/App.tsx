@@ -6,6 +6,7 @@ import { sentryEnvironment } from "./lib/sentry";
 import Alerts from "./overlays/alerts/Alerts";
 import Chat from "./overlays/chat/Chat";
 import FromLink from "./overlays/FromLink";
+import Frame from "./overlays/frame/Frame";
 import OverlayPlaceholder from "./overlays/OverlayPlaceholder";
 import StartingSoon from "./overlays/starting/StartingSoon";
 import TextScene from "./overlays/TextScene";
@@ -90,6 +91,10 @@ export default function App() {
           <Route
             path="/o/alerts"
             element={<FromLink>{(s, error) => <Alerts settings={s} error={error} />}</FromLink>}
+          />
+          <Route
+            path="/o/frame"
+            element={<FromLink>{(s, error) => <Frame settings={s} error={error} />}</FromLink>}
           />
           <Route path="/o/:overlay" element={<OverlayPlaceholder />} />
           {showSentryTest && <Route path="/_sentry-test" element={<SentryTestPage />} />}

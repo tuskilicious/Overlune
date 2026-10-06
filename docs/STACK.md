@@ -47,9 +47,10 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 - Badge **images** need the authenticated Helix API. Instead, we render **theme-styled badges** from the `badges` tag (broadcaster, moderator, vip, subscriber). This also matches the theme better.
 
 ## URL settings format
-- Route per overlay: `/o/starting`, `/o/brb`, `/o/ending`, `/o/chat`, `/o/alerts`.
+- Route per overlay: `/o/starting`, `/o/brb`, `/o/ending`, `/o/chat`, `/o/alerts`, `/o/frame` (T6.88).
 - Settings are in the **hash fragment**: `#<version>.<lz-string payload>`. The fragment is never sent to servers, and it is stripped from Sentry events.
 - Optional query flag `?rm=1` (before the `#`) forces reduced motion: every animation is turned off, same as the OS "reduce motion" setting. Never remove or repurpose it.
+- Optional payload field `frame` (added T6.88): the webcam frame's `width` (160 to 1920, default 640), `height` (120 to 1080, default 360) and `label` (up to 40 characters, default none). Overlay route `/o/frame`. Links without it get the defaults.
 - Optional payload field `chat.showBadges` (added T6.76, default `true`): role badges before chat names. Links without it keep badges.
 - Optional payload field `alerts.seconds` (added T6.75, 3 to 15, default 5): how long each alert stays on screen. Links without it keep 5 seconds; a value out of range falls back to 5.
 - Optional payload field `lessMotion` (added T6.74, default `false`): the editor's "Less motion" option, which does the same as `?rm=1` but lives in the settings, so the save link remembers it. Links without it keep full motion.

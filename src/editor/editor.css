@@ -781,8 +781,21 @@
   background: var(--bg);
 }
 
+.editor-optional {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* Webcam frame preview (T6.88): a plain stand-in for the camera, so the clear middle reads as clear. */
+.editor-frame-preview .editor-preview {
+  max-width: 420px;
+  margin-top: 12px;
+  background: linear-gradient(135deg, #3b4150, #1b1e26);
+}
+
 .editor-preview > .chat,
-.editor-preview > .alerts {
+.editor-preview > .alerts,
+.editor-preview > .frame {
   transform: scale(var(--scale));
   transform-origin: 0 0;
 }

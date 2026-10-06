@@ -137,6 +137,16 @@ export const settingsV1 = z.object({
       seconds: z.number().int().min(3).max(15).default(5),
     })
     .prefault({}),
+  /** Webcam frame (T6.88): a border in the look with a clear middle, placed over the camera in OBS. Old links have no
+   *  field and get the defaults; they never used it. */
+  frame: z
+    .object({
+      width: z.number().int().min(160).max(1920).default(640),
+      height: z.number().int().min(120).max(1080).default(360),
+      /** Optional name on a tab at the bottom left; "" shows none. */
+      label: text(40),
+    })
+    .prefault({}),
   /** Less motion in every overlay (T6.74): the same as the ?rm=1 flag, kept in the link so the editor remembers
    *  it. Old links have no field and keep full motion. */
   lessMotion: z.boolean().default(false),
