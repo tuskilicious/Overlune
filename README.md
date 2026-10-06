@@ -57,7 +57,7 @@ All are optional for local development. Without `VITE_SENTRY_DSN`, Sentry stays 
 | `VITE_SENTRY_DSN` | client (public) | Sentry error tracking |
 | `VITE_SENTRY_ENVIRONMENT` | client (public) | `development`, `staging` or `production` |
 | `VITE_SENTRY_RELEASE` | client (public) | Release name for Sentry events. Optional: by default the build uses `overlune@<package.json version>`, plus the commit on Cloudflare Pages (e.g. `overlune@1.0.0+319afe4`). |
-| `SENTRY_AUTH_TOKEN` | CI only | **Planned, not used yet:** uploading source maps to Sentry (see `docs/SENTRY.md`) |
+| `SENTRY_AUTH_TOKEN` | build only (Cloudflare Pages **production**, as an encrypted secret) | Uploads source maps to Sentry during the production build, then deletes them so they're never served. Without it, no maps are built. Never in client code (see `docs/SENTRY.md`) |
 
 Deploys use the Cloudflare Pages Git integration, so no Cloudflare token is needed.
 

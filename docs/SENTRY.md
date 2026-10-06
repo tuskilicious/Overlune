@@ -31,6 +31,12 @@ Sentry follows the official React guide (https://docs.sentry.io/platforms/javasc
 5. In Cloudflare Pages, set `VITE_SENTRY_DSN` and `VITE_SENTRY_ENVIRONMENT`: `staging` for preview deploys, `production` for `main`.
 
 ## Later (not done yet)
-- **Source maps:** run `npx @sentry/wizard@latest -i sourcemaps`. `SENTRY_AUTH_TOKEN` is CI-only. The build already emits hidden source maps.
 - **CSP (T0.7):** allow the EU ingest host in `connect-src`: `https://*.ingest.de.sentry.io`.
 - **Privacy policy:** "Error reports are processed by Sentry and stored in the EU. They do not include your overlay settings or chat messages."
+
+## Source maps (T6.92)
+Error reports show real file names and lines once source maps are uploaded. The upload happens in the build that Cloudflare deploys, so the maps match the served files exactly (debug IDs).
+- `vite.config.ts` uses `@sentry/vite-plugin` (org `overlune`, project `javascript-react`) **only when `SENTRY_AUTH_TOKEN` is set**. It makes hidden maps, uploads them for the release (`overlune@<version>+<commit>`), then deletes them from `dist`, so visitors never download them. A failed upload logs an error but never stops the deploy.
+- Without the token (local builds, CI, preview deploys) no maps are built at all.
+- **Owner setup:** in Sentry, Settings → Auth Tokens → create an **organization token** (it only needs to upload). In Cloudflare Pages → Settings → Variables and Secrets, add `SENTRY_AUTH_TOKEN` as an encrypted **Secret** for **Production** only, then redeploy. The token is build-only, like a CI secret (CLAUDE.md §3): never in client code, never in a link.
+
