@@ -2,7 +2,6 @@ import { Suspense, useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
 import { lazyPage } from "./lib/lazy-page";
 import { pages } from "./lib/page-meta";
-import { sentryEnvironment } from "./lib/sentry";
 import Alerts from "./overlays/alerts/Alerts";
 import Chat from "./overlays/chat/Chat";
 import FromLink from "./overlays/FromLink";
@@ -46,7 +45,10 @@ function PageMeta() {
 }
 
 // The test page exists in development and staging only (CLAUDE.md §7: no debug routes in production).
-const showSentryTest = sentryEnvironment !== "production";
+// Read from import.meta.env (same fallback as lib/sentry.ts) so the build folds it and drops the page from production.
+const showSentryTest =
+  (import.meta.env.VITE_SENTRY_ENVIRONMENT ??
+    (import.meta.env.DEV ? "development" : "production")) !== "production";
 
 export default function App() {
   return (

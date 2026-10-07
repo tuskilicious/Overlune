@@ -53,3 +53,4 @@ Claude outputs/
 skills-lock.json
 .impeccable/config.local.json
 .impeccable/*.cache.json
+graphify-out/
