@@ -12,7 +12,9 @@ import { themeIds, type ThemeId } from "../themes/types";
 import { themeVars } from "../themes/vars";
 import ChatView from "../overlays/chat/ChatView";
 import { chatSamples } from "./chat-samples";
-import AlertTester from "./AlertTester";
+import AlertTester, { useTestAlerts } from "./AlertTester";
+import AlertView from "../overlays/alerts/AlertView";
+import { testAlerts } from "../alerts/events";
 import ChannelPage from "./ChannelPage";
 import ObsLinks, { overlays, type OverlayId as Scene } from "./ObsLinks";
 import Preview from "./Preview";
@@ -64,6 +66,9 @@ const sections = [
   ["part-colors", "Colors"],
   ["obs-links", "Links"],
 ] as const;
+
+/** The order Test alert plays the samples in (T6.135). */
+const alertOrder = testAlerts.map((a) => a.kind);
 
 /** How much moves in the overlays (T6.119). */
 const motionLevels = [
@@ -349,6 +354,10 @@ export default function EditorPage() {
     side.scrollTo({ top: el ? el.offsetTop - 4 : 0 });
   }, [welcome, currentSection]);
   const section: SectionProps = { settings, setSettings, update, fresh, resetButton };
+  /** Test alert by the scene preview (T6.135): each press plays the next sample, through the same queue as the ?test=1
+   *  link and the alert preview's buttons. */
+  const { alert: testAlert, play: playAlert } = useTestAlerts(settings);
+  const nextAlert = useRef(0);
 
   return (
     <div className="editor" style={themeVars(brandChrome)}>
@@ -703,13 +712,30 @@ export default function EditorPage() {
                   {previewOpen ? "Hide preview" : "Show preview"}
                 </button>
                 <div id="scene-preview-body" className="editor-scene-preview-body">
-                  <h2>Preview: {overlays[scene].name}</h2>
+                  {/* The preview's bar (T6.135, the Studio board): its name, the canvas size and Test alert, which
+                      plays the next sample alert over the scene, as on stream. */}
+                  <div className="editor-preview-bar">
+                    <h2>Preview: {overlays[scene].name}</h2>
+                    <span className="editor-chip-static">1920 × 1080</span>
+                    <button
+                      type="button"
+                      className="editor-test-alert"
+                      onClick={() => {
+                        const kind = alertOrder[nextAlert.current % alertOrder.length]!;
+                        nextAlert.current += 1;
+                        playAlert(kind);
+                      }}
+                    >
+                      Test alert
+                    </button>
+                  </div>
                   <Preview>
                     {scene === "starting" ? (
                       <StartingSoon settings={settings} />
                     ) : (
                       <TextScene scene={scene} settings={settings} />
                     )}
+                    <AlertView settings={settings} alert={testAlert} />
                   </Preview>
                 </div>
               </section>

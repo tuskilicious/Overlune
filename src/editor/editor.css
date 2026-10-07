@@ -1592,3 +1592,41 @@
 .editor-saved svg {
   color: var(--accent);
 }
+
+/* The scene preview's bar (T6.135, the Studio board): the name, the canvas size as a chip and Test alert at the end. */
+.editor-preview-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.editor .editor-preview-bar h2 {
+  margin: 0;
+}
+
+.editor-chip-static {
+  padding: 2px 10px;
+  border: 1px solid var(--text-muted);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.editor .editor-test-alert {
+  margin-left: auto;
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+/* The test alert plays over the scene, on its own transparent 1920×1080 canvas. */
+.editor-scene-preview .editor-preview {
+  position: relative;
+}
+
+.editor-scene-preview .editor-preview > .alerts {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

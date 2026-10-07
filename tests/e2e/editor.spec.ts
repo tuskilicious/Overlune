@@ -1660,3 +1660,18 @@ test("disclosures open by height, and closed content never takes focus (T6.135)"
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(body).toHaveCSS("transition-duration", "0s");
 });
+
+test("Test alert by the scene preview plays the samples over the scene, in turn (T6.135)", async ({
+  page,
+}) => {
+  await page.clock.install();
+  const bar = page.locator(".editor-scene-preview .editor-preview-bar");
+  await expect(bar.getByText("1920 × 1080")).toBeVisible();
+  const box = page.locator(".editor-scene-preview .alert-box");
+  await expect(box).toHaveCount(0);
+  await bar.getByRole("button", { name: "Test alert" }).press("Enter");
+  await expect(box).toContainText("FriendlyRaider");
+  await bar.getByRole("button", { name: "Test alert" }).click(); // the next one waits its turn
+  await page.clock.runFor(6000); // 5 s on screen, then the half-second gap
+  await expect(box).toContainText("NewSubscriber");
+});
