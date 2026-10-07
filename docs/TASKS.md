@@ -544,9 +544,9 @@ The owner asked for all four planned items from docs/KIT-REFERENCE.md and a bold
 
 The owner asked for more looks (2026-10-07), picked all four from impeccable's second direction round and approved five OFL fonts.
 
-- [ ] **T6.125 New look: Sakura.** A spring night: lantern glow and drifting petals.
-- [ ] **T6.126 New look: Skate Deck.** A deck wall: maple, grip tape and a rocking deck.
-- [ ] **T6.127 New look: Phosphor.** A green-phosphor terminal: boot log, bloom and a breathing cursor.
-- [ ] **T6.128 New look: Quest.** An RPG quest log: gold capitals, embers and parchment panels.
+- [x] **T6.125 New look: Sakura.** A spring night: lantern glow and drifting petals.
+- [x] **T6.126 New look: Skate Deck.** A deck wall: maple, grip tape and a rocking deck.
+- [x] **T6.127 New look: Phosphor.** A green-phosphor terminal: boot log, bloom and a breathing cursor.
+- [x] **T6.128 New look: Quest.** An RPG quest log: gold capitals, embers and parchment panels.
   - Accept (all four): each look styles every scene, chat, alerts and the frame; every loop stops in Lite and Still; the fonts are self-hosted and in ASSETS.md; text passes the contrast test; the editor moods list them (Calm: Sakura; Retro: Phosphor; Bold: Skate Deck, Quest); the landing page counts sixteen looks and shows them in the showcase, collage and tour. Unit and e2e.
-  - *Built 2026-10-07 on `design/four-looks` (stacked on `design/landing-reference`). Token files plus per-look CSS in `scene.css`; no new link fields, so old links are unchanged. Checked every scene and the alert in screenshots. The look-filter test now expects Phosphor under Retro. Full suite passes (329 unit, 272 e2e). Waiting for the owner's OBS check.*
+  - *Built 2026-10-07 on `design/four-looks` (stacked on `design/landing-reference`). Token files plus per-look CSS in `scene.css`; no new link fields, so old links are unchanged. Checked every scene and the alert in screenshots. The look-filter test now expects Phosphor under Retro. Full suite passes (329 unit, 272 e2e). Owner tested it in OBS on the stack preview and reported a pass, 2026-10-07.*
