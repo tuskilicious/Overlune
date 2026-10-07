@@ -814,3 +814,59 @@
   align-items: flex-start;
   text-align: left;
 }
+
+/* 14. Skate Deck: the sticker wall. Under the rocking deck, the countdown and the socials are die-cut stickers slapped
+   on at an angle (a white cut line, a soft shadow); the sticker lettering runs straight across the bottom. The tilt
+   is this look's concept (stickers on a deck wall). `rotate` composes with the entrances, which animate transform. */
+.scene[data-theme="skate-deck"] .scene-main {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  column-gap: 56px;
+}
+
+.scene[data-theme="skate-deck"] .scene-title {
+  grid-area: 4 / 1 / auto / -1;
+  max-width: 1600px;
+  margin-top: 56px;
+}
+
+/* The stickers are the decoration; the rule above the lettering goes. */
+.scene[data-theme="skate-deck"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="skate-deck"] .scene-subtitle {
+  grid-area: 5 / 1 / auto / -1;
+  max-width: 56ch;
+}
+
+.scene[data-theme="skate-deck"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="skate-deck"] :is(.countdown, .scene-socials) {
+  box-shadow:
+    0 0 0 8px #fff,
+    0 12px 24px rgb(58 36 16 / 0.28);
+}
+
+.scene[data-theme="skate-deck"] .countdown {
+  grid-area: 3 / 2;
+  rotate: -5deg;
+}
+
+.scene[data-theme="skate-deck"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="skate-deck"] .scene-socials {
+  grid-area: 3 / 1;
+  justify-self: end;
+  align-self: center;
+  rotate: 4deg;
+}
+
+.scene[data-theme="skate-deck"] .scene-main:not(:has(.countdown)) .scene-socials {
+  grid-column: 2;
+}
