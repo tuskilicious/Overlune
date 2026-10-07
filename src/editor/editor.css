@@ -1695,6 +1695,46 @@
   left: 0;
 }
 
+/* Click-to-select over the scene preview (T6.135, the Studio board): the part under the pointer gets a Haze outline
+   and a Lune Violet name tag, as on the board; a click jumps to its settings. The preview itself is inert, so the
+   pointer lands on this wrapper. */
+.editor-pick {
+  position: relative;
+}
+
+.editor-pick[data-hover] {
+  cursor: pointer;
+}
+
+.editor-pick-box {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 4px;
+  outline: 2px solid var(--text-muted);
+  outline-offset: 3px;
+}
+
+.editor-pick-box span {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: -5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Near the top edge the tag drops inside the part instead. */
+.editor-pick-box[data-below] span {
+  top: 4px;
+  bottom: auto;
+  left: 4px;
+}
+
 /* The looks filmstrip under the scene preview (T6.135, the Studio board): real Starting Soon scenes, held still, in a
    row that scrolls sideways; one radio group, so one tab stop and arrow keys. The picked look has the selected card's
    Lune Violet ring. At 800px and below the preview docks, and the form's look grid is enough. */

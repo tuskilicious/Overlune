@@ -1763,3 +1763,16 @@ test("the looks filmstrip under the preview picks a look with the arrow keys (T6
   await page.setViewportSize({ width: 800, height: 900 });
   await expect(page.locator(".editor-strip")).toBeHidden();
 });
+
+test("clicking a part of the scene preview jumps to its settings (T6.135)", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const title = page.locator(".editor-pick .scene-title");
+  const box = (await title.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page.locator(".editor-pick-box")).toHaveText("Title");
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page.locator("#part-scenes")).toBeFocused();
+  // Off the parts, nothing is outlined.
+  await page.mouse.move(0, 0);
+  await expect(page.locator(".editor-pick-box")).toHaveCount(0);
+});

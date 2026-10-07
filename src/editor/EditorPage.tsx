@@ -109,6 +109,47 @@ const sectionPreview: Partial<Record<string, string>> = {
   "part-alerts": ".editor-alert-tester",
 };
 
+/** Click-to-select (T6.135, the Studio board): the scene preview's parts, their names and the section each jumps to. */
+const pickParts = [
+  [".scene-logo", "Logo", "part-logo"],
+  [".scene-title", "Title", "part-scenes"],
+  [".scene-subtitle", "Subtitle", "part-scenes"],
+  [".countdown", "Countdown", "part-scenes"],
+  [".scene-socials", "Socials", "part-socials"],
+  [".scene-ticker", "Ticker", "part-socials"],
+  [".alert-box", "Alert", "part-alerts"],
+] as const;
+
+type Picked = {
+  name: string;
+  id: string;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
+/** The smallest part under the pointer, placed relative to the preview. */
+const partAt = (wrap: HTMLElement, x: number, y: number): Picked | null => {
+  const box = wrap.getBoundingClientRect();
+  let best: Picked | null = null;
+  for (const [selector, name, id] of pickParts)
+    for (const el of wrap.querySelectorAll(selector)) {
+      const r = el.getBoundingClientRect();
+      const inside = x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+      if (inside && (!best || r.width * r.height < best.width * best.height))
+        best = {
+          name,
+          id,
+          left: r.left - box.left,
+          top: r.top - box.top,
+          width: r.width,
+          height: r.height,
+        };
+    }
+  return best;
+};
+
 const loadedMessage = (ok: boolean) =>
   ok
     ? "Loaded. You can keep editing."
@@ -370,6 +411,7 @@ export default function EditorPage() {
    *  link and the alert preview's buttons. */
   const { alert: testAlert, play: playAlert } = useTestAlerts(settings);
   const nextAlert = useRef(0);
+  const [picked, setPicked] = useState<Picked | null>(null);
 
   return (
     <div className="editor" style={themeVars(brandChrome)}>
@@ -769,14 +811,42 @@ export default function EditorPage() {
                       Test alert
                     </button>
                   </div>
-                  <Preview>
-                    {scene === "starting" ? (
-                      <StartingSoon settings={settings} />
-                    ) : (
-                      <TextScene scene={scene} settings={settings} />
+                  {/* Click a part to jump to its settings; hover outlines it and names it (T6.135, the Studio board).
+                      A mouse shortcut only: the section list and the form already reach every setting by keyboard. */}
+                  <div
+                    className="editor-pick"
+                    data-hover={picked ? "" : undefined}
+                    onPointerMove={(e) => setPicked(partAt(e.currentTarget, e.clientX, e.clientY))}
+                    onPointerLeave={() => setPicked(null)}
+                    onClick={(e) => {
+                      const part = partAt(e.currentTarget, e.clientX, e.clientY);
+                      if (part) jumpTo(e, part.id);
+                    }}
+                  >
+                    <Preview>
+                      {scene === "starting" ? (
+                        <StartingSoon settings={settings} />
+                      ) : (
+                        <TextScene scene={scene} settings={settings} />
+                      )}
+                      <AlertView settings={settings} alert={testAlert} />
+                    </Preview>
+                    {picked && (
+                      <div
+                        className="editor-pick-box"
+                        data-below={picked.top < 28 || undefined}
+                        style={{
+                          left: picked.left,
+                          top: picked.top,
+                          width: picked.width,
+                          height: picked.height,
+                        }}
+                        aria-hidden
+                      >
+                        <span>{picked.name}</span>
+                      </div>
                     )}
-                    <AlertView settings={settings} alert={testAlert} />
-                  </Preview>
+                  </div>
                 </div>
               </section>
               {/* The looks filmstrip under the preview (T6.135, the Studio board): the real Starting Soon scenes, held
