@@ -750,3 +750,67 @@
     transparent 560px
   );
 }
+
+/* 11. Session: the title card. Huge ink type stacked at the top left, then the teal and brick bars cutting across the
+   open middle (the bars live in the grid's flexible row, so a long title squeezes them, never crosses them), and at
+   the bottom the socials on the left and the countdown in a cream box on the right, like an episode card. Text only
+   ever sits on mustard or cream. Thick ink outlines are the look's print concept. */
+.scene[data-bg="session"][data-theme="session"] {
+  background: var(--bg);
+}
+
+.scene[data-theme="session"] .scene-main {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  column-gap: 64px;
+  align-items: start;
+}
+
+.scene[data-theme="session"] .scene-title {
+  grid-area: 2 / 1 / auto / -1;
+  max-width: 1500px;
+  margin-top: 8px;
+}
+
+.scene[data-theme="session"] .scene-subtitle {
+  grid-area: 3 / 1 / auto / -1;
+  max-width: 56ch;
+  margin-top: 24px;
+}
+
+/* The bars: across the whole width, in whatever room the title leaves. */
+.scene[data-theme="session"] .scene-main::before {
+  content: "";
+  grid-area: 4 / 1 / auto / -1;
+  align-self: stretch;
+  justify-self: stretch;
+  margin: 24px -112px;
+  background: linear-gradient(
+    -9deg,
+    transparent 0 18%,
+    #b23a2e 18% 26%,
+    transparent 26% 34%,
+    #146b6e 34% 80%,
+    transparent 80%
+  );
+}
+
+.scene[data-theme="session"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="session"] .scene-socials {
+  grid-area: 5 / 1;
+  align-self: end;
+  grid-auto-flow: column;
+  justify-content: start;
+  column-gap: 56px;
+}
+
+/* The episode card. */
+.scene[data-theme="session"] .countdown {
+  grid-area: 5 / 2;
+  align-self: end;
+  align-items: flex-start;
+  text-align: left;
+}
