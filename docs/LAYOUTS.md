@@ -168,17 +168,19 @@ s s s s s    /brick/
 - Anti-patterns: thick outlines are the look's print concept (ink lines), not a shortcut.
 
 ## 12. Shonen: the manga page
-A full manga page split into panels by inked gutters: a big slanted panel for the headline, and two stacked panels on the right for the countdown and the socials.
+A full manga page split into panels by white gutters with ink edges: a big panel on the left for the lettering (the screentone and the speed lines move into it), and a column of two panels on the right, running to the page border, for the countdown and the socials.
 ```
-+---------------------------+  +-----------+
-| T T T T T T              /   |  C C C C  |
-| T T T T                 /    +-----------+
-| s s s s s              /     | @ handle  |
-+-----------------------+      +-----------+
++-----------------------------+  +-----------+
+|  \  speed lines  //        |  |  C C C C  |
+| T T T T T T                 |  +-----------+
+| T T T T                     |  +-----------+
+| s s s s s                   |  | @ handle  |
++-----------------------------+  +-----------+
 ```
-- Memorable move: the slanted gutter splitting the page.
+- Memorable move: the page grid itself, panels bleeding to the page border.
 - Principles: ink borders, white gutters, speed lines inside the big panel.
-- Without a countdown the right column is one socials panel.
+- Without a countdown the right column is one tall socials panel; with nothing on the right, the big panel takes the page.
+- Built with straight gutters: a slanted one would cut the panels' ink borders (clip-path), and straight gutters are just as true to manga.
 - Anti-patterns: thick borders are manga ink (concept).
 
 ## 13. Sakura: the hanging scroll
