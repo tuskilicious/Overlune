@@ -169,6 +169,16 @@ The editor, setup guide, privacy and terms pages share one quiet, high-contrast 
 - **Spacing (px):** 4 · 6 · 8 · 12 · 16 · 24 · 32. Fieldsets use a 12px gap and 16px padding; the page has 24px × 32px padding; steps sit 16px apart.
 - New colors must come from `brand.ts` or BRAND.md. A raw hex in CSS needs a comment saying why (today only the error red).
 
+### Redesign after the owner's kits (T6.118)
+`docs/KIT-REFERENCE.md` lists what the Tuskilicious and ICARUS kits do well; the editor took these from their control docks:
+- **Panel headers** sit inside the panel (Quicksand 18px bold) over a hairline that runs to the edge, instead of breaking the panel's top border.
+- **Segmented controls** for two to four choices (scene to edit, countdown kind): every choice visible, the picked one filled with the accent and Night text; the radios stay for keyboards and screen readers.
+- **Quick rows** of small buttons under a field: countdown picks and -1 / +1 min nudges, common webcam frame sizes (a picked size shows `aria-pressed`).
+- **Status in the section list:** a small accent check after a part that's filled in (Socials, Chat, Logo, Colors), with "(filled in)" for screen readers.
+- **Line icons** (`components/Icon.tsx`, one 2px stroke) instead of text glyphs: the check in "Copied" and the section list, the back arrow on the guide and legal pages.
+- **Guide:** a row of index chips that jump to each part, and a "Before your first stream" run-through with check boxes drawn in the accent.
+- Copy: success messages end with a full stop, not an exclamation mark.
+
 ### Components
 | Component | Anatomy and variants | States | Notes |
 |---|---|---|---|
