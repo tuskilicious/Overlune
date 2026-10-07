@@ -525,6 +525,32 @@ test("each link has a preview that opens the overlay full size (T6.114)", async 
   await expect(tab.locator(".scene-title")).toHaveText("Be right back");
 });
 
+test("Undo takes back the last change, a burst of typing as one step (T6.115)", async ({
+  page,
+}) => {
+  const undo = page.getByRole("button", { name: "Undo", exact: true });
+  await expect(undo).toHaveCount(0); // nothing to undo yet
+  const title = page.getByLabel("Title", { exact: true });
+  const before = await title.inputValue();
+  await title.fill("Going live");
+  await title.pressSequentially(" soon", { delay: 30 });
+  await expect(previewTitle(page, "Going live soon")).toBeVisible();
+  await undo.click();
+  await expect(title).toHaveValue(before);
+  await expect(previewTitle(page, before)).toBeVisible();
+  await expect(undo).toHaveCount(0);
+  await expect(page.getByText("Undone.")).toBeVisible();
+});
+
+test("Ctrl+Z outside a text field undoes a look change (T6.115)", async ({ page }) => {
+  const neon = page.getByRole("radio", { name: "Neon Grid" });
+  await neon.check();
+  await expect(preview(page).locator(".scene")).toHaveAttribute("data-theme", "neon-grid");
+  await neon.press("Control+z");
+  await expect(preview(page).locator(".scene")).not.toHaveAttribute("data-theme", "neon-grid");
+  await expect(neon).not.toBeChecked();
+});
+
 test("quick picks set the countdown, and No countdown clears it (T6.113)", async ({ page }) => {
   await page.getByRole("button", { name: "In 30 min" }).click();
   // Rounded up to the next whole minute, so 30:00 to 30:59 left.

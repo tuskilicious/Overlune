@@ -1,4 +1,4 @@
-import { useEffect, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { Link } from "react-router";
 import { fromZoneInput, toZoneInput, zoneName } from "../lib/time";
 import { isHttpsUrl } from "../lib/url-safety";
@@ -305,6 +305,55 @@ export default function EditorPage() {
     save(settings);
   }, [settings]);
 
+  /** Undo (T6.115): earlier settings, newest last. A burst of edits (typing a title) is one step. */
+  const [past, setPast] = useState<Settings[]>([]);
+  const shown = useRef(settings);
+  const lastEdit = useRef(0);
+  const undoing = useRef(false);
+  useEffect(() => {
+    if (settings === shown.current) return;
+    const before = shown.current;
+    shown.current = settings;
+    if (undoing.current) {
+      undoing.current = false;
+      return;
+    }
+    // The same settings in a new object (picking the look already shown) is no step.
+    if (JSON.stringify(before) === JSON.stringify(settings)) return;
+    const now = Date.now();
+    // ponytail: 50 steps of whole snapshots; settings are a few kB, so diffs aren't worth it
+    if (now - lastEdit.current > 1000) setPast((p) => [...p.slice(-49), before]);
+    lastEdit.current = now;
+  }, [settings]);
+  const undo = useCallback(() => {
+    const before = past.at(-1);
+    if (!before) return;
+    undoing.current = true;
+    setPast(past.slice(0, -1));
+    setSettings(before);
+    setLogoInput(before.logo);
+    setBotsInput(before.chat.bots.join("\n"));
+    setLoadStatus("Undone.");
+  }, [past]);
+  // Ctrl+Z / Cmd+Z outside text fields; inside one, the browser's own undo works on the text.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey) || e.shiftKey || e.altKey || e.key.toLowerCase() !== "z")
+        return;
+      const t = e.target;
+      const typing =
+        t instanceof HTMLTextAreaElement ||
+        (t instanceof HTMLElement && t.isContentEditable) ||
+        (t instanceof HTMLInputElement &&
+          !["checkbox", "radio", "range", "color", "button", "submit"].includes(t.type));
+      if (typing || !past.length) return;
+      e.preventDefault();
+      undo();
+    };
+    addEventListener("keydown", onKey);
+    return () => removeEventListener("keydown", onKey);
+  }, [undo, past.length]);
+
   const startOver = () => {
     const fresh = freshSettings();
     setSettings(fresh);
@@ -498,6 +547,11 @@ export default function EditorPage() {
           >
             Load my overlay from a link
           </button>
+          {past.length > 0 && (
+            <button type="button" onClick={undo} aria-keyshortcuts="Control+Z">
+              Undo
+            </button>
+          )}
           {madeSomething && (
             <button
               id="start-over"
