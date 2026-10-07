@@ -70,7 +70,7 @@ overlune/
 ├─ src/
 │  ├─ main.tsx  App.tsx  routes.tsx
 │  ├─ landing/          landing page at / (Tailwind + GSAP, lazy-loaded)
-│  ├─ editor/           editor UI, preview, copy-link, setup guide
+│  ├─ editor/           editor UI, preview, copy-link, setup guide; sections/ holds one file per form section
 │  ├─ overlays/         starting/ brb/ ending/ chat/ alerts/ + shared frame & error state
 │  ├─ themes/           types.ts, index.ts, one file per theme
 │  ├─ settings/         schema.ts, url.ts (encode/decode), migrations.ts, storage.ts
