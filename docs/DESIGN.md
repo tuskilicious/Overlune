@@ -4,7 +4,7 @@
 1. **Themes are the product.** Each one must look like a paid pack.
 2. **One choice restyles everything:** scenes, chat, alerts and the editor preview.
 3. **Guard beginners from ugly results.** Theme defaults come first. Color and font overrides live under "Advanced".
-4. **Legible on stream:** readable at 720p on a phone, with WCAG AA contrast for text over its surface.
+4. **Legible on stream:** readable at 720p on a phone, with WCAG AA contrast for text over whatever it sits on: its surface, or the scene's own ground (see "Contrast as rendered").
 5. **Light on CPU:** CSS or canvas effects only, and every animation has a reduced-motion version.
 
 ## Theme token set
@@ -26,6 +26,25 @@ Every theme defines exactly these tokens (`src/themes/types.ts`):
 | `alertAnim` | Alert animation id |
 | `alertSound` | Default sound file (in `public/sounds`, licensed) |
 | `badgeStyle` | How role badges render in this theme |
+
+### Contrast as rendered
+The tokens alone don't tell you what a viewer reads: scenes put the headline, its last word and the subtitle straight on `bg`, and a look's CSS can swap a color there (`scene.css`, keyed on `data-theme`). Check the pair that actually renders.
+- **Body text on a surface** (chat, alerts, countdown card, panels): 4.5:1. `tests/unit/themes/contrast.test.ts` checks `text`, `textMuted` and `accent` on `surface` for every look.
+- **Text on the scene ground:** the subtitle needs 4.5:1. The headline is large text (68px and up in every look), so it and its accented last word need 3:1. The countdown and its done text sit on the countdown card (`surface`).
+- **Graphics** (the accent rule, icon tiles, outlines that carry meaning): 3:1.
+- **Gradient grounds** (Pastel Cloud, Vaporwave Sunset): measure against the part of the gradient behind the text, not the `bg` token (Vaporwave keeps all text on its purple top).
+- **Not yet tested automatically:** the ground pairs and the CSS overrides. Until a test covers them, a look that changes `bg`, `primary`, `accent`, `textMuted` or one of the overrides below gets checked by hand.
+
+Overrides on the ground today, and the tightest pairs (WCAG ratios from the shipped values, 2026-10-07):
+| Look | On the ground | Ratio | Why it holds |
+|---|---|---|---|
+| Skate Deck | Subtitle `#3A2410` instead of `textMuted` (made for the grip tape) | 8.0:1 | Override |
+| Skate Deck | Last word in `accent` `#FF4FA3` | 1.7:1 on maple | It sits on its 16px white sticker outline: about 3.0:1, large text |
+| Quest | Subtitle `#D9C08E`, last word `#FFB547` instead of `textMuted` and `accent` (made for parchment) | 10.4:1 each | Override |
+| Session | Last word in brick `#B23A2E` | 3.0:1 | Large text only, at the limit; don't lighten the brick or the mustard |
+| Pastel Cloud | Headline in `primary` `#7B5BD6` | 4.1:1 | Large text |
+| Cozy Café, Daylight, Shonen | Last word in `accent` | 4.5-4.6:1 | Large text; also passes the 4.5:1 body rule, barely |
+| Bold Esports | `accent` on `surface` (badges, alert band) | 4.7:1 | Passes; little room |
 
 ## The themes
 The starting palettes below are suggestions. Verify contrast before shipping each theme.
@@ -160,6 +179,38 @@ From impeccable's second direction round (seed `c833f7e1`, reroll 1), all four p
 - Effect (`quest`): embers rising from below (18s) through a forge glow, a vignette over the hall.
 - Sound: reuses Forest Night's alert sound.
 
+## The bar for a new or reworked look
+Set on 2026-10-07 from the owner's design handoff, an audit of the looks against paid packs (not in the repo). It applies to every new look and to any rework of a shipped one; shipped looks aren't redesigned only to meet it. These rules, CLAUDE.md and the sections above win over any style skill.
+
+**Before building**, write a short plan: 4-6 named colors, the two type roles, the layout as a quick sketch, and the one memorable move. Check it against the anti-patterns below and rewrite whatever matches.
+
+**A look is done when:**
+- It has one memorable move (its signature, named in the theme file's header comment) and everything else stays quiet. Before finishing, take one decorative element away.
+- Its heading face is its own, and it uses two type roles at most, clearly different from each other.
+- It has its own alert sound.
+- It covers every surface: Starting Soon, Be Right Back, Stream Ending, chat, alerts, webcam frame, Twitch panels and the offline banner.
+- Its layout is chosen for its concept: the shared layout v2 or one of its own (see "Scene layout"), never a recolor by default.
+- Its colors pass "Contrast as rendered" on the ground and on the surface.
+- It reads on a phone: check the scene scaled down to 1280×720 and 640×360.
+- Its motion follows the motion grammar (T6.117), uses CSS or canvas only, and every loop stops in Lite and Still.
+- Its copy is sentence case and plain, and its preview content reads like a real stream (`FriendlyRaider`, not `[Username]`).
+- Its fonts, sounds and art are in `docs/ASSETS.md`, and it has passed `docs/OBS-TESTING.md`.
+
+**Anti-patterns.** Each one is allowed only when the look's concept demands it, with the reason in the theme file's header comment.
+- Layout: identical rounded cards with one soft grey shadow; a gradient as decoration; blurred translucent panels (also heavy on low-end PCs); sticker tilt, an offset hard shadow or a thick black border as a shortcut for "bold"; everything centered.
+- Type: labels that restate the content; middle-dot strings ("A · B · C"); an italic serif as shorthand for calm; monospace small print as shorthand for technical.
+- Color: warm cream with terracotta or clay; near-black with one acid-green or vermilion accent; a tinted near-black standing in for black unless it's a named color in the palette; neon, scanlines and a grid as the default "retro" (pick a real source instead: teletext, a particular console, a print process); an accent sprinkled around instead of meaning something.
+- Content: "→" on links or buttons, numbers on things that aren't a sequence, invented metrics or testimonials.
+- Motion: the same fade-and-slide-up on every element. Each scene gets one orchestrated moment.
+
+**House patterns** are shared by every look, so they aren't tells: the two-tone headline whose last word takes the accent (T6.107), the uppercase event label on alerts, and small tracked caps for the platform names in the socials list. A look doesn't add a second accented word or more caps labels on top of them.
+
+**Known gaps (2026-10-07):**
+- Sounds: eight looks reuse another look's sound: Daylight (Clean Slate's), Abyss and Quest (Forest Night's), Session (Cozy Café's), Shonen (Bold Esports'), Sakura (Pastel Cloud's), Skate Deck (Arcade 8-Bit's), Phosphor (Neon Grid's).
+- Fonts: Space Grotesk is Daylight's heading and Vaporwave Sunset's body. Body faces shared by two looks: Nunito Sans (Forest Night, Daylight), Nunito (Cozy Café, Sakura), Barlow (Bold Esports, Skate Deck).
+- Composition: all 16 looks still use layout v2, so they differ by color, type, shape and effect, not by structure. Paid packs vary frames and shapes from pack to pack. Looks may now have their own layouts (owner, 2026-10-07; see "Scene layout"), so this closes look by look.
+- Shipped looks that match a tell keep it until they are reworked: Bold Esports (near-black with one red), Neon Grid (neon with a grid).
+
 ## Overlay layout rules
 - Canvas is always 1920×1080. Keep a 64px safe margin on scenes.
 - Chat default size is 400×600, transparent background, bottom-up.
@@ -167,11 +218,18 @@ From impeccable's second direction round (seed `c833f7e1`, reroll 1), all four p
 - Error states use the theme's surface and text colors, stay readable, and never flash.
 
 ### Scene layout (T6.35)
-All the themes share one composed layout, rolled out one theme at a time (T6.35-T6.42); the original centered layout was retired in T6.43. Theme ids, settings and links never changed, so pasted links picked up the new design. Per-theme tweaks key on `data-theme` (and `data-bg` for background effects) on `.scene`, `.chat` and `.alerts`.
+Layout v2 below is the shared default. It was rolled out one theme at a time (T6.35-T6.42); the original centered layout was retired in T6.43. Theme ids, settings and links never changed, so pasted links picked up the new design.
+
+**A look may have its own layout** (owner, 2026-10-07): looks don't have to share one composition. Paid packs differ in structure, not just color, and a layout is part of a look's world (a teletext page, a manga panel, a quest log). What every layout keeps:
+- The 1920×1080 canvas, the 64px safe margin, and the open space the look's motif needs.
+- The same pieces and settings: logo, headline, subtitle, countdown, socials, ticker and the error card. A layout is part of the look, never a link setting, so old links simply pick it up.
+- The shared markup (`SceneFrame`): a layout changes the CSS, keyed on `data-theme`, not the components, so fit-to-screen (T6.26, T6.52) keeps working. If several looks share a layout, add it as a token through `types.ts`, with a test.
+- The longest text still fits, "Contrast as rendered" holds for the new placements, it reads at 640×360, and the motion grammar and Lite and Still apply.
+- The scene, BRB, Stream Ending, offline banner and panels of one look read as one layout. Compare screenshots against the current scene before shipping. Per-theme tweaks key on `data-theme` (and `data-bg` for background effects) on `.scene`, `.chat` and `.alerts`.
 - **Scenes (layout v2, T6.107, after the maintainer's broadcast kits):** 88px top / 112px side / 72px bottom margins (inside the 64px safe margin). Logo top left (160px max). On the left, anchored to the bottom: a 96×8px accent rule, then a two-tone display headline (184px, -0.04em tracking, 0.94 leading, balanced, so "Starting soon" sets on two lines) whose last word takes the accent color, then the subtitle (40px, 30ch max). It shrinks to fit per T6.26 and fits again when the countdown widens as it ticks (T6.52). On the right, also bottom-anchored, one column (480px min): the countdown card (96px digits on one line, in the text color, so the accent stays with the headline) over the socials as a list, each an accent-tinted 72px icon tile with the platform name (small tracked caps) over the handle (36px bold). The open sky above both columns is where each theme's motif lives.
 - **Alerts:** still centered at the top. A wider card (760-1100px) with a 6px accent band, an uppercase event label ("Raid", "New subscriber", "Resub", "Gift subs", "Cheer"), then the streamer's message at 56px; resub and cheer text below in the muted color.
 - **Chat:** one panel instead of a card per message: no borders between cards, hairline separators, only the top and bottom of the stack rounded. Badges are small square-cornered tags tinted with the accent.
-- Each theme can restyle these pieces in its own CSS (fonts, background effect, shapes), keyed on `data-theme`; the composition stays the same so the set reads as one product.
+- Each theme can restyle these pieces in its own CSS (fonts, background effect, shapes), keyed on `data-theme`, or move them into its own layout (above). The set reads as one product through the shared pieces, settings and motion grammar, not through one composition.
 - **Neon Grid (T6.36):** horizon at 82% with the content kept above it; socials float on the grid floor as a glowing panel; smaller type for the wide Orbitron; the chat stack has one neon edge.
 - **Cozy Café (T6.37):** the steam wisps rise in the open space (between the title block and the countdown card, and from behind the card) instead of behind the title.
 - **Arcade 8-Bit (T6.38):** pixel-font sizes (title 68px, countdown 56px, done text 44px, alert title 40px per T6.55) so the title and countdown sit side by side; square accent rule; wider subtitle measure for VT323.
@@ -217,13 +275,13 @@ The editor, setup guide, privacy and terms pages share one quiet, high-contrast 
 | Text field, select, textarea | Label wraps the control; hint below, linked with `aria-describedby` | focus-visible, invalid (`aria-invalid`, red outline, message in `role="alert"`), near limit ("N characters left", `aria-live="polite"`) | Every limited text field shows characters left at 10 or fewer. |
 | Disclosure | Native `<details>`/`<summary>`, bold summary, closed by default | open, closed (native) | For rarely changed settings ("More chat options", "Advanced: colors and fonts"). Never hide a setting a beginner needs to finish. |
 | Look filters | Pills above the editor's picker: All, Calm, Retro, Bold (`aria-pressed`); each look is in one group | pressed (Lune Violet fill) | Filtered-out looks are hidden, not removed (T6.60). |
-| Look card | The theme's real Starting Soon scene with sample content (a subtitle, a countdown a day away and two `yourname` socials, `src/editor/scene-samples.ts`), held still, plus its name. Gallery: `<button>`, 4 across (2 at 800px and below). Editor: radio, 3 across | hover (Haze border), selected (Lune Violet border via `:has(:checked)`), focus-visible | Card scenes never animate (`editor-shot`), so 8 cards stay light. |
+| Look card | The theme's real Starting Soon scene with sample content (a subtitle, a countdown a day away and two `yourname` socials, `src/editor/scene-samples.ts`), held still, plus its name. Gallery: `<button>`, 4 across (2 at 800px and below). Editor: radio, 3 across | hover (Haze border), selected (Lune Violet border via `:has(:checked)`), focus-visible | Card scenes never animate (`editor-shot`), so a gallery of every look stays light. |
 | Link row | The name with Width and Height as chips (the dots stay in the text for screen readers and the guide's size table), a faint raw link (48ch max, still selectable), the filled Copy button | copied ("✓ Copied"), stale ("Changed since you copied it"), copy failed ("Press Ctrl+C") | The copy status is a `role="status"` that stays in the DOM. |
 | Steps bar | Sticky `<nav aria-label="Steps">` with three links | current step: accent, 3px underline, `aria-current="step"` | Jumps scroll and move focus; they never change the address, which holds the settings. |
 | Preview | Scaled overlay in a 16:9 (or chat-sized) box | — | `aria-hidden` and `inert`, because it repeats the form. Sticky column above 800px, and never taller than fits under the header, so the scene's title (at the bottom of the frame) is in view on a 768px-tall laptop (T6.49); docked "Show preview" bar at 800px and below. |
 | Callout | Deep Space box with a faint violet outline all the way round (`--callout-edge`: Lune Violet mixed 45% into Deep Space, 1px) and the usual 12px corners. No thick bar down one side (T6.53) | — | Save reminder, "You're set" line, legal disclaimer. One per region. |
 
-- **Responsive:** from 1200px, a three-column shell (T6.60): the section list on the left (Look, Text, Socials, Chat, Alerts, Logo, Colors, Links; the section in view marked with `aria-current="location"`), the live preview in the middle (sticky; it shows the chat or alert preview while those sections are in view), and the settings on the right (340–400px) with the links at their end. 801–1199px: a 300–400px form column beside the previews, with the steps bar; the links end the form column, so the sticky preview never covers them (T6.66). 800px and below: one column, docked preview, gallery 2 across. The editor is for desktop windows, often squeezed next to OBS; there is no mobile editor (PRD).
+- **Responsive:** from 1200px, a three-column shell (T6.60): the section list on the left (Look, Text, Socials, Chat, Alerts, Webcam frame, Channel page, Logo, Motion, Colors, Links; the section in view marked with `aria-current="location"`), the live preview in the middle (sticky; it shows the chat or alert preview while those sections are in view), and the settings on the right (340–400px) with the links at their end. 801–1199px: a 300–400px form column beside the previews, with the steps bar; the links end the form column, so the sticky preview never covers them (T6.66). 800px and below: one column, docked preview, gallery 2 across. The editor is for desktop windows, often squeezed next to OBS; there is no mobile editor (PRD).
 - **Long content:** labels wrap, look names wrap to two lines, raw links truncate with an ellipsis, and overlay titles shrink to fit (T6.26).
 
 ### Accessibility (checked in tests)
@@ -252,12 +310,13 @@ Write for a streamer opening OBS for the first time: concise, confident, helpful
 ### Landing page (`/`)
 - The one page built with Tailwind and GSAP (STACK.md). It uses the same brand tokens, exposed as Tailwind colors (`night`, `deep`, `moon`, `haze`, `violet`, …) and fonts (`font-heading`, `font-body`) in `src/landing/landing.css`.
 - Images are real Overlune scenes rendered live (the editor's `Preview`) with the same sample content as the look cards, never stock photos. Only the hero moves; the rest are held still (`landing-still`).
-- **Hero (T6.59):** the whole kit. A live scene in a 16:9 stream frame with a small Signal Cyan LIVE badge, two real alert cards in the same look (over the frame's empty top-left on wide screens, under it on phones), and the three scene names with the current one filled. It tours a look and a scene every 4.5 seconds. A "Pause the looks" button stops the tour and holds the scene still (WCAG 2.2.2); with reduced motion it starts paused on Vaporwave Sunset. Under the buttons, a fact row: 8 looks, Scenes, chat and alerts, One link per overlay, Free, no account.
+- **Hero (T6.59):** the whole kit. A live scene in a 16:9 stream frame with a small Signal Cyan LIVE badge, two real alert cards in the same look (over the frame's empty top-left on wide screens, under it on phones), and the three scene names with the current one filled. It tours a look and a scene every 4.5 seconds. A "Pause the looks" button stops the tour and holds the scene still (WCAG 2.2.2); with reduced motion it starts paused on Vaporwave Sunset. Under the buttons, a fact row: the number of looks (counted from `themeIds`, never typed in), Scenes, chat and alerts, One link per overlay, Free, no account. Since T6.124 the hero is one big rounded card that, on wide windows with motion, zooms out into a drifting collage of every look as you scroll.
 - **Night sky (T6.59):** CSS only, static: a few small stars, a soft violet arc and a crescent moon behind the hero. No image files.
-- **Glow (T6.59):** the page's one gradient is the hero frame's edge (Lune Violet to Signal Cyan) with a soft glow, and the hero's primary button gets a matching glow. No other card or button glows.
-- **Overlay cards (T6.59):** Starting Soon, Be Right Back, Stream Ending, Chat and Alerts, each a live thumbnail that opens its part of the editor (`/editor?part=starting|brb|ending|chat|alerts`; a first visit picks a look first).
+- **Glow (T6.59, T6.124):** the hero frame's edge (Lune Violet to Signal Cyan) with a soft glow, the hero's primary button with a matching glow, and the closing call to action, a panel lit by violet radial light. Soft radial light also sits behind the page, never behind body text (BRAND.md). No other card or button glows.
+- **Looks (T6.124):** the looks rise on a violet curve as a list (name and one line each) beside one big live preview that follows hover, focus and the row in the middle of the window, with scene buttons, full screen and "Use this look". Narrow windows get a picture per look.
+- **Overlay cards (T6.59, T6.102, T6.124):** Starting Soon, Be Right Back, Stream Ending, Chat, Alerts and Webcam frame, tall cards in a sideways row that fill with violet from the pointer. Each is a live thumbnail that opens its part of the editor (`/editor?part=starting|brb|ending|chat|alerts|frame`; a first visit picks a look first).
 - **Nav (T6.59):** the link for the section in the middle of the window is underlined in Lune Violet (`aria-current="location"`).
-- Motion: scroll reveals, a pinned theme gallery (1024px and wider), a word-by-word reveal that starts at 40% opacity so large text keeps 3:1 contrast, and CSS hover zooms. All GSAP runs inside `gsap.matchMedia("(prefers-reduced-motion: no-preference)")`; with reduced motion the page is static and fully visible.
+- Motion: scroll reveals, the pinned hero zoom (wide windows), a word-by-word reveal that starts at 40% opacity so large text keeps 3:1 contrast, and CSS hover zooms. All GSAP runs inside `gsap.matchMedia("(prefers-reduced-motion: no-preference)")`; with reduced motion the page is static and fully visible.
 - One filled button style (Lune Violet, Night text). No meta-labels ("SECTION 01"), no invented reviews or stats.
 - Responsive down to 390px with no sideways scroll (e2e check).
 
