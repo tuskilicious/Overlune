@@ -35,6 +35,8 @@ async function savePng(el: HTMLElement, name: string, width: number, height: num
       "background-size",
       "background-position",
       "background-repeat",
+      "opacity", // Session's grain is a faint multiply layer, not a solid one
+      "mix-blend-mode",
     ] as const)
       standIn.style.setProperty(p, after.getPropertyValue(p));
     el.dataset.shot = "";

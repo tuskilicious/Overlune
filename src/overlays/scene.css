@@ -77,6 +77,10 @@
 .scene[data-bg="steam"] {
   position: relative;
   isolation: isolate;
+  /* Warm window light from the top left, and paper grain over the page (T6.112). */
+  background:
+    url("/images/themes/paper-grain.svg"),
+    radial-gradient(90% 80% at 0% 0%, rgb(255 236 200 / 0.75), transparent 60%), var(--bg);
 }
 
 .scene[data-bg="steam"]::before,
@@ -227,6 +231,7 @@
       color-mix(in srgb, var(--primary) 20%, transparent) 68px,
       transparent 360px
     ),
+    url("/images/themes/forest-treeline.svg") center bottom / 100% 240px no-repeat,
     var(--bg);
 }
 
@@ -847,4 +852,99 @@
 .scene[data-theme="shonen"] .scene-icon {
   background: var(--text);
   color: var(--surface);
+}
+
+/* Uplift of the original looks (T6.112): each gets one signature move from its own world, to the bar of the
+   maintainer's kits. Every animation is still under reduced motion (index.css). */
+
+/* Neon Grid: the headline is a lit neon tube, and its last word flickers on once after the entrance. */
+.scene[data-theme="neon-grid"] .scene-title {
+  text-shadow:
+    0 0 14px color-mix(in srgb, var(--primary) 55%, transparent),
+    0 0 40px color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+.scene[data-theme="neon-grid"] .scene-title-end {
+  text-shadow:
+    0 0 14px color-mix(in srgb, var(--accent) 60%, transparent),
+    0 0 40px color-mix(in srgb, var(--accent) 35%, transparent);
+  animation: neon-on 1.4s linear 0.5s both;
+}
+
+@keyframes neon-on {
+  0%,
+  14%,
+  30% {
+    opacity: 0.25;
+  }
+  8%,
+  22%,
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Arcade 8-Bit: a blinking block cursor after the title, like an attract screen waiting for a coin. */
+.scene[data-theme="arcade-8bit"] .scene-title::after {
+  content: "";
+  display: inline-block;
+  width: 0.55em;
+  height: 0.8em;
+  margin-left: 0.25em;
+  background: var(--accent);
+  animation: arcade-blink 1.1s steps(1) infinite;
+}
+
+@keyframes arcade-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Pastel Cloud: a four-point sparkle after the title that twinkles. */
+.scene[data-theme="pastel-cloud"] .scene-title::after {
+  content: "";
+  display: inline-block;
+  width: 0.36em;
+  height: 0.36em;
+  margin-left: 0.18em;
+  vertical-align: 0.4em;
+  background: var(--accent);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  animation: pastel-twinkle 2.6s ease-in-out infinite;
+}
+
+@keyframes pastel-twinkle {
+  50% {
+    transform: scale(0.6) rotate(45deg);
+    opacity: 0.6;
+  }
+}
+
+/* Bold Esports: angled speed slabs cutting across the top-right corner, like a broadcast package. Static. */
+.scene[data-theme="bold-esports"] {
+  background:
+    linear-gradient(
+        115deg,
+        transparent 0 56%,
+        var(--accent) 56% 60%,
+        transparent 60% 63%,
+        color-mix(in srgb, var(--accent) 45%, transparent) 63% 65%,
+        transparent 65% 68%,
+        color-mix(in srgb, var(--accent) 20%, transparent) 68% 69%,
+        transparent 69%
+      )
+      right top / 70% 38% no-repeat,
+    radial-gradient(
+      70% 80% at 100% 0%,
+      color-mix(in srgb, var(--accent) 10%, transparent),
+      transparent 70%
+    ),
+    var(--bg);
+}
+
+/* Daylight: a Swiss-poster vermilion disc in the open top right. Static. */
+.scene[data-theme="daylight"] {
+  background:
+    radial-gradient(circle at 80% 21%, var(--accent) 0 190px, transparent 191px), var(--bg);
 }

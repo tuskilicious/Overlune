@@ -86,6 +86,17 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 - Effects: none; a soft shadow under surfaces, hairline border `#D9DEE7`, radius 14
 - Contrast: text, muted and accent all pass AA on both bg and surface (accent 4.5:1 on bg, 5.1:1 on white). Reuses Clean Slate's alert sound.
 
+### Uplift of the original looks (T6.112)
+Each original look got one signature move from its own world, to the kits' bar. All motion stops under reduced motion.
+- **Neon Grid:** the headline glows like a lit neon tube (two soft text-shadows in its own colors); the last word flickers on once after the entrance.
+- **Cozy Café:** warm window light from the top left and paper grain (`public/images/themes/paper-grain.svg`, the Session grain at a third of its strength).
+- **Arcade 8-Bit:** a blinking accent block cursor after the title (1.1s, stepped), like an attract screen.
+- **Pastel Cloud:** a four-point accent sparkle after the title that twinkles.
+- **Forest Night:** a pine treeline along the bottom under the moon (`public/images/themes/forest-treeline.svg`, three ridges, generated).
+- **Bold Esports:** angled accent speed slabs cutting across the top-right corner.
+- **Daylight:** a Swiss-poster vermilion disc (380px) in the open top right.
+- **Clean Slate** stays the quiet baseline; **Vaporwave Sunset** already had its full world.
+
 ### Kit-inspired looks (T6.109-T6.111)
 Built to the bar of the maintainer's own kits (Tuskilicious, ICARUS): each look is a world with one signature motif, not a palette swap. Directions came from impeccable's direction round (seed `c833f7e1`), picked by the owner.
 
