@@ -5,7 +5,7 @@ Realistic goals after v1.0.0 (2026-10-03). These are goals, not promises: nothin
 Sizes are rough, for one maintainer working with Claude: **S** a day or two, **M** about a week, **L** several weeks.
 
 ## Where v1 stands
-- Live at overlune.in: three scenes, Twitch chat, Twitch alerts, 8 looks, an editor and a setup guide. No accounts, no backend.
+- Live at overlune.in (v1.1.0): three scenes, Twitch chat, Twitch alerts, a webcam frame, a socials ticker, 16 looks, Twitch panels and an offline banner, an OBS scene collection file, an editor and a setup guide. No accounts, no backend.
 - Five streamers have used it and sent 38 points of feedback (T6.6). Most were fixed in v1 (T6.68 to T6.79). The rest are below.
 - The PRD's gate for v2 ("5 real streamers using v1") is met (T5.7, T6.6).
 - Funding: GitHub Sponsors is live. Overlune stays free; support unlocks nothing.
@@ -21,23 +21,19 @@ Sizes are rough, for one maintainer working with Claude: **S** a day or two, **M
 ## v1.x: more value with no backend
 These fit today's rules (a static site) and can ship one at a time, in any order.
 
-**Approved 2026-10-06 (T6.86):** the scene collection file, webcam frame, panels and offline banner (with `html-to-image`), a light look and page previews, plus all the upkeep below. Hindi waits. Tasks T6.87 to T6.98.
+**Done in 1.1 (T6.87 to T6.98):** page previews, the webcam frame, a light look (Daylight), the OBS scene collection file, Twitch panels and the offline banner (with `html-to-image`), Sentry source maps, lighter overlays (Sentry loads after the page), and the React Router 8, Vite 8, Vitest 5 and Sentry 11 upgrades. Seven more looks followed (T6.109 to T6.111, T6.125 to T6.128).
+
+Still open, in any order:
 
 | Goal | Size | Why | Notes |
 |---|---|---|---|
-| **OBS scene collection file** | M | Setup today means pasting 5 links one by one. One import would make every scene with its link and size. | PRD v2 #2. OBS only: Streamlabs uses a different format, so it keeps the guide. Test the import in OBS on Windows and Mac. |
-| **Webcam frame** | S | Asked for in feedback. A themed border with a clear middle, sized in OBS. | A new overlay route, so a new link type, not a change to old ones. |
-| **Twitch panels and offline banner as images** | M | Streamers asked for a matching channel page. | PRD v2 #3. Drawn in the browser and downloaded as PNG. Needs a small image library (dependency approval) or hand-drawn canvas code. No video export. |
-| **A light look, then seasonal looks** | S each | Asked for in feedback. | Each look still needs every scene, chat and alert, contrast checks and an OBS test. |
-| **Page previews when the site is shared** | S | Shared links to /guide show the home page's preview today. | Write a copy of `index.html` with its own title and image for each page at build time. No server needed. |
+| **Seasonal looks** | S each | Asked for in feedback. | Each look still needs every scene, chat and alert, contrast checks and an OBS test. |
 | **Showcase of real streamers** | S | Shows the looks on real streams. | Only with each streamer's written permission. |
-| **Hindi, then other languages** | L | Asked for in feedback. | The editor, guide and default overlay text. Needs a fluent reviewer for each language; ongoing work. |
+| **Hindi, then other languages** | L | Asked for in feedback. | Waits (owner, 2026-10-06). The editor, guide and default overlay text. Needs a fluent reviewer for each language; ongoing work. |
 
 ### Upkeep
-- **TypeScript 7:** waits for typescript-eslint to support it (8.71 supports up to 6.0). We're on 6.0 (T6.97).
-- **Dependency majors**, one PR each with the full test suite and an OBS check: React Router 8, Vite 8, Vitest 5, TypeScript 7, Sentry 11, `@vitejs/plugin-react` 6.
-- **Sentry source maps:** upload them in CI so error reports show real file names (`docs/SENTRY.md`). Needs `SENTRY_AUTH_TOKEN` as a CI secret.
-- **Overlay size:** Sentry is about 150 kB of an overlay's 540 kB of code (T6.82). Check whether a lighter setup keeps the same error reports.
+- **TypeScript 7:** waits for typescript-eslint to support it (8.71 needs below 6.1). We're on 6.0 (T6.97). Dependabot holds TypeScript majors until then; remove that rule in `.github/dependabot.yml` when support lands.
+- **Dependabot:** merge the weekly minor-and-patch group once CI passes; take each major in its own PR with the full suite and an OBS check.
 
 ## v2: accounts and a backend (Supabase)
 The owner chose Supabase (2026-10-03): sign-in, Postgres with row-level security, file storage, live updates and server functions in one place. A free project for staging and a paid one for production. Check current pricing before signing up.
@@ -82,7 +78,5 @@ Paid for by GitHub Sponsors and the owner. Nothing in v1.x costs money.
 
 ## Decisions for the owner
 1. **Backups:** Supabase's paid plan includes daily backups; point-in-time recovery, which CLAUDE.md asks for, is an extra monthly cost. Proposed: daily backups plus a nightly copy to a separate account, and change CLAUDE.md's backup rule to match. Needed before Phase 1.
-2. **Which v1.x goal comes first?** Suggested: the OBS scene collection file, since setup was the hardest part for new streamers.
-3. **Follow alerts:** confirm the backend route over Streamer.bot.
-4. **A light look:** wanted?
-5. **The drag-and-drop editor:** keep it under "Later, maybe" until Phase 2 is live?
+2. **Follow alerts:** confirm the backend route over Streamer.bot.
+3. **The drag-and-drop editor:** keep it under "Later, maybe" until Phase 2 is live?
