@@ -344,51 +344,103 @@
   }
 }
 
-/* Vaporwave Sunset: a striped sun in the open top-right sky with a coral glow, and palm silhouettes at the edges
-   (public/images/themes), the right one crossing the sun (T6.42). The sky stays purple behind all text.
-   Static, so no reduced-motion version. */
+/* Vaporwave Sunset (T6.42, animated in T6.134): the synthwave frame. A striped sun sets on a horizon at 80%, half
+   below it, centered; a grid floor runs from the horizon toward the viewer; palm silhouettes frame both sides
+   (public/images/themes). The sky stays purple behind all text (layouts.css keeps the content above the sun).
+   Motion: the floor scrolls toward the viewer, the sun's stripes slide down into the horizon, and the palms sway.
+   Transform, opacity and one mask position only. Lite and Still hold all of it (index.css). */
 .scene[data-bg="sunset"] {
   position: relative;
   isolation: isolate;
   background:
-    radial-gradient(circle at 78% 31%, rgb(255 107 107 / 0.45), transparent 460px),
-    linear-gradient(var(--bg) 0 60%, color-mix(in srgb, var(--bg) 82%, #000));
+    radial-gradient(60% 46% at 50% 80%, rgb(255 107 107 / 0.42), transparent 70%),
+    linear-gradient(var(--bg) 0 46%, color-mix(in srgb, var(--bg) 70%, #ff6b6b) 80%);
 }
 
 .scene[data-bg="sunset"]::before,
-.scene[data-bg="sunset"]::after {
+.scene[data-bg="sunset"]::after,
+.scene[data-bg="sunset"] .scene-main::before,
+.scene[data-bg="sunset"] .scene-main::after {
   content: "";
   position: absolute;
   z-index: -1;
   pointer-events: none;
 }
 
+/* The sun: centered on the horizon, half set. Solid at the top, striped below, the stripes sliding down. */
 .scene[data-bg="sunset"]::before {
-  right: 180px;
-  top: 40px;
-  width: 420px;
-  height: 420px;
+  left: calc(50% - 280px);
+  top: calc(80% - 280px);
+  width: 560px;
+  height: 560px;
   border-radius: 50%;
-  background: linear-gradient(#ffd36b, var(--accent));
-  /* The stripes, in the lower half: gaps that widen toward the bottom of the sun. */
-  mask-image: linear-gradient(
-    #000 0 50%,
-    transparent 50% 52%,
-    #000 52% 59%,
-    transparent 59% 62%,
-    #000 62% 68%,
-    transparent 68% 72%,
-    #000 72% 77%,
-    transparent 77% 83%,
-    #000 83% 87%,
-    transparent 87% 94%,
-    #000 94%
-  );
+  background: linear-gradient(#ffd36b 8%, #ff9a6b 30%, var(--accent) 50%);
+  box-shadow: 0 0 120px rgb(255 113 206 / 0.45);
+  mask-image:
+    linear-gradient(#000 0 26%, transparent 26%),
+    repeating-linear-gradient(#000 0 22px, transparent 22px 30px);
+  mask-size:
+    100% 100%,
+    100% 30px;
+  animation: sun-stripes 1.6s linear infinite;
 }
 
+@keyframes sun-stripes {
+  to {
+    mask-position:
+      0 0,
+      0 30px;
+  }
+}
+
+/* The floor: a perspective grid from the horizon to the bottom edge, scrolling toward the viewer. */
+.scene[data-bg="sunset"] .scene-main::before {
+  left: -50%;
+  right: -50%;
+  top: 80%;
+  height: 100%;
+  background:
+    linear-gradient(var(--accent) 2px, transparent 2px) 0 0 / 120px 120px,
+    linear-gradient(90deg, var(--accent) 2px, transparent 2px) 0 0 / 120px 120px,
+    linear-gradient(#1b0b33, #12062a);
+  opacity: 0.85;
+  transform-origin: 50% 0;
+  transform: perspective(520px) rotateX(72deg);
+  animation: sunset-floor 2s linear infinite;
+}
+
+@keyframes sunset-floor {
+  to {
+    transform: perspective(520px) rotateX(72deg) translateY(120px);
+  }
+}
+
+/* The horizon: a hot line where the floor meets the sky, and the floor fading into the haze behind it. */
+.scene[data-bg="sunset"] .scene-main::after {
+  left: 0;
+  right: 0;
+  top: 80%;
+  height: 12%;
+  border-top: 3px solid #ff9ad8;
+  box-shadow: 0 -12px 32px -10px var(--accent);
+  background: linear-gradient(color-mix(in srgb, var(--bg) 70%, #ff6b6b), transparent);
+}
+
+/* The palms frame the sun from both edges and sway a little, from their roots. */
 .scene[data-bg="sunset"]::after {
   inset: 0;
   background: url("/images/themes/vaporwave-palms.svg") center bottom / cover no-repeat;
+  transform-origin: 50% 100%;
+  animation: palms-sway 7s ease-in-out infinite alternate;
+}
+
+@keyframes palms-sway {
+  from {
+    transform: skewX(-0.8deg);
+  }
+  to {
+    transform: skewX(0.8deg);
+  }
 }
 
 /* A soft dark edge keeps the text crisp where it crosses the palms. */
@@ -1143,12 +1195,6 @@
   height: 280px;
 }
 
-.scene[data-bg="sunset"][data-ticker]::before {
-  top: 24px;
-  width: 340px;
-  height: 340px;
-}
-
 /* Bolder pass (T6.123): every look has something alive in the background. All of these loop, so Lite and Still
    hold them (index.css stops .scene::before and ::after). */
 
@@ -1205,17 +1251,6 @@
 @keyframes shonen-throb {
   to {
     transform: scale(1.05);
-  }
-}
-
-/* Vaporwave Sunset: the sun bobs on the horizon. */
-.scene[data-bg="sunset"]::before {
-  animation: sun-bob 6s ease-in-out infinite alternate;
-}
-
-@keyframes sun-bob {
-  to {
-    transform: translateY(-12px);
   }
 }
 

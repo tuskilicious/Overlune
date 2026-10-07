@@ -28,6 +28,7 @@ html[data-rm] *::after {
    blinks stop. Every looping animation in an overlay belongs in this list. The editor preview uses .editor-lite. */
 :is(html[data-lite], .editor-lite) .scene::before,
 :is(html[data-lite], .editor-lite) .scene::after,
+:is(html[data-lite], .editor-lite) .scene-main::before,
 :is(html[data-lite], .editor-lite) .scene-title::after,
 :is(html[data-lite], .editor-lite) .countdown-time,
 :is(html[data-lite], .editor-lite) .alerts-test-label,

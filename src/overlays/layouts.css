@@ -381,3 +381,72 @@
   grid-auto-flow: column;
   column-gap: 72px;
 }
+
+/* 8. Vaporwave Sunset: the horizon. Symmetric round the setting sun (scene.css): the chrome title, the subtitle and one
+   row with the countdown and the socials, centered in the purple sky above it. The scene's bottom padding ends the
+   content where the sun begins, so a long title shrinks instead of crossing the sun. A gradient, neon and a grid
+   are this look's concept (synthwave). */
+.scene[data-theme="vaporwave-sunset"],
+.scene[data-theme="vaporwave-sunset"][data-ticker] {
+  padding-bottom: 520px; /* the sun's top is at 584px */
+}
+
+.scene[data-theme="vaporwave-sunset"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 0 minmax(0, 1fr) auto auto auto minmax(0, 1fr);
+  row-gap: 0;
+  justify-items: center;
+  text-align: center;
+}
+
+.scene[data-theme="vaporwave-sunset"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  left: 112px;
+}
+
+.scene[data-theme="vaporwave-sunset"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 1500px;
+}
+
+.scene[data-theme="vaporwave-sunset"] .scene-main:has(.scene-logo) .scene-title {
+  padding-inline: 184px;
+}
+
+/* The sun is the accent; the rule above the title goes. */
+.scene[data-theme="vaporwave-sunset"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="vaporwave-sunset"] .scene-subtitle {
+  grid-area: 4 / 1;
+  max-width: 44ch;
+  margin-top: 16px;
+}
+
+/* One row: the countdown, then the socials. */
+.scene[data-theme="vaporwave-sunset"] .scene-side {
+  grid-area: 5 / 1;
+  justify-self: center;
+  flex-direction: row;
+  align-items: center;
+  gap: 64px;
+  min-width: 0;
+  margin-top: 40px;
+}
+
+.scene[data-theme="vaporwave-sunset"] .countdown {
+  padding: 28px 40px 24px;
+}
+
+.scene[data-theme="vaporwave-sunset"] .countdown-time {
+  font-size: 64px;
+}
+
+.scene[data-theme="vaporwave-sunset"] .scene-socials {
+  grid-auto-flow: column;
+  column-gap: 48px;
+  text-align: left;
+}
