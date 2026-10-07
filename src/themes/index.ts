@@ -7,8 +7,12 @@ import { daylight } from "./daylight";
 import { forestNight } from "./forest-night";
 import { neonGrid } from "./neon-grid";
 import { pastelCloud } from "./pastel-cloud";
+import { phosphor } from "./phosphor";
+import { quest } from "./quest";
+import { sakura } from "./sakura";
 import { session } from "./session";
 import { shonen } from "./shonen";
+import { skateDeck } from "./skate-deck";
 import { vaporwaveSunset } from "./vaporwave-sunset";
 import type { Theme, ThemeId } from "./types";
 
@@ -25,6 +29,10 @@ export const themes: Record<ThemeId, Theme> = {
   abyss,
   session,
   shonen,
+  sakura,
+  "skate-deck": skateDeck,
+  phosphor,
+  quest,
 };
 
 export const defaultThemeId: ThemeId = "clean-slate";

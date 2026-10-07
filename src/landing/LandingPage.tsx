@@ -163,6 +163,10 @@ const tour: [ThemeId, KitScene][] = [
   ["abyss", "starting"],
   ["session", "brb"],
   ["shonen", "ending"],
+  ["sakura", "starting"],
+  ["skate-deck", "brb"],
+  ["phosphor", "ending"],
+  ["quest", "starting"],
 ];
 
 /** The hero picture: a live scene in a stream frame, two alerts in the same look, and the scene names. It tours
@@ -376,7 +380,7 @@ const facts = [
 ];
 
 const steps = [
-  ["Pick a look", "Twelve looks, each with matching scenes, chat and alerts."],
+  ["Pick a look", "Sixteen looks, each with matching scenes, chat and alerts."],
   ["Add your details", "Your title, countdown, socials and Twitch channel name."],
   [
     "Paste into OBS",
@@ -508,6 +512,10 @@ const blurbs: Record<ThemeId, string> = {
   abyss: "Deep water where only living things glow.",
   session: "A jazz-anime title card in mustard and ink.",
   shonen: "A manga page, inked and lettered.",
+  sakura: "A spring night with petals and a lantern.",
+  "skate-deck": "A deck wall in aqua, pink and grip tape.",
+  phosphor: "A green terminal glowing at midnight.",
+  quest: "A quest log in gold, parchment and embers.",
 };
 
 /** A look full screen (T6.106): a native dialog keeps focus and Esc; its body goes full screen, since Chrome won't
@@ -598,7 +606,7 @@ function LooksShowcase() {
           data-reveal
           className="font-heading text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.02] font-bold"
         >
-          Twelve looks. Every scene matches.
+          Sixteen looks. Every scene matches.
         </h2>
         <p className="mt-6 max-w-md text-lg text-moon/85">
           Pick one and your Starting Soon, Be Right Back and Stream Ending scenes, chat and alerts
@@ -802,7 +810,7 @@ export default function LandingPage() {
         <section className="landing-hero relative px-3 pt-24 md:px-6 md:pt-28">
           <div data-hero-stage className="relative flex min-h-[calc(100dvh-7rem)] items-center">
             <div data-collage aria-hidden className="landing-collage">
-              {[0, 1, 2].map((row) => (
+              {[0, 1, 2, 3].map((row) => (
                 <div key={row} data-collage-row className="landing-collage-row">
                   {themeIds.slice(row * 4, row * 4 + 4).map((id) => (
                     <div key={id} className="landing-collage-tile">
