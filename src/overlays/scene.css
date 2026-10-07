@@ -999,3 +999,116 @@
   background:
     radial-gradient(circle at 80% 21%, var(--accent) 0 190px, transparent 191px), var(--bg);
 }
+
+/* The ticker (T6.121), after the Tuskilicious kit: a band along the bottom of every scene with an optional tab in
+   the accent, then the socials and an extra line scrolling left. The content moves up to make room. Lite and Still
+   hold it still (index.css), showing the start of the list. */
+.scene[data-ticker] {
+  position: relative;
+  padding-bottom: 152px;
+}
+
+.scene-ticker {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 72px;
+  display: flex;
+  align-items: stretch;
+  background: var(--surface);
+  border-top: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.scene-ticker-tab {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 0 40px 0 64px;
+  background: var(--accent);
+  color: var(--surface);
+  font-family: var(--font-heading);
+  font-size: 30px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 24px) 100%, 0 100%);
+}
+
+.scene-ticker-rail {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+}
+
+.scene-ticker-track {
+  display: flex;
+  width: max-content;
+  height: 100%;
+  animation: scene-ticker var(--ticker-s) linear infinite;
+}
+
+.scene-ticker-track ul {
+  min-width: 1856px; /* at least the band's width, so the loop never shows a gap */
+  margin: 0;
+  padding: 0 0 0 64px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 96px;
+  box-sizing: border-box;
+}
+
+.scene-ticker li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  white-space: nowrap;
+}
+
+.scene-ticker .scene-icon {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  background: none;
+}
+
+@keyframes scene-ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Neon Grid: the content already sits above the horizon, so the band rides on the floor without moving it. */
+.scene[data-theme="neon-grid"][data-ticker] {
+  padding-bottom: 232px;
+}
+
+/* Shonen: the band sits inside the panel border. */
+.scene[data-theme="shonen"] .scene-ticker {
+  left: 38px;
+  right: 38px;
+  bottom: 38px;
+  border-top: 4px solid var(--text);
+}
+
+.scene[data-theme="shonen"][data-ticker] {
+  padding-bottom: 188px;
+}
+
+/* With a ticker the content sits higher, so the top-right motifs shrink to stay clear of the right column. */
+.scene[data-theme="daylight"][data-ticker] {
+  background:
+    radial-gradient(circle at 80% 15%, var(--accent) 0 140px, transparent 141px), var(--bg);
+}
+
+.scene[data-bg="sunset"][data-ticker]::before {
+  top: 24px;
+  width: 340px;
+  height: 340px;
+}

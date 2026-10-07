@@ -139,6 +139,15 @@ export const settingsV1 = z.object({
       label: text(40),
     })
     .prefault({}),
+  /** A ticker along the bottom of every scene (T6.121), after the Tuskilicious kit: an optional tab, then the
+   *  socials and an optional extra line, scrolling. Old links have no field and show none. */
+  ticker: z
+    .object({
+      show: z.boolean().default(false),
+      label: text(24),
+      extra: text(120),
+    })
+    .prefault({}),
   /** Less motion in every overlay (T6.74): the same as the ?rm=1 flag, kept in the link so the editor remembers
    *  it. Old links have no field and keep full motion. */
   lessMotion: z.boolean().default(false),

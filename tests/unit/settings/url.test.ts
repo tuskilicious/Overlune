@@ -46,6 +46,7 @@ const sample: Settings = {
     seconds: 8,
   },
   frame: { width: 800, height: 450, label: "Ronni" },
+  ticker: { show: true, label: "Ronni", extra: "Tue / Thu at 7 PM" },
   lessMotion: true,
   liteMotion: true,
   advanced: {
@@ -82,6 +83,14 @@ describe("settings link", () => {
   it("keeps full motion for links made before the Lite option (T6.119)", () => {
     expect(decode(raw({ theme: "neon-grid" })).settings.liteMotion).toBe(false);
     expect(decode(raw({ theme: "neon-grid", liteMotion: true })).settings.liteMotion).toBe(true);
+  });
+
+  it("shows no ticker for links made before the ticker (T6.121)", () => {
+    expect(decode(raw({ theme: "neon-grid" })).settings.ticker).toEqual({
+      show: false,
+      label: "",
+      extra: "",
+    });
   });
 
   it("fills in BRB and Ending defaults for links made before those scenes existed", () => {
