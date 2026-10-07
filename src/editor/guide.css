@@ -167,3 +167,50 @@
 .notfound-actions .notfound-primary:hover {
   background: color-mix(in srgb, var(--accent) 80%, var(--text));
 }
+
+/* The index (T6.118): the guide's parts as a row of chips that jump there. */
+.guide-index ol {
+  margin: 16px 0 24px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.guide-index a {
+  display: inline-block;
+  padding: 6px 12px;
+  border: var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.guide-index a:hover {
+  border-color: var(--accent);
+}
+
+/* The run-through: a check before each line, in the accent. */
+.guide-checklist {
+  padding: 0;
+  list-style: none;
+}
+
+.guide-checklist li {
+  position: relative;
+  padding-left: 28px;
+}
+
+.guide-checklist li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.3em;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+}

@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import type { Settings } from "../settings/schema";
 import { encode } from "../settings/url";
 import { sceneCollection } from "./scene-collection";
+import Icon from "../components/Icon";
 
 /** The full-screen scenes, with the Browser Source size to enter in OBS. */
 export const overlays = {
@@ -42,7 +43,7 @@ export function LinkRow({
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(link);
-      setStatus("Copied!");
+      setStatus("Copied.");
       onCopied?.(link);
     } catch {
       input.current?.select();
@@ -74,7 +75,9 @@ export function LinkRow({
       </label>
       {/* A link carries the settings, so after an edit the copy in OBS is out of date. */}
       {copiedLink === link ? (
-        <span className="editor-link-done">✓ Copied</span>
+        <span className="editor-link-done">
+          <Icon name="check" /> Copied
+        </span>
       ) : (
         copiedLink && (
           <span className="editor-link-stale">Changed since you copied it. Copy it again.</span>

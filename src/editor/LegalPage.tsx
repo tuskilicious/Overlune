@@ -7,6 +7,7 @@ import privacy from "../../docs/legal/privacy.md?raw";
 import terms from "../../docs/legal/terms.md?raw";
 import "./editor.css";
 import "./guide.css";
+import Icon from "../components/Icon";
 
 const sources = { privacy, terms };
 
@@ -34,7 +35,9 @@ export default function LegalPage({ page }: { page: keyof typeof sources }) {
           <img src="/images/brand/logo.png" alt="Overlune home" width="159" height="48" />
         </Link>
         <p>
-          <Link to="/editor">← Back to the editor</Link>
+          <Link to="/editor">
+            <Icon name="back" /> Back to the editor
+          </Link>
         </p>
       </header>
       <main className="legal">

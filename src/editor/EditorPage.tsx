@@ -39,6 +39,7 @@ import Preview from "./Preview";
 import { sampleScene } from "./scene-samples";
 import SiteFooter from "../components/SiteFooter";
 import "./editor.css";
+import Icon from "../components/Icon";
 
 type Platform = (typeof socialPlatforms)[number];
 
@@ -185,6 +186,21 @@ const sections = [
   ["obs-links", "Links"],
 ] as const;
 
+/** The kinds of countdown, as a segmented control (T6.118). */
+const repeatModes: [RepeatMode, string][] = [
+  ["off", "One time"],
+  ["daily", "Every day"],
+  ["days", "On set days"],
+];
+
+/** Common webcam frame sizes (T6.118): 16:9 at three sizes, and 4:3. */
+const frameSizes = [
+  [480, 270],
+  [640, 360],
+  [800, 450],
+  [640, 480],
+] as const;
+
 /** Quick countdown picks (T6.113): label and minutes from now. */
 const quickStarts = [
   ["In 15 min", 15],
@@ -264,8 +280,8 @@ function initialState(): { settings: Settings; status: string } {
     return {
       settings: saved.settings,
       status: saved.ok
-        ? "Welcome back! We restored your last overlay from this browser."
-        : "Welcome back! Some saved settings couldn’t be read, so defaults are showing for those.",
+        ? "Welcome back. We restored your last overlay from this browser."
+        : "Welcome back. Some saved settings couldn’t be read, so defaults are showing for those.",
     };
   return { settings: freshSettings(), status: "" };
 }
@@ -412,6 +428,15 @@ export default function EditorPage() {
   const { starting } = settings;
   /** Anything changed from a fresh editor, including work restored from a link or autosave. */
   const madeSomething = JSON.stringify(settings) !== freshJson;
+  const filled: Partial<Record<string, boolean>> = {
+    "part-socials": settings.socials.some((s) => s.handle.trim()),
+    "part-chat": settings.chat.channel !== "",
+    "part-logo": settings.logo !== "",
+    "part-colors":
+      Object.keys(settings.advanced.colors).length > 0 ||
+      !!settings.advanced.fontHeading ||
+      !!settings.advanced.fontBody,
+  };
   /** First visit: a gallery of looks comes before the editor (T6.16). Saved or loaded work skips it. */
   const welcome = !started;
 
@@ -686,6 +711,13 @@ export default function EditorPage() {
                       }}
                     >
                       {name}
+                      {/* What's already filled in, at a glance, as the kits' docks show their status (T6.118). */}
+                      {filled[id] && (
+                        <span className="editor-rail-set">
+                          <Icon name="check" />
+                          <span className="editor-sep"> (filled in)</span>
+                        </span>
+                      )}
                     </a>
                   </li>
                 ))}
@@ -737,7 +769,7 @@ export default function EditorPage() {
               </h2>
               <fieldset id="part-scenes" className="editor-part" tabIndex={-1}>
                 <legend>Scene to edit</legend>
-                <div className="editor-scenes">
+                <div className="editor-scenes editor-segmented">
                   {(Object.keys(overlays) as Scene[]).map((id) => (
                     <label key={id}>
                       <input
@@ -779,24 +811,26 @@ export default function EditorPage() {
                   <>
                     {/* The kind of countdown comes first because it decides which time fields follow. Asking
                         "repeat this countdown?" before any countdown was set read backwards (T6.50). */}
-                    <label>
-                      Countdown
-                      <select
-                        value={starting.repeat.mode}
-                        aria-describedby="repeat-hint"
-                        onChange={(e) =>
-                          updateScene("starting", {
-                            repeat: { ...starting.repeat, mode: e.target.value as RepeatMode },
-                          })
-                        }
-                      >
-                        <option value="off">One time, on a set date</option>
-                        <option value="daily">Every day, same time</option>
-                        <option value="days">On these days each week</option>
-                      </select>
-                    </label>
+                    {/* Three choices, all shown (T6.118): a drop-down hid two of them. */}
+                    <fieldset className="editor-segmented" aria-describedby="repeat-hint">
+                      <legend>Countdown</legend>
+                      {repeatModes.map(([mode, label]) => (
+                        <label key={mode}>
+                          <input
+                            type="radio"
+                            name="repeat-mode"
+                            value={mode}
+                            checked={starting.repeat.mode === mode}
+                            onChange={() =>
+                              updateScene("starting", { repeat: { ...starting.repeat, mode } })
+                            }
+                          />
+                          {label}
+                        </label>
+                      ))}
+                    </fieldset>
                     <p id="repeat-hint" className="editor-hint">
-                      &quot;Every day&quot; and &quot;On these days&quot; always count to your next
+                      &quot;Every day&quot; and &quot;On set days&quot; always count to your next
                       stream, so you never re-paste the link into OBS.
                     </p>
                     {starting.repeat.mode === "off" ? (
@@ -835,12 +869,34 @@ export default function EditorPage() {
                             </button>
                           ))}
                           {starting.endsAt !== null && (
-                            <button
-                              type="button"
-                              onClick={() => updateScene("starting", { endsAt: null })}
-                            >
-                              No countdown
-                            </button>
+                            <>
+                              {/* A minute either way, like the kits' countdown controls (T6.118). */}
+                              {(
+                                [
+                                  ["−1 min", "1 minute earlier", -1],
+                                  ["+1 min", "1 minute later", 1],
+                                ] as const
+                              ).map(([label, name, step]) => (
+                                <button
+                                  key={step}
+                                  type="button"
+                                  aria-label={`Countdown ${name}`}
+                                  onClick={() =>
+                                    updateScene("starting", {
+                                      endsAt: (starting.endsAt ?? 0) + step * 60_000,
+                                    })
+                                  }
+                                >
+                                  {label}
+                                </button>
+                              ))}
+                              <button
+                                type="button"
+                                onClick={() => updateScene("starting", { endsAt: null })}
+                              >
+                                No countdown
+                              </button>
+                            </>
                           )}
                         </div>
                       </>
@@ -1234,6 +1290,18 @@ export default function EditorPage() {
                     describedBy="frame-size-hint"
                     onChange={(height) => updateFrame({ height })}
                   />
+                </div>
+                <div className="editor-quick" role="group" aria-label="Common camera sizes">
+                  {frameSizes.map(([w, h]) => (
+                    <button
+                      key={`${w}x${h}`}
+                      type="button"
+                      aria-pressed={settings.frame.width === w && settings.frame.height === h}
+                      onClick={() => updateFrame({ width: w, height: h })}
+                    >
+                      {w} × {h}
+                    </button>
+                  ))}
                 </div>
                 <p id="frame-size-hint" className="editor-hint">
                   Make it the size of your camera in OBS, and enter the same numbers there. They’re

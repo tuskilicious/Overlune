@@ -383,7 +383,7 @@ test("copied links are marked, and the last copy says what's next (T6.24)", asyn
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   const links = page.getByRole("region", { name: "Links to paste into OBS" });
   await links.getByRole("button", { name: "Copy Starting Soon link" }).click();
-  await expect(links.locator(".editor-link").first()).toContainText("✓ Copied");
+  await expect(links.locator(".editor-link").first()).toContainText("Copied");
   await expect(links.getByText("1 of 5 links copied.")).toBeVisible();
 
   // Editing changes every link, so the copy in OBS is out of date.
@@ -551,6 +551,31 @@ test("Ctrl+Z outside a text field undoes a look change (T6.115)", async ({ page 
   await expect(neon).not.toBeChecked();
 });
 
+test("editor redesign: nudges, frame sizes and what's filled in (T6.118)", async ({ page }) => {
+  await page.getByRole("button", { name: "In 15 min" }).click();
+  const field = page.getByLabel("Countdown ends at");
+  const at = await field.inputValue();
+  await page.getByRole("button", { name: "Countdown 1 minute later" }).click();
+  await expect(field).not.toHaveValue(at);
+  await page.getByRole("button", { name: "Countdown 1 minute earlier" }).click();
+  await expect(field).toHaveValue(at);
+
+  const size = page.getByRole("button", { name: "800 × 450" });
+  await size.click();
+  await expect(page.getByLabel("Frame width")).toHaveValue("800");
+  await expect(page.getByLabel("Frame height")).toHaveValue("450");
+  await expect(size).toHaveAttribute("aria-pressed", "true");
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const socials = page.getByRole("navigation", { name: "Sections" }).getByRole("link", {
+    name: "Socials",
+  });
+  await expect(socials).toHaveAccessibleName("Socials");
+  await page.getByRole("button", { name: "Add a social" }).click();
+  await page.getByLabel("Handle").first().fill("tuskilicious");
+  await expect(socials).toHaveAccessibleName("Socials (filled in)");
+});
+
 test("quick picks set the countdown, and No countdown clears it (T6.113)", async ({ page }) => {
   await page.getByRole("button", { name: "In 30 min" }).click();
   // Rounded up to the next whole minute, so 30:00 to 30:59 left.
@@ -566,13 +591,13 @@ test("quick picks set the countdown, and No countdown clears it (T6.113)", async
 
 test("a repeating countdown counts to the next stream and is saved", async ({ page }) => {
   await pickTimeZone(page, "UTC");
-  await page.getByRole("combobox", { name: /^Countdown/ }).selectOption("Every day, same time");
+  await page.getByRole("radio", { name: "Every day" }).check();
   await expect(page.getByLabel("Countdown ends at")).toHaveCount(0);
   const inTwoHours = new Date(Date.now() + 2 * 3_600_000).toISOString().slice(11, 16);
   await page.getByLabel("Stream starts at").fill(inTwoHours);
   await expect(preview(page).locator(".countdown-time")).toHaveText(/^1:5\d:\d{2}$|^2:00:00$/);
 
-  await page.getByRole("combobox", { name: /^Countdown/ }).selectOption("On these days each week");
+  await page.getByRole("radio", { name: "On set days" }).check();
   await page.getByRole("checkbox", { name: "Sat" }).check();
   const scan = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
@@ -580,7 +605,7 @@ test("a repeating countdown counts to the next stream and is saved", async ({ pa
   expect(scan.violations).toEqual([]);
 
   await page.reload();
-  await expect(page.getByRole("combobox", { name: /^Countdown/ })).toHaveValue("days");
+  await expect(page.getByRole("radio", { name: "On set days" })).toBeChecked();
   await expect(page.getByRole("checkbox", { name: "Sat" })).toBeChecked();
   await expect(page.getByLabel("Stream starts at")).toHaveValue(inTwoHours);
 });
@@ -671,7 +696,7 @@ test("autosave restores the last overlay when the editor opens without a link", 
   await page.goto("about:blank");
   await page.goto("/editor"); // "/" is always the landing page now (T6.67)
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Autosaved title");
-  await expect(page.getByRole("status").filter({ hasText: "Welcome back!" })).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Welcome back." })).toBeVisible();
 });
 
 test("a link in the address wins over the autosave", async ({ page }) => {
@@ -762,7 +787,7 @@ test("a copied link opens the overlay with the editor's settings", async ({ page
   await page.getByLabel("Title", { exact: true }).fill("Grabbing snacks");
 
   await page.getByRole("button", { name: "Copy Be Right Back link" }).click();
-  await expect(page.getByRole("status").filter({ hasText: "Copied!" })).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Copied." })).toBeVisible();
   const link = await page.evaluate(() => navigator.clipboard.readText());
   expect(link).toMatch(/\/o\/brb#1\./);
 

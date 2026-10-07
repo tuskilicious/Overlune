@@ -7,6 +7,7 @@ import { themeVars } from "../themes/vars";
 import { overlays } from "./ObsLinks";
 import "./editor.css";
 import "./guide.css";
+import Icon from "../components/Icon";
 
 /** A screenshot from public/images/guide (not public/guide, which would shadow the /guide page on some hosts): the owner's own OBS captures (docs/ASSETS.md). */
 function Shot({ file, alt, caption }: { file: string; alt: string; caption?: string }) {
@@ -19,6 +20,17 @@ function Shot({ file, alt, caption }: { file: string; alt: string; caption?: str
 }
 
 /** Step-by-step OBS and Streamlabs setup for beginners, at /guide. */
+/** The guide's index (T6.118): heading id and a short name. */
+const guideIndex = [
+  ["add-heading", "1. Add an overlay"],
+  ["settings-heading", "2. Tick the boxes"],
+  ["audio-heading", "3. Alert sound"],
+  ["import-heading", "Import every scene"],
+  ["rehearse-heading", "Before your first stream"],
+  ["black-heading", "Fixes"],
+  ["streamlabs-heading", "Streamlabs"],
+] as const;
+
 export default function SetupGuide() {
   const sizes = [
     ...Object.values(overlays).map((o) => ({ ...o, note: "" })),
@@ -43,10 +55,22 @@ export default function SetupGuide() {
           <img src="/images/brand/logo.png" alt="Overlune home" width="159" height="48" />
         </Link>
         <p>
-          <Link to="/editor">← Back to the editor</Link>
+          <Link to="/editor">
+            <Icon name="back" /> Back to the editor
+          </Link>
         </p>
         <h1>Set up your overlays in OBS</h1>
         <p>You only do this once. After that, your overlays update themselves.</p>
+        {/* Every part one tap away, like the kits' guides (T6.118). */}
+        <nav className="guide-index" aria-label="On this page">
+          <ol>
+            {guideIndex.map(([id, name]) => (
+              <li key={id}>
+                <a href={`#${id}`}>{name}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
       </header>
 
       <main>
@@ -154,6 +178,22 @@ export default function SetupGuide() {
             Alerts already has Control audio via OBS ticked. Add your game and camera to{" "}
             <strong>Overlune: Live</strong>. Streamlabs can’t import it: use the steps above.
           </p>
+        </section>
+
+        <section aria-labelledby="rehearse-heading">
+          <h2 id="rehearse-heading">Before your first stream</h2>
+          <p>A five-minute run-through, so nothing surprises you live:</p>
+          <ul className="guide-checklist">
+            <li>Switch to each scene in OBS once and check it fills the screen.</li>
+            <li>Check the countdown shows the right time and time zone.</li>
+            <li>Ask a friend to type in your chat, and check it shows in the Chat overlay.</li>
+            <li>
+              Paste the <strong>Link to test your alerts</strong> into your Alerts source, and check
+              you see and hear every alert.
+            </li>
+            <li>Switch the Alerts source back to your normal Alerts link.</li>
+            <li>Bookmark the editor page: your link is your save file.</li>
+          </ul>
         </section>
 
         <section aria-labelledby="black-heading">
