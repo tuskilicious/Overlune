@@ -148,8 +148,9 @@ test("Bold Esports keeps its angles without cutting the socials divider (T6.41)"
       }),
     )}`,
   );
-  // Read the shapes after the wipe-in, which animates clip-path.
-  await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
+  // Read the shapes after the wipe-in, which animates clip-path. allSettled: a countdown digit that changes
+  // remounts and cancels its flip (T6.117), which rejects that animation's promise.
+  await page.evaluate(() => Promise.allSettled(document.getAnimations().map((a) => a.finished)));
   const clip = (sel: string) => page.locator(sel).evaluate((el) => getComputedStyle(el).clipPath);
   expect(await clip(".countdown")).toContain("polygon");
   // A slanted box clip on the socials row would trim the start of the divider line.
