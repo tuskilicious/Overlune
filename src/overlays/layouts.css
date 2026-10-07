@@ -197,3 +197,127 @@
   height: 0;
   margin-bottom: 0;
 }
+
+/* 4. Arcade 8-Bit: the attract screen (the handoff's Retro board, its row bands). Centered like a cabinet waiting for
+   a coin, because attract screens are: the title, the countdown under it, and the socials as a high-score table, one
+   colored band per row (ink on yellow, green or pink, 6:1 or more). */
+.scene[data-theme="arcade-8bit"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 0 minmax(0, 1fr) auto auto auto auto minmax(0, 1fr); /* centered, like the cabinet screen */
+  row-gap: 0;
+  justify-items: center;
+  text-align: center;
+}
+
+/* The logo sits in the corner of the cabinet screen, out of the centered stack, so it never pushes it down. */
+.scene[data-theme="arcade-8bit"] {
+  position: relative;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  left: 112px;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 1500px;
+}
+
+/* With a logo in the corner, a long title wraps clear of it. */
+.scene[data-theme="arcade-8bit"] .scene-main:has(.scene-logo) .scene-title {
+  padding-inline: 184px;
+}
+
+/* One decoration less: the blinking cursor marks the title, so the rule above it goes (a zero-height box, which the
+   scene-fit test measures). */
+.scene[data-theme="arcade-8bit"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-subtitle {
+  grid-area: 4 / 1;
+  margin-top: 24px;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="arcade-8bit"] .countdown {
+  grid-area: 5 / 1;
+  justify-self: center;
+  margin-top: 48px;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials {
+  grid-area: 6 / 1;
+  justify-self: center;
+  width: min(1040px, 100%);
+  margin-top: 48px;
+  gap: 0;
+  counter-reset: rank;
+}
+
+/* A high-score row: rank, icon, platform, handle, on a colored band. */
+.scene[data-theme="arcade-8bit"] .scene-socials li {
+  grid-template-columns: 112px 56px 240px minmax(0, 1fr);
+  column-gap: 16px;
+  padding: 10px 24px;
+  text-align: left;
+  color: var(--bg);
+  background: var(--primary);
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials li:nth-child(3n + 2) {
+  background: var(--accent);
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials li:nth-child(3n) {
+  background: #ff5c7a; /* the pixel drop shadow's pink (DESIGN.md) */
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials li::before {
+  counter-increment: rank;
+  content: counter(rank) "ST";
+  font-family: var(--font-heading);
+  font-size: 28px;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials li:nth-child(2)::before {
+  content: counter(rank) "ND";
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials li:nth-child(3)::before {
+  content: counter(rank) "RD";
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials li:nth-child(n + 4)::before {
+  content: counter(rank) "TH";
+}
+
+.scene[data-theme="arcade-8bit"] .scene-icon {
+  grid-row: auto;
+  width: 56px;
+  height: 56px;
+  padding: 12px;
+  color: var(--bg);
+  background: none;
+}
+
+.scene[data-theme="arcade-8bit"] :is(.scene-platform, .scene-handle) {
+  color: var(--bg);
+  font-family: var(--font-heading);
+  letter-spacing: 0;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-platform {
+  font-size: 24px;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-handle {
+  font-size: 28px;
+  text-align: right;
+}
