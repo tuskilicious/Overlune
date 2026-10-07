@@ -1176,3 +1176,114 @@
 .scene[data-theme="abyss"][data-ticker] .scene-main::before {
   bottom: 152px; /* stops above the band */
 }
+
+/* 13. Sakura: the hanging scroll. One tall paper scroll hangs on the right like a kakejiku, with a dark rod at each
+   end and the brush stroke under the top rod; the title, subtitle, countdown and socials are written down it. The
+   lantern's glow moves to the open left, where the petals drift. */
+.scene[data-bg="sakura"][data-theme="sakura"] {
+  background:
+    radial-gradient(
+      circle at 24% 26%,
+      rgb(255 214 170 / 0.32),
+      rgb(255 170 120 / 0.12) 160px,
+      transparent 420px
+    ),
+    radial-gradient(120% 70% at 50% 120%, rgb(255 145 180 / 0.12), transparent 70%),
+    linear-gradient(#1a1f45, var(--bg) 70%);
+}
+
+.scene[data-theme="sakura"] .scene-main {
+  grid-template-columns: minmax(0, 1fr) 680px;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto auto minmax(0, 1fr);
+  column-gap: 0;
+  row-gap: 0;
+}
+
+/* The scroll: paper between two rods, running the height of the scene. */
+.scene[data-theme="sakura"] .scene-main::before {
+  content: "";
+  grid-area: 1 / 2 / -1 / 3;
+  align-self: stretch;
+  justify-self: stretch;
+  margin: -40px 0 -24px;
+  background: var(--surface);
+  border-block: 16px solid #0b0e24;
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+}
+
+.scene[data-theme="sakura"] :is(.scene-title, .scene-subtitle, .countdown, .scene-socials) {
+  grid-column: 2;
+  justify-self: center;
+  max-width: 560px;
+  text-align: center;
+}
+
+.scene[data-theme="sakura"] .scene-title {
+  grid-row: 3;
+  font-size: 128px;
+}
+
+/* The brush stroke sits centered under the rod. */
+.scene[data-theme="sakura"] .scene-title::before {
+  margin-inline: auto;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+.scene[data-theme="sakura"] .scene-subtitle {
+  grid-row: 4;
+  margin-top: 20px;
+}
+
+.scene[data-theme="sakura"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="sakura"] .countdown {
+  grid-row: 5;
+  margin-top: 40px;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="sakura"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="sakura"] .countdown-time {
+  font-size: 80px;
+}
+
+.scene[data-theme="sakura"] .scene-socials {
+  grid-row: 6;
+  margin-top: 40px;
+  text-align: left;
+}
+
+/* The scroll is narrow, so its smaller pieces are set tighter, and the longest text still fits above a ticker. */
+.scene[data-theme="sakura"] .scene-title::before {
+  margin-bottom: 32px;
+}
+
+.scene[data-theme="sakura"] .scene-subtitle {
+  font-size: 34px;
+}
+
+.scene[data-theme="sakura"] .scene-socials {
+  gap: 12px;
+}
+
+.scene[data-theme="sakura"] .scene-icon {
+  width: 56px;
+  height: 56px;
+  padding: 14px;
+}
+
+/* The logo sits in the open sky's corner, out of the grid, so its row never takes height from the scroll. */
+.scene[data-theme="sakura"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  left: 112px;
+}
