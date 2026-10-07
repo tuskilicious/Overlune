@@ -321,3 +321,63 @@
   font-size: 28px;
   text-align: right;
 }
+
+/* 2. Neon Grid: the sign over the vanishing point. The grid converges on the center, so the scene does too: the
+   title and subtitle centered in the sky, the countdown lit like a sign, and the socials in one row just above the
+   horizon. Centered by concept (the perspective grid). */
+.scene[data-theme="neon-grid"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 0 minmax(0, 1fr) auto auto auto auto;
+  row-gap: 0;
+  justify-items: center;
+  text-align: center;
+}
+
+.scene[data-theme="neon-grid"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  left: 112px;
+}
+
+.scene[data-theme="neon-grid"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 1500px;
+}
+
+.scene[data-theme="neon-grid"] .scene-main:has(.scene-logo) .scene-title {
+  padding-inline: 184px;
+}
+
+/* The horizon glow is the accent line here, so the rule above the title goes. */
+.scene[data-theme="neon-grid"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="neon-grid"] .scene-subtitle {
+  grid-area: 4 / 1;
+  max-width: 44ch;
+  margin-top: 24px;
+}
+
+.scene[data-theme="neon-grid"] .scene-side {
+  display: contents;
+}
+
+/* The sign: a lit tube round the card, the one glow in the stack besides the title. */
+.scene[data-theme="neon-grid"] .countdown {
+  grid-area: 5 / 1;
+  margin-top: 48px;
+  padding-inline: 72px;
+  border: 2px solid var(--primary);
+  box-shadow:
+    0 0 24px color-mix(in srgb, var(--primary) 45%, transparent),
+    inset 0 0 24px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.scene[data-theme="neon-grid"] .scene-socials {
+  grid-area: 6 / 1;
+  margin-top: 40px;
+  grid-auto-flow: column;
+  column-gap: 72px;
+}
