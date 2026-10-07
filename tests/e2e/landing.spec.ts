@@ -30,7 +30,7 @@ test("returning visitors land on the landing page and can continue their overlay
   page,
 }) => {
   await page.goto("/editor");
-  await page.getByRole("button", { name: "Neon Grid" }).click();
+  await page.getByRole("button", { name: "Neon Grid", exact: true }).click();
   await page.goto("about:blank");
   await page.goto("/");
   await expect(page).toHaveURL(/\/$/);
@@ -44,7 +44,7 @@ test("returning visitors land on the landing page and can continue their overlay
 
 test("the editor's logo leads back to the landing page (T6.67)", async ({ page }) => {
   await page.goto("/editor");
-  await page.getByRole("button", { name: "Cozy Café" }).click();
+  await page.getByRole("button", { name: "Cozy Café", exact: true }).click();
   await page.getByRole("link", { name: "Overlune home" }).click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
@@ -58,7 +58,7 @@ test("the editor and overlays never load the landing page's animation library", 
   const gsap: string[] = [];
   page.on("request", (r) => /gsap|LandingPage/i.test(r.url()) && gsap.push(r.url()));
   await page.goto("/editor");
-  await page.getByRole("button", { name: "Clean Slate" }).click();
+  await page.getByRole("button", { name: "Clean Slate", exact: true }).click();
   await page.goto("/o/starting");
   await expect(page.locator(".scene")).toBeVisible();
   expect(gsap).toEqual([]);
@@ -234,20 +234,20 @@ test("each overlay card opens its part of the editor", async ({ page }) => {
 
   await cards.filter({ hasText: "Be Right Back" }).click();
   // A first visit picks a look first; the part opens after that.
-  await page.getByRole("button", { name: "Cozy Café" }).click();
+  await page.getByRole("button", { name: "Cozy Café", exact: true }).click();
   await expect(page.getByRole("radio", { name: "Be Right Back" })).toBeChecked();
   await expect(page.locator("#part-scenes")).toBeInViewport();
 });
 
 test("the chat card opens the chat settings", async ({ page }) => {
   await page.goto("/editor?part=chat");
-  await page.getByRole("button", { name: "Neon Grid" }).click();
+  await page.getByRole("button", { name: "Neon Grid", exact: true }).click();
   await expect(page.locator("#part-chat")).toBeInViewport();
 });
 
 test("the webcam frame card opens the frame settings (T6.102)", async ({ page }) => {
   await page.goto("/editor?part=frame");
-  await page.getByRole("button", { name: "Neon Grid" }).click();
+  await page.getByRole("button", { name: "Neon Grid", exact: true }).click();
   await expect(page.locator("#part-frame")).toBeInViewport();
 });
 
@@ -337,4 +337,33 @@ test("the looks ring orbits on hover, holds still for reduced motion, and is a g
       page.locator("[data-ring-card]").evaluateAll((els) => els.map((el) => el.style.transform)),
     )
     .toEqual(Array(themeIds.length).fill(""));
+});
+
+test("a look opens full screen on click and closes with Esc or Close", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" }); // the ring holds still to be clicked
+  await page.goto("/");
+  const look = page.getByRole("dialog", { name: "Neon Grid, full screen" });
+  const fullscreen = () => page.evaluate(() => document.fullscreenElement?.className ?? null);
+
+  await page.getByRole("button", { name: "See Neon Grid full screen" }).click();
+  await expect(look).toBeVisible();
+  await expect(look.getByText("Starting soon")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Close (Esc)" })).toBeFocused();
+  await expect.poll(fullscreen).toBe("landing-look-full-body");
+  // The scene fills the screen's width at 16:9.
+  const stage = (await look.locator(".landing-look-full-stage").boundingBox())!;
+  expect(Math.round(stage.width)).toBe(1440);
+  expect(Math.round(stage.height)).toBe(810);
+
+  await page.getByRole("button", { name: "Close (Esc)" }).click();
+  await expect(look).toBeHidden();
+  await expect.poll(fullscreen).toBeNull();
+  await expect(page.getByRole("button", { name: "See Neon Grid full screen" })).toBeFocused();
+
+  await page.getByRole("button", { name: "See Daylight full screen" }).click();
+  await expect(page.getByRole("dialog", { name: "Daylight, full screen" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect.poll(fullscreen).toBeNull();
 });

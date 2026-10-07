@@ -394,6 +394,35 @@ const ORBIT_SPEED = (Math.PI * 2) / 30;
  */
 function LooksRing() {
   const stage = useRef<HTMLDivElement>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const screen = useRef<HTMLDivElement>(null);
+  /** The look shown full screen (T6.106). */
+  const [open, setOpen] = useState<ThemeId | null>(null);
+  useEffect(() => {
+    const d = dialog.current;
+    if (!d || !open) return;
+    d.showModal();
+    // The dialog keeps focus and Esc; its body goes full screen (Chrome won't for a dialog itself).
+    // iPhones can't put an element full screen; the dialog still fills the window there.
+    let gone = false;
+    screen.current?.requestFullscreen?.().then(
+      () => gone && void document.exitFullscreen(), // closed before full screen arrived
+      () => {},
+    );
+    // Esc in full screen only leaves full screen, so close with it.
+    const left = () => {
+      if (!document.fullscreenElement) d.close();
+    };
+    document.addEventListener("fullscreenchange", left);
+    return () => {
+      gone = true;
+      document.removeEventListener("fullscreenchange", left);
+      if (document.fullscreenElement) void document.exitFullscreen();
+    };
+  }, [open]);
+  // Leave full screen first (that closes the dialog, as Esc does), so focus returns to the look.
+  const close = () =>
+    document.fullscreenElement ? void document.exitFullscreen() : dialog.current?.close();
   useEffect(() => {
     const root = stage.current!;
     const cards = [...root.querySelectorAll<HTMLElement>("[data-ring-card]")];
@@ -493,9 +522,40 @@ function LooksRing() {
               <Scene theme={id} />
             </div>
             <p className="mt-3 font-heading text-xl font-bold">{themes[id].name}</p>
+            <button
+              type="button"
+              className="absolute inset-0 cursor-zoom-in rounded-2xl"
+              aria-label={`See ${themes[id].name} full screen`}
+              onClick={() => setOpen(id)}
+            />
           </li>
         ))}
       </ul>
+      <dialog
+        ref={dialog}
+        className="landing-look-full"
+        aria-label={open ? `${themes[open].name}, full screen` : undefined}
+        onClose={() => setOpen(null)}
+      >
+        <div ref={screen} className="landing-look-full-body">
+          {open && (
+            <>
+              <div className="landing-look-full-stage">
+                <Preview>
+                  <StartingSoon settings={sampleScene(open)} />
+                </Preview>
+              </div>
+              <button
+                type="button"
+                className={`${button} landing-look-full-close border border-moon/40 bg-night/80 text-moon hover:border-moon`}
+                onClick={close}
+              >
+                Close (Esc)
+              </button>
+            </>
+          )}
+        </div>
+      </dialog>
     </div>
   );
 }

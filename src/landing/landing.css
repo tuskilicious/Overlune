@@ -217,6 +217,45 @@
 }
 
 /* The looks ring (T6.105): from 1024px the cards are placed on an ellipse by LooksRing; below that, a grid. */
+/* Each look opens full screen on click (T6.106); its button covers the card. */
+.landing-ring-card {
+  position: relative;
+}
+
+.landing-look-full {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--color-night);
+}
+
+.landing-look-full-body {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background: var(--color-night);
+}
+
+.landing-look-full::backdrop {
+  background: var(--color-night);
+}
+
+/* The scene as big as the screen allows at 16:9. */
+.landing-look-full-stage {
+  width: min(100vw, calc(100dvh * 16 / 9));
+}
+
+.landing-look-full-close {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+}
+
 @media (min-width: 1024px) {
   /* The ring's own list only: the scenes inside have lists too (their socials). */
   .landing-ring > ul {
