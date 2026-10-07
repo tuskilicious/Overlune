@@ -515,6 +515,19 @@ test("the preview runs the real overlay, countdown included", async ({ page }) =
   await expect(preview(page).getByText(/^Starts (at|tomorrow,) .* UTC$/)).toBeVisible();
 });
 
+test("quick picks set the countdown, and No countdown clears it (T6.113)", async ({ page }) => {
+  await page.getByRole("button", { name: "In 30 min" }).click();
+  // Rounded up to the next whole minute, so 30:00 to 30:59 left.
+  await expect(preview(page).locator(".countdown-time")).toHaveText(/^30:\d{2}$|^29:\d{2}$/);
+  await expect(page.getByLabel("Countdown ends at")).not.toHaveValue("");
+  await page.getByRole("button", { name: "In 1 hour" }).click();
+  await expect(preview(page).locator(".countdown-time")).toHaveText(/^1:00:\d{2}$|^59:\d{2}$/);
+  await page.getByRole("button", { name: "No countdown" }).click();
+  await expect(preview(page).locator(".countdown")).toHaveCount(0);
+  await expect(page.getByLabel("Countdown ends at")).toHaveValue("");
+  await expect(page.getByRole("button", { name: "No countdown" })).toHaveCount(0);
+});
+
 test("a repeating countdown counts to the next stream and is saved", async ({ page }) => {
   await pickTimeZone(page, "UTC");
   await page.getByRole("combobox", { name: /^Countdown/ }).selectOption("Every day, same time");

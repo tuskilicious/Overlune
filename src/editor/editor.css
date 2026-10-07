@@ -374,6 +374,13 @@
 }
 
 /* Weekday checkboxes for a repeating countdown sit in one wrapping row. */
+/* Quick countdown picks under the date field (T6.113). */
+.editor-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .editor fieldset.editor-days {
   flex-direction: row;
   flex-wrap: wrap;
