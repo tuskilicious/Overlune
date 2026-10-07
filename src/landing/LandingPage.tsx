@@ -160,6 +160,7 @@ const tour: [ThemeId, KitScene][] = [
   ["clean-slate", "brb"],
   ["daylight", "ending"],
   ["abyss", "starting"],
+  ["session", "brb"],
 ];
 
 /** The hero picture: a live scene in a stream frame, two alerts in the same look, and the scene names. It tours
@@ -368,7 +369,7 @@ const support: { overlay: string; detail: string; on: [Support, Support, Support
 const facts = ["9 looks", "Scenes, chat and alerts", "One link per overlay", "Free, no account"];
 
 const steps = [
-  ["Pick a look", "Ten looks, each with matching scenes, chat and alerts."],
+  ["Pick a look", "Eleven looks, each with matching scenes, chat and alerts."],
   ["Add your details", "Your title, countdown, socials and Twitch channel name."],
   [
     "Paste into OBS",
@@ -501,7 +502,7 @@ function LooksRing() {
           id="looks-heading"
           className="mx-auto max-w-[34rem] font-heading text-[clamp(2.25rem,4vw,3.5rem)] leading-tight font-bold"
         >
-          Ten looks. Every scene matches.
+          Eleven looks. Every scene matches.
         </h2>
         <p className="mx-auto mt-6 max-w-md text-lg text-haze">
           Pick one and your Starting Soon, Be Right Back and Stream Ending scenes, chat and alerts
@@ -765,7 +766,7 @@ export default function LandingPage() {
             <ul className="mt-16 grid grid-flow-dense grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 xl:grid-rows-2">
               <li className="group flex flex-col justify-between gap-6 overflow-hidden rounded-3xl border border-white/10 bg-deep p-6 md:col-span-2 xl:row-span-2">
                 <div>
-                  <h3 className="font-heading text-2xl font-bold">Ten looks, ready to go</h3>
+                  <h3 className="font-heading text-2xl font-bold">Eleven looks, ready to go</h3>
                   <p className="mt-2 text-haze">
                     Every theme is free, with fonts and sounds licensed for streaming.
                   </p>

@@ -97,6 +97,14 @@ Built to the bar of the maintainer's own kits (Tuskilicious, ICARUS): each look 
 - Effect (`abyss`): last surface light slanting in from the top left and fading into the water; marine snow sinking in two full-width layers (far 80s, near 54s), three motes glowing. Transform only; still under reduced motion.
 - Sound: reuses Forest Night's alert sound.
 
+**11. Session** (T6.110): every scene is a frame of a jazz-session anime: Starting Soon the title card, BRB the eyecatch, the ending the end card.
+- Colors: mustard ground `#E0B23C`, teal `#146B6E` and brick `#B23A2E` bars, cream surface `#F1E6CF`, ink `#0E0E0E` for titles, text and outlines, muted `#4F4334`; the headline's last word in brick
+- Fonts: Archivo Black (uppercase headline 168px, line-height 0.84, tracking -0.045em) / Archivo
+- Shape: radius 0, 3px ink outlines, no shadows; ink icon tiles; hard wipes (350ms in, 250ms out) like a cut on the beat
+- Effect (`session`): one diagonal teal bar and a thin brick bar across the open top, kept clear of a three-line title, so text only sits on mustard; print grain (`public/images/themes/print-grain.svg`, SVG noise) multiplied over every color. Static.
+- Adaptations: the lines sit tight but never overlap (legible at 720p); the title card's figure silhouettes need commissioned art and are left out.
+- Sound: reuses Cozy Café's alert sound.
+
 ## Overlay layout rules
 - Canvas is always 1920×1080. Keep a 64px safe margin on scenes.
 - Chat default size is 400×600, transparent background, bottom-up.
