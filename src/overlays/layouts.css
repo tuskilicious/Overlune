@@ -95,3 +95,105 @@
 .scene[data-theme="clean-slate"] .countdown::after {
   display: none;
 }
+
+/* 7. Bold Esports: the broadcast bar (the handoff's Bold board). The poster headline above, and one bar across the
+   whole stream at the bottom: the countdown in a large angled red slab (ink on red, 5.2:1), the socials beside it. */
+.scene[data-theme="bold-esports"] .scene-main {
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  column-gap: 0;
+}
+
+.scene[data-theme="bold-esports"] .scene-title {
+  grid-area: 3 / 1 / auto / -1;
+}
+
+.scene[data-theme="bold-esports"] .scene-subtitle {
+  grid-area: 4 / 1 / auto / -1;
+  max-width: 40ch;
+}
+
+/* The bar: edge to edge, sitting on the bottom of the stream (or on the ticker). */
+.scene[data-theme="bold-esports"] .scene-main::before {
+  content: "";
+  grid-area: 5 / 1 / auto / -1;
+  align-self: stretch;
+  justify-self: stretch;
+  margin: 56px -112px -72px;
+  background: var(--surface);
+  border-top: 2px solid var(--accent);
+}
+
+.scene[data-theme="bold-esports"][data-ticker] .scene-main::before {
+  margin-bottom: -78px; /* down to the ticker band's top edge (its 2px border included) */
+}
+
+.scene[data-theme="bold-esports"] .scene-main:not(:has(.countdown, .scene-socials))::before {
+  display: none;
+}
+
+.scene[data-theme="bold-esports"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="bold-esports"] .countdown {
+  grid-area: 5 / 1;
+  align-self: end;
+  margin: 56px 0 -72px -112px;
+  padding: 36px 120px 32px 112px;
+  align-items: flex-start;
+  text-align: left;
+  background: var(--accent);
+  border: 0;
+  border-radius: 0;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 64px) 100%, 0 100%);
+}
+
+.scene[data-theme="bold-esports"][data-ticker] .countdown {
+  margin-bottom: -78px;
+}
+
+.scene[data-theme="bold-esports"] :is(.countdown-time, .countdown-at, .countdown-done) {
+  color: var(--bg);
+}
+
+.scene[data-theme="bold-esports"] .countdown-time {
+  font-size: 112px;
+}
+
+.scene[data-theme="bold-esports"] .countdown-at {
+  font-weight: 700;
+}
+
+/* The light that runs round the countdown card (T6.123) would cut the slab's angle. */
+.scene[data-theme="bold-esports"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="bold-esports"] .scene-socials {
+  grid-area: 5 / 2;
+  align-self: center;
+  margin-top: 56px;
+  padding-left: 64px;
+  grid-auto-flow: column;
+  justify-content: start;
+  column-gap: 64px;
+  /* Centered in the bar, which starts 56px into the row and reaches 72px (the padding) past it. */
+  transform: translateY(36px);
+}
+
+.scene[data-theme="bold-esports"][data-ticker] .scene-socials {
+  transform: translateY(39px);
+}
+
+.scene[data-theme="bold-esports"] .scene-main:not(:has(.countdown)) .scene-socials {
+  grid-column: 1 / -1;
+  padding-left: 0;
+}
+
+/* One decoration less: the bar's red edge carries the accent, so the rule above the headline goes (kept as a
+   zero-height box, which the scene-fit test measures). */
+.scene[data-theme="bold-esports"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
