@@ -185,6 +185,13 @@ const sections = [
   ["obs-links", "Links"],
 ] as const;
 
+/** Quick countdown picks (T6.113): label and minutes from now. */
+const quickStarts = [
+  ["In 15 min", 15],
+  ["In 30 min", 30],
+  ["In 1 hour", 60],
+] as const;
+
 /** Look filters (T6.60). Each look is in one group. */
 const moods = {
   Calm: ["clean-slate", "cozy-cafe", "pastel-cloud", "forest-night", "daylight", "abyss"],
@@ -739,22 +746,50 @@ export default function EditorPage() {
                       stream, so you never re-paste the link into OBS.
                     </p>
                     {starting.repeat.mode === "off" ? (
-                      <label>
-                        Countdown ends at (leave empty for no countdown)
-                        <input
-                          type="datetime-local"
-                          value={
-                            starting.endsAt === null
-                              ? ""
-                              : toZoneInput(starting.endsAt, starting.tz)
-                          }
-                          onChange={(e) =>
-                            updateScene("starting", {
-                              endsAt: fromZoneInput(e.target.value, starting.tz),
-                            })
-                          }
-                        />
-                      </label>
+                      <>
+                        <label>
+                          Countdown ends at (leave empty for no countdown)
+                          <input
+                            type="datetime-local"
+                            value={
+                              starting.endsAt === null
+                                ? ""
+                                : toZoneInput(starting.endsAt, starting.tz)
+                            }
+                            onChange={(e) =>
+                              updateScene("starting", {
+                                endsAt: fromZoneInput(e.target.value, starting.tz),
+                              })
+                            }
+                          />
+                        </label>
+                        {/* Going live soon is the common case, and a date-time field is fiddly (T6.113). Whole
+                            minutes, so the field shows exactly what was picked. */}
+                        <div className="editor-quick" role="group" aria-label="Quick countdown">
+                          {quickStarts.map(([label, minutes]) => (
+                            <button
+                              key={minutes}
+                              type="button"
+                              onClick={() =>
+                                updateScene("starting", {
+                                  endsAt:
+                                    Math.ceil((Date.now() + minutes * 60_000) / 60_000) * 60_000,
+                                })
+                              }
+                            >
+                              {label}
+                            </button>
+                          ))}
+                          {starting.endsAt !== null && (
+                            <button
+                              type="button"
+                              onClick={() => updateScene("starting", { endsAt: null })}
+                            >
+                              No countdown
+                            </button>
+                          )}
+                        </div>
+                      </>
                     ) : (
                       <>
                         {starting.repeat.mode === "days" && (
