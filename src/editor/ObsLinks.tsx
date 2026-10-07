@@ -83,6 +83,16 @@ export function LinkRow({
       <button type="button" onClick={copy} aria-label={`Copy ${name} link`}>
         Copy link
       </button>
+      {/* See it full size before OBS (T6.114). Alerts wait for events, so their preview plays the samples. */}
+      <a
+        className="editor-link-open"
+        href={link.replace("/o/alerts#", "/o/alerts?test=1#")}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Preview ${name} in a new tab`}
+      >
+        Preview
+      </a>
       <span className="editor-link-status" role="status">
         {status}
       </span>
