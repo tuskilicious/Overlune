@@ -644,6 +644,26 @@ test("the webcam frame can be placed here, and its link goes full screen (T6.122
   await expect(page.locator(".frame")).toHaveCSS("top", "96px");
 });
 
+test("a full-size frame placed at the far edges still makes a working link", async ({ page }) => {
+  await page.getByLabel("Frame width").fill("1920");
+  await page.getByLabel("Frame height").fill("1080");
+  // Both used to put the frame at -48, which the link format rejects: an error card on stream.
+  const row = page.locator(".editor-link", { hasText: "Webcam frame" });
+  for (const place of [
+    () => page.getByRole("radio", { name: "Place it here" }).check(),
+    () => page.getByRole("button", { name: "Move the frame to the bottom right" }).click(),
+  ]) {
+    await place();
+    await expect(page.getByText("0 across, 0 down, 1920 × 1080")).toBeVisible();
+    const link = await row.locator("input").inputValue();
+    const overlay = await page.context().newPage();
+    await overlay.goto(link);
+    await expect(overlay.locator(".frame-canvas")).toBeVisible();
+    await expect(overlay.locator(".overlay-error")).toHaveCount(0);
+    await overlay.close();
+  }
+});
+
 test("dragging the frame on the pad moves it in stream pixels (T6.122)", async ({ page }) => {
   await page.getByRole("radio", { name: "Place it here" }).check();
   await page.getByRole("button", { name: "Move the frame to the top left" }).click();

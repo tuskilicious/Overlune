@@ -93,12 +93,8 @@ export default function FramePlacer({
             key={name}
             type="button"
             aria-label={`Move the frame to the ${name.toLowerCase()}`}
-            onClick={() =>
-              onMove({
-                x: along(col, frame.width, 1920),
-                y: along(row, frame.height, 1080),
-              })
-            }
+            // Clamped: a frame within 48px of the stream's size would land at a negative spot otherwise.
+            onClick={() => clamp(along(col, frame.width, 1920), along(row, frame.height, 1080))}
           >
             {name}
           </button>

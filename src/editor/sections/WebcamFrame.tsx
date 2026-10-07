@@ -83,7 +83,8 @@ export default function WebcamFrame({
               onChange={() =>
                 updateFrame(
                   where === "here"
-                    ? { x: 48, y: 1080 - settings.frame.height - 48 }
+                    ? // Bottom left; never above the top, which the link format would reject.
+                      { x: 48, y: Math.max(0, 1080 - settings.frame.height - 48) }
                     : { x: null, y: null },
                 )
               }
