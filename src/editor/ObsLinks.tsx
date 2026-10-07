@@ -165,35 +165,39 @@ export default function ObsLinks({ settings, heading }: { settings: Settings; he
       {/* The OBS steps right next to the links, in plain words (T6.71). Open at first: beginners need it. */}
       <details className="editor-obs-help" open>
         <summary>How to paste a link into OBS</summary>
-        <ol>
-          <li>
-            In OBS, find <strong>Sources</strong> at the bottom, press <strong>+</strong> and choose{" "}
-            <strong>Browser</strong>. A Browser source shows a web page on your stream, like this
-            overlay.
-          </li>
-          <li>
-            Delete what’s in <strong>URL</strong> and paste your link.
-          </li>
-          <li>
-            Type the <strong>Width</strong> and <strong>Height</strong> shown next to the link: the
-            overlay’s size in pixels, so it fits your stream exactly.
-          </li>
-          <li>
-            For Alerts, tick <strong>Control audio via OBS</strong> so your viewers hear the alert
-            sound. Then press <strong>OK</strong>.
-          </li>
-        </ol>
-        <img
-          src="/images/guide/obs-properties.png"
-          alt="OBS Browser source properties with the link pasted into URL, width 1920, height 1080 and Control audio via OBS ticked."
-          width="791"
-          height="618"
-          loading="lazy"
-        />
-        <p>
-          The <Link to="/guide">step-by-step setup guide</Link> has more pictures, Streamlabs steps
-          and fixes.
-        </p>
+        <div className="editor-disclosure">
+          <div>
+            <ol>
+              <li>
+                In OBS, find <strong>Sources</strong> at the bottom, press <strong>+</strong> and
+                choose <strong>Browser</strong>. A Browser source shows a web page on your stream,
+                like this overlay.
+              </li>
+              <li>
+                Delete what’s in <strong>URL</strong> and paste your link.
+              </li>
+              <li>
+                Type the <strong>Width</strong> and <strong>Height</strong> shown next to the link:
+                the overlay’s size in pixels, so it fits your stream exactly.
+              </li>
+              <li>
+                For Alerts, tick <strong>Control audio via OBS</strong> so your viewers hear the
+                alert sound. Then press <strong>OK</strong>.
+              </li>
+            </ol>
+            <img
+              src="/images/guide/obs-properties.png"
+              alt="OBS Browser source properties with the link pasted into URL, width 1920, height 1080 and Control audio via OBS ticked."
+              width="791"
+              height="618"
+              loading="lazy"
+            />
+            <p>
+              The <Link to="/guide">step-by-step setup guide</Link> has more pictures, Streamlabs
+              steps and fixes.
+            </p>
+          </div>
+        </div>
       </details>
       {/* One file instead of six pastes (T6.90). OBS Studio only: Streamlabs can't import it. */}
       <div className="editor-collection">

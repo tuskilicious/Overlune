@@ -98,55 +98,59 @@ export default function Alerts({
       </p>
       <details className="editor-more">
         <summary>Change alert messages</summary>
-        <p id="alerts-hint" className="editor-hint">
-          Type your message, and use the buttons to add their name or the amount. The example under
-          each one shows how it will read.
-        </p>
-        {alertFields.map(([kind, label]) => (
-          <div key={kind} className="editor-template">
-            <label>
-              {label}
-              <input
-                id={`template-${kind}`}
-                value={settings.alerts.templates[kind]}
-                maxLength={100}
-                placeholder={defaultTemplates[kind]}
-                aria-describedby={`alerts-hint template-${kind}-example chars-template-${kind}`}
-                onChange={(e) => updateTemplate(kind, e.target.value)}
-              />
-            </label>
-            <div className="editor-template-tools">
-              <button
-                type="button"
-                aria-label={`Add their name to ${label}`}
-                onClick={() => insertInTemplate(kind, "{user}")}
-              >
-                + Their name
-              </button>
-              {kind !== "sub" && (
-                <button
-                  type="button"
-                  aria-label={`Add the amount to ${label}`}
-                  onClick={() => insertInTemplate(kind, "{amount}")}
-                >
-                  + Amount
-                </button>
-              )}
-            </div>
-            <p id={`template-${kind}-example`} className="editor-hint">
-              Example: {exampleAlert(settings.alerts.templates, kind)}
+        <div className="editor-disclosure">
+          <div>
+            <p id="alerts-hint" className="editor-hint">
+              Type your message, and use the buttons to add their name or the amount. The example
+              under each one shows how it will read.
             </p>
-            <CharsLeft
-              id={`chars-template-${kind}`}
-              value={settings.alerts.templates[kind]}
-              max={100}
-            />
+            {alertFields.map(([kind, label]) => (
+              <div key={kind} className="editor-template">
+                <label>
+                  {label}
+                  <input
+                    id={`template-${kind}`}
+                    value={settings.alerts.templates[kind]}
+                    maxLength={100}
+                    placeholder={defaultTemplates[kind]}
+                    aria-describedby={`alerts-hint template-${kind}-example chars-template-${kind}`}
+                    onChange={(e) => updateTemplate(kind, e.target.value)}
+                  />
+                </label>
+                <div className="editor-template-tools">
+                  <button
+                    type="button"
+                    aria-label={`Add their name to ${label}`}
+                    onClick={() => insertInTemplate(kind, "{user}")}
+                  >
+                    + Their name
+                  </button>
+                  {kind !== "sub" && (
+                    <button
+                      type="button"
+                      aria-label={`Add the amount to ${label}`}
+                      onClick={() => insertInTemplate(kind, "{amount}")}
+                    >
+                      + Amount
+                    </button>
+                  )}
+                </div>
+                <p id={`template-${kind}-example`} className="editor-hint">
+                  Example: {exampleAlert(settings.alerts.templates, kind)}
+                </p>
+                <CharsLeft
+                  id={`chars-template-${kind}`}
+                  value={settings.alerts.templates[kind]}
+                  max={100}
+                />
+              </div>
+            ))}
+            <p className="editor-hint">
+              {"{user}"} and {"{amount}"} in a message are where the name and amount go.
+              {" {s}"} adds an “s” when the amount isn’t 1.
+            </p>
           </div>
-        ))}
-        <p className="editor-hint">
-          {"{user}"} and {"{amount}"} in a message are where the name and amount go.
-          {" {s}"} adds an “s” when the amount isn’t 1.
-        </p>
+        </div>
       </details>
     </fieldset>
   );

@@ -1601,3 +1601,30 @@ test("quick rows are chips, and a picked frame size is pressed (T6.135)", async 
   );
   await expect(sizes.getByRole("button", { pressed: true })).toHaveCount(1);
 });
+
+test("disclosures open by height, and closed content never takes focus (T6.135)", async ({
+  page,
+}) => {
+  const more = page.locator("#part-chat details.editor-more");
+  const body = more.locator(".editor-disclosure");
+  const summary = more.getByText("More chat options");
+  const badges = page.getByLabel("Show badges (Mod, Sub, VIP) before names");
+
+  // Closed: Tab from the summary skips the hidden content.
+  await summary.focus();
+  await page.keyboard.press("Tab");
+  await expect(badges).not.toBeFocused();
+  await expect(body).toHaveCSS("visibility", "hidden");
+
+  // Open: it grows to its full height (220ms) and the content takes focus.
+  await expect(body).toHaveCSS("transition-duration", "0.22s, 0.22s");
+  await summary.click();
+  await expect(body).toHaveCSS("visibility", "visible");
+  await summary.focus();
+  await page.keyboard.press("Tab");
+  await expect(badges).toBeFocused();
+
+  // Reduced motion: it opens and closes at once.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(body).toHaveCSS("transition-duration", "0s");
+});

@@ -576,7 +576,47 @@
 .editor-more {
   display: flex;
   flex-direction: column;
+}
+
+/* Disclosures open and close by height (T6.135): the native <details> stays, its content sits in one wrapper whose
+   grid row goes from 0fr to 1fr in 220ms. ::details-content (Chrome 131+) lets the closed content stay laid out so it
+   can collapse; visibility hides it once collapsed, so it never takes focus or reaches screen readers while closed.
+   Browsers without ::details-content open and close at once, as before. Reduced motion: index.css drops the
+   transition. */
+.editor details::details-content {
+  content-visibility: visible;
+}
+
+.editor-disclosure {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows 220ms cubic-bezier(0.2, 0, 0, 1),
+    visibility 220ms;
+}
+
+.editor details[open] > .editor-disclosure {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+.editor-disclosure > div {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.editor :is(.editor-advanced, .editor-more) > .editor-disclosure > div {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
+  padding-top: 12px;
+}
+
+/* Room for focus rings inside the clipped content. */
+.editor .editor-disclosure > div {
+  padding-inline: 4px;
+  margin-inline: -4px;
 }
 
 .editor-advanced summary,
@@ -584,10 +624,6 @@
   cursor: pointer;
   font-weight: 600;
   padding: 8px 0;
-}
-
-.editor-advanced[open] {
-  gap: 12px;
 }
 
 .editor .editor-hint {
@@ -652,7 +688,7 @@
   cursor: pointer;
 }
 
-.editor-advanced > button {
+.editor-advanced .editor-disclosure > div > button {
   margin-top: 12px;
 }
 
