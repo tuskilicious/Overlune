@@ -1,5 +1,6 @@
-import { lazy, Suspense, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
+import { lazyPage } from "./lib/lazy-page";
 import { pages } from "./lib/page-meta";
 import { sentryEnvironment } from "./lib/sentry";
 import Alerts from "./overlays/alerts/Alerts";
@@ -12,12 +13,12 @@ import TextScene from "./overlays/TextScene";
 import SentryTestPage from "./components/SentryTestPage";
 
 // GSAP and Tailwind live in this chunk only, so the editor and overlays never load them.
-const LandingPage = lazy(() => import("./landing/LandingPage"));
+const LandingPage = lazyPage(() => import("./landing/LandingPage"));
 // The site pages load on their own too, so an overlay in OBS only loads what it shows (T6.82).
-const EditorPage = lazy(() => import("./editor/EditorPage"));
-const SetupGuide = lazy(() => import("./editor/SetupGuide"));
-const LegalPage = lazy(() => import("./editor/LegalPage"));
-const NotFoundPage = lazy(() => import("./editor/NotFoundPage"));
+const EditorPage = lazyPage(() => import("./editor/EditorPage"));
+const SetupGuide = lazyPage(() => import("./editor/SetupGuide"));
+const LegalPage = lazyPage(() => import("./editor/LegalPage"));
+const NotFoundPage = lazyPage(() => import("./editor/NotFoundPage"));
 
 /** "/" is always the landing page (T6.34, T6.67); returning visitors get a "Continue your overlay" button there.
  *  The editor used to live here, so its old bookmarks ("/#1.…", a saved overlay) still open /editor with their

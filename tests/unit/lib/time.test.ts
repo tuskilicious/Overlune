@@ -1,6 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   formatCountdown,
+  localZone,
   formatEndTime,
   formatStartsAt,
   fromZoneInput,
@@ -162,5 +163,23 @@ describe("zoneName", () => {
     expect(zoneName("Asia/Calcutta")).toBe("India Standard Time");
     expect(zoneName("America/New_York")).toBe("Eastern Time");
     expect(zoneName("Etc/GMT+5")).toBe("GMT-05:00");
+  });
+});
+
+describe("localZone (Sentry JAVASCRIPT-REACT-9)", () => {
+  it("falls back to UTC when the browser reports a zone it can't format", () => {
+    const spy = vi
+      .spyOn(Intl.DateTimeFormat.prototype, "resolvedOptions")
+      .mockReturnValue({ timeZone: "Etc/Unknown" } as Intl.ResolvedDateTimeFormatOptions);
+    expect(localZone()).toBe("UTC");
+    spy.mockRestore();
+  });
+
+  it("keeps a real zone", () => {
+    const spy = vi
+      .spyOn(Intl.DateTimeFormat.prototype, "resolvedOptions")
+      .mockReturnValue({ timeZone: "Asia/Kolkata" } as Intl.ResolvedDateTimeFormatOptions);
+    expect(localZone()).toBe("Asia/Kolkata");
+    spy.mockRestore();
   });
 });
