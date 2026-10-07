@@ -1,5 +1,7 @@
 # Look layouts (T6.134)
 
+Status: all 16 built (2026-10-07), one commit each; DESIGN.md "Scene layout" lists what shipped.
+
 Every look gets its own scene composition (owner, 2026-10-07; DESIGN.md "Scene layout"). The plan follows the design handoff's method: a concept, one memorable move, a sketch, three principles, then a check against DESIGN.md's anti-patterns. Its three mockup boards are the source of layout ideas, reinterpreted in each look's own world rather than copied: **Bold** (Swiss frame: flat blocks, a full-width bottom bar, one large accent block, left aligned), **Calm** (one continuous shelf of cells split by hairlines) and **Retro** (a teletext page: one column of colored row bands).
 
 Applies to everything `SceneFrame` draws: Starting Soon, Be Right Back, Stream Ending and the offline banner. Chat, alerts, the webcam frame and the panels keep their current shapes.

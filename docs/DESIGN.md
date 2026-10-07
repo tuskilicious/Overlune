@@ -97,7 +97,7 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 - Colors: bg gradient `#2B0F4C`→`#FF6B6B`→`#FFB86B`, surface `#1B0B33` at 80%, accents `#FF71CE` `#01CDFE`, text `#FFFBF5`
 - Fonts: Audiowide / Space Grotesk
 - Effects: chrome headings, striped sun, palm silhouettes
-- Shipped: bg `#2B0F4C` stays purple to 68% of the height, then fades to coral and orange at the horizon, so text never sits on the light part. Opaque surface (hex, for the contrast checks), primary `#01CDFE` (the band across the chrome titles), accent `#FF71CE`, muted `#C9B6E4`, radius 6, pink glow. Palms are `public/images/themes/vaporwave-palms.svg` (the CSP blocks `data:` images). Static, so no reduced-motion version is needed.
+- Shipped: bg `#2B0F4C` stays purple to 68% of the height, then fades to coral and orange at the horizon, so text never sits on the light part. Opaque surface (hex, for the contrast checks), primary `#01CDFE` (the band across the chrome titles), accent `#FF71CE`, muted `#C9B6E4`, radius 6, pink glow. Palms are `public/images/themes/vaporwave-palms.svg` (the CSP blocks `data:` images). Animated since T6.134 (the floor, the sun's stripes, the palms); Lite and Still hold it.
 
 **9. Daylight** (T6.89, the light look streamers asked for)
 - Colors: bg `#EEF1F6` (cool paper), surface `#FFFFFF`, titles and text ink `#141821`, accent vermilion `#C93A1C`, muted `#5B6272`
@@ -208,7 +208,7 @@ Set on 2026-10-07 from the owner's design handoff, an audit of the looks against
 **Known gaps (2026-10-07):**
 - Sounds: eight looks reuse another look's sound: Daylight (Clean Slate's), Abyss and Quest (Forest Night's), Session (Cozy Café's), Shonen (Bold Esports'), Sakura (Pastel Cloud's), Skate Deck (Arcade 8-Bit's), Phosphor (Neon Grid's).
 - Fonts: Space Grotesk is Daylight's heading and Vaporwave Sunset's body. Body faces shared by two looks: Nunito Sans (Forest Night, Daylight), Nunito (Cozy Café, Sakura), Barlow (Bold Esports, Skate Deck).
-- Composition: all 16 looks still use layout v2, so they differ by color, type, shape and effect, not by structure. Paid packs vary frames and shapes from pack to pack. Looks may now have their own layouts (owner, 2026-10-07; see "Scene layout"), so this closes look by look.
+- Composition: closed in T6.134. Every look now has its own scene layout (see "Scene layout"); layout v2 stays as the starting point for new looks.
 - Shipped looks that match a tell keep it until they are reworked: Bold Esports (near-black with one red), Neon Grid (neon with a grid).
 
 ## Overlay layout rules
@@ -217,26 +217,40 @@ Set on 2026-10-07 from the owner's design handoff, an audit of the looks against
 - Alerts render centered-top by default, with no background outside the alert box.
 - Error states use the theme's surface and text colors, stay readable, and never flash.
 
-### Scene layout (T6.35)
-Layout v2 below is the shared default. It was rolled out one theme at a time (T6.35-T6.42); the original centered layout was retired in T6.43. Theme ids, settings and links never changed, so pasted links picked up the new design.
+### Scene layout (T6.35, T6.134)
+Each look has its own scene composition (T6.134, plan and sketches in `docs/LAYOUTS.md`), built in `src/overlays/layouts.css` on the shared markup. Layout v2 (below) is the default a new look starts from. Theme ids, settings and links never changed, so pasted links picked up every new layout. Per-look rules key on `data-theme` (and `data-bg` for background effects) on `.scene`, `.chat` and `.alerts`; BRB, Stream Ending and the offline banner have no countdown, which `.scene-main:has(.countdown)` tells apart (OBS 31+).
 
 **A look may have its own layout** (owner, 2026-10-07): looks don't have to share one composition. Paid packs differ in structure, not just color, and a layout is part of a look's world (a teletext page, a manga panel, a quest log). What every layout keeps:
 - The 1920×1080 canvas, the 64px safe margin, and the open space the look's motif needs.
 - The same pieces and settings: logo, headline, subtitle, countdown, socials, ticker and the error card. A layout is part of the look, never a link setting, so old links simply pick it up.
 - The shared markup (`SceneFrame`): a layout changes the CSS, keyed on `data-theme`, not the components, so fit-to-screen (T6.26, T6.52) keeps working. If several looks share a layout, add it as a token through `types.ts`, with a test.
 - The longest text still fits, "Contrast as rendered" holds for the new placements, it reads at 640×360, and the motion grammar and Lite and Still apply.
-- The scene, BRB, Stream Ending, offline banner and panels of one look read as one layout. Compare screenshots against the current scene before shipping. Per-theme tweaks key on `data-theme` (and `data-bg` for background effects) on `.scene`, `.chat` and `.alerts`.
-- **Scenes (layout v2, T6.107, after the maintainer's broadcast kits):** 88px top / 112px side / 72px bottom margins (inside the 64px safe margin). Logo top left (160px max). On the left, anchored to the bottom: a 96×8px accent rule, then a two-tone display headline (184px, -0.04em tracking, 0.94 leading, balanced, so "Starting soon" sets on two lines) whose last word takes the accent color, then the subtitle (40px, 30ch max). It shrinks to fit per T6.26 and fits again when the countdown widens as it ticks (T6.52). On the right, also bottom-anchored, one column (480px min): the countdown card (96px digits on one line, in the text color, so the accent stays with the headline) over the socials as a list, each an accent-tinted 72px icon tile with the platform name (small tracked caps) over the handle (36px bold). The open sky above both columns is where each theme's motif lives.
+- The scene, BRB, Stream Ending, offline banner and panels of one look read as one layout. Compare screenshots against the current scene before shipping (`node tests/shots.mjs <dir>` and `tests/sheet.mjs`, with the dev server running).
+
+**The layouts (T6.134).** The handoff's three mockup boards were the source: Bold (a broadcast bar), Calm (one shelf) and Retro (row bands).
+- **Clean Slate, the shelf:** one surface shelf along the bottom holds the subtitle, countdown and socials in cells split by hairlines, under the headline.
+- **Neon Grid, the sign over the vanishing point:** centered on the grid's vanishing point; the countdown lit like a neon sign (a primary tube round the card); the socials in a row above the horizon (82%).
+- **Cozy Café, the menu card:** the headline as the shop sign on the left; one paper menu card on the right, the countdown at its head and the socials as specials with dot leaders.
+- **Arcade 8-Bit, the attract screen:** centered; the socials as a high-score table, one colored band per row (ink on yellow, green and the pixel-shadow pink); pixel-font sizes as before (T6.38, T6.55).
+- **Pastel Cloud, the floating stack:** centered and low in the sky; the countdown a pill, the socials a row of pills; the lower cloud rises to 18% so both clouds drift above the title.
+- **Forest Night, under the moon:** the headline hangs right-aligned under the moon; the countdown and socials sit low on the left over the treeline; the fireflies keep to the left third of the sky.
+- **Bold Esports, the broadcast bar:** the poster headline above one bar across the stream, the countdown in an angled red slab (ink on red, 5.2:1) and the socials beside it.
+- **Vaporwave Sunset, the horizon:** the sun sets centered on a horizon at 80%, a grid floor runs to the viewer and palms frame both sides; the chrome title, subtitle and one countdown-and-socials row sit in the purple sky, which ends where the sun begins. Animated (T6.134): the floor scrolls, the sun's stripes slide into the horizon, the palms sway.
+- **Daylight, the poster colophon:** the headline very large and flush left at the top, the disc top right, the details in ruled columns along the bottom.
+- **Abyss, the depth gauge:** a depth scale down the right edge; the stack floats centered; the countdown reads like an instrument between two seams.
+- **Session, the title card:** the ink headline at the top, the teal and brick bars across the open middle (in the grid's flexible row, so a long title squeezes them), the socials bottom left and the countdown in a cream episode box bottom right.
+- **Shonen, the manga page:** a big panel for the lettering (screentone and speed lines inside), and a column of two panels running to the page border for the countdown and the socials, with white gutters and ink edges.
+- **Sakura, the hanging scroll:** one tall scroll on the right in the night surface color, a dark rod at each end and the brush stroke under the top one, with everything written down it; the lantern glow moves to the open left.
+- **Skate Deck, the sticker wall:** the countdown and socials as die-cut stickers (a white cut line, a soft shadow) slapped on at an angle under the deck; the lettering straight across the bottom.
+- **Phosphor, the terminal window:** one full-screen window with a title bar; the boot log first, the headline at a `$` prompt, the countdown as `T-minus`, the socials as an `ls` listing.
+- **Quest, the quest log:** one tall parchment panel on the left with the title, description, countdown and socials (ink, wax red and muted ink on parchment; the logo a small crest in its corner); the hall and embers stay open on the right.
+- One decoration less (the handoff's rule): where a layout has its own mark (the bar, the disc, the gauge, the stickers), the short accent rule above the headline is set to zero height. The scene-fit test still measures it.
+
+**Layout v2, the default (T6.107):**
+**Scenes (layout v2, T6.107, after the maintainer's broadcast kits):** 88px top / 112px side / 72px bottom margins (inside the 64px safe margin). Logo top left (160px max). On the left, anchored to the bottom: a 96×8px accent rule, then a two-tone display headline (184px, -0.04em tracking, 0.94 leading, balanced, so "Starting soon" sets on two lines) whose last word takes the accent color, then the subtitle (40px, 30ch max). It shrinks to fit per T6.26 and fits again when the countdown widens as it ticks (T6.52). On the right, also bottom-anchored, one column (480px min): the countdown card (96px digits on one line, in the text color, so the accent stays with the headline) over the socials as a list, each an accent-tinted 72px icon tile with the platform name (small tracked caps) over the handle (36px bold). The open sky above both columns is where each theme's motif lives.
+
 - **Alerts:** still centered at the top. A wider card (760-1100px) with a 6px accent band, an uppercase event label ("Raid", "New subscriber", "Resub", "Gift subs", "Cheer"), then the streamer's message at 56px; resub and cheer text below in the muted color.
 - **Chat:** one panel instead of a card per message: no borders between cards, hairline separators, only the top and bottom of the stack rounded. Badges are small square-cornered tags tinted with the accent.
-- Each theme can restyle these pieces in its own CSS (fonts, background effect, shapes), keyed on `data-theme`, or move them into its own layout (above). The set reads as one product through the shared pieces, settings and motion grammar, not through one composition.
-- **Neon Grid (T6.36):** horizon at 82% with the content kept above it; socials float on the grid floor as a glowing panel; smaller type for the wide Orbitron; the chat stack has one neon edge.
-- **Cozy Café (T6.37):** the steam wisps rise in the open space (between the title block and the countdown card, and from behind the card) instead of behind the title.
-- **Arcade 8-Bit (T6.38):** pixel-font sizes (title 68px, countdown 56px, done text 44px, alert title 40px per T6.55) so the title and countdown sit side by side; square accent rule; wider subtitle measure for VT323.
-- **Pastel Cloud (T6.39):** both clouds drift through the upper sky, clear of a typical title block; the theme keeps its own gradient background.
-- **Forest Night (T6.40):** a full moon (soft-edged disc with a halo) sits in the open top-right corner; the fireflies fade out above a typical title block, so none lands between the words. The countdown is 100px, since Lora's wide numerals made the widest day countdown wrap the title (T6.52).
-- **Bold Esports (T6.41):** the angles move onto the new pieces: a slanted accent rule and a parallelogram countdown card, matching the angled alert card and chat messages. The socials row keeps its full-width hairline and wipes in with the content.
-- **Vaporwave Sunset (T6.42):** the content now fills the bottom where the sun used to set, so the striped sun (480px, stripes in its lower half) rises into the open top-right sky with a coral glow, and the right palm crosses it. The sky stays purple behind all text. Smaller Audiowide sizes (title 96px, countdown 88px) keep the title on one line.
 
 ## Editor and site UI
 The editor, setup guide, privacy and terms pages share one quiet, high-contrast chrome in Overlune's brand (`docs/BRAND.md`), so the colorful theme previews stay the loudest thing on the page. Tokens live in `src/editor/brand.ts` and reach CSS as variables on `.editor` (`themeVars`). "Must" rules are hard requirements; "should" rules are defaults.
