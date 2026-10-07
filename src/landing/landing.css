@@ -624,3 +624,126 @@
   padding-top: 1.25rem;
   border-top: 1px solid rgb(255 255 255 / 0.15);
 }
+
+/* The hero's night (T6.129), after the Kage reference: a near plane of ridges in front of the sky, motes rising past
+   them, and the moon breathing. Loads in from the card's foot; with reduced motion, index.css stops every animation and
+   each piece sits where it ends. */
+.landing-night {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Mist between the far ridge and the near ones. */
+.landing-night::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 14% 0;
+  height: 30%;
+  z-index: 1;
+  background: radial-gradient(60% 50% at 50% 60%, rgb(164 94 252 / 0.16), transparent 75%);
+}
+
+.landing-ridges {
+  position: absolute;
+  inset: auto 0 0;
+  width: 100%;
+  height: clamp(11rem, 34%, 20rem);
+}
+
+.landing-ridges path {
+  animation: ridge-rise 1.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: calc(150ms + var(--i) * 90ms);
+}
+
+.landing-ridge-far {
+  fill: rgb(164 94 252 / 0.3);
+}
+
+.landing-ridge-mid {
+  fill: #2a1d7a;
+}
+
+.landing-ridge-near {
+  fill: var(--color-night);
+}
+
+@keyframes ridge-rise {
+  from {
+    opacity: 0;
+    translate: 0 40%;
+  }
+}
+
+/* Motes rising out of the ridges: a tile one tile taller than the card slides up one tile, so the loop never jumps. */
+.landing-motes {
+  --tile: 520px;
+  position: absolute;
+  inset: 0 0 calc(var(--tile) * -1);
+  background-image:
+    radial-gradient(circle at 12% 18%, rgb(24 210 245 / 0.7) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 31% 64%, rgb(244 241 255 / 0.6) 0 1px, transparent 2px),
+    radial-gradient(circle at 47% 32%, rgb(164 94 252 / 0.8) 0 2px, transparent 3px),
+    radial-gradient(circle at 63% 81%, rgb(24 210 245 / 0.6) 0 1px, transparent 2px),
+    radial-gradient(circle at 78% 46%, rgb(244 241 255 / 0.55) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 91% 12%, rgb(164 94 252 / 0.7) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 22% 90%, rgb(164 94 252 / 0.6) 0 1px, transparent 2px),
+    radial-gradient(circle at 56% 6%, rgb(24 210 245 / 0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 5% 42%, rgb(244 241 255 / 0.7) 0 2px, transparent 3px),
+    radial-gradient(circle at 38% 12%, rgb(164 94 252 / 0.75) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 71% 22%, rgb(24 210 245 / 0.65) 0 2px, transparent 3px),
+    radial-gradient(circle at 85% 70%, rgb(164 94 252 / 0.7) 0 2px, transparent 3px),
+    radial-gradient(circle at 44% 56%, rgb(244 241 255 / 0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 97% 88%, rgb(24 210 245 / 0.55) 0 1.5px, transparent 2.5px);
+  background-size: 100% var(--tile);
+  mask-image: linear-gradient(transparent 5%, #000 60%);
+  filter: drop-shadow(0 0 4px rgb(164 94 252 / 0.6));
+  animation: motes-rise 26s linear infinite;
+}
+
+@keyframes motes-rise {
+  to {
+    transform: translateY(calc(var(--tile) * -1));
+  }
+}
+
+/* The moon's air, breathing. */
+.landing-moon::after {
+  content: "";
+  position: absolute;
+  inset: -48px -34px -48px -20px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(164 94 252 / 0.28), transparent);
+  animation: moon-breathe 8s ease-in-out infinite alternate;
+}
+
+@keyframes moon-breathe {
+  from {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+}
+
+/* The headline arrives a word at a time, each rising out of its own mask. The mask keeps room for descenders. */
+.landing-word-mask {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+  vertical-align: top;
+}
+
+.landing-word {
+  display: inline-block;
+  animation: word-rise 0.82s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: calc(80ms + var(--i) * 72ms);
+}
+
+@keyframes word-rise {
+  from {
+    opacity: 0;
+    transform: translateY(110%);
+  }
+}
