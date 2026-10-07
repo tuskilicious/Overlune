@@ -34,5 +34,7 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 | Archivo Black (`@fontsource/archivo-black` 5.3.0, weight 400) | font | Advanced font picker; Session headings (T6.110) | https://fontsource.org/fonts/archivo-black | SIL OFL 1.1 | No | 2026-10-07 |
 | Archivo (`@fontsource/archivo` 5.3.0, weights 400/600/700) | font | Advanced font picker; Session body text (T6.110) | https://fontsource.org/fonts/archivo | SIL OFL 1.1 | No | 2026-10-07 |
 | `public/images/themes/print-grain.svg` (SVG fractal noise filter) | image | Session print grain | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-07 |
+| Bangers (`@fontsource/bangers` 5.3.0, weight 400) | font | Advanced font picker; Shonen headings (T6.111) | https://fontsource.org/fonts/bangers | SIL OFL 1.1 | No | 2026-10-07 |
+| Comic Neue (`@fontsource/comic-neue` 5.3.0, weights 400/700) | font | Advanced font picker; Shonen body text (T6.111) | https://fontsource.org/fonts/comic-neue | SIL OFL 1.1 | No | 2026-10-07 |
 | `public/sounds/vaporwave-sunset.ogg` (Kenney Digital Audio 1.0, `threeTone1.ogg`, unchanged) | sound | Vaporwave Sunset alert sound | https://kenney.nl/assets/digital-audio | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
 | `public/images/themes/vaporwave-palms.svg` (palm silhouettes, simple paths) | image | Vaporwave Sunset scene background | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-01 |

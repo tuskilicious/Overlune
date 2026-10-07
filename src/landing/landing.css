@@ -269,7 +269,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 280px;
+    width: 240px; /* twelve looks share the ring (T6.111) */
     will-change: transform, filter;
   }
 

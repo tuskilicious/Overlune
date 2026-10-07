@@ -46,3 +46,6 @@ import "@fontsource/archivo-black/400.css"; // one weight only
 import "@fontsource/archivo/400.css";
 import "@fontsource/archivo/600.css";
 import "@fontsource/archivo/700.css";
+import "@fontsource/bangers/400.css"; // one weight only
+import "@fontsource/comic-neue/400.css";
+import "@fontsource/comic-neue/700.css";
