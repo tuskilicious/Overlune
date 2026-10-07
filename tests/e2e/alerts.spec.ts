@@ -212,3 +212,19 @@ for (const [seconds, goneBy] of [
     await expect(box(page)).toHaveCount(goneBy ? 0 : 1);
   });
 }
+
+test("each alert lands with a burst and a name pop, invisible at rest under reduced motion (T6.117)", async ({
+  page,
+}) => {
+  await fakeTwitch(page);
+  await page.goto(link({ chat: { channel: "dallas" } }, "?test=1"));
+  await expect(page.locator(".alert-box")).toBeVisible();
+  await expect(page.locator(".alert-burst")).toHaveCSS("animation-name", "alert-burst");
+  await expect(page.locator(".alert-user")).toHaveCSS("animation-name", "alert-pop");
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(link({ chat: { channel: "dallas" } }, "?test=1"));
+  await expect(page.locator(".alert-box")).toBeVisible();
+  await expect(page.locator(".alert-burst")).toHaveCSS("opacity", "0");
+  await expect(page.locator(".alert-user")).toHaveCSS("opacity", "1");
+});

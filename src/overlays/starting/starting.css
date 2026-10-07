@@ -20,7 +20,7 @@
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.03em;
-  white-space: nowrap; /* "1d 23h 59m" stays one line; the column grows to hold it */
+  white-space: pre; /* "1d 23h 59m" stays one line (the column grows to hold it), and its spaces keep their width */
   color: var(--text); /* the accent belongs to the headline's last word (T6.107) */
   font-variant-numeric: tabular-nums;
 }
@@ -44,4 +44,23 @@
 .scene[data-theme="arcade-8bit"] .countdown-done {
   font-size: 44px;
   line-height: 1.3;
+}
+
+/* Only the digits that change remount (StartingSoon.tsx), so they flip in from above while the rest hold still
+   (T6.117). Reduced motion: index.css shows the new digit at once. */
+.countdown-ch {
+  display: inline-block;
+  animation: countdown-tick 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes countdown-tick {
+  from {
+    opacity: 0;
+    transform: translateY(-40%) scaleY(0.8);
+  }
+}
+
+/* Arcade 8-Bit: digits snap in two hard steps, like a score counter. */
+.scene[data-theme="arcade-8bit"] .countdown-ch {
+  animation-timing-function: steps(2, end);
 }

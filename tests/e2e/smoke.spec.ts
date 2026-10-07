@@ -49,11 +49,35 @@ for (const hash of ["#1.garbage", "#9.abc"]) {
 }
 
 const entranceAnimation = (page: import("@playwright/test").Page) =>
-  page.locator(".scene-main").evaluate((el) => getComputedStyle(el).animationName);
+  page
+    .locator(".scene-word")
+    .first()
+    .evaluate((el) => getComputedStyle(el).animationName);
 
-test("the entrance animates by default", async ({ page }) => {
+test("the entrance animates by default, word by word (T6.117)", async ({ page }) => {
   await page.goto("/o/starting");
   expect(await entranceAnimation(page)).toBe("scene-slide-fade");
+  // Each word waits its turn.
+  const delays = await page
+    .locator(".scene-word")
+    .evaluateAll((els) => els.map((el) => getComputedStyle(el).animationDelay));
+  expect(delays).toEqual(["0.16s", "0.25s"]);
+});
+
+test("only the countdown digits that change flip in (T6.117)", async ({ page }) => {
+  // Paused, so time only moves when the test says so.
+  await page.clock.install({ time: new Date("2026-10-02T11:59:00Z") });
+  await page.clock.pauseAt(new Date("2026-10-02T12:00:00Z"));
+  const data = { starting: { endsAt: new Date("2026-10-02T12:10:05Z").getTime() } };
+  await page.goto(`/o/starting#1.${lz.compressToEncodedURIComponent(JSON.stringify(data))}`);
+  await expect(page.locator(".countdown-time")).toHaveText("10:05");
+  const first = await page.locator(".countdown-ch").elementHandles();
+  await page.clock.runFor(1000);
+  await expect(page.locator(".countdown-time")).toHaveText("10:04");
+  const after = await page.locator(".countdown-ch").elementHandles();
+  // "1", "0", ":" and "0" are the same elements; only the last digit was replaced.
+  const same = await Promise.all(after.map((h, i) => h.evaluate((a, b) => a === b, first[i])));
+  expect(same).toEqual([true, true, true, true, false]);
 });
 
 test("?rm=1 turns animations off", async ({ page }) => {

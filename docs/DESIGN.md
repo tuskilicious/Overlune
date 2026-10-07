@@ -86,6 +86,12 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 - Effects: none; a soft shadow under surfaces, hairline border `#D9DEE7`, radius 14
 - Contrast: text, muted and accent all pass AA on both bg and surface (accent 4.5:1 on bg, 5.1:1 on white). Reuses Clean Slate's alert sound.
 
+### Motion (T6.117)
+One motion grammar for every look, flavoured by its `enter` and `alertAnim`. All of it plays once per event and stops under reduced motion (`?rm=1`, "Less motion" or the OS setting); hidden pieces show at once.
+- **Scene entrance:** the pieces land in sequence instead of as one block: logo (0ms), the accent rule drawing in from the left (500ms), the headline word by word (160ms + 90ms per word), the countdown (320ms), the socials one by one (460ms + 80ms each), the subtitle (560ms). Each uses the look's enter motion (slide-fade with an expo ease-out, bounce, stepped, or wipe). Neon Grid's last word flickers on after it lands. Vaporwave's chrome is clipped per word, since a heading's clipped background doesn't paint through children that move on their own.
+- **Countdown:** each character is its own span keyed by its value, so only the digits that change remount and flip in from above (360ms); Arcade snaps in two steps.
+- **Alerts:** the box arrives in the look's own motion, then a burst of the accent light behind it (Shonen: speed lines; Session: two bars slashing across; Arcade: stepped; Neon: a flicker), the name and amount pop (scale 0.6 to 1.08 to 1), and a sheen crosses the card once.
+
 ### Uplift of the original looks (T6.112)
 Each original look got one signature move from its own world, to the kits' bar. All motion stops under reduced motion.
 - **Neon Grid:** the headline glows like a lit neon tube (two soft text-shadows in its own colors); the last word flickers on once after the entrance.

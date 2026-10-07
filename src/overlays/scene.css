@@ -20,8 +20,44 @@
   font-family: var(--font-body);
 }
 
-.scene[data-enter="slide-fade"] .scene-main {
-  animation: scene-slide-fade var(--enter-ms) ease-out both;
+/* Entrance choreography (T6.117): the pieces land in sequence, in the look's own motion: the logo, the accent rule
+   drawing in, the headline word by word, the countdown, the socials one by one, then the subtitle. Each piece
+   waits for its turn (--d) and stays hidden until then. Reduced-motion version: index.css shows everything at once. */
+.scene-word {
+  display: inline-block;
+  --d: calc(160ms + var(--i) * 90ms);
+}
+
+.scene-logo {
+  --d: 0ms;
+}
+
+.countdown {
+  --d: 320ms;
+}
+
+.scene-socials li {
+  --d: calc(460ms + var(--i) * 80ms);
+}
+
+.scene-subtitle {
+  --d: 560ms;
+}
+
+.scene-title::before {
+  transform-origin: left;
+  animation: scene-rule 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes scene-rule {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.scene[data-enter="slide-fade"]
+  :is(.scene-logo, .scene-word, .scene-subtitle, .countdown, .scene-socials li) {
+  animation: scene-slide-fade var(--enter-ms) cubic-bezier(0.16, 1, 0.3, 1) var(--d) both;
 }
 
 /* Neon Grid: a floor grid scrolling toward the viewer. Transform-only animation, so it stays on the GPU.
@@ -123,8 +159,9 @@
   }
 }
 
-.scene[data-enter="bounce"] .scene-main {
-  animation: scene-bounce var(--enter-ms) cubic-bezier(0.34, 1.56, 0.64, 1) both;
+.scene[data-enter="bounce"]
+  :is(.scene-logo, .scene-word, .scene-subtitle, .countdown, .scene-socials li) {
+  animation: scene-bounce var(--enter-ms) cubic-bezier(0.34, 1.56, 0.64, 1) var(--d) both;
 }
 
 @keyframes scene-bounce {
@@ -169,8 +206,9 @@
   }
 }
 
-.scene[data-enter="steps"] .scene-main {
-  animation: scene-slide-fade var(--enter-ms) steps(4, end) both;
+.scene[data-enter="steps"]
+  :is(.scene-logo, .scene-word, .scene-subtitle, .countdown, .scene-socials li) {
+  animation: scene-slide-fade var(--enter-ms) steps(4, end) var(--d) both;
 }
 
 /* Pastel Cloud: a soft diagonal gradient with two puffy clouds drifting across the sky above a typical title
@@ -290,10 +328,11 @@
   }
 }
 
-/* Bold Esports: the content wipes in left to right. Reduced-motion version: index.css stops
+/* Bold Esports: each piece wipes in left to right, in turn. Reduced-motion version: index.css stops
    the wipe. */
-.scene[data-enter="wipe"] .scene-main {
-  animation: scene-wipe var(--enter-ms) ease-out backwards;
+.scene[data-enter="wipe"]
+  :is(.scene-logo, .scene-word, .scene-subtitle, .countdown, .scene-socials li) {
+  animation: scene-wipe var(--enter-ms) ease-out var(--d) backwards;
 }
 
 @keyframes scene-wipe {
@@ -360,10 +399,20 @@
 /* Chrome titles: white with a band of `primary` across the middle, and a pink edge. */
 .scene[data-bg="sunset"] .scene-title {
   text-shadow: none; /* it would show through the see-through text fill */
+  filter: drop-shadow(0 4px 0 var(--accent));
+}
+
+/* The chrome is clipped to each word, not the heading: the words animate in one by one (T6.117), and a heading's
+   clipped background doesn't paint through children that move on their own. */
+.scene[data-bg="sunset"] .scene-word {
   background: linear-gradient(#fff 0 38%, var(--primary) 52%, #fff 70%, #e8d9ff);
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 4px 0 var(--accent));
+}
+
+.scene[data-bg="sunset"] .scene-title-end {
+  background: none;
+  color: var(--accent);
 }
 
 @keyframes scene-slide-fade {
@@ -868,7 +917,9 @@
   text-shadow:
     0 0 14px color-mix(in srgb, var(--accent) 60%, transparent),
     0 0 40px color-mix(in srgb, var(--accent) 35%, transparent);
-  animation: neon-on 1.4s linear 0.5s both;
+  animation:
+    scene-slide-fade var(--enter-ms) cubic-bezier(0.16, 1, 0.3, 1) var(--d) both,
+    neon-on 1.4s linear calc(var(--d) + var(--enter-ms)) both;
 }
 
 @keyframes neon-on {

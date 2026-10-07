@@ -35,7 +35,15 @@ export default function StartingSoon({
         <div className="countdown">
           {secs > 0 ? (
             <>
-              <div className="countdown-time">{formatCountdown(secs)}</div>
+              <div className="countdown-time">
+                {/* One span per character, keyed by its value: only the digits that change remount and flip in
+                    (T6.117). */}
+                {[...formatCountdown(secs)].map((ch, i) => (
+                  <span key={`${i}${ch}`} className="countdown-ch">
+                    {ch}
+                  </span>
+                ))}
+              </div>
               <div className="countdown-at">{formatStartsAt(endsAt, tz, now)}</div>
             </>
           ) : (
