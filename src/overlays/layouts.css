@@ -946,3 +946,87 @@
 .scene[data-theme="cozy-cafe"] .scene-handle {
   font-size: 32px;
 }
+
+/* 5. Pastel Cloud: the floating card stack. A soft centered stack resting low in the sky: the title on one line, the
+   subtitle, the countdown as a pill, and the socials as a row of pills (the look's one shape). The lower cloud rises
+   to 18% so both drift above it. Centered by concept (floating). */
+.scene[data-bg="clouds"][data-theme="pastel-cloud"]::after {
+  top: 18%;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 0 minmax(0, 1fr) auto auto auto auto minmax(0, 0.3fr);
+  row-gap: 0;
+  justify-items: center;
+  text-align: center;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  left: 112px;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 1500px;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-main:has(.scene-logo) .scene-title {
+  padding-inline: 184px;
+}
+
+/* The sparkle marks the title; the rule above it goes. */
+.scene[data-theme="pastel-cloud"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-subtitle {
+  grid-area: 4 / 1;
+  max-width: 44ch;
+  margin-top: 16px;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="pastel-cloud"] .countdown {
+  grid-area: 5 / 1;
+  margin-top: 40px;
+  padding: 24px 64px 22px;
+  border-radius: 999px;
+}
+
+.scene[data-theme="pastel-cloud"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="pastel-cloud"] .countdown-time {
+  font-size: 72px;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-socials {
+  grid-area: 6 / 1;
+  margin-top: 28px;
+  grid-auto-flow: column;
+  column-gap: 20px;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-socials li {
+  column-gap: 16px;
+  padding: 10px 32px 10px 10px;
+  text-align: left;
+  background: var(--surface);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+}
+
+.scene[data-theme="pastel-cloud"] .scene-icon {
+  width: 60px;
+  height: 60px;
+  padding: 15px;
+  border-radius: 50%;
+}
