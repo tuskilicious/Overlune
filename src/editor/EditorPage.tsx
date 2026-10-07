@@ -178,8 +178,10 @@ export default function EditorPage() {
     save(settings);
   }, [settings]);
 
-  /** Undo (T6.115): earlier settings, newest last. A burst of edits (typing a title) is one step. */
+  /** Undo (T6.115) and Redo (T6.135): earlier and undone settings, newest last. A burst of edits (typing a title) is
+   *  one step; any new edit clears Redo, as in every editor. */
   const [past, setPast] = useState<Settings[]>([]);
+  const [future, setFuture] = useState<Settings[]>([]);
   const shown = useRef(settings);
   const lastEdit = useRef(0);
   const undoing = useRef(false);
@@ -196,36 +198,56 @@ export default function EditorPage() {
     const now = Date.now();
     // ponytail: 50 steps of whole snapshots; settings are a few kB, so diffs aren't worth it
     if (now - lastEdit.current > 1000) setPast((p) => [...p.slice(-49), before]);
+    setFuture([]);
     lastEdit.current = now;
   }, [settings]);
+  /** Shows a snapshot from Undo or Redo, with the boxes that keep their own text. */
+  const restore = (to: Settings) => {
+    undoing.current = true;
+    lastEdit.current = 0; // the next edit is its own step
+    setSettings(to);
+    setLogoInput(to.logo);
+    setBotsInput(to.chat.bots.join("\n"));
+  };
   const undo = useCallback(() => {
     const before = past.at(-1);
     if (!before) return;
-    undoing.current = true;
     setPast(past.slice(0, -1));
-    setSettings(before);
-    setLogoInput(before.logo);
-    setBotsInput(before.chat.bots.join("\n"));
+    setFuture((f) => [...f, settings]);
+    restore(before);
     setLoadStatus("Undone.");
-  }, [past]);
-  // Ctrl+Z / Cmd+Z outside text fields; inside one, the browser's own undo works on the text.
+  }, [past, settings]);
+  const redo = useCallback(() => {
+    const next = future.at(-1);
+    if (!next) return;
+    setFuture(future.slice(0, -1));
+    setPast((p) => [...p.slice(-49), settings]);
+    restore(next);
+    setLoadStatus("Redone.");
+  }, [future, settings]);
+  // Ctrl+Z / Cmd+Z undoes, and Ctrl+Shift+Z / Cmd+Shift+Z or Ctrl+Y redoes, outside text fields; inside one, the
+  // browser's own undo and redo work on the text.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (!(e.ctrlKey || e.metaKey) || e.shiftKey || e.altKey || e.key.toLowerCase() !== "z")
-        return;
+      if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+      const key = e.key.toLowerCase();
+      const isRedo = (key === "z" && e.shiftKey) || (key === "y" && !e.shiftKey);
+      const isUndo = key === "z" && !e.shiftKey;
+      if (!isRedo && !isUndo) return;
       const t = e.target;
       const typing =
         t instanceof HTMLTextAreaElement ||
         (t instanceof HTMLElement && t.isContentEditable) ||
         (t instanceof HTMLInputElement &&
           !["checkbox", "radio", "range", "color", "button", "submit"].includes(t.type));
-      if (typing || !past.length) return;
+      if (typing || (isUndo ? !past.length : !future.length)) return;
       e.preventDefault();
-      undo();
+      if (isUndo) undo();
+      else redo();
     };
     addEventListener("keydown", onKey);
     return () => removeEventListener("keydown", onKey);
-  }, [undo, past.length]);
+  }, [undo, redo, past.length, future.length]);
 
   const startOver = () => {
     const fresh = freshSettings();
@@ -378,6 +400,13 @@ export default function EditorPage() {
         </div>
         {/* The buttons stay put; each opens its own panel underneath, one at a time, and Escape closes it (T6.58). */}
         <div className="editor-save-actions">
+          {/* The address bar is rewritten on every change (above), so this is always true once something is made. */}
+          {madeSomething && (
+            <span className="editor-saved">
+              <Icon name="check" />
+              Saved in your link
+            </span>
+          )}
           {/* The editor link is the save file; this keeps it somewhere other than the browser (T6.70). */}
           {madeSomething && (
             <button
@@ -412,6 +441,11 @@ export default function EditorPage() {
           {past.length > 0 && (
             <button type="button" onClick={undo} aria-keyshortcuts="Control+Z">
               Undo
+            </button>
+          )}
+          {future.length > 0 && (
+            <button type="button" onClick={redo} aria-keyshortcuts="Control+Shift+Z Control+Y">
+              Redo
             </button>
           )}
           {madeSomething && (

@@ -552,6 +552,38 @@ test("Ctrl+Z outside a text field undoes a look change (T6.115)", async ({ page 
   await expect(neon).not.toBeChecked();
 });
 
+test("Redo puts back what Undo took, and a new change clears it (T6.135)", async ({ page }) => {
+  const undo = page.getByRole("button", { name: "Undo", exact: true });
+  const redo = page.getByRole("button", { name: "Redo", exact: true });
+  await expect(redo).toHaveCount(0); // nothing to redo yet
+  await expect(page.getByText("Saved in your link")).toHaveCount(0);
+
+  const neon = page.getByRole("radio", { name: "Neon Grid" });
+  await neon.check();
+  await expect(page.getByText("Saved in your link")).toBeVisible();
+  await undo.click();
+  await expect(neon).not.toBeChecked();
+  await redo.click();
+  await expect(neon).toBeChecked();
+  await expect(page.getByText("Redone.")).toBeVisible();
+  await expect(redo).toHaveCount(0);
+
+  // The keys, outside a text field: Ctrl+Z, then Ctrl+Shift+Z and Ctrl+Y.
+  await neon.press("Control+z");
+  await expect(neon).not.toBeChecked();
+  await page.getByRole("radio", { name: "Clean Slate" }).press("Control+Shift+z");
+  await expect(neon).toBeChecked();
+  await neon.press("Control+z");
+  await neon.press("Control+y");
+  await expect(neon).toBeChecked();
+
+  // A new change after Undo clears Redo.
+  await neon.press("Control+z");
+  await expect(redo).toBeVisible();
+  await page.getByLabel("Title", { exact: true }).fill("Going live");
+  await expect(redo).toHaveCount(0);
+});
+
 test("editor redesign: nudges, frame sizes and what's filled in (T6.118)", async ({ page }) => {
   await page.getByRole("button", { name: "In 15 min" }).click();
   const field = page.getByLabel("Countdown ends at");

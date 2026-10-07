@@ -1577,3 +1577,18 @@
   padding: 6px 4px;
   font-size: 13px;
 }
+
+/* "Saved in your link" (T6.135): the editor's address is rewritten on every change, so once something is made it's
+   always saved. Haze text with an accent check, beside Undo and Redo. */
+.editor-saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: center;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.editor-saved svg {
+  color: var(--accent);
+}
