@@ -129,6 +129,37 @@ Built to the bar of the maintainer's own kits (Tuskilicious, ICARUS): each look 
 - Effect (`shonen`): a 6px ink panel border 32px in from the edge (an outline, so it paints above the art); speed lines bursting from a focal point at the top right, clear at the center and gone before the text; a hard-cut screentone sheet over the lower left, with the subtitle in a white knockout so it stays readable. Static.
 - Sound: reuses Bold Esports' alert sound.
 
+### Four more looks (T6.125-T6.128)
+From impeccable's second direction round (seed `c833f7e1`, reroll 1), all four picked by the owner. Every loop stops in Lite and Still.
+
+**13. Sakura** (T6.125): a spring night in Japan.
+- Colors: indigo `#11152F` (lighter `#1A1F45` at the top), surface `#1A1E3D`, petal white `#FFF3F6` titles, text `#F1ECF6`, muted `#B6AFCC`, accent sakura pink `#FF91B4`
+- Fonts: Shippori Mincho (headline 168px, weight 500; countdown 88px) / Nunito
+- Shape: radius 12; the rule above the title is a tapered brush stroke in the accent
+- Effect (`sakura`): a paper lantern's warm glow in the open top right (light through washi); petals drifting down and across in two layers (40s far, 26s near), each a tile that slides one tile so the loop never jumps.
+- Sound: reuses Pastel Cloud's alert sound.
+
+**14. Skate Deck** (T6.126): a skate-shop deck wall.
+- Colors: maple `#E8B877` with its grain, grip-tape `#151515` surface and titles, cream text `#F7F2E8` on the panels, accent hot pink `#FF4FA3`; the deck adds aqua `#19E3D1` and yellow `#FFE14D`
+- Fonts: Bungee (sticker lettering 128px with a 16px white outline) / Barlow
+- Shape: radius 18, 3px ink borders, no shadows; socials sit on a grip-tape panel; alerts bounce in
+- Effect (`skate`): a deck lying in the open top right, rocking on its trucks (3.2s).
+- Sound: reuses Arcade 8-Bit's alert sound.
+
+**15. Phosphor** (T6.127): a green-phosphor terminal at midnight.
+- Colors: black glass `#040A05`, surface `#07120A`, one ink in three strengths: titles `#9DFFAE`, text `#B9F5C6`, accent `#4DFF78`; muted `#73B583`
+- Fonts: JetBrains Mono for everything (headline 128px, weight 700)
+- Shape: radius 2, hairline `#1C4A27` borders; text blooms, the title leaves a faint afterimage; stepped entrances
+- Effect (`phosphor`): scanlines and a vignette; a faint boot log in the open top right; a slow refresh band (7s); a cursor that breathes after the title.
+- Sound: reuses Neon Grid's alert sound.
+
+**16. Quest** (T6.128): a fantasy RPG quest log.
+- Colors: dark hall `#1B130C`, gold `#F2D489` titles (the last word forge orange `#FFB547`), parchment `#F2E4C4` panels with ink `#3A2716` text, muted `#6A4D2E`, wax-seal red `#8E2A1E` accent
+- Fonts: Cinzel (carved capitals 148px) / Alegreya (italic subtitle)
+- Shape: radius 6, 2px gilt `#B88F3E` borders with an inner gilt line; countdown and socials on parchment panels
+- Effect (`quest`): embers rising from below (18s) through a forge glow, a vignette over the hall.
+- Sound: reuses Forest Night's alert sound.
+
 ## Overlay layout rules
 - Canvas is always 1920×1080. Keep a 64px safe margin on scenes.
 - Chat default size is 400×600, transparent background, bottom-up.

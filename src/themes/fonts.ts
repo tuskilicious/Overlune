@@ -49,3 +49,12 @@ import "@fontsource/archivo/700.css";
 import "@fontsource/bangers/400.css"; // one weight only
 import "@fontsource/comic-neue/400.css";
 import "@fontsource/comic-neue/700.css";
+import "@fontsource/shippori-mincho/500.css";
+import "@fontsource/shippori-mincho/700.css";
+import "@fontsource/bungee/400.css"; // one weight only
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/700.css";
+import "@fontsource/cinzel/600.css";
+import "@fontsource/cinzel/700.css";
+import "@fontsource/alegreya/400.css";
+import "@fontsource/alegreya/700.css";

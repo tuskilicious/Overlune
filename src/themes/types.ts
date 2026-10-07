@@ -14,6 +14,10 @@ export const themeIds = [
   "abyss",
   "session",
   "shonen",
+  "sakura",
+  "skate-deck",
+  "phosphor",
+  "quest",
 ] as const;
 /** Bundled @fontsource families (OFL, docs/ASSETS.md). Loaded by src/themes/fonts.ts. Only add to the end. */
 export const fontIds = [
@@ -38,6 +42,11 @@ export const fontIds = [
   "Archivo",
   "Bangers",
   "Comic Neue",
+  "Shippori Mincho",
+  "Bungee",
+  "JetBrains Mono",
+  "Cinzel",
+  "Alegreya",
 ] as const;
 export type FontId = (typeof fontIds)[number];
 /** Theme colors a streamer can override under "Advanced". */
@@ -54,7 +63,11 @@ export type BgEffect =
   | "sunset"
   | "abyss"
   | "session"
-  | "shonen";
+  | "shonen"
+  | "sakura"
+  | "skate"
+  | "phosphor"
+  | "quest";
 export type AnimId = "slide-fade" | "bounce" | "steps" | "wipe";
 export type AlertAnimId = "slide-fade" | "glitch" | "bounce" | "steps" | "wipe";
 export type BadgeStyle = "pill";

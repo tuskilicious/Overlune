@@ -36,6 +36,11 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 | `public/images/themes/print-grain.svg` (SVG fractal noise filter) | image | Session print grain | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-07 |
 | Bangers (`@fontsource/bangers` 5.3.0, weight 400) | font | Advanced font picker; Shonen headings (T6.111) | https://fontsource.org/fonts/bangers | SIL OFL 1.1 | No | 2026-10-07 |
 | Comic Neue (`@fontsource/comic-neue` 5.3.0, weights 400/700) | font | Advanced font picker; Shonen body text (T6.111) | https://fontsource.org/fonts/comic-neue | SIL OFL 1.1 | No | 2026-10-07 |
+| Shippori Mincho (`@fontsource/shippori-mincho` 5.3.0, weights 500/700) | font | Advanced font picker; Sakura headings (T6.125) | https://fontsource.org/fonts/shippori-mincho | SIL OFL 1.1 | No | 2026-10-07 |
+| Bungee (`@fontsource/bungee` 5.3.0, weight 400) | font | Advanced font picker; Skate Deck headings (T6.126) | https://fontsource.org/fonts/bungee | SIL OFL 1.1 | No | 2026-10-07 |
+| JetBrains Mono (`@fontsource/jetbrains-mono` 5.3.0, weights 400/700) | font | Advanced font picker; Phosphor headings and body text (T6.127) | https://fontsource.org/fonts/jetbrains-mono | SIL OFL 1.1 | No | 2026-10-07 |
+| Cinzel (`@fontsource/cinzel` 5.3.0, weights 600/700) | font | Advanced font picker; Quest headings (T6.128) | https://fontsource.org/fonts/cinzel | SIL OFL 1.1 | No | 2026-10-07 |
+| Alegreya (`@fontsource/alegreya` 5.3.0, weights 400/700) | font | Advanced font picker; Quest body text (T6.128) | https://fontsource.org/fonts/alegreya | SIL OFL 1.1 | No | 2026-10-07 |
 | `public/images/themes/forest-treeline.svg` (generated pine silhouettes) | image | Forest Night treeline (T6.112) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-07 |
 | `public/images/themes/paper-grain.svg` (SVG fractal noise filter) | image | Cozy Café paper grain (T6.112) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-07 |
 | `public/sounds/vaporwave-sunset.ogg` (Kenney Digital Audio 1.0, `threeTone1.ogg`, unchanged) | sound | Vaporwave Sunset alert sound | https://kenney.nl/assets/digital-audio | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |

@@ -1229,3 +1229,364 @@
     opacity: 0.7;
   }
 }
+
+/* ---- Four more looks (T6.125-T6.128), from impeccable's second direction round. Every loop here stops in Lite and
+   Still (index.css stops .scene::before and ::after). ---- */
+
+/* Sakura (T6.125): a spring night. A paper lantern's warm glow in the open sky (light diffused through washi, after the
+   akari challenger), and petals drifting down and sideways in two layers. Each layer is a tile one tile taller and wider
+   than the scene that slides one tile down and across, so the loop never jumps. */
+.scene[data-bg="sakura"] {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(
+      circle at 80% 20%,
+      rgb(255 214 170 / 0.32),
+      rgb(255 170 120 / 0.12) 160px,
+      transparent 420px
+    ),
+    radial-gradient(120% 70% at 50% 120%, rgb(255 145 180 / 0.12), transparent 70%),
+    linear-gradient(#1a1f45, var(--bg) 70%);
+}
+
+.scene[data-bg="sakura"]::before,
+.scene[data-bg="sakura"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: calc(var(--tile) * -1);
+  left: calc(var(--tile) * -1);
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background-size: var(--tile) var(--tile);
+  animation: petals-fall linear infinite;
+}
+
+.scene[data-bg="sakura"]::before {
+  --tile: 540px;
+  background-image:
+    radial-gradient(ellipse 4px 2.4px at 39% 12%, rgb(255 170 198 / 0.45) 70%, transparent 100%),
+    radial-gradient(ellipse 5.1px 3.1px at 56% 50%, rgb(255 196 214 / 0.55) 70%, transparent 100%),
+    radial-gradient(ellipse 4.5px 2.7px at 94% 26%, rgb(255 196 214 / 0.55) 70%, transparent 100%),
+    radial-gradient(ellipse 4.9px 2.9px at 30% 81%, rgb(255 196 214 / 0.55) 70%, transparent 100%),
+    radial-gradient(ellipse 6px 3.6px at 15% 12%, rgb(255 170 198 / 0.45) 70%, transparent 100%),
+    radial-gradient(ellipse 5px 3px at 55% 4%, rgb(255 170 198 / 0.45) 70%, transparent 100%),
+    radial-gradient(ellipse 4.4px 2.6px at 47% 9%, rgb(255 196 214 / 0.55) 70%, transparent 100%),
+    radial-gradient(ellipse 5.3px 3.2px at 77% 49%, rgb(255 196 214 / 0.55) 70%, transparent 100%),
+    radial-gradient(ellipse 5.1px 3.1px at 96% 48%, rgb(255 170 198 / 0.45) 70%, transparent 100%),
+    radial-gradient(ellipse 5.3px 3.2px at 75% 38%, rgb(255 170 198 / 0.45) 70%, transparent 100%),
+    radial-gradient(ellipse 5.6px 3.4px at 75% 12%, rgb(255 196 214 / 0.55) 70%, transparent 100%),
+    radial-gradient(ellipse 5.2px 3.1px at 93% 63%, rgb(255 170 198 / 0.45) 70%, transparent 100%),
+    radial-gradient(ellipse 4.3px 2.6px at 88% 84%, rgb(255 196 214 / 0.55) 70%, transparent 100%),
+    radial-gradient(ellipse 5.3px 3.2px at 70% 43%, rgb(255 196 214 / 0.55) 70%, transparent 100%);
+  animation-duration: 40s;
+}
+
+.scene[data-bg="sakura"]::after {
+  --tile: 720px;
+  background-image:
+    radial-gradient(ellipse 7.2px 4.3px at 76% 16%, rgb(255 145 180 / 0.75) 70%, transparent 100%),
+    radial-gradient(ellipse 7.8px 4.7px at 6% 74%, rgb(255 236 242 / 0.8) 70%, transparent 100%),
+    radial-gradient(ellipse 8px 4.8px at 37% 77%, rgb(255 145 180 / 0.75) 70%, transparent 100%),
+    radial-gradient(ellipse 7.9px 4.7px at 38% 71%, rgb(255 145 180 / 0.75) 70%, transparent 100%),
+    radial-gradient(ellipse 7.8px 4.7px at 72% 29%, rgb(255 196 214 / 0.85) 70%, transparent 100%),
+    radial-gradient(ellipse 9.1px 5.5px at 81% 17%, rgb(255 145 180 / 0.75) 70%, transparent 100%),
+    radial-gradient(ellipse 8.6px 5.2px at 32% 44%, rgb(255 236 242 / 0.8) 70%, transparent 100%),
+    radial-gradient(ellipse 9.8px 5.9px at 77% 14%, rgb(255 196 214 / 0.85) 70%, transparent 100%),
+    radial-gradient(ellipse 7.2px 4.3px at 59% 6%, rgb(255 145 180 / 0.75) 70%, transparent 100%),
+    radial-gradient(ellipse 7.5px 4.5px at 52% 4%, rgb(255 196 214 / 0.85) 70%, transparent 100%);
+  animation-duration: 26s;
+}
+
+@keyframes petals-fall {
+  to {
+    transform: translate(var(--tile), var(--tile));
+  }
+}
+
+/* The heading set like a brush title: lighter weight, the rule a tapered brush stroke. */
+.scene[data-theme="sakura"] .scene-title {
+  font-size: 168px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+}
+
+.scene[data-theme="sakura"] .scene-title::before {
+  width: 160px;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
+
+.scene[data-theme="sakura"] .countdown-time {
+  font-family: var(--font-heading);
+  font-size: 88px;
+  font-weight: 500;
+}
+
+/* Skate Deck (T6.126): maple ply with its grain, and a deck in aqua, pink and grip-tape black lying in the open top
+   right, rocking on its trucks. */
+.scene[data-bg="skate"] {
+  position: relative;
+  isolation: isolate;
+  background:
+    repeating-linear-gradient(
+      172deg,
+      rgb(150 90 30 / 0.07) 0 3px,
+      transparent 3px 22px,
+      rgb(150 90 30 / 0.05) 22px 24px,
+      transparent 24px 41px
+    ),
+    linear-gradient(160deg, #f0c387, var(--bg) 60%, #d9a464);
+}
+
+.scene[data-bg="skate"]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 150px;
+  right: 140px;
+  width: 860px;
+  height: 210px;
+  border-radius: 999px;
+  border: 8px solid #151515;
+  background:
+    radial-gradient(circle at 17% 35%, #151515 0 7px, transparent 8px),
+    radial-gradient(circle at 17% 65%, #151515 0 7px, transparent 8px),
+    radial-gradient(circle at 83% 35%, #151515 0 7px, transparent 8px),
+    radial-gradient(circle at 83% 65%, #151515 0 7px, transparent 8px),
+    linear-gradient(
+      100deg,
+      #19e3d1 0 34%,
+      #ff4fa3 34% 58%,
+      #151515 58% 63%,
+      #ffe14d 63% 78%,
+      #19e3d1 78%
+    );
+  rotate: -14deg;
+  animation: deck-rock 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes deck-rock {
+  to {
+    transform: rotate(4deg) translateY(-10px);
+  }
+}
+
+/* Sticker lettering: ink with a thick white outline, the last word hot pink. */
+.scene[data-theme="skate-deck"] .scene-title {
+  font-size: 128px;
+  font-weight: 400; /* Bungee has one weight */
+  line-height: 1.02;
+  letter-spacing: 0;
+  -webkit-text-stroke: 16px #fff;
+  paint-order: stroke fill;
+}
+
+.scene[data-theme="skate-deck"] .scene-title::before {
+  width: 150px;
+  height: 14px;
+  border-radius: 999px;
+  background: #151515;
+}
+
+.scene[data-theme="skate-deck"] .scene-subtitle {
+  font-weight: 700;
+  color: #3a2410;
+}
+
+.scene[data-theme="skate-deck"] .countdown-time {
+  font-family: var(--font-heading);
+  font-size: 76px;
+  font-weight: 400;
+  color: #19e3d1;
+}
+
+.scene[data-theme="skate-deck"] .scene-socials {
+  padding: 28px 32px;
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+/* Phosphor (T6.127): one green ink on black glass. A faint boot log in the open top left, a slow refresh band, text that
+   blooms, and a cursor that breathes after the title. */
+.scene[data-bg="phosphor"] {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(120% 120% at 50% 50%, transparent 55%, rgb(0 0 0 / 0.6)),
+    repeating-linear-gradient(rgb(77 255 120 / 0.035) 0 2px, transparent 2px 4px), var(--bg);
+  text-shadow: 0 0 14px rgb(77 255 120 / 0.35);
+}
+
+.scene[data-bg="phosphor"]::before {
+  content: "> overlune --scene starting\A> loading look ............ ok\A> chat link ............... ok\A> alerts .................. armed\A> waiting for broadcast_";
+  position: absolute;
+  z-index: -1;
+  top: 88px;
+  right: 112px;
+  white-space: pre;
+  font-family: var(--font-body);
+  font-size: 22px;
+  line-height: 1.7;
+  color: rgb(157 255 174 / 0.28);
+  text-align: left;
+}
+
+.scene[data-bg="phosphor"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(transparent, rgb(157 255 174 / 0.05) 50%, transparent);
+  background-size: 100% 220px;
+  background-repeat: no-repeat;
+  animation: phosphor-refresh 7s linear infinite;
+}
+
+@keyframes phosphor-refresh {
+  from {
+    background-position: 0 -220px;
+  }
+  to {
+    background-position: 0 1300px;
+  }
+}
+
+.scene[data-theme="phosphor"] .scene-title {
+  font-size: 128px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  text-shadow:
+    0 0 18px rgb(77 255 120 / 0.55),
+    6px 0 0 rgb(77 255 120 / 0.14); /* the afterimage */
+}
+
+.scene[data-theme="phosphor"] .scene-title::before {
+  border-radius: 0;
+  height: 6px;
+}
+
+.scene[data-theme="phosphor"] .scene-title::after {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 0.12em;
+  margin-left: 0.15em;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+  animation: phosphor-cursor 1.6s ease-in-out infinite;
+}
+
+@keyframes phosphor-cursor {
+  50% {
+    opacity: 0.15;
+  }
+}
+
+.scene[data-theme="phosphor"] .countdown-time {
+  font-size: 84px;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+}
+
+/* Quest (T6.128): gold carved capitals over a dark hall, embers rising from below, and parchment panels with gilt
+   corners. */
+.scene[data-bg="quest"] {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(90% 60% at 50% 115%, rgb(255 140 60 / 0.28), transparent 70%),
+    radial-gradient(140% 120% at 50% 40%, transparent 50%, rgb(0 0 0 / 0.55)), var(--bg);
+}
+
+.scene[data-bg="quest"]::before {
+  --tile: 680px;
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 calc(var(--tile) * -1);
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 89% 3%, rgb(255 228 150 / 0.7) 0 3px, transparent 4px),
+    radial-gradient(circle at 9% 70%, rgb(255 140 60 / 0.8) 0 2.9px, transparent 3.9px),
+    radial-gradient(circle at 97% 13%, rgb(255 140 60 / 0.8) 0 2px, transparent 3px),
+    radial-gradient(circle at 64% 26%, rgb(255 140 60 / 0.8) 0 1.6px, transparent 2.6px),
+    radial-gradient(circle at 61% 72%, rgb(255 140 60 / 0.8) 0 1.8px, transparent 2.8px),
+    radial-gradient(circle at 39% 29%, rgb(255 228 150 / 0.7) 0 1.6px, transparent 2.6px),
+    radial-gradient(circle at 69% 85%, rgb(255 228 150 / 0.7) 0 1.8px, transparent 2.8px),
+    radial-gradient(circle at 73% 32%, rgb(255 140 60 / 0.8) 0 1.9px, transparent 2.9px),
+    radial-gradient(circle at 23% 3%, rgb(255 140 60 / 0.8) 0 2.2px, transparent 3.2px),
+    radial-gradient(circle at 86% 55%, rgb(255 228 150 / 0.7) 0 2.7px, transparent 3.7px),
+    radial-gradient(circle at 90% 54%, rgb(255 228 150 / 0.7) 0 1.6px, transparent 2.6px),
+    radial-gradient(circle at 97% 32%, rgb(255 140 60 / 0.8) 0 2.3px, transparent 3.3px),
+    radial-gradient(circle at 54% 40%, rgb(255 228 150 / 0.7) 0 2.7px, transparent 3.7px),
+    radial-gradient(circle at 80% 72%, rgb(255 140 60 / 0.8) 0 1.6px, transparent 2.6px);
+  background-size: 100% var(--tile);
+  mask-image: linear-gradient(transparent 5%, #000 60%);
+  animation: embers-rise 18s linear infinite;
+}
+
+@keyframes embers-rise {
+  to {
+    transform: translateY(calc(var(--tile) * -1));
+  }
+}
+
+.scene[data-theme="quest"] .scene-title {
+  font-size: 148px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+  text-shadow: 0 4px 24px rgb(0 0 0 / 0.6);
+}
+
+/* The last word glows like a forge, not in the wax red, which would sink into the dark hall. */
+.scene[data-theme="quest"] .scene-title-end {
+  color: #ffb547;
+  text-shadow: 0 0 28px rgb(255 140 60 / 0.55);
+}
+
+.scene[data-theme="quest"] .scene-title::before {
+  width: 180px;
+  height: 4px;
+  border-radius: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--primary) 20%,
+    var(--primary) 80%,
+    transparent
+  );
+}
+
+.scene[data-theme="quest"] .scene-subtitle {
+  color: #d9c08e;
+  font-style: italic;
+}
+
+/* Parchment panels with gilt corners. */
+.scene[data-theme="quest"] :is(.countdown, .scene-socials) {
+  background: url("/images/themes/paper-grain.svg"), var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow:
+    var(--shadow),
+    inset 0 0 0 6px var(--surface),
+    inset 0 0 0 7px #b88f3e;
+}
+
+.scene[data-theme="quest"] .scene-socials {
+  padding: 28px 32px;
+}
+
+.scene[data-theme="quest"] .countdown-time {
+  font-family: var(--font-heading);
+  font-size: 80px;
+  color: var(--accent);
+}
