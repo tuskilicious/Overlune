@@ -634,6 +634,9 @@ test("the webcam frame can be placed here, and its link goes full screen (T6.122
   await box.press("ArrowLeft");
   await box.press("Shift+ArrowDown");
   await expect(page.getByText("1224 across, 96 down, 640 × 360")).toBeVisible();
+  // The editor's preview shows the frame alone, not the cropped corner of the placed canvas.
+  await expect(page.locator(".editor-frame-preview .frame")).toBeVisible();
+  await expect(page.locator(".editor-frame-preview .frame-canvas")).toHaveCount(0);
   await expect(row).toContainText("Width 1920");
   await expect(row).toContainText("Height 1080");
 
