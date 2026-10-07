@@ -15,7 +15,7 @@ It includes:
 
 Everything matches one theme. Paste the links into OBS or Streamlabs and you're live.
 
-> Status: v1.1.0, live at **https://overlune.in**. What changed: `CHANGELOG.md`. Work in progress: `docs/TASKS.md`. What's next: `docs/FUTURE-SCOPE.md`.
+> Status: v1.2.0, live at **https://overlune.in**. What changed: `CHANGELOG.md`. Work in progress: `docs/TASKS.md`. What's next: `docs/FUTURE-SCOPE.md`.
 
 Overlune is a free, non-commercial hobby project, provided **as is, with no warranty** (see [License](#license)).
 

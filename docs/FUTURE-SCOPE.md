@@ -5,7 +5,7 @@ Realistic goals after v1.0.0 (2026-10-03). These are goals, not promises: nothin
 Sizes are rough, for one maintainer working with Claude: **S** a day or two, **M** about a week, **L** several weeks.
 
 ## Where v1 stands
-- Live at overlune.in (v1.1.0): three scenes, Twitch chat, Twitch alerts, a webcam frame, a socials ticker, 16 looks, Twitch panels and an offline banner, an OBS scene collection file, an editor and a setup guide. No accounts, no backend.
+- Live at overlune.in (v1.2.0): three scenes, Twitch chat, Twitch alerts, a webcam frame, a socials ticker, 16 looks, Twitch panels and an offline banner, an OBS scene collection file, an editor and a setup guide. No accounts, no backend.
 - Five streamers have used it and sent 38 points of feedback (T6.6). Most were fixed in v1 (T6.68 to T6.79). The rest are below.
 - The PRD's gate for v2 ("5 real streamers using v1") is met (T5.7, T6.6).
 - Funding: GitHub Sponsors is live. Overlune stays free; support unlocks nothing.
@@ -21,7 +21,7 @@ Sizes are rough, for one maintainer working with Claude: **S** a day or two, **M
 ## v1.x: more value with no backend
 These fit today's rules (a static site) and can ship one at a time, in any order.
 
-**Done in 1.1 (T6.87 to T6.98):** page previews, the webcam frame, a light look (Daylight), the OBS scene collection file, Twitch panels and the offline banner (with `html-to-image`), Sentry source maps, lighter overlays (Sentry loads after the page), and the React Router 8, Vite 8, Vitest 5 and Sentry 11 upgrades. Seven more looks followed (T6.109 to T6.111, T6.125 to T6.128).
+**Done in 1.1 (T6.87 to T6.98):** page previews, the webcam frame, a light look (Daylight), the OBS scene collection file, Twitch panels and the offline banner (with `html-to-image`), Sentry source maps, lighter overlays (Sentry loads after the page), and the React Router 8, Vite 8, Vitest 5 and Sentry 11 upgrades. Seven more looks followed in 1.2 (T6.109 to T6.111, T6.125 to T6.128).
 
 Still open, in any order:
 
