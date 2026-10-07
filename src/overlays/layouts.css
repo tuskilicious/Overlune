@@ -1030,3 +1030,66 @@
   padding: 15px;
   border-radius: 50%;
 }
+
+/* 6. Forest Night: under the moon. The moon (top right) anchors the headline, which hangs right-aligned just below it;
+   the countdown and the socials sit low on the left above the treeline, like a trail sign. The fireflies keep to the
+   open left of the sky, clear of the headline. */
+.scene[data-bg="fireflies"][data-theme="forest-night"]::before,
+.scene[data-bg="fireflies"][data-theme="forest-night"]::after {
+  mask-image:
+    linear-gradient(to right, #000 26%, transparent 36%),
+    linear-gradient(to bottom, #000 58%, transparent 70%);
+  mask-composite: intersect;
+}
+
+.scene[data-theme="forest-night"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+}
+
+.scene[data-theme="forest-night"] .scene-title {
+  grid-area: 2 / 1;
+  justify-self: end;
+  max-width: 1100px;
+  margin-top: 220px; /* under the moon */
+  text-align: right;
+}
+
+.scene[data-theme="forest-night"] .scene-main:has(.scene-logo) .scene-title {
+  margin-top: 40px;
+}
+
+/* The moon is the mark; the rule above the title goes. */
+.scene[data-theme="forest-night"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="forest-night"] .scene-subtitle {
+  grid-area: 3 / 1;
+  justify-self: end;
+  text-align: right;
+}
+
+/* The trail sign: the countdown and the socials in one row, low on the left. */
+.scene[data-theme="forest-night"] .scene-side {
+  grid-area: 5 / 1;
+  justify-self: start;
+  flex-direction: row;
+  align-items: center;
+  gap: 56px;
+  min-width: 0;
+}
+
+.scene[data-theme="forest-night"] .countdown {
+  padding: 28px 40px 24px;
+}
+
+.scene[data-theme="forest-night"] .countdown-time {
+  font-size: 72px;
+}
+
+.scene[data-theme="forest-night"] .scene-socials {
+  grid-auto-flow: column;
+  column-gap: 48px;
+}
