@@ -8,7 +8,7 @@ const settings = {
   ...defaultSettings,
   theme: "daylight" as const,
   chat: { ...defaultSettings.chat, channel: "ronnistreams", width: 420, height: 560 },
-  frame: { width: 800, height: 450, label: "Ronni" },
+  frame: { width: 800, height: 450, label: "Ronni", x: null, y: null },
 };
 const c = sceneCollection(settings, "https://overlune.in", () => `id-${++n}`);
 const browsers = c.sources.filter((s) => s.id === "browser_source");

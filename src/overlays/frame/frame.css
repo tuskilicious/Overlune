@@ -80,3 +80,17 @@
     transform: scale(0.97);
   }
 }
+
+/* Placed in Overlune (T6.122): a transparent full-screen canvas with the frame at its spot. */
+.frame-canvas {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+}
+
+.frame-canvas > .frame {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+}

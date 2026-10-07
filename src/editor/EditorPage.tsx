@@ -35,6 +35,7 @@ import { channelFromInput } from "../twitch/irc";
 import AlertTester from "./AlertTester";
 import ChannelPage from "./ChannelPage";
 import ObsLinks, { overlays, type OverlayId as Scene } from "./ObsLinks";
+import FramePlacer from "./FramePlacer";
 import Preview from "./Preview";
 import { sampleScene } from "./scene-samples";
 import SiteFooter from "../components/SiteFooter";
@@ -1403,9 +1404,43 @@ export default function EditorPage() {
                   ))}
                 </div>
                 <p id="frame-size-hint" className="editor-hint">
-                  Make it the size of your camera in OBS, and enter the same numbers there. They’re
-                  shown next to the Webcam frame link.
+                  Make it the size of your camera in OBS. The numbers to enter in OBS are shown next
+                  to the Webcam frame link.
                 </p>
+                {/* Placed here, the frame link is full screen and lines up by itself (T6.122). */}
+                <fieldset className="editor-segmented" aria-describedby="frame-place-hint">
+                  <legend>Where it goes</legend>
+                  {(
+                    [
+                      ["obs", "I'll move it in OBS"],
+                      ["here", "Place it here"],
+                    ] as const
+                  ).map(([where, label]) => (
+                    <label key={where}>
+                      <input
+                        type="radio"
+                        name="frame-place"
+                        checked={(settings.frame.x !== null) === (where === "here")}
+                        onChange={() =>
+                          updateFrame(
+                            where === "here"
+                              ? { x: 48, y: 1080 - settings.frame.height - 48 }
+                              : { x: null, y: null },
+                          )
+                        }
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </fieldset>
+                <p id="frame-place-hint" className="editor-hint">
+                  {settings.frame.x !== null
+                    ? "Add the link in OBS full screen, 1920 × 1080, above your camera. Then line your camera up with the frame."
+                    : "Add the link in OBS at the frame's size, then drag it over your camera."}
+                </p>
+                {settings.frame.x !== null && (
+                  <FramePlacer frame={settings.frame} onMove={(at) => updateFrame(at)} />
+                )}
                 <label>
                   Name on the frame (optional)
                   <input

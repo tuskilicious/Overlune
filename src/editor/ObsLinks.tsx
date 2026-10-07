@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router";
-import type { Settings } from "../settings/schema";
+import { framePosition, type Settings } from "../settings/schema";
 import { encode } from "../settings/url";
 import { sceneCollection } from "./scene-collection";
 import Icon from "../components/Icon";
@@ -124,8 +124,10 @@ export default function ObsLinks({ settings, heading }: { settings: Settings; he
     {
       id: "frame",
       name: "Webcam frame",
-      width: settings.frame.width,
-      height: settings.frame.height,
+      // Placed in Overlune, the frame's overlay is full screen (T6.122).
+      ...(framePosition(settings.frame)
+        ? { width: 1920, height: 1080 }
+        : { width: settings.frame.width, height: settings.frame.height }),
       optional: true,
     },
   ];

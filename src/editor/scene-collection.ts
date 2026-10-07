@@ -1,4 +1,4 @@
-import type { Settings } from "../settings/schema";
+import { framePosition, type Settings } from "../settings/schema";
 import { encode } from "../settings/url";
 
 /** OBS's default Browser source CSS: a transparent page with no margin. */
@@ -28,7 +28,9 @@ export function sceneCollection(
     { name: "Be Right Back", route: "brb", width: 1920, height: 1080 },
     { name: "Stream Ending", route: "ending", width: 1920, height: 1080 },
     { name: "Chat", route: "chat", width: chat.width, height: chat.height },
-    { name: "Webcam frame", route: "frame", width: frame.width, height: frame.height },
+    framePosition(frame)
+      ? { name: "Webcam frame", route: "frame", width: 1920, height: 1080 }
+      : { name: "Webcam frame", route: "frame", width: frame.width, height: frame.height },
     { name: "Alerts", route: "alerts", width: 1920, height: 1080 },
   ].map((b) => ({ ...b, name: `Overlune ${b.name}`, uuid: uuid() }));
   const byName = (n: string) => browsers.find((b) => b.name === `Overlune ${n}`)!;
@@ -85,7 +87,9 @@ export function sceneCollection(
     scene("Starting Soon", [full("Starting Soon"), full("Alerts")]),
     // The streamer adds their game and camera under these.
     scene("Live", [
-      { source: "Webcam frame", x: MARGIN, y: 1080 - frame.height - MARGIN },
+      framePosition(frame)
+        ? full("Webcam frame")
+        : { source: "Webcam frame", x: MARGIN, y: 1080 - frame.height - MARGIN },
       { source: "Chat", x: 1920 - chat.width - MARGIN, y: 1080 - chat.height - MARGIN },
       full("Alerts"),
     ]),

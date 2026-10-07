@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import lz from "lz-string";
 import { themeIds } from "../../src/themes/types";
 
 /** A first visit opens on the gallery of looks (T6.16). Clean Slate keeps the editor's fresh defaults. */
@@ -619,6 +620,54 @@ test("the ticker is set up under Socials and shows in the preview (T6.121)", asy
   await page.getByLabel("Extra line (optional)").fill("Tue at 7");
   await expect(preview(page).locator(".scene-ticker-tab")).toHaveText("Tusk");
   await expect(preview(page).locator(".scene-ticker ul").first()).toContainText("Tue at 7");
+});
+
+test("the webcam frame can be placed here, and its link goes full screen (T6.122)", async ({
+  page,
+}) => {
+  const row = page.locator(".editor-link", { hasText: "Webcam frame" });
+  await expect(row).toContainText("Width 640");
+  await page.getByRole("radio", { name: "Place it here" }).check();
+  await page.getByRole("button", { name: "Move the frame to the top right" }).click();
+  await expect(page.getByText("1232 across, 48 down, 640 × 360")).toBeVisible();
+  const box = page.getByRole("button", { name: /^Webcam frame position/ });
+  await box.press("ArrowLeft");
+  await box.press("Shift+ArrowDown");
+  await expect(page.getByText("1224 across, 96 down, 640 × 360")).toBeVisible();
+  await expect(row).toContainText("Width 1920");
+  await expect(row).toContainText("Height 1080");
+
+  await page.goto(await row.locator("input").inputValue());
+  await expect(page.locator(".frame-canvas")).toBeVisible();
+  // Its laid-out spot (the entrance scales it in, so its box moves for a moment).
+  await expect(page.locator(".frame")).toHaveCSS("left", "1224px");
+  await expect(page.locator(".frame")).toHaveCSS("top", "96px");
+});
+
+test("dragging the frame on the pad moves it in stream pixels (T6.122)", async ({ page }) => {
+  await page.getByRole("radio", { name: "Place it here" }).check();
+  await page.getByRole("button", { name: "Move the frame to the top left" }).click();
+  const pad = (await page.locator(".frame-placer-pad").boundingBox())!;
+  const box = (await page.getByRole("button", { name: /^Webcam frame position/ }).boundingBox())!;
+  const scale = 1920 / pad.width;
+  await page.mouse.move(box.x + 10, box.y + 10);
+  await page.mouse.down();
+  // A quarter of the pad across: 480 stream pixels.
+  await page.mouse.move(box.x + 10 + pad.width / 4, box.y + 10, { steps: 5 });
+  await page.mouse.up();
+  const across = Number(
+    (await page.getByText(/\d+ across, \d+ down/).textContent())!.match(/(\d+) across/)![1],
+  );
+  expect(Math.abs(across - (48 + 480))).toBeLessThanOrEqual(Math.ceil(scale));
+});
+
+test("a webcam frame link from before placing it here keeps its own size (T6.122)", async ({
+  page,
+}) => {
+  const old = { frame: { width: 640, height: 360, label: "Ronni" } };
+  await page.goto(`/o/frame#1.${lz.compressToEncodedURIComponent(JSON.stringify(old))}`);
+  await expect(page.locator(".frame")).toBeVisible();
+  await expect(page.locator(".frame-canvas")).toHaveCount(0);
 });
 
 test("quick picks set the countdown, and No countdown clears it (T6.113)", async ({ page }) => {

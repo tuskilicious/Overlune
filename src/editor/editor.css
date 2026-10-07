@@ -1278,3 +1278,53 @@
   padding: 4px 10px;
   font-size: 13px;
 }
+
+/* The webcam frame placer (T6.122), after the ICARUS kit's cam pad: the stream as a 16:9 pad with the frame as a
+   box to drag, and nine quick spots. */
+.frame-placer-pad {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border: var(--border);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(color-mix(in srgb, var(--text) 8%, transparent) 1px, transparent 1px) 0 0 / 100%
+      33.34%,
+    linear-gradient(90deg, color-mix(in srgb, var(--text) 8%, transparent) 1px, transparent 1px) 0
+      0 / 33.34% 100%,
+    var(--bg);
+  touch-action: none;
+}
+
+.editor .frame-placer-box {
+  position: absolute;
+  min-width: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: grab;
+}
+
+.editor .frame-placer-box:active {
+  cursor: grabbing;
+  transform: none;
+}
+
+.frame-placer-anchors {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.editor .frame-placer-anchors button {
+  padding: 6px 4px;
+  font-size: 13px;
+}

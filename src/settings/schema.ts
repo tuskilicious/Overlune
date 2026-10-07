@@ -137,6 +137,10 @@ export const settingsV1 = z.object({
       height: z.number().int().min(120).max(1080).default(360),
       /** Optional name on a tab at the bottom left; "" shows none. */
       label: text(40),
+      /** Placed on a 1920×1080 canvas (T6.122): the overlay is full screen with the frame at x, y. null (old links,
+       *  and the default) keeps the frame-sized overlay placed in OBS. */
+      x: z.number().int().min(0).max(1920).nullable().default(null),
+      y: z.number().int().min(0).max(1080).nullable().default(null),
     })
     .prefault({}),
   /** A ticker along the bottom of every scene (T6.121), after the Tuskilicious kit: an optional tab, then the
@@ -167,3 +171,13 @@ export const settingsV1 = z.object({
 export type Settings = z.output<typeof settingsV1>;
 
 export const defaultSettings: Settings = settingsV1.parse({});
+
+/** Where a placed webcam frame sits on the 1920×1080 canvas, kept fully on screen (T6.122); null when it's placed in
+ *  OBS instead. */
+export function framePosition(frame: Settings["frame"]): { x: number; y: number } | null {
+  if (frame.x === null || frame.y === null) return null;
+  return {
+    x: Math.min(Math.max(0, frame.x), 1920 - frame.width),
+    y: Math.min(Math.max(0, frame.y), 1080 - frame.height),
+  };
+}
