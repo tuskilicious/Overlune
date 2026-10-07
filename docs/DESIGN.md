@@ -105,6 +105,13 @@ Built to the bar of the maintainer's own kits (Tuskilicious, ICARUS): each look 
 - Adaptations: the lines sit tight but never overlap (legible at 720p); the title card's figure silhouettes need commissioned art and are left out.
 - Sound: reuses Cozy Café's alert sound.
 
+**12. Shonen** (T6.111): every scene is a manga page.
+- Colors: paper `#F4F3EE`, white surface, ink `#111111` for titles, text and outlines, muted `#454545`, one spot color, manga red `#D61F26` (the headline's last word, alerts)
+- Fonts: Bangers (headline 196px, ink with a 14px white knockout stroke; countdown 104px) / Comic Neue
+- Shape: radius 0, 4px ink outlines, no shadows; the right column sits in white inked panels (countdown and socials); the chat stack is an inked panel; alerts land with an impact (bounce)
+- Effect (`shonen`): a 6px ink panel border 32px in from the edge (an outline, so it paints above the art); speed lines bursting from a focal point at the top right, clear at the center and gone before the text; a hard-cut screentone sheet over the lower left, with the subtitle in a white knockout so it stays readable. Static.
+- Sound: reuses Bold Esports' alert sound.
+
 ## Overlay layout rules
 - Canvas is always 1920×1080. Keep a 64px safe margin on scenes.
 - Chat default size is 400×600, transparent background, bottom-up.

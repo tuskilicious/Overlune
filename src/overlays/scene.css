@@ -758,3 +758,93 @@
   background: var(--text);
   color: var(--bg);
 }
+
+/* Shonen (T6.111): every scene is a manga page. The frame is one panel (a heavy ink border inside a white gutter);
+   speed lines burst from a focal point in the open top right and fade before the text; screentone dots shade the
+   lower left, so lettering there gets a white knockout and the right column sits in white panels, as on a real
+   page. Static, so no reduced-motion version. */
+.scene[data-bg="shonen"] {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle, #111 0 1.6px, transparent 2.2px) 0 0 / 9px 9px,
+    var(--bg);
+  /* The panel border: a 6px ink line 32px in from the edge. An outline paints above the tone and the speed lines;
+     the content's margins keep it clear of the text. */
+  outline: 6px solid #111;
+  outline-offset: -38px;
+}
+
+/* The tone only shades the lower left, thinning out toward the middle like a hand-cut screentone sheet. */
+.scene[data-bg="shonen"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--bg);
+  mask-image: radial-gradient(130% 120% at 0% 100%, transparent 18%, #000 52%);
+}
+
+/* Speed lines from the focal point, clear in the middle of the burst and gone before the text, under the panel
+   border. */
+.scene[data-bg="shonen"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: repeating-conic-gradient(
+    from 0deg at 78% 22%,
+    #111 0 0.5deg,
+    transparent 0.5deg 3.2deg
+  );
+  mask-image: radial-gradient(
+    circle at 78% 22%,
+    transparent 0 120px,
+    rgb(0 0 0 / 0.55) 260px,
+    rgb(0 0 0 / 0.3) 520px,
+    transparent 760px
+  );
+}
+
+/* Lettering: big ink caps with a white knockout stroke, the last word in the spot color. */
+.scene[data-theme="shonen"] .scene-title {
+  font-size: 196px;
+  font-weight: 400; /* Bangers has one weight */
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+  -webkit-text-stroke: 14px var(--surface);
+  paint-order: stroke fill;
+}
+
+.scene[data-theme="shonen"] .scene-title::before {
+  width: 120px;
+  height: 12px;
+  border-radius: 0;
+  background: var(--text);
+}
+
+.scene[data-theme="shonen"] .scene-subtitle {
+  font-weight: 700;
+  color: var(--text);
+  -webkit-text-stroke: 8px var(--surface);
+  paint-order: stroke fill;
+}
+
+.scene[data-theme="shonen"] .scene-socials {
+  padding: 28px 32px;
+  background: var(--surface);
+  border: var(--border);
+}
+
+.scene[data-theme="shonen"] .countdown-time {
+  font-size: 104px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.scene[data-theme="shonen"] .scene-icon {
+  background: var(--text);
+  color: var(--surface);
+}

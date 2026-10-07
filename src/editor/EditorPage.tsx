@@ -189,7 +189,7 @@ const sections = [
 const moods = {
   Calm: ["clean-slate", "cozy-cafe", "pastel-cloud", "forest-night", "daylight", "abyss"],
   Retro: ["arcade-8bit", "vaporwave-sunset", "session"],
-  Bold: ["neon-grid", "bold-esports"],
+  Bold: ["neon-grid", "bold-esports", "shonen"],
 } as const satisfies Record<string, readonly ThemeId[]>;
 type Mood = keyof typeof moods | "All";
 

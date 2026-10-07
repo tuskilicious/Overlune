@@ -176,3 +176,16 @@
 .chat[data-theme="abyss"] .chat-msg:last-child {
   background: color-mix(in srgb, var(--accent) 9%, var(--surface));
 }
+
+/* Shonen (T6.111): the chat stack is an inked panel, like everything on a manga page. */
+.chat[data-theme="shonen"] .chat-msg {
+  border-inline: 4px solid var(--text);
+}
+
+.chat[data-theme="shonen"] .chat-msg:first-child {
+  border-top: 4px solid var(--text);
+}
+
+.chat[data-theme="shonen"] .chat-msg:last-child {
+  border-bottom: 4px solid var(--text);
+}
