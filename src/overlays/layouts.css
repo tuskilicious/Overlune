@@ -1,0 +1,97 @@
+/* Look layouts (T6.134, docs/LAYOUTS.md): each look composes the scene its own way, on the shared markup. Layout v2 in
+   scene.css stays the default. Loaded after scene.css, so these win at equal specificity. A layout changes placement
+   only; colors, fonts, effects and motion stay in scene.css. Pieces: .scene-logo, .scene-title, .scene-subtitle and
+   .scene-side (the countdown on Starting Soon, then .scene-socials). BRB, Stream Ending and the offline banner have
+   no countdown: `.scene-main:has(.countdown)` tells them apart (OBS 31+, Chromium 127). */
+
+/* 1. Clean Slate: the shelf (the handoff's Calm board). One continuous surface along the bottom holds the subtitle,
+   the countdown and the socials in cells split by hairlines; the headline stands above it. */
+.scene[data-theme="clean-slate"] .scene-main {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  column-gap: 0;
+  align-items: center;
+}
+
+.scene[data-theme="clean-slate"] .scene-main:has(.countdown) {
+  grid-template-columns: minmax(0, 1.25fr) auto minmax(0, 1fr);
+}
+
+.scene[data-theme="clean-slate"] .scene-title {
+  grid-area: 3 / 1 / auto / -1;
+  margin-bottom: 56px;
+  max-width: 1400px;
+}
+
+/* The shelf itself: a grid item behind the last row's cells. Hidden when there's nothing to put on it. */
+.scene[data-theme="clean-slate"] .scene-main::before {
+  content: "";
+  grid-area: 4 / 1 / auto / -1;
+  align-self: stretch;
+  justify-self: stretch;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  border-radius: calc(var(--radius) * 1.5);
+}
+
+.scene[data-theme="clean-slate"]
+  .scene-main:not(:has(.scene-subtitle, .countdown, .scene-socials))::before {
+  display: none;
+}
+
+.scene[data-theme="clean-slate"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="clean-slate"] :is(.scene-subtitle, .countdown, .scene-socials) {
+  grid-row: 4;
+  align-self: stretch;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 40px 48px;
+}
+
+.scene[data-theme="clean-slate"] .scene-subtitle {
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  max-width: none;
+  font-size: 36px;
+}
+
+/* The countdown is a cell of the shelf, not a card of its own. */
+.scene[data-theme="clean-slate"] .countdown {
+  grid-column: 2;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-left: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="clean-slate"] .countdown-time {
+  font-size: 80px;
+}
+
+.scene[data-theme="clean-slate"] .scene-socials {
+  grid-column: -2;
+  align-content: center;
+  border-left: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+/* Only the socials: they open the shelf, so no hairline on their left. */
+.scene[data-theme="clean-slate"] .scene-main:not(:has(.scene-subtitle, .countdown)) .scene-socials {
+  grid-column: 1 / -1;
+  grid-auto-flow: column;
+  justify-content: start;
+  column-gap: 64px;
+  border-left: 0;
+}
+
+/* The light that runs round the countdown card (T6.123) would trace one cell of the shelf. */
+.scene[data-theme="clean-slate"] .countdown::after {
+  display: none;
+}
