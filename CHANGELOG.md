@@ -2,6 +2,37 @@
 
 What changed in each Overlune release. Overlay links from every release keep working: the link format only ever gains optional settings.
 
+## 1.2.0 (2026-10-07)
+
+Seven new looks, bolder overlays and an editor that's quicker to use. Every 1.0 and 1.1 link keeps working and picks up the new designs on its own: there is nothing to re-paste.
+
+### New
+- **Seven new looks, 16 in all:** Abyss (deep water and marine snow), Session (a jazz anime title card), Shonen (a manga page), Sakura (a spring night with drifting petals), Skate Deck (maple and grip tape), Phosphor (a green terminal) and Quest (an RPG quest log). Each one styles every scene, chat, alerts and the webcam frame.
+- **Socials ticker:** an optional band along the bottom of every scene, with your socials and a line of your own scrolling past. Set it up under Socials.
+- **Place the webcam frame in Overlune:** drag it on a small 16:9 pad, use the arrow keys or pick one of nine spots. The frame link then fills the whole screen with the frame where you put it, so there's nothing to move in OBS. Moving it in OBS still works too.
+- **Lite motion:** Motion is now Full, Lite or Still. Lite keeps entrances, countdown flips and alerts, and stops the looping backgrounds.
+- **Undo:** an Undo button, and Ctrl+Z (Cmd+Z on a Mac) outside text fields, take back your last change.
+- **Reset per section:** each editor section has its own Reset, shown only when you've changed something there.
+- **Quick countdown picks:** "In 15 min", "In 30 min", "In 1 hour" and "No countdown".
+- **Preview each link:** every link has a Preview that opens the overlay full size in a new tab. The Alerts preview plays one of each alert.
+- **Open a look full screen** from the home page to see it as big as your screen.
+
+### Looks and overlays
+- Bolder scenes: a much bigger headline, and the countdown and socials together in one column, socials with their names.
+- More life: scene pieces land one after another, only the countdown digits that change flip, alerts land with a burst of light, every look has a moving background, and the newest chat message flashes in the accent. Everything stops with Still motion or reduced motion.
+- Each of the first nine looks gained a signature move from its own world.
+- The oldest chat message fades out at the top instead of being cut in half, and the webcam frame gets corner brackets in most looks.
+
+### Editor, guide and site
+- The editor is redesigned: clearer section headers, choices as buttons, and status at a glance.
+- The setup guide has an index and a run-through of your first stream.
+- A new home page, and a 404 page that points the way back.
+
+### Fixed
+- The editor's look gallery crashed on computers that report an unknown time zone. It now falls back to UTC.
+- After an update, a page could fail to load instead of reloading itself.
+- A webcam frame almost as big as the stream, placed in Overlune, made a link that showed an error on stream. It now stays on screen.
+
 ## 1.1.0 (2026-10-07)
 
 More to make, a faster start in OBS, and a privacy fix. Every 1.0 link keeps working as it was.
