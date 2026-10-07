@@ -1287,3 +1287,118 @@
   top: 88px;
   left: 112px;
 }
+
+/* 16. Quest: the quest log. One tall parchment panel on the left holds the whole quest: its title, the description,
+   then under a gilt line the countdown and the socials. The dark hall and its embers stay open on the right. On
+   parchment the text takes the ink colors: ink title, wax-red last word (6.7:1), muted ink description; the gold and
+   the forge orange stay for the hall. A framed panel is the RPG concept, one panel only. */
+.scene[data-theme="quest"] .scene-main {
+  grid-template-columns: 760px minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
+  column-gap: 0;
+  row-gap: 0;
+}
+
+.scene[data-theme="quest"] .scene-main::before {
+  content: "";
+  grid-area: 1 / 1 / -1 / 2;
+  align-self: stretch;
+  justify-self: stretch;
+  margin: -24px 0 -16px -32px;
+  background: url("/images/themes/paper-grain.svg"), var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow:
+    var(--shadow),
+    inset 0 0 0 8px var(--surface),
+    inset 0 0 0 9px #b88f3e;
+}
+
+.scene[data-theme="quest"]
+  :is(.scene-logo, .scene-title, .scene-subtitle, .countdown, .scene-socials) {
+  grid-column: 1;
+  margin-inline: 32px 48px;
+}
+
+.scene[data-theme="quest"] .scene-logo {
+  grid-row: 1;
+  margin-top: 40px;
+}
+
+.scene[data-theme="quest"] .scene-title {
+  grid-row: 2;
+  margin-top: 56px;
+  font-size: 104px;
+  color: var(--text);
+  text-shadow: none;
+}
+
+.scene[data-theme="quest"] .scene-title-end {
+  color: var(--accent);
+  text-shadow: none;
+}
+
+.scene[data-theme="quest"] .scene-subtitle {
+  grid-row: 3;
+  margin-top: 24px;
+  color: var(--text-muted);
+}
+
+.scene[data-theme="quest"] .scene-side {
+  display: contents;
+}
+
+/* Inside the log, the countdown and the socials are lines of it, not panels of their own. */
+.scene[data-theme="quest"] :is(.countdown, .scene-socials) {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="quest"] .countdown {
+  grid-row: 5;
+  align-items: flex-start;
+  padding: 28px 0 0;
+  border-top: 1px solid #b88f3e;
+  text-align: left;
+}
+
+.scene[data-theme="quest"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="quest"] .scene-socials {
+  grid-row: 6;
+  margin-top: 28px;
+  margin-bottom: 40px;
+  padding: 0;
+}
+
+.scene[data-theme="quest"] .scene-main:not(:has(.countdown)) .scene-socials {
+  padding-top: 28px;
+  border-top: 1px solid #b88f3e;
+}
+
+/* The gilt lines run the width of the log. */
+.scene[data-theme="quest"] :is(.countdown, .scene-socials) {
+  justify-self: stretch;
+}
+
+.scene[data-theme="quest"] .scene-subtitle {
+  max-width: none;
+}
+
+/* The logo is a crest in the log's top right corner, out of the flow, so a long quest still fits. */
+.scene[data-theme="quest"] .scene-logo {
+  position: absolute;
+  top: 104px;
+  left: calc(112px + 760px - 48px - 96px);
+  max-width: 96px;
+  max-height: 96px;
+  margin: 0;
+}
+
+.scene[data-theme="quest"] .scene-main:has(.scene-logo) .scene-title {
+  padding-right: 112px;
+}
