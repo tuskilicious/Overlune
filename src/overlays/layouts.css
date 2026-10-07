@@ -1093,3 +1093,86 @@
   grid-auto-flow: column;
   column-gap: 48px;
 }
+
+/* 10. Abyss: the depth gauge. A dive: a depth scale runs down the right edge (fine ticks every 40px, long ones every
+   200px, on a hairline seam), and the stack floats centered in the water: the title where the light still reaches,
+   the countdown read like an instrument between two seams, the socials in a row. Centered by concept (suspended). */
+.scene[data-theme="abyss"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 0 minmax(0, 1fr) auto auto auto auto minmax(0, 1fr);
+  row-gap: 0;
+  justify-items: center;
+  text-align: center;
+}
+
+.scene[data-theme="abyss"] .scene-main::before {
+  content: "";
+  position: absolute;
+  top: 88px;
+  bottom: 72px;
+  right: 48px;
+  width: 36px;
+  border-right: 1px solid #16343a;
+  background:
+    repeating-linear-gradient(#5d8a96 0 2px, transparent 2px 200px) right / 36px 100% no-repeat,
+    repeating-linear-gradient(#2a5560 0 1px, transparent 1px 40px) right / 16px 100% no-repeat;
+}
+
+.scene[data-theme="abyss"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  left: 112px;
+}
+
+.scene[data-theme="abyss"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 1400px;
+}
+
+.scene[data-theme="abyss"] .scene-main:has(.scene-logo) .scene-title {
+  padding-inline: 184px;
+}
+
+/* The gauge is the mark; the rule above the title goes. */
+.scene[data-theme="abyss"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="abyss"] .scene-subtitle {
+  grid-area: 4 / 1;
+  max-width: 44ch;
+  margin-top: 20px;
+}
+
+.scene[data-theme="abyss"] .scene-side {
+  display: contents;
+}
+
+/* The instrument: the reading between two seams, no card. */
+.scene[data-theme="abyss"] .countdown {
+  grid-area: 5 / 1;
+  margin-top: 48px;
+  padding: 24px 96px 20px;
+  background: none;
+  border: 0;
+  border-block: 1px solid #16343a;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="abyss"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="abyss"] .scene-socials {
+  grid-area: 6 / 1;
+  margin-top: 40px;
+  grid-auto-flow: column;
+  column-gap: 56px;
+  text-align: left;
+}
+
+.scene[data-theme="abyss"][data-ticker] .scene-main::before {
+  bottom: 152px; /* stops above the band */
+}
