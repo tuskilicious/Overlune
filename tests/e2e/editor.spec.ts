@@ -612,6 +612,15 @@ test("each section resets on its own, and Undo brings it back (T6.120)", async (
   await expect(page.getByLabel("Hide chat commands (messages starting with !)")).toBeChecked();
 });
 
+test("the ticker is set up under Socials and shows in the preview (T6.121)", async ({ page }) => {
+  await expect(page.getByLabel("Ticker tab (optional)")).toHaveCount(0);
+  await page.getByLabel("Scrolling ticker along the bottom of every scene").check();
+  await page.getByLabel("Ticker tab (optional)").fill("Tusk");
+  await page.getByLabel("Extra line (optional)").fill("Tue at 7");
+  await expect(preview(page).locator(".scene-ticker-tab")).toHaveText("Tusk");
+  await expect(preview(page).locator(".scene-ticker ul").first()).toContainText("Tue at 7");
+});
+
 test("quick picks set the countdown, and No countdown clears it (T6.113)", async ({ page }) => {
   await page.getByRole("button", { name: "In 30 min" }).click();
   // Rounded up to the next whole minute, so 30:00 to 30:59 left.

@@ -230,3 +230,43 @@ test("a short countdown is centered in its card", async ({ page }) => {
     expect(Math.abs(box.x + box.width / 2 - (card.x + card.width / 2)), sel).toBeLessThan(2);
   }
 });
+
+for (const theme of themeIds) {
+  test(`${theme}: with the ticker, everything stays above the band (T6.121)`, async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.route("https://logos.example/logo.png", (r) =>
+      r.fulfill({ path: "public/images/brand/apple-touch-icon.png" }),
+    );
+    const data = { ...longest(theme), ticker: { show: true, label: "Tusk", extra: "Tue at 7" } };
+    await page.goto(`/o/starting#1.${lz.compressToEncodedURIComponent(JSON.stringify(data))}`);
+    await expect(page.locator(".scene-logo")).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    const band = (await page.locator(".scene-ticker").boundingBox())!;
+    for (const sel of [".scene-title", ".scene-subtitle", ".countdown", ".scene-socials"]) {
+      const box = (await page.locator(sel).boundingBox())!;
+      expect(box.y + box.height, sel).toBeLessThanOrEqual(band.y);
+    }
+  });
+}
+
+test("the ticker loops the socials and the extra line, and holds still in Lite (T6.121)", async ({
+  page,
+}) => {
+  const data = {
+    socials: [{ platform: "twitch", handle: "tusk" }],
+    ticker: { show: true, label: "Tusk", extra: "Tue at 7" },
+  };
+  const link = `/o/brb#1.${lz.compressToEncodedURIComponent(JSON.stringify(data))}`;
+  await page.goto(link);
+  await expect(page.locator(".scene-ticker-tab")).toHaveText("Tusk");
+  await expect(page.locator(".scene-ticker ul")).toHaveCount(2);
+  await expect(page.locator(".scene-ticker ul").nth(1)).toHaveAttribute("aria-hidden", "true");
+  await expect(page.locator(".scene-ticker ul").first()).toContainText("tusk");
+  await expect(page.locator(".scene-ticker ul").first()).toContainText("Tue at 7");
+  await expect(page.locator(".scene-ticker-track")).toHaveCSS("animation-name", "scene-ticker");
+
+  const lite = `/o/brb#1.${lz.compressToEncodedURIComponent(JSON.stringify({ ...data, liteMotion: true }))}`;
+  await page.goto(lite);
+  await expect(page.locator(".scene-ticker-track")).toHaveCSS("animation-name", "none");
+});

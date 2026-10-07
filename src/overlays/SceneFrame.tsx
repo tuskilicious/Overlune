@@ -98,10 +98,13 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
     ro.observe(t);
     return () => ro.disconnect();
   }, [fit]);
+  const { show, label, extra } = settings.ticker;
+  const ticker = show && (socials.length > 0 || extra.trim() !== "" || label.trim() !== "");
   return (
     <div
       ref={scene}
       className="scene"
+      data-ticker={ticker ? "" : undefined}
       data-enter={theme.enter.id}
       data-bg={theme.bgEffect}
       data-theme={theme.id}
@@ -133,6 +136,33 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
           </div>
         )}
       </div>
+      {ticker && (
+        <div className="scene-ticker">
+          {label.trim() && <span className="scene-ticker-tab">{label}</span>}
+          {/* Two copies, each at least as wide as the band, slide left by one copy: a seamless loop. The second copy
+              is only there for the loop, so screen readers skip it. */}
+          <div className="scene-ticker-rail">
+            <div
+              className="scene-ticker-track"
+              style={
+                { "--ticker-s": `${Math.max(24, (socials.length + 1) * 9)}s` } as CSSProperties
+              }
+            >
+              {[0, 1].map((copy) => (
+                <ul key={copy} aria-hidden={copy === 1 || undefined}>
+                  {socials.map((s, i) => (
+                    <li key={i}>
+                      <SocialIcon platform={s.platform} />
+                      {s.handle}
+                    </li>
+                  ))}
+                  {extra.trim() && <li>{extra}</li>}
+                </ul>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
