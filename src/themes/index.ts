@@ -34,5 +34,3 @@ export const themes: Record<ThemeId, Theme> = {
   phosphor,
   quest,
 };
-
-export const defaultThemeId: ThemeId = "clean-slate";
