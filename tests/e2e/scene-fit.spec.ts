@@ -66,7 +66,9 @@ test("Neon Grid keeps the title block in the sky, above the horizon (T6.36)", as
 });
 
 for (const theme of themeIds) {
-  test(`${theme}: "Starting soon" stays on one line beside the countdown`, async ({ page }) => {
+  test(`${theme}: "Starting soon" sets on at most two lines at full size beside the countdown`, async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     // The widest countdown a stream day shows, "1d 23h 59m", on a fixed clock so the tick can't change it (T6.52).
     const now = new Date("2026-10-02T12:00:00Z").getTime();
@@ -82,7 +84,9 @@ for (const theme of themeIds) {
         el.getBoundingClientRect().height - parseFloat(rule.height) - parseFloat(rule.marginBottom);
       return text / parseFloat(getComputedStyle(el).lineHeight);
     });
-    expect(lines).toBeLessThan(1.5);
+    // The two-line headline is the design (T6.107); a third line, or a shrink, means the column got squeezed.
+    expect(lines).toBeLessThan(2.5);
+    await expect(page.locator(".scene-title")).not.toHaveAttribute("style", /font-size/);
   });
 }
 

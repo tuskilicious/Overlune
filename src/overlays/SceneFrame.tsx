@@ -24,6 +24,18 @@ interface Props {
   children?: ReactNode;
 }
 
+/** A two-tone headline (T6.107): the last word takes the accent color. Plain text, rendered as React elements. */
+function TwoTone({ text }: { text: string }) {
+  const i = text.trimEnd().lastIndexOf(" ");
+  if (i < 0) return text;
+  return (
+    <>
+      {text.slice(0, i + 1)}
+      <span className="scene-title-end">{text.slice(i + 1)}</span>
+    </>
+  );
+}
+
 /** Shared 1920×1080 scene layout for Starting Soon, BRB and Stream Ending. */
 export default function SceneFrame({ settings, title, subtitle, error, children }: Props) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
@@ -36,7 +48,7 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
   const fit = useCallback(() => {
     const box = scene.current;
     const t = titleEl.current;
-    // The last block in the flow; a theme may float its socials over the background (Neon Grid's floor).
+    // The last block in the flow: the content, under any error notice.
     const last = [...(box?.children ?? [])]
       .reverse()
       .find((el) => getComputedStyle(el).position !== "absolute") as HTMLElement | undefined;
@@ -88,22 +100,26 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
           <img className="scene-logo" src={settings.logo} alt="Channel logo" onLoad={fit} />
         )}
         <h1 ref={titleEl} className="scene-title">
-          {title}
+          <TwoTone text={title} />
         </h1>
         {subtitle && <p className="scene-subtitle">{subtitle}</p>}
-        {children}
+        {(children || socials.length > 0) && (
+          <div className="scene-side">
+            {children}
+            {socials.length > 0 && (
+              <ul className="scene-socials">
+                {socials.map((s, i) => (
+                  <li key={i}>
+                    <SocialIcon platform={s.platform} />
+                    <span className="scene-platform">{platformLabel[s.platform]}</span>{" "}
+                    <span className="scene-handle">{s.handle}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
       </div>
-      {socials.length > 0 && (
-        <ul className="scene-socials">
-          {socials.map((s, i) => (
-            <li key={i}>
-              <SocialIcon platform={s.platform} />
-              <span className="scene-platform">{platformLabel[s.platform]}</span>{" "}
-              <span className="scene-handle">{s.handle}</span>
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }

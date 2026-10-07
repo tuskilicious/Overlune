@@ -1,9 +1,7 @@
-/* The countdown is a card on the right, beside the title block (docs/DESIGN.md "Scene layout (T6.35)"). The minimum
-   width keeps it from jumping as it ticks, so the content is centered: a short "09:58" left-aligned left the card's
+/* The countdown is a card at the top of the right column, over the socials (T6.107). The column's
+   minimum width keeps it from jumping as it ticks, so the content is centered: a short "09:58" left-aligned left the card's
    right third empty (T6.54). */
 .countdown {
-  grid-area: 3 / 2 / span 2;
-  min-width: 440px;
   padding: 40px 48px 36px;
   display: flex;
   flex-direction: column;
@@ -18,11 +16,12 @@
 
 .countdown-time {
   font-family: var(--font-heading);
-  font-size: 120px;
+  font-size: 96px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.03em;
-  color: var(--accent);
+  white-space: nowrap; /* "1d 23h 59m" stays one line; the column grows to hold it */
+  color: var(--text); /* the accent belongs to the headline's last word (T6.107) */
   font-variant-numeric: tabular-nums;
 }
 
