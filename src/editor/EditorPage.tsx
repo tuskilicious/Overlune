@@ -54,18 +54,29 @@ const steps = [
 
 /** Wide windows (T6.60): the section list on the left. Each jumps to its place in the settings column. */
 const sections = [
-  ["step-look", "Look"],
-  ["part-scenes", "Text"],
-  ["part-socials", "Socials"],
-  ["part-chat", "Chat"],
-  ["part-alerts", "Alerts"],
-  ["part-frame", "Webcam frame"],
-  ["part-channel", "Channel page"],
-  ["part-logo", "Logo"],
-  ["part-motion", "Motion"],
-  ["part-colors", "Colors"],
-  ["obs-links", "Links"],
+  ["step-look", "Look", "look"],
+  ["part-scenes", "Text", "text"],
+  ["part-socials", "Socials", "socials"],
+  ["part-chat", "Chat", "chat"],
+  ["part-alerts", "Alerts", "alerts"],
+  ["part-frame", "Webcam frame", "frame"],
+  ["part-channel", "Channel page", "channel"],
+  ["part-logo", "Logo", "logo"],
+  ["part-motion", "Motion", "motion"],
+  ["part-colors", "Colors", "colors"],
+  ["obs-links", "Links", "links"],
 ] as const;
+
+/** The section list folded to icons (T6.135) is a per-browser convenience, kept outside the link. Storage can be
+ *  blocked (private windows), so every call is wrapped. */
+const railKey = "overlune:rail-collapsed";
+const readRail = () => {
+  try {
+    return localStorage.getItem(railKey) === "1";
+  } catch {
+    return false;
+  }
+};
 
 /** The order Test alert plays the samples in (T6.135). */
 const alertOrder = testAlerts.map((a) => a.kind);
@@ -170,6 +181,7 @@ export default function EditorPage() {
   const [loadStatus, setLoadStatus] = useState(initial.status);
   const [confirmReset, setConfirmReset] = useState(false);
   const [mood, setMood] = useState<Mood>("All");
+  const [railCollapsed, setRailCollapsed] = useState(readRail);
   /** The editor shows instead of the welcome gallery (T6.16). Decided once, so setting everything back to the
    *  defaults never swaps the editor out from under the streamer. Picking Clean Slate changes no setting. */
   const [started, setStarted] = useState(
@@ -574,14 +586,19 @@ export default function EditorPage() {
               ))}
             </ol>
           </nav>
-          <div className="editor-body">
+          <div className="editor-body" data-rail={railCollapsed ? "collapsed" : undefined}>
             {/* Wide windows only (editor.css); narrower ones use the steps bar above. */}
-            <nav className="editor-rail" aria-label="Sections">
-              <ol>
-                {sections.map(([id, name]) => (
+            <nav
+              className="editor-rail"
+              aria-label="Sections"
+              data-collapsed={railCollapsed || undefined}
+            >
+              <ol id="editor-rail-list">
+                {sections.map(([id, name, icon]) => (
                   <li key={id}>
                     <a
                       href={`#${id}`}
+                      title={railCollapsed ? name : undefined}
                       aria-current={currentSection === id ? "location" : undefined}
                       onClick={(e) => {
                         const colors = document.getElementById("part-colors");
@@ -590,7 +607,9 @@ export default function EditorPage() {
                         jumpTo(e, id);
                       }}
                     >
-                      {name}
+                      <Icon name={icon} />
+                      {/* Folded, the name stays for screen readers (and as a tooltip) but not on screen. */}
+                      <span className="editor-rail-name">{name}</span>
                       {/* What's already filled in, at a glance, as the kits' docks show their status (T6.118). */}
                       {filled[id] && (
                         <span className="editor-rail-set">
@@ -602,6 +621,27 @@ export default function EditorPage() {
                   </li>
                 ))}
               </ol>
+              {/* Folds the list to icons, as on the Studio board (T6.135). */}
+              <button
+                type="button"
+                className="editor-rail-toggle"
+                aria-expanded={!railCollapsed}
+                aria-controls="editor-rail-list"
+                aria-label={railCollapsed ? "Expand menu" : undefined}
+                title={railCollapsed ? "Expand menu" : undefined}
+                onClick={() => {
+                  const next = !railCollapsed;
+                  setRailCollapsed(next);
+                  try {
+                    localStorage.setItem(railKey, next ? "1" : "0");
+                  } catch {
+                    // Remembering it is a convenience; the menu still folds.
+                  }
+                }}
+              >
+                <Icon name={railCollapsed ? "open" : "collapse"} />
+                <span className="editor-rail-name">Collapse menu</span>
+              </button>
             </nav>
             <form className="editor-form" onSubmit={(e) => e.preventDefault()}>
               <h2 id="step-look" className="editor-step" tabIndex={-1}>

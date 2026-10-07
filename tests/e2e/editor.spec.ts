@@ -1675,3 +1675,29 @@ test("Test alert by the scene preview plays the samples over the scene, in turn 
   await page.clock.runFor(6000); // 5 s on screen, then the half-second gap
   await expect(box).toContainText("NewSubscriber");
 });
+
+test("the section list folds to icons, keeps its names for screen readers, and remembers it (T6.135)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const rail = page.getByRole("navigation", { name: "Sections" });
+  const toggle = rail.getByRole("button", { name: "Collapse menu" });
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await toggle.press("Enter");
+  const expand = rail.getByRole("button", { name: "Expand menu" });
+  await expect(expand).toHaveAttribute("aria-expanded", "false");
+  // Folded: the names leave the screen but the links keep them.
+  await expect(rail.getByRole("link", { name: "Webcam frame" })).toBeVisible();
+  await expect(rail.locator(".editor-rail-name").first()).toHaveCSS("position", "absolute");
+  const axe = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .include(".editor-rail")
+    .analyze();
+  expect(axe.violations).toEqual([]);
+  // A folded menu stays folded in this browser. (A change first, so the reload reopens the editor, not the gallery.)
+  await page.getByLabel("Title", { exact: true }).fill("Going live");
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Expand menu" })).toBeVisible();
+  await page.getByRole("button", { name: "Expand menu" }).click();
+  await expect(page.getByRole("button", { name: "Collapse menu" })).toBeVisible();
+});
