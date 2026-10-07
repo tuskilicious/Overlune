@@ -400,6 +400,48 @@
   accent-color: var(--accent);
 }
 
+/* A switch (T6.135): an on/off checkbox drawn as a track with a knob (after the 21st.dev switches, ported to CSS). It
+   stays a native checkbox, so Space toggles it and screen readers announce it as before. The weekday picks keep plain
+   boxes. Off: a Haze outline and knob on Night (8.3:1); on: Lune Violet with a Night knob (5.3:1). */
+.editor label.editor-check:not(.editor-days *) input[type="checkbox"] {
+  appearance: none;
+  flex: none;
+  position: relative;
+  width: 40px;
+  height: 24px;
+  border: 1px solid var(--text-muted);
+  border-radius: 999px;
+  background: var(--bg);
+  cursor: pointer;
+  transition:
+    background-color 160ms ease-out,
+    border-color 160ms ease-out;
+}
+
+.editor label.editor-check:not(.editor-days *) input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition:
+    transform 160ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 160ms ease-out;
+}
+
+.editor label.editor-check:not(.editor-days *) input[type="checkbox"]:checked {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.editor label.editor-check:not(.editor-days *) input[type="checkbox"]:checked::before {
+  background: var(--bg);
+  transform: translateX(16px);
+}
+
 .editor button {
   cursor: pointer;
   align-self: start;
@@ -921,6 +963,53 @@
   grid-column: 1;
 }
 
+/* The slider (T6.135): a Lune Violet fill up to the thumb (--pct, set from the value in Alerts.tsx) on a Night track
+   with a Haze edge, and a round thumb (after the 21st.dev sliders, ported to CSS). A native range input, so arrow
+   keys, Page Up/Down and Home/End work as before. */
+.editor .editor-slider input[type="range"] {
+  appearance: none;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.editor .editor-slider input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  border: 1px solid var(--text-muted);
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent) var(--pct, 0%), var(--bg) var(--pct, 0%));
+}
+
+.editor .editor-slider input[type="range"]::-moz-range-track {
+  height: 8px;
+  border: 1px solid var(--text-muted);
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent) var(--pct, 0%), var(--bg) var(--pct, 0%));
+}
+
+.editor .editor-slider input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: -7px;
+  border: 3px solid var(--bg);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.editor .editor-slider input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 3px solid var(--bg);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
 .editor-slider output {
   grid-column: 2;
   min-width: 4.5ch;
@@ -1178,44 +1267,101 @@
   clear: both;
 }
 
-/* The scene picker is a segmented control too. */
-.editor-scenes.editor-segmented {
+/* A segmented control (T6.118, T6.135): every choice visible, inside one track, with a single highlight that slides
+   to the picked one (after the 21st.dev segmented controls, ported to CSS with no dependency). The radios stay in the
+   page, so arrow keys, one tab stop and form behavior come from the browser; the label is the button. :has() counts
+   the options (--n) and finds the checked one (--i), so the highlight needs no script. Reduced motion: index.css turns
+   the slide off. */
+.editor-segmented {
+  --n: 2;
+  --i: 0;
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
-  gap: 4px;
+  gap: 0;
+  padding: 3px;
+  border: 1px solid var(--text-muted);
+  border-radius: calc(var(--radius) + 3px);
+  background: var(--bg);
 }
 
-/* A segmented control (T6.118): every choice visible, the picked one filled. The radios stay in the page for
-   keyboards and screen readers; the label is the button. */
+/* Fieldsets need the grid restated: the editor's own fieldset rule is more specific than .editor-segmented. */
 .editor fieldset.editor-segmented {
-  padding: 0;
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
-  gap: 4px;
-  background: none;
-  border: none;
+  gap: 0;
+  padding: 3px;
+  border: 1px solid var(--text-muted);
+  border-radius: calc(var(--radius) + 3px);
+  background: var(--bg);
+}
+
+/* The legend sits just above the track. Positioned, it isn't drawn into the fieldset's border, which would break the
+   track's outline around it. */
+.editor fieldset.editor-segmented {
+  margin-top: 26px;
 }
 
 .editor fieldset.editor-segmented legend {
-  margin-bottom: 4px;
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 0;
+  margin: 0;
   padding: 0;
   font-size: 14px;
+  white-space: nowrap;
+}
+
+.editor-segmented:has(> label:nth-of-type(3)) {
+  --n: 3;
+}
+
+.editor-segmented:has(> label:nth-of-type(4)) {
+  --n: 4;
+}
+
+.editor-segmented:has(> label:nth-of-type(2) :checked) {
+  --i: 1;
+}
+
+.editor-segmented:has(> label:nth-of-type(3) :checked) {
+  --i: 2;
+}
+
+.editor-segmented:has(> label:nth-of-type(4) :checked) {
+  --i: 3;
+}
+
+/* The highlight: one cell wide, slid to the checked option. Hidden until something is checked. */
+.editor-segmented::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / var(--n));
+  height: var(--thumb-h, calc(100% - 6px));
+  border-radius: var(--radius);
+  background: var(--accent);
+  transform: translateX(calc(var(--i) * 100%));
+  transition: transform 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.editor-segmented:not(:has(:checked))::after {
+  visibility: hidden;
 }
 
 .editor-segmented label {
   position: relative;
   display: block;
   padding: 8px 6px;
-  border: 1px solid var(--text-muted);
   border-radius: var(--radius);
-  background: var(--bg);
   text-align: center;
   cursor: pointer;
-  transition:
-    background-color 150ms ease-out,
-    color 150ms ease-out;
+  transition: color 150ms ease-out;
 }
 
 .editor-segmented input {
@@ -1225,13 +1371,12 @@
   cursor: pointer;
 }
 
-.editor-segmented label:hover {
-  border-color: var(--text);
+.editor-segmented label:hover:not(:has(:checked)) {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
 }
 
+/* Night on Lune Violet (5.3:1). */
 .editor-segmented label:has(:checked) {
-  background: var(--accent);
-  border-color: var(--accent);
   color: var(--bg);
   font-weight: 700;
 }

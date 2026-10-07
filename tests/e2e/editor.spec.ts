@@ -1534,3 +1534,32 @@ test("channel page pictures download at Twitch's sizes (T6.91)", async ({ page }
   });
   await expect(part.getByRole("status")).toHaveText("Saved. Check your downloads.");
 });
+
+test("segmented controls, switches and the slider work from the keyboard (T6.135)", async ({
+  page,
+}) => {
+  // Segmented: native radios, so the arrow keys move the choice, and the highlight follows it.
+  const motion = page.getByRole("radiogroup", { name: "How much moves" });
+  await motion.getByRole("radio", { name: "Full" }).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(motion.getByRole("radio", { name: "Lite" })).toBeChecked();
+  const slot = () => motion.evaluate((el) => getComputedStyle(el).getPropertyValue("--i").trim());
+  expect(await slot()).toBe("1");
+  await page.keyboard.press("ArrowRight");
+  await expect(motion.getByRole("radio", { name: "Still" })).toBeChecked();
+  expect(await slot()).toBe("2");
+
+  // Switch: still a checkbox, so Space toggles it.
+  const commands = page.getByLabel("Hide chat commands (messages starting with !)");
+  await expect(commands).toBeChecked();
+  await commands.focus();
+  await page.keyboard.press("Space");
+  await expect(commands).not.toBeChecked();
+
+  // Slider: the arrow keys move it, and the fill follows the value.
+  const volume = page.getByLabel("Alert volume");
+  await volume.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(volume).toHaveValue("75");
+  await expect(volume).toHaveAttribute("style", /--pct: 75%/);
+});

@@ -16,6 +16,11 @@ describe("editor colors meet WCAG AA", () => {
     expect(contrast(color, t.surface)).toBeGreaterThanOrEqual(4.5);
   });
 
+  // T6.135: the picked segment's text and the switch's knob are Night on Lune Violet.
+  it("Night on Lune Violet (picked segment, switch on) is at least 4.5:1", () => {
+    expect(contrast(t.bg, t.accent)).toBeGreaterThanOrEqual(4.5);
+  });
+
   it("control outlines and focus rings are at least 3:1 (WCAG 1.4.11)", () => {
     for (const edge of [t.textMuted, t.accent]) {
       expect(contrast(edge, t.bg)).toBeGreaterThanOrEqual(3);

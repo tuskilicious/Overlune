@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { testAlerts, type AlertKind } from "../../alerts/events";
 import { fillTemplate } from "../../alerts/templates";
 import { defaultTemplates, type Settings } from "../../settings/schema";
@@ -67,6 +68,7 @@ export default function Alerts({
           max={100}
           step={5}
           value={settings.alerts.volume}
+          style={{ "--pct": `${settings.alerts.volume}%` } as CSSProperties}
           aria-describedby="volume-hint"
           onChange={(e) => updateAlerts({ volume: Number(e.target.value) })}
         />
