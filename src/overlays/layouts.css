@@ -539,3 +539,125 @@
   .scene-main:not(:has(.countdown, .scene-socials, .scene-subtitle))::before {
   display: none;
 }
+
+/* 15. Phosphor: the terminal window. The whole scene is one session: a window with a title bar, the boot log
+   (scene.css) as its first lines, the headline typed at the prompt, the countdown as T-minus and the socials as a
+   listing. Left aligned on the monospace grid, top down like a terminal. Monospace and window chrome are this look's
+   concept. */
+.scene[data-theme="phosphor"] .scene-main {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 216px auto auto auto auto minmax(0, 1fr);
+  row-gap: 0;
+  align-items: start;
+  padding: 104px 56px 48px;
+  border: 2px solid #1c4a27;
+  border-radius: 6px;
+}
+
+/* The title bar. */
+.scene[data-theme="phosphor"] .scene-main::before {
+  content: "overlune: ~/stream (tty1)";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 14px 24px;
+  border-bottom: 2px solid #1c4a27;
+  font-family: var(--font-body);
+  font-size: 22px;
+  color: var(--text-muted);
+  text-shadow: none;
+}
+
+/* The boot log moves inside the window, as its first lines. */
+.scene[data-bg="phosphor"][data-theme="phosphor"]::before {
+  top: 214px;
+  right: auto;
+  left: 170px;
+  font-size: 24px;
+  line-height: 1.5;
+}
+
+/* The logo in the window's top right corner, under the title bar. */
+.scene[data-theme="phosphor"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  right: 56px;
+  max-width: 120px;
+  max-height: 120px;
+}
+
+.scene[data-theme="phosphor"] .scene-title {
+  grid-area: 2 / 1;
+  max-width: 1500px;
+}
+
+.scene[data-theme="phosphor"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+/* The prompt. */
+.scene[data-theme="phosphor"] .scene-word:first-child::before {
+  content: "$ ";
+  color: var(--text-muted);
+  text-shadow: none;
+}
+
+.scene[data-theme="phosphor"] .scene-subtitle {
+  grid-area: 3 / 1;
+  max-width: 60ch;
+  margin-top: 16px;
+}
+
+.scene[data-theme="phosphor"] .scene-side {
+  display: contents;
+}
+
+/* T-minus, as a plain output line, not a card. */
+.scene[data-theme="phosphor"] .countdown {
+  grid-area: 4 / 1;
+  margin-top: 40px;
+  padding: 0;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 32px;
+  text-align: left;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="phosphor"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="phosphor"] .countdown-time::before {
+  content: "T-minus ";
+  font-size: 0.4em;
+  color: var(--text-muted);
+}
+
+/* The listing: a command line, then the entries in a row. */
+.scene[data-theme="phosphor"] .scene-socials {
+  grid-area: 5 / 1;
+  margin-top: 40px;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(3, max-content);
+  column-gap: 64px;
+  row-gap: 16px;
+}
+
+.scene[data-theme="phosphor"] .scene-socials::before {
+  content: "$ ls ~/socials";
+  grid-column: 1 / -1;
+  font-family: var(--font-body);
+  font-size: 26px;
+  color: var(--text-muted);
+}
+
+.scene[data-theme="phosphor"] .scene-icon {
+  background: none;
+  border: 1px solid #1c4a27;
+}
