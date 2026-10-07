@@ -435,6 +435,6 @@ test("the hero's night rises in, parts on scroll, and holds still for reduced mo
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "Free stream overlays that look pro.",
   );
-  for (const sel of [".landing-word", ".landing-motes", ".landing-ridges path"])
+  for (const sel of [".landing-word", ".landing-motes", ".landing-ridges > svg"])
     await expect(page.locator(sel).first()).toHaveCSS("animation-name", "none");
 });
