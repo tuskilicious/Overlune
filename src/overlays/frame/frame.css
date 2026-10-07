@@ -27,6 +27,31 @@
   border-radius: inherit;
 }
 
+/* Corner brackets just outside the edge, as in the maintainer's broadcast kits (T6.108): eight accent strokes,
+   two per corner. The soft looks keep plain rounded corners. */
+.frame-edge::after {
+  --arm: calc(var(--edge) * 2.5);
+  --line: max(3px, calc(var(--edge) * 0.35));
+  content: "";
+  position: absolute;
+  inset: calc(var(--edge) * -0.6);
+  background:
+    linear-gradient(var(--accent), var(--accent)) top left / var(--arm) var(--line),
+    linear-gradient(var(--accent), var(--accent)) top left / var(--line) var(--arm),
+    linear-gradient(var(--accent), var(--accent)) top right / var(--arm) var(--line),
+    linear-gradient(var(--accent), var(--accent)) top right / var(--line) var(--arm),
+    linear-gradient(var(--accent), var(--accent)) bottom left / var(--arm) var(--line),
+    linear-gradient(var(--accent), var(--accent)) bottom left / var(--line) var(--arm),
+    linear-gradient(var(--accent), var(--accent)) bottom right / var(--arm) var(--line),
+    linear-gradient(var(--accent), var(--accent)) bottom right / var(--line) var(--arm);
+  background-repeat: no-repeat;
+}
+
+.frame[data-theme="cozy-cafe"] .frame-edge::after,
+.frame[data-theme="pastel-cloud"] .frame-edge::after {
+  content: none;
+}
+
 .frame-label {
   position: absolute;
   left: calc(var(--edge) * 1.5);

@@ -34,6 +34,8 @@
   justify-content: flex-end;
   gap: 0;
   overflow: hidden;
+  /* The oldest message fades out at the top instead of being cut mid-line (T6.108). Only a full box reaches it. */
+  mask-image: linear-gradient(transparent, #000 2.5em);
 }
 
 /* One calm panel instead of a card per message (T6.35). Messages still arrive and leave one at a time; hairlines
