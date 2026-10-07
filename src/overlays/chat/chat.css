@@ -109,6 +109,7 @@
   from {
     opacity: 0;
     transform: translateY(0.6em);
+    filter: blur(4px);
   }
 }
 
@@ -188,4 +189,27 @@
 
 .chat[data-theme="shonen"] .chat-msg:last-child {
   border-bottom: 4px solid var(--text);
+}
+
+/* The newest message flashes with the accent as it lands, then settles (T6.123). The flash belongs to whichever
+   message is last, so it plays once per message. */
+.chat-msg {
+  position: relative;
+}
+
+.chat-msg:last-child::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  animation: chat-flash 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes chat-flash {
+  from {
+    opacity: 0.28;
+  }
 }

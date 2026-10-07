@@ -138,3 +138,23 @@ test("overlays have no canonical address", async ({ page }) => {
   await expect(page.locator(".scene")).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
 });
+
+test("the bolder pass: a light runs round the countdown, and Lite holds it (T6.123)", async ({
+  page,
+}) => {
+  const data = { theme: "daylight", starting: { endsAt: Date.now() + 3_600_000 } };
+  const link = (extra = {}) =>
+    `/o/starting#1.${lz.compressToEncodedURIComponent(JSON.stringify({ ...data, ...extra }))}`;
+  const sweep = () =>
+    page.locator(".countdown").evaluate((el) => getComputedStyle(el, "::after").animationName);
+  const disc = () =>
+    page.locator(".scene").evaluate((el) => getComputedStyle(el, "::before").animationName);
+  await page.goto(link());
+  expect(await sweep()).toBe("countdown-sweep");
+  expect(await disc()).toBe("daylight-breathe");
+  await page.goto(link({ liteMotion: true }));
+  expect(await sweep()).toBe("none");
+  expect(await disc()).toBe("none");
+  // Entrances still blur into focus in Lite.
+  await expect(page.locator(".scene-word").first()).toHaveCSS("animation-name", "scene-slide-fade");
+});

@@ -64,3 +64,46 @@
 .scene[data-theme="arcade-8bit"] .countdown-ch {
   animation-timing-function: steps(2, end);
 }
+
+/* A light runs around the countdown card's edge (T6.123), like a timer's progress ring. Looping, so Lite and Still
+   hold it (index.css). The ink-and-paper looks (Session, Shonen) and the pixel one stay still. */
+@property --sweep {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.countdown {
+  position: relative;
+}
+
+.countdown::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  padding: 2px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--sweep),
+    transparent 0 72%,
+    var(--accent) 88%,
+    transparent 100%
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: countdown-sweep 4s linear infinite;
+}
+
+@keyframes countdown-sweep {
+  to {
+    --sweep: 360deg;
+  }
+}
+
+.scene:is([data-theme="session"], [data-theme="shonen"], [data-theme="arcade-8bit"])
+  .countdown::after {
+  content: none;
+}
