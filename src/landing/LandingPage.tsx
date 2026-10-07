@@ -281,7 +281,7 @@ function ElementShot({ part, theme }: { part: string; theme: ThemeId }) {
           <Frame
             settings={{
               ...sampleScene(theme),
-              frame: { width: 640, height: 360, label: "yourname" },
+              frame: { ...sampleScene(theme).frame, label: "yourname" },
             }}
           />
         </LazyPreview>

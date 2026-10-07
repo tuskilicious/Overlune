@@ -4,6 +4,7 @@ import {
   defaultBots,
   defaultSettings,
   defaultTemplates,
+  framePosition,
   type Settings,
 } from "../../../src/settings/schema";
 import { decode, decodeLink, encode } from "../../../src/settings/url";
@@ -45,7 +46,7 @@ const sample: Settings = {
     volume: 40,
     seconds: 8,
   },
-  frame: { width: 800, height: 450, label: "Ronni" },
+  frame: { width: 800, height: 450, label: "Ronni", x: 1072, y: 582 },
   ticker: { show: true, label: "Ronni", extra: "Tue / Thu at 7 PM" },
   lessMotion: true,
   liteMotion: true,
@@ -91,6 +92,18 @@ describe("settings link", () => {
       label: "",
       extra: "",
     });
+  });
+
+  it("keeps the webcam frame placed in OBS for links made before placing it here (T6.122)", () => {
+    const { frame } = decode(raw({ frame: { width: 640, height: 360 } })).settings;
+    expect(frame.x).toBeNull();
+    expect(framePosition(frame)).toBeNull();
+  });
+
+  it("keeps a placed frame fully on screen (T6.122)", () => {
+    const frame = { width: 640, height: 360, label: "", x: 1900, y: 1000 };
+    expect(framePosition(frame)).toEqual({ x: 1280, y: 720 });
+    expect(framePosition({ ...frame, x: 48, y: 672 })).toEqual({ x: 48, y: 672 });
   });
 
   it("fills in BRB and Ending defaults for links made before those scenes existed", () => {
@@ -407,7 +420,7 @@ describe("webcam frame (T6.88)", () => {
   it("gets the defaults in links made before the frame existed", () => {
     const { settings, ok } = decode(raw({ brb: { title: "Hi" } }));
     expect(ok).toBe(true);
-    expect(settings.frame).toEqual({ width: 640, height: 360, label: "" });
+    expect(settings.frame).toEqual({ width: 640, height: 360, label: "", x: null, y: null });
   });
 
   it("cuts a long name to 40 characters", () => {
@@ -421,7 +434,7 @@ describe("webcam frame (T6.88)", () => {
     (bad) => {
       const { settings, ok } = decode(raw({ frame: { label: "Ronni", ...bad } }));
       expect(ok).toBe(false);
-      expect(settings.frame).toEqual({ width: 640, height: 360, label: "Ronni" });
+      expect(settings.frame).toEqual({ width: 640, height: 360, label: "Ronni", x: null, y: null });
     },
   );
 });
