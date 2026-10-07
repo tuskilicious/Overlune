@@ -215,7 +215,7 @@ test("with reduced motion the hero kit starts paused on one look", async ({ page
 test("the hero lists four facts, all true for v1", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("list", { name: "At a glance" }).getByRole("listitem")).toHaveText([
-    "9 looks",
+    `${themeIds.length} looks`,
     "Scenes, chat and alerts",
     "One link per overlay",
     "Free, no account",
@@ -266,12 +266,17 @@ test("the nav marks the section in view", async ({ page }) => {
 test("the landing page says what works where (T6.69, T6.79)", async ({ page }) => {
   await page.goto("/");
   const know = page.getByRole("region", { name: "Good to know" });
-  await expect(know.locator("dt")).toHaveText([
+  await expect(know.locator("summary")).toHaveText([
     "What you’ll need",
     "Works in OBS and Streamlabs",
     "Extras for your channel",
     "Your links never break",
   ]);
+  // The answers open in place (T6.124).
+  const answer = know.getByText("Paste a link once.");
+  await expect(answer).toBeHidden();
+  await know.getByText("Your links never break").click();
+  await expect(answer).toBeVisible();
   // One row per overlay, one column per platform, in words.
   const table = page.getByRole("table", { name: "Which overlays work on which platform" });
   const row = (name: string) => table.getByRole("row").filter({ hasText: name }).locator("td");
@@ -303,45 +308,62 @@ test("the landing page offers optional support and says Overlune stays free (T6.
   );
 });
 
-// T6.105: the looks orbit their heading while the pointer is over them; still for reduced motion; a grid when narrow.
-test("the looks ring orbits on hover, holds still for reduced motion, and is a grid on narrow windows", async ({
+// T6.124: the looks as a list beside one big live preview, after the owner's reference.
+test("the looks list drives one big preview by hover, focus and scroll, with a picture per look when narrow", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  const ring = page.locator("#looks");
-  await ring.scrollIntoViewIfNeeded();
-  const card = page.locator("[data-ring-card]").first();
-  const at = () => card.evaluate((el) => el.style.transform);
-  const rest = await at();
-  expect(rest).toContain("translate(");
-  await page.mouse.move(0, 0);
-  await page.waitForTimeout(600);
-  expect(await at()).toBe(rest); // resting until the pointer arrives
-  const box = (await ring.boundingBox())!;
-  await page.mouse.move(box.x + box.width * 0.3, box.y + box.height / 2); // clear of the fixed nav
-  await expect.poll(at).not.toBe(rest);
+  const preview = page.locator(".landing-look-preview .scene");
+  const row = (name: string) => page.locator("[data-look-row]").filter({ hasText: name });
+  await page.locator("#looks").scrollIntoViewIfNeeded();
+  await row("Session").locator(".landing-look-row").hover();
+  await expect(preview).toHaveAttribute("data-theme", "session");
+  await expect(row("Session")).toHaveAttribute("aria-current", "true");
+  await row("Daylight").locator(".landing-look-row").focus();
+  await expect(preview).toHaveAttribute("data-theme", "daylight");
+  // The scene buttons switch the preview's scene.
+  await page.getByRole("button", { name: "Be Right Back", exact: true }).click();
+  await expect(page.locator(".landing-look-preview .scene-title")).toContainText("right back");
+  // Scrolling a row to the middle of the window hands it the preview.
+  await page.mouse.move(5, 450);
+  await row("Neon Grid").evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await expect(preview).toHaveAttribute("data-theme", "neon-grid");
+  await expect(page.getByRole("link", { name: "Use Neon Grid" })).toHaveAttribute(
+    "href",
+    "/editor",
+  );
+
+  await page.setViewportSize({ width: 800, height: 900 });
+  await expect(page.locator(".landing-look-stage")).toBeHidden();
+  await expect(page.locator("[data-look]").first()).toBeVisible();
+});
+
+test("on wide windows the hero card zooms out into a collage of the looks; reduced motion keeps it still (T6.124)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const scale = () =>
+    page
+      .locator("[data-hero-card]")
+      .evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).a);
+  expect(await scale()).toBe(1);
+  await page.evaluate(() => scrollTo(0, 600));
+  await expect.poll(scale).toBeLessThan(0.8);
+  await expect(page.locator("[data-collage]")).toBeVisible();
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  await ring.scrollIntoViewIfNeeded();
-  const still = await at();
-  const b2 = (await ring.boundingBox())!;
-  await page.mouse.move(b2.x + b2.width * 0.3, b2.y + b2.height / 2);
-  await page.waitForTimeout(1200);
-  expect(await at()).toBe(still);
-
-  await page.setViewportSize({ width: 800, height: 900 });
-  await expect
-    .poll(() =>
-      page.locator("[data-ring-card]").evaluateAll((els) => els.map((el) => el.style.transform)),
-    )
-    .toEqual(Array(themeIds.length).fill(""));
+  await page.evaluate(() => scrollTo(0, 600));
+  await page.waitForTimeout(500);
+  expect(await scale()).toBe(1);
+  await expect(page.locator("[data-collage]")).toBeHidden();
 });
 
 test("a look opens full screen on click and closes with Esc or Close", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.emulateMedia({ reducedMotion: "reduce" }); // the ring holds still to be clicked
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const look = page.getByRole("dialog", { name: "Neon Grid, full screen" });
   const fullscreen = () => page.evaluate(() => document.fullscreenElement?.className ?? null);

@@ -216,12 +216,7 @@
   transform-origin: 0 0;
 }
 
-/* The looks ring (T6.105): from 1024px the cards are placed on an ellipse by LooksRing; below that, a grid. */
-/* Each look opens full screen on click (T6.106); its button covers the card. */
-.landing-ring-card {
-  position: relative;
-}
-
+/* A look full screen (T6.106). */
 .landing-look-full {
   width: 100vw;
   height: 100dvh;
@@ -256,33 +251,303 @@
   right: 1rem;
 }
 
+/* Redesign after the owner's reference recording (T6.124), in Overlune's violet. */
+
+/* The hero card: the old hero inside one big rounded card. On wide windows it zooms out into the collage (GSAP). */
+.landing-hero-card {
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 2.5rem;
+  background:
+    radial-gradient(80% 110% at 12% 0%, rgb(125 67 250 / 0.55), transparent 60%),
+    radial-gradient(70% 90% at 100% 100%, rgb(74 42 227 / 0.45), transparent 60%), var(--color-deep);
+  box-shadow: 0 40px 120px -40px rgb(74 42 227 / 0.6);
+  transform-origin: 50% 50%;
+}
+
+/* The collage behind the card: three rows of four looks, drifting opposite ways as the card zooms out. Hidden until
+   then, and on narrow windows and with reduced motion. */
+.landing-collage {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.25rem;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.landing-collage-row {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.landing-collage-tile {
+  width: min(22vw, 22rem);
+  flex: none;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 1rem;
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .landing-collage {
+    display: flex;
+  }
+}
+
+/* The six overlays: tall cards in a row that scrolls sideways when they don't fit. */
+.landing-cards {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(17rem, 1fr);
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0 0 1rem;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.landing-cards > li {
+  scroll-snap-align: start;
+}
+
+.landing-card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 26rem;
+  padding: 1rem 1rem 1.5rem;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 1.5rem;
+  background: var(--color-deep);
+  transition: border-color 300ms ease-out;
+}
+
+/* The fill: violet light grows from the pointer and spreads over the card. */
+.landing-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 80%),
+    var(--color-violet),
+    var(--color-ultra) 35%,
+    var(--color-indigo) 70%,
+    transparent 100%
+  );
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 400ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landing-card:hover::before,
+.landing-card:focus-visible::before {
+  opacity: 1;
+  transform: scale(1.4);
+}
+
+.landing-card:hover {
+  border-color: transparent;
+}
+
+.landing-card-arrow {
+  position: absolute;
+  top: 1.75rem;
+  right: 1.75rem;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: 50%;
+  background: var(--color-night);
+  transition:
+    background-color 300ms ease-out,
+    color 300ms ease-out;
+}
+
+.landing-card:hover .landing-card-arrow {
+  background: var(--color-moon);
+  color: var(--color-night);
+}
+
+/* The looks rise on a violet curve. */
+.landing-curve {
+  border-radius: 50% 50% 0 0 / 9rem 9rem 0 0;
+  background:
+    radial-gradient(110% 60% at 50% 0%, var(--color-violet), transparent 70%),
+    linear-gradient(
+      var(--color-ultra),
+      var(--color-indigo) 45%,
+      var(--color-deep) 85%,
+      var(--color-night)
+    );
+}
+
+.landing-look-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-look-list > li {
+  position: relative;
+  border-top: 1px solid rgb(244 241 255 / 0.2);
+}
+
+.landing-look-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  padding: 1.1rem 3.5rem 1.1rem 1rem;
+  border: 0;
+  border-radius: 1rem;
+  background: none;
+  color: var(--color-moon);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 300ms ease-out,
+    padding-left 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landing-look-list > li[aria-current="true"] .landing-look-row {
+  padding-left: 1.75rem;
+  background: rgb(5 6 26 / 0.35);
+}
+
+/* A bar marks the look on screen. */
+.landing-look-list > li[aria-current="true"]::before {
+  content: "";
+  position: absolute;
+  left: 0.6rem;
+  top: 1.4rem;
+  bottom: 1.4rem;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--color-moon);
+}
+
+.landing-look-expand {
+  position: absolute;
+  top: 1.1rem;
+  right: 0.75rem;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid rgb(244 241 255 / 0.3);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-moon);
+  cursor: zoom-in;
+}
+
+.landing-look-expand:hover {
+  border-color: var(--color-moon);
+}
+
+.landing-look-thumb {
+  margin: 0 0 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.15);
+  border-radius: 1rem;
+}
+
+/* Wide windows: one big sticky preview instead of a picture per row. */
+.landing-look-stage {
+  display: none;
+}
+
 @media (min-width: 1024px) {
-  /* The ring's own list only: the scenes inside have lists too (their socials). */
-  .landing-ring > ul {
-    position: absolute;
-    inset: 0;
+  .landing-look-thumb {
+    display: none;
+  }
+
+  .landing-look-stage {
     display: block;
-    margin: 0;
+    position: sticky;
+    top: 7rem;
+    align-self: start;
   }
+}
 
-  .landing-ring-card {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 240px; /* twelve looks share the ring (T6.111) */
-    will-change: transform, filter;
+.landing-look-preview {
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: 1.5rem;
+  box-shadow: 0 30px 80px -30px rgb(5 6 26 / 0.8);
+  animation: look-swap 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Each new look arrives out of a soft blur. */
+@keyframes look-swap {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+    filter: blur(6px);
   }
+}
 
-  /* A soft dark halo behind the copy: cards fade into it as they pass behind the text. */
-  .landing-ring > div:first-child::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 46rem;
-    height: 30rem;
-    transform: translate(-50%, -62%);
-    background: radial-gradient(closest-side, var(--color-night) 55%, transparent);
-    z-index: -1;
+/* Questions with round violet toggles: a plus that turns into a minus. */
+.landing-faq-toggle {
+  position: relative;
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--color-violet);
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landing-faq-toggle::before,
+.landing-faq-toggle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.9rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-night);
+  translate: -50% -50%;
+}
+
+.landing-faq-toggle::after {
+  rotate: 90deg;
+  transition: rotate 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landing-faq[open] .landing-faq-toggle::after {
+  rotate: 0deg;
+}
+
+.landing-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The call to action in one gradient panel. */
+.landing-cta {
+  border-radius: 2.5rem;
+  background:
+    radial-gradient(70% 90% at 50% 120%, var(--color-violet), transparent 70%),
+    radial-gradient(60% 80% at 0% 0%, rgb(74 42 227 / 0.6), transparent 60%), var(--color-deep);
+}
+
+@media (max-width: 767px) {
+  .landing-card {
+    min-height: 21rem;
   }
 }

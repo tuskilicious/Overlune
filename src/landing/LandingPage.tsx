@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { testAlerts } from "../alerts/events";
+import Icon from "../components/Icon";
 import SiteFooter, { repoUrl, supportUrl } from "../components/SiteFooter";
 import { chatSamples } from "../editor/chat-samples";
 import Preview from "../editor/Preview";
@@ -367,7 +368,12 @@ const support: { overlay: string; detail: string; on: [Support, Support, Support
   },
 ];
 
-const facts = ["9 looks", "Scenes, chat and alerts", "One link per overlay", "Free, no account"];
+const facts = [
+  `${themeIds.length} looks`,
+  "Scenes, chat and alerts",
+  "One link per overlay",
+  "Free, no account",
+];
 
 const steps = [
   ["Pick a look", "Twelve looks, each with matching scenes, chat and alerts."],
@@ -384,27 +390,31 @@ const promise =
 const button =
   "inline-flex items-center justify-center rounded-full px-7 py-3.5 font-heading text-lg font-bold transition-colors duration-300";
 
-/** One orbit every 30 seconds while the pointer is over the ring (T6.105). */
-const ORBIT_SPEED = (Math.PI * 2) / 30;
+/** One line per look for the showcase (T6.124): what it is, in its own words. */
+const blurbs: Record<ThemeId, string> = {
+  "clean-slate": "Quiet and sharp, with one blue accent.",
+  "neon-grid": "A glowing grid floor under a dark sky.",
+  "cozy-cafe": "Warm paper, window light and rising steam.",
+  "arcade-8bit": "Pixel type, scanlines and a blinking cursor.",
+  "pastel-cloud": "Soft colors, drifting clouds and a sparkle.",
+  "forest-night": "A full moon, fireflies and a pine treeline.",
+  "bold-esports": "Condensed type and angled red slabs.",
+  "vaporwave-sunset": "A striped sun setting behind the palms.",
+  daylight: "A light look with a vermilion disc.",
+  abyss: "Deep water where only living things glow.",
+  session: "A jazz-anime title card in mustard and ink.",
+  shonen: "A manga page, inked and lettered.",
+};
 
-/**
- * The looks orbiting their heading (T6.105), an original take on the "headline ringed by plates" idea, with the
- * real looks as the plates. From 1024px the cards sit on an ellipse round the copy: front ones pass over it, back ones
- * dim behind it, and every card keeps facing you. The ring rests until the pointer is over it, eases up to one orbit
- * every 30 seconds and eases back to a stop on leave. Reduced motion: it stays still. Narrower windows: a plain grid.
- */
-function LooksRing() {
-  const stage = useRef<HTMLDivElement>(null);
+/** A look full screen (T6.106): a native dialog keeps focus and Esc; its body goes full screen, since Chrome won't
+ *  for a dialog itself. Phones that can't go full screen get a dialog that fills the window. */
+function FullScreenLook({ look, onClose }: { look: ThemeId | null; onClose: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const screen = useRef<HTMLDivElement>(null);
-  /** The look shown full screen (T6.106). */
-  const [open, setOpen] = useState<ThemeId | null>(null);
   useEffect(() => {
     const d = dialog.current;
-    if (!d || !open) return;
+    if (!d || !look) return;
     d.showModal();
-    // The dialog keeps focus and Esc; its body goes full screen (Chrome won't for a dialog itself).
-    // iPhones can't put an element full screen; the dialog still fills the window there.
     let gone = false;
     screen.current?.requestFullscreen?.().then(
       () => gone && void document.exitFullscreen(), // closed before full screen arrived
@@ -420,143 +430,138 @@ function LooksRing() {
       document.removeEventListener("fullscreenchange", left);
       if (document.fullscreenElement) void document.exitFullscreen();
     };
-  }, [open]);
+  }, [look]);
   // Leave full screen first (that closes the dialog, as Esc does), so focus returns to the look.
   const close = () =>
     document.fullscreenElement ? void document.exitFullscreen() : dialog.current?.close();
+  return (
+    <dialog
+      ref={dialog}
+      className="landing-look-full"
+      aria-label={look ? `${themes[look].name}, full screen` : undefined}
+      onClose={onClose}
+    >
+      <div ref={screen} className="landing-look-full-body">
+        {look && (
+          <>
+            <div className="landing-look-full-stage">
+              <Preview>
+                <StartingSoon settings={sampleScene(look)} />
+              </Preview>
+            </div>
+            <button
+              type="button"
+              className={`${button} landing-look-full-close border border-moon/40 bg-night/80 text-moon hover:border-moon`}
+              onClick={close}
+            >
+              Close (Esc)
+            </button>
+          </>
+        )}
+      </div>
+    </dialog>
+  );
+}
+
+/**
+ * The looks (T6.124), after the owner's reference recording: a violet section rising on a curve, the looks listed on
+ * the left and one big live preview on the right. On wide windows the preview follows the row in the middle of the
+ * window as you scroll, or the one under the pointer or keyboard focus; on narrow ones each row shows its own picture.
+ */
+function LooksShowcase() {
+  const [active, setActive] = useState<ThemeId>("abyss");
+  const [scene, setScene] = useState<KitScene>("starting");
+  const [open, setOpen] = useState<ThemeId | null>(null);
+  const list = useRef<HTMLOListElement>(null);
   useEffect(() => {
-    const root = stage.current!;
-    const cards = [...root.querySelectorAll<HTMLElement>("[data-ring-card]")];
     const wide = matchMedia("(min-width: 1024px)");
-    const still = matchMedia("(prefers-reduced-motion: reduce)");
-    let angle = 0,
-      speed = 0,
-      target = 0,
-      frame = 0,
-      last = 0,
-      visible = false;
-    const place = () => {
-      if (!wide.matches) {
-        for (const c of cards) c.removeAttribute("style");
-        return;
-      }
-      const rx = Math.min(480, root.clientWidth / 2 - 160);
-      // The back half rises higher than the front half dips, so cards behind the copy clear the headline.
-      const front = 230,
-        back = 330;
-      // The ring sits lower than the copy so front cards pass under its button; the pair is raised together (the
-      // copy's padding below) so the group is centered in the stage.
-      const dy = 18;
-      cards.forEach((c, i) => {
-        const a = angle + (i / cards.length) * Math.PI * 2;
-        const depth = Math.cos(a); // 1 in front (bottom), -1 at the back (top)
-        const t = (depth + 1) / 2;
-        const y = depth * (depth > 0 ? front : back) + dy;
-        c.style.transform = `translate(-50%, -50%) translate(${Math.sin(a) * rx}px, ${y}px) scale(${0.55 + 0.45 * t})`;
-        // Dimmed, not faded: a faded card would show the cards and labels behind it.
-        c.style.filter = `brightness(${0.3 + 0.7 * t})`;
-        c.style.zIndex = String(depth > 0 ? 20 + Math.round(t * 10) : 1 + Math.round(t * 4));
-      });
-    };
-    const tick = (now: number) => {
-      const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
-      last = now;
-      speed += (target - speed) * Math.min(1, dt * 2.5); // ease towards the target speed
-      angle += speed * dt;
-      place();
-      frame = visible && (target > 0 || speed > 0.0005) ? requestAnimationFrame(tick) : 0;
-      if (!frame) last = 0;
-    };
-    const run = () => {
-      if (!frame && visible) frame = requestAnimationFrame(tick);
-    };
-    const enter = () => {
-      if (still.matches || !wide.matches) return;
-      target = ORBIT_SPEED;
-      run();
-    };
-    const leave = () => {
-      target = 0;
-      run();
-    };
-    const io = new IntersectionObserver(([e]) => {
-      visible = Boolean(e?.isIntersecting);
-      if (visible) run();
-    });
-    io.observe(root);
-    root.addEventListener("pointerenter", enter);
-    root.addEventListener("pointerleave", leave);
-    wide.addEventListener("change", place);
-    place();
-    return () => {
-      cancelAnimationFrame(frame);
-      io.disconnect();
-      root.removeEventListener("pointerenter", enter);
-      root.removeEventListener("pointerleave", leave);
-      wide.removeEventListener("change", place);
-    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!wide.matches) return;
+        for (const e of entries)
+          if (e.isIntersecting) setActive(e.target.getAttribute("data-look-row") as ThemeId);
+      },
+      { rootMargin: "-48% 0px -48% 0px" },
+    );
+    for (const row of list.current!.querySelectorAll("[data-look-row]")) io.observe(row);
+    return () => io.disconnect();
   }, []);
   return (
-    <div ref={stage} className="landing-ring relative mx-auto max-w-7xl lg:h-[48rem]">
-      <div className="relative z-10 text-center lg:pointer-events-none lg:absolute lg:inset-0 lg:flex lg:flex-col lg:items-center lg:justify-center lg:pb-[94px]">
+    <div className="mx-auto max-w-7xl">
+      <div className="max-w-2xl">
         <h2
           id="looks-heading"
-          className="mx-auto max-w-[34rem] font-heading text-[clamp(2.25rem,4vw,3.5rem)] leading-tight font-bold"
+          data-reveal
+          className="font-heading text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.02] font-bold"
         >
           Twelve looks. Every scene matches.
         </h2>
-        <p className="mx-auto mt-6 max-w-md text-lg text-haze">
+        <p className="mt-6 max-w-md text-lg text-moon/85">
           Pick one and your Starting Soon, Be Right Back and Stream Ending scenes, chat and alerts
           all change together. Switch any time.
         </p>
-        <Link
-          to="/editor"
-          className={`${button} mt-8 border border-moon/40 text-moon hover:border-moon lg:pointer-events-auto`}
-        >
-          Try them in the editor
-        </Link>
       </div>
-      <ul className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:mt-0">
-        {themeIds.map((id) => (
-          <li key={id} data-ring-card className="landing-ring-card">
-            <div data-look className="overflow-hidden rounded-2xl border border-white/10">
-              <Scene theme={id} />
-            </div>
-            <p className="mt-3 font-heading text-xl font-bold">{themes[id].name}</p>
-            <button
-              type="button"
-              className="absolute inset-0 cursor-zoom-in rounded-2xl"
-              aria-label={`See ${themes[id].name} full screen`}
-              onClick={() => setOpen(id)}
-            />
-          </li>
-        ))}
-      </ul>
-      <dialog
-        ref={dialog}
-        className="landing-look-full"
-        aria-label={open ? `${themes[open].name}, full screen` : undefined}
-        onClose={() => setOpen(null)}
-      >
-        <div ref={screen} className="landing-look-full-body">
-          {open && (
-            <>
-              <div className="landing-look-full-stage">
-                <Preview>
-                  <StartingSoon settings={sampleScene(open)} />
-                </Preview>
-              </div>
+      <div className="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]">
+        <ol ref={list} className="landing-look-list" aria-label="The looks">
+          {themeIds.map((id) => (
+            <li key={id} data-look-row={id} aria-current={active === id || undefined}>
               <button
                 type="button"
-                className={`${button} landing-look-full-close border border-moon/40 bg-night/80 text-moon hover:border-moon`}
-                onClick={close}
+                className="landing-look-row"
+                onPointerEnter={() => setActive(id)}
+                onFocus={() => setActive(id)}
+                onClick={() => setActive(id)}
               >
-                Close (Esc)
+                <span className="font-heading text-2xl font-bold">{themes[id].name}</span>
+                <span className="text-moon/75">{blurbs[id]}</span>
               </button>
-            </>
-          )}
+              <button
+                type="button"
+                className="landing-look-expand"
+                aria-label={`See ${themes[id].name} full screen`}
+                onClick={() => setOpen(id)}
+              >
+                <Icon name="expand" />
+              </button>
+              {/* Narrow windows: each look shows its own picture, since a sticky preview needs room beside it. */}
+              <div data-look className="landing-look-thumb">
+                <Scene theme={id} />
+              </div>
+            </li>
+          ))}
+        </ol>
+        <div className="landing-look-stage">
+          <div key={`${active}-${scene}`} className="landing-look-preview">
+            <Preview>
+              <SceneOf theme={active} scene={scene} />
+            </Preview>
+          </div>
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            {(Object.keys(sceneNames) as KitScene[]).map((id) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={scene === id}
+                onClick={() => setScene(id)}
+                className="cursor-pointer rounded-full border border-moon/30 bg-transparent px-4 py-1.5 font-body text-sm text-moon hover:border-moon aria-pressed:border-moon aria-pressed:bg-moon aria-pressed:text-night"
+              >
+                {sceneNames[id]}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setOpen(active)}
+              className="ml-auto inline-flex cursor-pointer items-center gap-2 rounded-full border border-moon/30 bg-transparent px-4 py-1.5 font-body text-sm text-moon hover:border-moon"
+            >
+              <Icon name="expand" /> Full screen
+            </button>
+          </div>
+          <Link to="/editor" className={`${button} mt-8 bg-moon text-night hover:bg-white`}>
+            Use {themes[active].name}
+          </Link>
         </div>
-      </dialog>
+      </div>
+      <FullScreenLook look={open} onClose={() => setOpen(null)} />
     </div>
   );
 }
@@ -578,6 +583,43 @@ export default function LandingPage() {
     () => {
       const mm = gsap.matchMedia();
       // Every animation has a reduced-motion version: none at all (CLAUDE.md).
+      // The hero card zooms out into a drifting collage of every look as you scroll (T6.124), on wide windows.
+      mm.add("(prefers-reduced-motion: no-preference) and (min-width: 1024px)", () => {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: "[data-hero-stage]",
+            start: "top top",
+            end: "+=900",
+            pin: true,
+            scrub: 0.6,
+          },
+        });
+        tl.to("[data-hero-card]", { scale: 0.56, ease: "none" }, 0)
+          .fromTo("[data-collage]", { opacity: 0 }, { opacity: 1, ease: "none" }, 0)
+          .fromTo(
+            "[data-collage-row]:nth-child(odd)",
+            { xPercent: 6 },
+            { xPercent: -6, ease: "none" },
+            0,
+          )
+          .fromTo(
+            "[data-collage-row]:nth-child(even)",
+            { xPercent: -6 },
+            { xPercent: 6, ease: "none" },
+            0,
+          );
+        // The looks section rises over the page on its curve.
+        gsap.from("[data-curve]", {
+          yPercent: 8,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "[data-curve]",
+            start: "top bottom",
+            end: "top 30%",
+            scrub: true,
+          },
+        });
+      });
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) =>
           gsap.from(el, {
@@ -648,57 +690,77 @@ export default function LandingPage() {
         </Link>
       </nav>
 
-      <main id="main" tabIndex={-1} className="w-full max-w-full overflow-x-hidden outline-none">
+      <main id="main" tabIndex={-1} className="w-full max-w-full overflow-x-clip outline-none">
         {/* Attention: text left, a live overlay beside it. The whole scene stays in view: its title sits at the
             bottom of the frame, so a scene hanging off the hero would hide it (T6.45). */}
-        <section className="landing-ambient landing-sky relative px-6 pt-40 pb-32 md:px-12 md:pt-48 md:pb-48">
-          <span aria-hidden className="landing-moon" />
-          <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-            <div>
-              <h1 className="max-w-5xl font-heading text-[clamp(2.75rem,5.5vw,5.25rem)] leading-[1.05] font-bold">
-                Free stream overlays that look pro.
-              </h1>
-              <p className="mt-8 max-w-xl text-xl leading-relaxed text-haze">
-                Pick a look, add your text, and paste one link per overlay into OBS. Starting Soon,
-                Be Right Back, Stream Ending, chat and alerts, all matching.
-              </p>
-              <div className="mt-10 flex flex-wrap gap-4">
-                <Link
-                  to="/editor"
-                  className={`${button} landing-glow-button bg-violet text-night hover:bg-moon`}
-                >
-                  {returning ? "Continue your overlay" : "Make your overlays"}
-                </Link>
-                <a
-                  href="#looks"
-                  className={`${button} border border-moon/40 text-moon hover:border-moon`}
-                >
-                  See the looks
-                </a>
-              </div>
-              <ul
-                className="mt-10 flex flex-wrap gap-x-6 gap-y-2 text-haze"
-                aria-label="At a glance"
-              >
-                {facts.map((f) => (
-                  <li key={f} className="flex items-center gap-2">
-                    <span aria-hidden className="size-1.5 rounded-full bg-cyan" />
-                    {f}
-                  </li>
-                ))}
-                {/* Open source, higher on the page than the footer (T6.77). */}
-                <li className="flex items-center gap-2">
-                  <span aria-hidden className="size-1.5 rounded-full bg-cyan" />
-                  <a
-                    href={repoUrl}
-                    className="underline decoration-haze/50 underline-offset-4 hover:text-moon"
-                  >
-                    Open source
-                  </a>
-                </li>
-              </ul>
+        {/* The hero card, after the owner's reference (T6.124): on wide windows it zooms out into a drifting collage
+            of every look as you scroll. */}
+        <section className="landing-hero relative px-3 pt-24 md:px-6 md:pt-28">
+          <div data-hero-stage className="relative flex min-h-[calc(100dvh-7rem)] items-center">
+            <div data-collage aria-hidden className="landing-collage">
+              {[0, 1, 2].map((row) => (
+                <div key={row} data-collage-row className="landing-collage-row">
+                  {themeIds.slice(row * 4, row * 4 + 4).map((id) => (
+                    <div key={id} className="landing-collage-tile">
+                      <Scene theme={id} />
+                    </div>
+                  ))}
+                </div>
+              ))}
             </div>
-            <HeroKit />
+            <div
+              data-hero-card
+              className="landing-hero-card landing-sky relative z-10 mx-auto w-full max-w-[90rem] px-6 py-16 md:px-12 md:py-20"
+            >
+              <span aria-hidden className="landing-moon" />
+              <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+                <div>
+                  <h1 className="max-w-5xl font-heading text-[clamp(2.75rem,5.5vw,5.25rem)] leading-[1.05] font-bold">
+                    Free stream overlays that look pro.
+                  </h1>
+                  <p className="mt-8 max-w-xl text-xl leading-relaxed text-haze">
+                    Pick a look, add your text, and paste one link per overlay into OBS. Starting
+                    Soon, Be Right Back, Stream Ending, chat and alerts, all matching.
+                  </p>
+                  <div className="mt-10 flex flex-wrap gap-4">
+                    <Link
+                      to="/editor"
+                      className={`${button} landing-glow-button bg-violet text-night hover:bg-moon`}
+                    >
+                      {returning ? "Continue your overlay" : "Make your overlays"}
+                    </Link>
+                    <a
+                      href="#looks"
+                      className={`${button} border border-moon/40 text-moon hover:border-moon`}
+                    >
+                      See the looks
+                    </a>
+                  </div>
+                  <ul
+                    className="mt-10 flex flex-wrap gap-x-6 gap-y-2 text-haze"
+                    aria-label="At a glance"
+                  >
+                    {facts.map((f) => (
+                      <li key={f} className="flex items-center gap-2">
+                        <span aria-hidden className="size-1.5 rounded-full bg-cyan" />
+                        {f}
+                      </li>
+                    ))}
+                    {/* Open source, higher on the page than the footer (T6.77). */}
+                    <li className="flex items-center gap-2">
+                      <span aria-hidden className="size-1.5 rounded-full bg-cyan" />
+                      <a
+                        href={repoUrl}
+                        className="underline decoration-haze/50 underline-offset-4 hover:text-moon"
+                      >
+                        Open source
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <HeroKit />
+              </div>
+            </div>
           </div>
         </section>
 
@@ -726,18 +788,30 @@ export default function LandingPage() {
               Six overlays in every look
             </h2>
             <p className="mt-4 max-w-xl text-lg text-haze">Open any of them in the editor.</p>
-            <ul className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {/* A row of tall cards, after the reference's services row (T6.124): the one under the pointer fills with
+                violet from where the pointer is. Sideways scroll when they don't fit. */}
+            <ul className="landing-cards mt-12">
               {elements.map((e) => (
                 <li key={e.part}>
                   <Link
                     to={`/editor?part=${e.part}`}
-                    className="group block h-full rounded-3xl border border-white/10 bg-deep p-4 transition-colors hover:border-violet"
+                    className="landing-card group"
+                    onPointerMove={(ev) => {
+                      const r = ev.currentTarget.getBoundingClientRect();
+                      ev.currentTarget.style.setProperty("--mx", `${ev.clientX - r.left}px`);
+                      ev.currentTarget.style.setProperty("--my", `${ev.clientY - r.top}px`);
+                    }}
                   >
+                    <span aria-hidden className="landing-card-arrow">
+                      <Icon name="arrow" />
+                    </span>
                     <div className="landing-still aspect-video overflow-hidden rounded-xl bg-night">
                       <ElementShot part={e.part} theme={e.theme} />
                     </div>
-                    <h3 className="mt-4 font-heading text-xl font-bold">{e.name}</h3>
-                    <p className="mt-1 text-haze">{e.line}</p>
+                    <div className="relative mt-auto pt-10">
+                      <h3 className="font-heading text-2xl font-bold">{e.name}</h3>
+                      <p className="mt-2 text-haze group-hover:text-moon">{e.line}</p>
+                    </div>
                   </Link>
                 </li>
               ))}
@@ -835,10 +909,11 @@ export default function LandingPage() {
         {/* Desire: the title stays put while every look scrolls past. */}
         <section
           id="looks"
-          className="relative px-6 py-32 md:px-12 md:py-40"
+          data-curve
+          className="landing-curve relative px-6 py-32 md:px-12 md:py-40"
           aria-labelledby="looks-heading"
         >
-          <LooksRing />
+          <LooksShowcase />
         </section>
 
         {/* How it works: slices that widen on hover or focus. */}
@@ -954,17 +1029,18 @@ export default function LandingPage() {
             >
               Good to know
             </h2>
-            <dl className="divide-y divide-white/10 border-y border-white/10">
+            {/* Questions that open in place, with round toggles, after the reference's FAQ (T6.124). */}
+            <div className="divide-y divide-white/10 border-y border-white/10">
               {goodToKnow.map(([term, text]) => (
-                <div
-                  key={term}
-                  className="grid gap-2 py-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:gap-8"
-                >
-                  <dt className="font-heading text-xl font-bold">{term}</dt>
-                  <dd className="m-0 text-haze">{text}</dd>
-                </div>
+                <details key={term} className="landing-faq group">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 font-heading text-xl font-bold">
+                    {term}
+                    <span aria-hidden className="landing-faq-toggle" />
+                  </summary>
+                  <p className="m-0 max-w-2xl pb-6 text-haze">{text}</p>
+                </details>
               ))}
-            </dl>
+            </div>
           </div>
         </section>
 
@@ -983,35 +1059,34 @@ export default function LandingPage() {
         </section>
 
         {/* Action. */}
-        <section
-          className="landing-ambient px-6 pt-16 pb-32 text-center md:px-12 md:pt-24 md:pb-48"
-          aria-labelledby="cta-heading"
-        >
-          <h2
-            id="cta-heading"
-            data-reveal
-            className="mx-auto max-w-5xl font-heading text-[clamp(2.5rem,6vw,5.5rem)] leading-[1.05] font-bold"
-          >
-            Make your stream look pro.
-          </h2>
-          <Link
-            to="/editor"
-            className={`${button} mt-12 bg-violet px-10 py-5 text-xl text-night hover:bg-moon`}
-          >
-            Make your overlays
-          </Link>
-          <p className="mt-6 text-haze">Free. No account. Works with OBS and Streamlabs.</p>
-          {/* Optional, quiet, and after the call to action: nothing is locked (T6.80). */}
-          <p className="mx-auto mt-3 max-w-xl text-sm text-haze">
-            Overlune is free and stays free. If it helped your stream, you can{" "}
-            <a
-              href={supportUrl}
-              className="underline decoration-haze/50 underline-offset-4 hover:text-moon"
+        <section className="px-3 pb-6 md:px-6" aria-labelledby="cta-heading">
+          <div className="landing-cta mx-auto max-w-[90rem] px-6 pt-20 pb-24 text-center md:px-12 md:pt-28 md:pb-32">
+            <h2
+              id="cta-heading"
+              data-reveal
+              className="mx-auto max-w-5xl font-heading text-[clamp(2.5rem,6vw,5.5rem)] leading-[1.05] font-bold"
             >
-              support it on GitHub Sponsors
-            </a>
-            .
-          </p>
+              Make your stream look pro.
+            </h2>
+            <Link
+              to="/editor"
+              className={`${button} mt-12 bg-violet px-10 py-5 text-xl text-night hover:bg-moon`}
+            >
+              Make your overlays
+            </Link>
+            <p className="mt-6 text-haze">Free. No account. Works with OBS and Streamlabs.</p>
+            {/* Optional, quiet, and after the call to action: nothing is locked (T6.80). */}
+            <p className="mx-auto mt-3 max-w-xl text-sm text-haze">
+              Overlune is free and stays free. If it helped your stream, you can{" "}
+              <a
+                href={supportUrl}
+                className="underline decoration-haze/50 underline-offset-4 hover:text-moon"
+              >
+                support it on GitHub Sponsors
+              </a>
+              .
+            </p>
+          </div>
         </section>
       </main>
       <SiteFooter />
