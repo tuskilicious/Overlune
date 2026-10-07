@@ -206,3 +206,9 @@
   line-height: 1.3;
   letter-spacing: 0;
 }
+
+/* Abyss (T6.109): an alert is a living thing, so it carries the light: an accent seam and a soft glow below it. */
+.alerts[data-theme="abyss"] .alert-box {
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 24px 64px -16px color-mix(in srgb, var(--accent) 30%, transparent);
+}

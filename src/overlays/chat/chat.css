@@ -171,3 +171,8 @@
 .chat[data-theme="neon-grid"] .chat-msg:last-child {
   border-bottom: var(--border);
 }
+
+/* Abyss (T6.109): light is kept for living things, so only the newest message is lit, with a faint accent wash. */
+.chat[data-theme="abyss"] .chat-msg:last-child {
+  background: color-mix(in srgb, var(--accent) 9%, var(--surface));
+}
