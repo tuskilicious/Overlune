@@ -61,7 +61,7 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 overlune/
 ├─ CLAUDE.md  README.md  CHANGELOG.md  LICENSE  .gitignore  .env.example
 ├─ docs/
-│  ├─ PRD.md  TASKS.md  STACK.md  DESIGN.md  BRAND.md  ASSETS.md  OBS-TESTING.md  FUTURE-SCOPE.md
+│  ├─ PRD.md  TASKS.md  STACK.md  DESIGN.md  LAYOUTS.md  BRAND.md  ASSETS.md  OBS-TESTING.md  FUTURE-SCOPE.md
 │  ├─ brand/            logo, icon and social exports (BRAND.md)
 │  └─ legal/            privacy.md, terms.md
 ├─ public/
@@ -71,7 +71,7 @@ overlune/
 │  ├─ main.tsx  App.tsx  routes.tsx
 │  ├─ landing/          landing page at / (Tailwind + GSAP, lazy-loaded)
 │  ├─ editor/           editor UI, preview, copy-link, setup guide; sections/ holds one file per form section
-│  ├─ overlays/         starting/ brb/ ending/ chat/ alerts/ + shared frame & error state
+│  ├─ overlays/         starting/ brb/ ending/ chat/ alerts/ + shared frame & error state; layouts.css (a scene layout per look)
 │  ├─ themes/           types.ts, index.ts, one file per theme
 │  ├─ settings/         schema.ts, url.ts (encode/decode), migrations.ts, storage.ts
 │  ├─ twitch/           irc.ts (connection), parse.ts (IRC → typed events), emotes.ts

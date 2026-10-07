@@ -123,7 +123,9 @@ test("Pastel Cloud's clouds drift above the title block, never through it (T6.39
   expect(cloudBottom).toBeLessThanOrEqual(titleTop);
 });
 
-test("Forest Night's fireflies fade out above the title block (T6.40)", async ({ page }) => {
+test("Forest Night's fireflies keep to the open left of the sky, clear of the headline (T6.134)", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto(
     `/o/starting#1.${lz.compressToEncodedURIComponent(
@@ -135,14 +137,16 @@ test("Forest Night's fireflies fade out above the title block (T6.40)", async ({
     )}`,
   );
   await page.evaluate(() => document.fonts.ready);
-  // Typical content, as for Pastel Cloud. The firefly layers fade to nothing at the mask's last stop.
+  // Typical content. The headline hangs right-aligned under the moon; the firefly layers fade out across the width
+  // (the mask's first layer, "to right"), so its last stop is where they end.
   const fadeEnd = await page.locator(".scene").evaluate((el) => {
     const mask = getComputedStyle(el, "::before").maskImage;
-    const stops = [...mask.matchAll(/([\d.]+)%/g)].map((m) => parseFloat(m[1]!));
-    return (el.clientHeight * (stops.at(-1) ?? 100)) / 100;
+    const toRight = mask.slice(0, mask.indexOf("), linear-gradient"));
+    const stops = [...toRight.matchAll(/([\d.]+)%/g)].map((m) => parseFloat(m[1]!));
+    return (el.clientWidth * (stops.at(-1) ?? 100)) / 100;
   });
-  const titleTop = (await page.locator(".scene-title").boundingBox())!.y;
-  expect(fadeEnd).toBeLessThanOrEqual(titleTop);
+  const title = (await page.locator(".scene-title").boundingBox())!;
+  expect(fadeEnd).toBeLessThanOrEqual(title.x);
 });
 
 test("Bold Esports keeps its angles without cutting the socials divider (T6.41)", async ({

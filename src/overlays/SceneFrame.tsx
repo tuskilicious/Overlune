@@ -13,6 +13,7 @@ import "../themes/fonts";
 import { applyOverrides, themeVars } from "../themes/vars";
 import SocialIcon from "./social-icons";
 import "./scene.css";
+import "./layouts.css";
 
 const platformLabel: Record<Settings["socials"][number]["platform"], string> = {
   twitch: "Twitch",

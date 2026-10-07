@@ -110,8 +110,10 @@ export default function WebcamFrame({
         />
       </label>
       <div className="editor-frame-preview">
+        {/* The frame alone: placed, its overlay is a 1920×1080 canvas, which a frame-sized box would crop. The pad
+            above shows where it goes. */}
         <Preview width={settings.frame.width} height={settings.frame.height}>
-          <Frame settings={settings} />
+          <Frame settings={{ ...settings, frame: { ...settings.frame, x: null, y: null } }} />
         </Preview>
       </div>
     </fieldset>

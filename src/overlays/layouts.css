@@ -1,0 +1,1404 @@
+/* Look layouts (T6.134, docs/LAYOUTS.md): each look composes the scene its own way, on the shared markup. Layout v2 in
+   scene.css stays the default. Loaded after scene.css, so these win at equal specificity. A layout changes placement
+   only; colors, fonts, effects and motion stay in scene.css. Pieces: .scene-logo, .scene-title, .scene-subtitle and
+   .scene-side (the countdown on Starting Soon, then .scene-socials). BRB, Stream Ending and the offline banner have
+   no countdown: `.scene-main:has(.countdown)` tells them apart (OBS 31+, Chromium 127). */
+
+/* 1. Clean Slate: the shelf (the handoff's Calm board). One continuous surface along the bottom holds the subtitle,
+   the countdown and the socials in cells split by hairlines; the headline stands above it. */
+.scene[data-theme="clean-slate"] .scene-main {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  column-gap: 0;
+  align-items: center;
+}
+
+.scene[data-theme="clean-slate"] .scene-main:has(.countdown) {
+  grid-template-columns: minmax(0, 1.25fr) auto minmax(0, 1fr);
+}
+
+.scene[data-theme="clean-slate"] .scene-title {
+  grid-area: 3 / 1 / auto / -1;
+  margin-bottom: 56px;
+  max-width: 1400px;
+}
+
+/* The shelf itself: a grid item behind the last row's cells. Hidden when there's nothing to put on it. */
+.scene[data-theme="clean-slate"] .scene-main::before {
+  content: "";
+  grid-area: 4 / 1 / auto / -1;
+  align-self: stretch;
+  justify-self: stretch;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  border-radius: calc(var(--radius) * 1.5);
+}
+
+.scene[data-theme="clean-slate"]
+  .scene-main:not(:has(.scene-subtitle, .countdown, .scene-socials))::before {
+  display: none;
+}
+
+.scene[data-theme="clean-slate"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="clean-slate"] :is(.scene-subtitle, .countdown, .scene-socials) {
+  grid-row: 4;
+  align-self: stretch;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 40px 48px;
+}
+
+.scene[data-theme="clean-slate"] .scene-subtitle {
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  max-width: none;
+  font-size: 36px;
+}
+
+/* The countdown is a cell of the shelf, not a card of its own. */
+.scene[data-theme="clean-slate"] .countdown {
+  grid-column: 2;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-left: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="clean-slate"] .countdown-time {
+  font-size: 80px;
+}
+
+.scene[data-theme="clean-slate"] .scene-socials {
+  grid-column: -2;
+  align-content: center;
+  border-left: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+/* Only the socials: they open the shelf, so no hairline on their left. */
+.scene[data-theme="clean-slate"] .scene-main:not(:has(.scene-subtitle, .countdown)) .scene-socials {
+  grid-column: 1 / -1;
+  grid-auto-flow: column;
+  justify-content: start;
+  column-gap: 64px;
+  border-left: 0;
+}
+
+/* The light that runs round the countdown card (T6.123) would trace one cell of the shelf. */
+.scene[data-theme="clean-slate"] .countdown::after {
+  display: none;
+}
+
+/* 7. Bold Esports: the broadcast bar (the handoff's Bold board). The poster headline above, and one bar across the
+   whole stream at the bottom: the countdown in a large angled red slab (ink on red, 5.2:1), the socials beside it. */
+.scene[data-theme="bold-esports"] .scene-main {
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  column-gap: 0;
+}
+
+.scene[data-theme="bold-esports"] .scene-title {
+  grid-area: 3 / 1 / auto / -1;
+}
+
+.scene[data-theme="bold-esports"] .scene-subtitle {
+  grid-area: 4 / 1 / auto / -1;
+  max-width: 40ch;
+}
+
+/* The bar: edge to edge, sitting on the bottom of the stream (or on the ticker). */
+.scene[data-theme="bold-esports"] .scene-main::before {
+  content: "";
+  grid-area: 5 / 1 / auto / -1;
+  align-self: stretch;
+  justify-self: stretch;
+  margin: 56px -112px -72px;
+  background: var(--surface);
+  border-top: 2px solid var(--accent);
+}
+
+.scene[data-theme="bold-esports"][data-ticker] .scene-main::before {
+  margin-bottom: -78px; /* down to the ticker band's top edge (its 2px border included) */
+}
+
+.scene[data-theme="bold-esports"] .scene-main:not(:has(.countdown, .scene-socials))::before {
+  display: none;
+}
+
+.scene[data-theme="bold-esports"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="bold-esports"] .countdown {
+  grid-area: 5 / 1;
+  align-self: end;
+  margin: 56px 0 -72px -112px;
+  padding: 36px 120px 32px 112px;
+  align-items: flex-start;
+  text-align: left;
+  background: var(--accent);
+  border: 0;
+  border-radius: 0;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 64px) 100%, 0 100%);
+}
+
+.scene[data-theme="bold-esports"][data-ticker] .countdown {
+  margin-bottom: -78px;
+}
+
+.scene[data-theme="bold-esports"] :is(.countdown-time, .countdown-at, .countdown-done) {
+  color: var(--bg);
+}
+
+.scene[data-theme="bold-esports"] .countdown-time {
+  font-size: 112px;
+}
+
+.scene[data-theme="bold-esports"] .countdown-at {
+  font-weight: 700;
+}
+
+/* The light that runs round the countdown card (T6.123) would cut the slab's angle. */
+.scene[data-theme="bold-esports"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="bold-esports"] .scene-socials {
+  grid-area: 5 / 2;
+  align-self: center;
+  margin-top: 56px;
+  padding-left: 64px;
+  grid-auto-flow: column;
+  justify-content: start;
+  column-gap: 64px;
+  /* Centered in the bar, which starts 56px into the row and reaches 72px (the padding) past it. */
+  transform: translateY(36px);
+}
+
+.scene[data-theme="bold-esports"][data-ticker] .scene-socials {
+  transform: translateY(39px);
+}
+
+.scene[data-theme="bold-esports"] .scene-main:not(:has(.countdown)) .scene-socials {
+  grid-column: 1 / -1;
+  padding-left: 0;
+}
+
+/* One decoration less: the bar's red edge carries the accent, so the rule above the headline goes (kept as a
+   zero-height box, which the scene-fit test measures). */
+.scene[data-theme="bold-esports"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+/* 4. Arcade 8-Bit: the attract screen (the handoff's Retro board, its row bands). Centered like a cabinet waiting for
+   a coin, because attract screens are: the title, the countdown under it, and the socials as a high-score table, one
+   colored band per row (ink on yellow, green or pink, 6:1 or more). */
+.scene[data-theme="arcade-8bit"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 0 minmax(0, 1fr) auto auto auto auto minmax(0, 1fr); /* centered, like the cabinet screen */
+  row-gap: 0;
+  justify-items: center;
+  text-align: center;
+}
+
+/* The logo sits in the corner of the cabinet screen, out of the centered stack, so it never pushes it down. */
+.scene[data-theme="arcade-8bit"] {
+  position: relative;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  left: 112px;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 1500px;
+}
+
+/* With a logo in the corner, a long title wraps clear of it. */
+.scene[data-theme="arcade-8bit"] .scene-main:has(.scene-logo) .scene-title {
+  padding-inline: 184px;
+}
+
+/* One decoration less: the blinking cursor marks the title, so the rule above it goes (a zero-height box, which the
+   scene-fit test measures). */
+.scene[data-theme="arcade-8bit"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-subtitle {
+  grid-area: 4 / 1;
+  margin-top: 24px;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="arcade-8bit"] .countdown {
+  grid-area: 5 / 1;
+  justify-self: center;
+  margin-top: 48px;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials {
+  grid-area: 6 / 1;
+  justify-self: center;
+  width: min(1040px, 100%);
+  margin-top: 48px;
+  gap: 0;
+  counter-reset: rank;
+}
+
+/* A high-score row: rank, icon, platform, handle, on a colored band. */
+.scene[data-theme="arcade-8bit"] .scene-socials li {
+  grid-template-columns: 112px 56px 240px minmax(0, 1fr);
+  column-gap: 16px;
+  padding: 10px 24px;
+  text-align: left;
+  color: var(--bg);
+  background: var(--primary);
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials li:nth-child(3n + 2) {
+  background: var(--accent);
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials li:nth-child(3n) {
+  background: #ff5c7a; /* the pixel drop shadow's pink (DESIGN.md) */
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials li::before {
+  counter-increment: rank;
+  content: counter(rank) "ST";
+  font-family: var(--font-heading);
+  font-size: 28px;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials li:nth-child(2)::before {
+  content: counter(rank) "ND";
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials li:nth-child(3)::before {
+  content: counter(rank) "RD";
+}
+
+.scene[data-theme="arcade-8bit"] .scene-socials li:nth-child(n + 4)::before {
+  content: counter(rank) "TH";
+}
+
+.scene[data-theme="arcade-8bit"] .scene-icon {
+  grid-row: auto;
+  width: 56px;
+  height: 56px;
+  padding: 12px;
+  color: var(--bg);
+  background: none;
+}
+
+.scene[data-theme="arcade-8bit"] :is(.scene-platform, .scene-handle) {
+  color: var(--bg);
+  font-family: var(--font-heading);
+  letter-spacing: 0;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-platform {
+  font-size: 24px;
+}
+
+.scene[data-theme="arcade-8bit"] .scene-handle {
+  font-size: 28px;
+  text-align: right;
+}
+
+/* 2. Neon Grid: the sign over the vanishing point. The grid converges on the center, so the scene does too: the
+   title and subtitle centered in the sky, the countdown lit like a sign, and the socials in one row just above the
+   horizon. Centered by concept (the perspective grid). */
+.scene[data-theme="neon-grid"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 0 minmax(0, 1fr) auto auto auto auto;
+  row-gap: 0;
+  justify-items: center;
+  text-align: center;
+}
+
+.scene[data-theme="neon-grid"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  left: 112px;
+}
+
+.scene[data-theme="neon-grid"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 1500px;
+}
+
+.scene[data-theme="neon-grid"] .scene-main:has(.scene-logo) .scene-title {
+  padding-inline: 184px;
+}
+
+/* The horizon glow is the accent line here, so the rule above the title goes. */
+.scene[data-theme="neon-grid"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="neon-grid"] .scene-subtitle {
+  grid-area: 4 / 1;
+  max-width: 44ch;
+  margin-top: 24px;
+}
+
+.scene[data-theme="neon-grid"] .scene-side {
+  display: contents;
+}
+
+/* The sign: a lit tube round the card, the one glow in the stack besides the title. */
+.scene[data-theme="neon-grid"] .countdown {
+  grid-area: 5 / 1;
+  margin-top: 48px;
+  padding-inline: 72px;
+  border: 2px solid var(--primary);
+  box-shadow:
+    0 0 24px color-mix(in srgb, var(--primary) 45%, transparent),
+    inset 0 0 24px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.scene[data-theme="neon-grid"] .scene-socials {
+  grid-area: 6 / 1;
+  margin-top: 40px;
+  grid-auto-flow: column;
+  column-gap: 72px;
+}
+
+/* 8. Vaporwave Sunset: the horizon. Symmetric round the setting sun (scene.css): the chrome title, the subtitle and one
+   row with the countdown and the socials, centered in the purple sky above it. The scene's bottom padding ends the
+   content where the sun begins, so a long title shrinks instead of crossing the sun. A gradient, neon and a grid
+   are this look's concept (synthwave). */
+.scene[data-theme="vaporwave-sunset"],
+.scene[data-theme="vaporwave-sunset"][data-ticker] {
+  padding-bottom: 520px; /* the sun's top is at 584px */
+}
+
+.scene[data-theme="vaporwave-sunset"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 0 minmax(0, 1fr) auto auto auto minmax(0, 1fr);
+  row-gap: 0;
+  justify-items: center;
+  text-align: center;
+}
+
+.scene[data-theme="vaporwave-sunset"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  left: 112px;
+}
+
+.scene[data-theme="vaporwave-sunset"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 1500px;
+}
+
+.scene[data-theme="vaporwave-sunset"] .scene-main:has(.scene-logo) .scene-title {
+  padding-inline: 184px;
+}
+
+/* The sun is the accent; the rule above the title goes. */
+.scene[data-theme="vaporwave-sunset"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="vaporwave-sunset"] .scene-subtitle {
+  grid-area: 4 / 1;
+  max-width: 44ch;
+  margin-top: 16px;
+}
+
+/* One row: the countdown, then the socials. */
+.scene[data-theme="vaporwave-sunset"] .scene-side {
+  grid-area: 5 / 1;
+  justify-self: center;
+  flex-direction: row;
+  align-items: center;
+  gap: 64px;
+  min-width: 0;
+  margin-top: 40px;
+}
+
+.scene[data-theme="vaporwave-sunset"] .countdown {
+  padding: 28px 40px 24px;
+}
+
+.scene[data-theme="vaporwave-sunset"] .countdown-time {
+  font-size: 64px;
+}
+
+.scene[data-theme="vaporwave-sunset"] .scene-socials {
+  grid-auto-flow: column;
+  column-gap: 48px;
+  text-align: left;
+}
+
+/* 9. Daylight: the poster colophon. A Swiss poster: the headline very large and flush left at the top, the vermilion
+   disc in the top right (scene.css), and the details set like a poster's small print in ruled columns along the
+   bottom. Hairline rules, no boxes; the disc is the only color besides the headline's last word. */
+.scene[data-theme="daylight"] .scene-main {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  column-gap: 48px;
+  align-items: start;
+}
+
+.scene[data-theme="daylight"] .scene-main:has(.countdown) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.scene[data-theme="daylight"] .scene-title {
+  grid-area: 2 / 1 / auto / -1;
+  max-width: 1150px;
+  margin-top: 8px;
+  font-size: 216px;
+}
+
+/* The disc is the poster's mark; the rule above the headline goes. */
+.scene[data-theme="daylight"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="daylight"] .scene-side {
+  display: contents;
+}
+
+/* The colophon: each column under an ink hairline. */
+.scene[data-theme="daylight"] :is(.scene-subtitle, .countdown, .scene-socials) {
+  grid-row: 4;
+  align-self: stretch;
+  justify-self: stretch;
+  box-sizing: border-box;
+  margin: 0;
+  padding-top: 24px;
+  border-top: 2px solid var(--text);
+}
+
+.scene[data-theme="daylight"] .scene-subtitle {
+  grid-column: 1;
+  max-width: none;
+  font-size: 36px;
+}
+
+.scene[data-theme="daylight"] .countdown {
+  grid-column: 2;
+  align-items: flex-start;
+  gap: 8px;
+  padding-inline: 0;
+  padding-bottom: 0;
+  text-align: left;
+  background: none;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="daylight"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="daylight"] .countdown-time {
+  font-size: 80px;
+}
+
+.scene[data-theme="daylight"] .scene-socials {
+  grid-column: -2;
+  gap: 16px;
+}
+
+/* No subtitle: the rule still runs under the first column, so the colophon keeps its grid. */
+.scene[data-theme="daylight"] .scene-main::before {
+  content: "";
+  grid-area: 4 / 1;
+  justify-self: stretch;
+  border-top: 2px solid var(--text);
+}
+
+.scene[data-theme="daylight"]
+  .scene-main:not(:has(.countdown, .scene-socials, .scene-subtitle))::before {
+  display: none;
+}
+
+/* 15. Phosphor: the terminal window. The whole scene is one session: a window with a title bar, the boot log
+   (scene.css) as its first lines, the headline typed at the prompt, the countdown as T-minus and the socials as a
+   listing. Left aligned on the monospace grid, top down like a terminal. Monospace and window chrome are this look's
+   concept. */
+.scene[data-theme="phosphor"] .scene-main {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 216px auto auto auto auto minmax(0, 1fr);
+  row-gap: 0;
+  align-items: start;
+  padding: 104px 56px 48px;
+  border: 2px solid #1c4a27;
+  border-radius: 6px;
+}
+
+/* The title bar. */
+.scene[data-theme="phosphor"] .scene-main::before {
+  content: "overlune: ~/stream (tty1)";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 14px 24px;
+  border-bottom: 2px solid #1c4a27;
+  font-family: var(--font-body);
+  font-size: 22px;
+  color: var(--text-muted);
+  text-shadow: none;
+}
+
+/* The boot log moves inside the window, as its first lines. */
+.scene[data-bg="phosphor"][data-theme="phosphor"]::before {
+  top: 214px;
+  right: auto;
+  left: 170px;
+  font-size: 24px;
+  line-height: 1.5;
+}
+
+/* The logo in the window's top right corner, under the title bar. */
+.scene[data-theme="phosphor"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  right: 56px;
+  max-width: 120px;
+  max-height: 120px;
+}
+
+.scene[data-theme="phosphor"] .scene-title {
+  grid-area: 2 / 1;
+  max-width: 1500px;
+}
+
+.scene[data-theme="phosphor"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+/* The prompt. */
+.scene[data-theme="phosphor"] .scene-word:first-child::before {
+  content: "$ ";
+  color: var(--text-muted);
+  text-shadow: none;
+}
+
+.scene[data-theme="phosphor"] .scene-subtitle {
+  grid-area: 3 / 1;
+  max-width: 60ch;
+  margin-top: 16px;
+}
+
+.scene[data-theme="phosphor"] .scene-side {
+  display: contents;
+}
+
+/* T-minus, as a plain output line, not a card. */
+.scene[data-theme="phosphor"] .countdown {
+  grid-area: 4 / 1;
+  margin-top: 40px;
+  padding: 0;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 32px;
+  text-align: left;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="phosphor"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="phosphor"] .countdown-time::before {
+  content: "T-minus ";
+  font-size: 0.4em;
+  color: var(--text-muted);
+}
+
+/* The listing: a command line, then the entries in a row. */
+.scene[data-theme="phosphor"] .scene-socials {
+  grid-area: 5 / 1;
+  margin-top: 40px;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(3, max-content);
+  column-gap: 64px;
+  row-gap: 16px;
+}
+
+.scene[data-theme="phosphor"] .scene-socials::before {
+  content: "$ ls ~/socials";
+  grid-column: 1 / -1;
+  font-family: var(--font-body);
+  font-size: 26px;
+  color: var(--text-muted);
+}
+
+.scene[data-theme="phosphor"] .scene-icon {
+  background: none;
+  border: 1px solid #1c4a27;
+}
+
+/* 12. Shonen: the manga page. The page splits into panels with white gutters and ink edges: one big panel on the left
+   for the lettering (the screentone and the speed lines live in it), and a column of two panels on the right that run
+   to the page border, the countdown over the socials. Ink borders are manga ink (the concept). */
+.scene[data-theme="shonen"] .scene-main {
+  grid-template-columns: minmax(0, 1fr) 560px;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  column-gap: 0;
+}
+
+.scene[data-theme="shonen"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 1040px;
+}
+
+.scene[data-theme="shonen"] .scene-subtitle {
+  grid-area: 4 / 1;
+}
+
+/* The right column: from the top of the page to the bottom, inside the border with an 18px gutter. */
+.scene[data-theme="shonen"] .scene-side {
+  grid-area: 1 / 2 / -1 / 3;
+  align-self: stretch;
+  justify-self: stretch;
+  gap: 18px;
+  min-width: 0;
+  margin: -26px -50px -10px 0;
+}
+
+.scene[data-theme="shonen"][data-ticker] .scene-side {
+  margin-bottom: -56px; /* down to the gutter above the band */
+}
+
+.scene[data-theme="shonen"] :is(.countdown, .scene-socials) {
+  flex: 1;
+  box-sizing: border-box;
+  justify-content: center;
+  border: 6px solid var(--text);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="shonen"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="shonen"] .scene-socials {
+  align-content: center;
+  padding: 32px 40px;
+}
+
+/* The big panel's right edge: an ink line, so a white gutter separates it from the column. */
+.scene[data-theme="shonen"] .scene-main::after {
+  content: "";
+  position: absolute;
+  top: 38px;
+  bottom: 38px;
+  right: calc(112px + 560px + 18px);
+  width: 6px;
+  background: var(--text);
+}
+
+.scene[data-theme="shonen"][data-ticker] .scene-main::after {
+  bottom: 114px; /* stops at the band */
+}
+
+.scene[data-theme="shonen"] .scene-main:not(:has(.scene-side))::after {
+  display: none;
+}
+
+.scene[data-theme="shonen"] .scene-main:not(:has(.scene-side)) :is(.scene-title, .scene-subtitle) {
+  grid-column: 1 / -1;
+}
+
+/* The speed lines burst in the big panel now, from a point above the lettering. */
+.scene[data-bg="shonen"][data-theme="shonen"]::after {
+  background: repeating-conic-gradient(
+    from 0deg at 36% 24%,
+    #111 0 0.5deg,
+    transparent 0.5deg 3.2deg
+  );
+  mask-image: radial-gradient(
+    circle at 36% 24%,
+    transparent 0 110px,
+    rgb(0 0 0 / 0.55) 220px,
+    rgb(0 0 0 / 0.3) 400px,
+    transparent 560px
+  );
+}
+
+/* 11. Session: the title card. Huge ink type stacked at the top left, then the teal and brick bars cutting across the
+   open middle (the bars live in the grid's flexible row, so a long title squeezes them, never crosses them), and at
+   the bottom the socials on the left and the countdown in a cream box on the right, like an episode card. Text only
+   ever sits on mustard or cream. Thick ink outlines are the look's print concept. */
+.scene[data-bg="session"][data-theme="session"] {
+  background: var(--bg);
+}
+
+.scene[data-theme="session"] .scene-main {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  column-gap: 64px;
+  align-items: start;
+}
+
+.scene[data-theme="session"] .scene-title {
+  grid-area: 2 / 1 / auto / -1;
+  max-width: 1500px;
+  margin-top: 8px;
+}
+
+.scene[data-theme="session"] .scene-subtitle {
+  grid-area: 3 / 1 / auto / -1;
+  max-width: 56ch;
+  margin-top: 24px;
+}
+
+/* The bars: across the whole width, in whatever room the title leaves. */
+.scene[data-theme="session"] .scene-main::before {
+  content: "";
+  grid-area: 4 / 1 / auto / -1;
+  align-self: stretch;
+  justify-self: stretch;
+  margin: 24px -112px;
+  background: linear-gradient(
+    -9deg,
+    transparent 0 18%,
+    #b23a2e 18% 26%,
+    transparent 26% 34%,
+    #146b6e 34% 80%,
+    transparent 80%
+  );
+}
+
+.scene[data-theme="session"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="session"] .scene-socials {
+  grid-area: 5 / 1;
+  align-self: end;
+  grid-auto-flow: column;
+  justify-content: start;
+  column-gap: 56px;
+}
+
+/* The episode card. */
+.scene[data-theme="session"] .countdown {
+  grid-area: 5 / 2;
+  align-self: end;
+  align-items: flex-start;
+  text-align: left;
+}
+
+/* 14. Skate Deck: the sticker wall. Under the rocking deck, the countdown and the socials are die-cut stickers slapped
+   on at an angle (a white cut line, a soft shadow); the sticker lettering runs straight across the bottom. The tilt
+   is this look's concept (stickers on a deck wall). `rotate` composes with the entrances, which animate transform. */
+.scene[data-theme="skate-deck"] .scene-main {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  column-gap: 56px;
+}
+
+.scene[data-theme="skate-deck"] .scene-title {
+  grid-area: 4 / 1 / auto / -1;
+  max-width: 1600px;
+  margin-top: 56px;
+}
+
+/* The stickers are the decoration; the rule above the lettering goes. */
+.scene[data-theme="skate-deck"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="skate-deck"] .scene-subtitle {
+  grid-area: 5 / 1 / auto / -1;
+  max-width: 56ch;
+}
+
+.scene[data-theme="skate-deck"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="skate-deck"] :is(.countdown, .scene-socials) {
+  box-shadow:
+    0 0 0 8px #fff,
+    0 12px 24px rgb(58 36 16 / 0.28);
+}
+
+.scene[data-theme="skate-deck"] .countdown {
+  grid-area: 3 / 2;
+  rotate: -5deg;
+}
+
+.scene[data-theme="skate-deck"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="skate-deck"] .scene-socials {
+  grid-area: 3 / 1;
+  justify-self: end;
+  align-self: center;
+  rotate: 4deg;
+}
+
+.scene[data-theme="skate-deck"] .scene-main:not(:has(.countdown)) .scene-socials {
+  grid-column: 2;
+}
+
+/* 3. Cozy Café: the menu card. The shop sign (the headline) on the left, and one paper menu card on the right: the
+   countdown at its head, then the socials listed like the day's specials, with dot leaders from platform to handle.
+   The steam rises in the gap between them. */
+.scene[data-theme="cozy-cafe"] .scene-main {
+  grid-template-columns: minmax(0, 1fr) 640px;
+  column-gap: 96px;
+}
+
+.scene[data-theme="cozy-cafe"] .scene-side {
+  grid-area: 2 / 2 / -1 / 3;
+  align-self: center;
+  justify-self: stretch;
+  gap: 0;
+  min-width: 0;
+  padding: 24px 48px 40px;
+  background: var(--surface);
+  border: var(--border);
+  border-radius: calc(var(--radius) * 1.5);
+  box-shadow: var(--shadow);
+}
+
+/* The countdown heads the card instead of being a card of its own. */
+.scene[data-theme="cozy-cafe"] .countdown {
+  padding: 24px 0 32px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="cozy-cafe"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="cozy-cafe"] .countdown + .scene-socials {
+  padding-top: 32px;
+  border-top: 2px dashed color-mix(in srgb, var(--text-muted) 45%, transparent);
+}
+
+.scene[data-theme="cozy-cafe"] .scene-socials {
+  gap: 20px;
+}
+
+/* A menu line: icon, platform, dots, handle. */
+.scene[data-theme="cozy-cafe"] .scene-socials li {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: 20px;
+}
+
+.scene[data-theme="cozy-cafe"] .scene-icon {
+  grid-row: auto;
+  width: 56px;
+  height: 56px;
+  padding: 14px;
+}
+
+.scene[data-theme="cozy-cafe"] .scene-platform {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.scene[data-theme="cozy-cafe"] .scene-platform::after {
+  content: "";
+  flex: 1;
+  border-bottom: 4px dotted color-mix(in srgb, var(--text-muted) 55%, transparent);
+}
+
+.scene[data-theme="cozy-cafe"] .scene-handle {
+  font-size: 32px;
+}
+
+/* 5. Pastel Cloud: the floating card stack. A soft centered stack resting low in the sky: the title on one line, the
+   subtitle, the countdown as a pill, and the socials as a row of pills (the look's one shape). The lower cloud rises
+   to 18% so both drift above it. Centered by concept (floating). */
+.scene[data-bg="clouds"][data-theme="pastel-cloud"]::after {
+  top: 18%;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 0 minmax(0, 1fr) auto auto auto auto minmax(0, 0.3fr);
+  row-gap: 0;
+  justify-items: center;
+  text-align: center;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  left: 112px;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 1500px;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-main:has(.scene-logo) .scene-title {
+  padding-inline: 184px;
+}
+
+/* The sparkle marks the title; the rule above it goes. */
+.scene[data-theme="pastel-cloud"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-subtitle {
+  grid-area: 4 / 1;
+  max-width: 44ch;
+  margin-top: 16px;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="pastel-cloud"] .countdown {
+  grid-area: 5 / 1;
+  margin-top: 40px;
+  padding: 24px 64px 22px;
+  border-radius: 999px;
+}
+
+.scene[data-theme="pastel-cloud"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="pastel-cloud"] .countdown-time {
+  font-size: 72px;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-socials {
+  grid-area: 6 / 1;
+  margin-top: 28px;
+  grid-auto-flow: column;
+  column-gap: 20px;
+}
+
+.scene[data-theme="pastel-cloud"] .scene-socials li {
+  column-gap: 16px;
+  padding: 10px 32px 10px 10px;
+  text-align: left;
+  background: var(--surface);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+}
+
+.scene[data-theme="pastel-cloud"] .scene-icon {
+  width: 60px;
+  height: 60px;
+  padding: 15px;
+  border-radius: 50%;
+}
+
+/* 6. Forest Night: under the moon. The moon (top right) anchors the headline, which hangs right-aligned just below it;
+   the countdown and the socials sit low on the left above the treeline, like a trail sign. The fireflies keep to the
+   open left of the sky, clear of the headline. */
+.scene[data-bg="fireflies"][data-theme="forest-night"]::before,
+.scene[data-bg="fireflies"][data-theme="forest-night"]::after {
+  mask-image:
+    linear-gradient(to right, #000 26%, transparent 36%),
+    linear-gradient(to bottom, #000 58%, transparent 70%);
+  mask-composite: intersect;
+}
+
+.scene[data-theme="forest-night"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+}
+
+.scene[data-theme="forest-night"] .scene-title {
+  grid-area: 2 / 1;
+  justify-self: end;
+  max-width: 1100px;
+  margin-top: 220px; /* under the moon */
+  text-align: right;
+}
+
+.scene[data-theme="forest-night"] .scene-main:has(.scene-logo) .scene-title {
+  margin-top: 40px;
+}
+
+/* The moon is the mark; the rule above the title goes. */
+.scene[data-theme="forest-night"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="forest-night"] .scene-subtitle {
+  grid-area: 3 / 1;
+  justify-self: end;
+  text-align: right;
+}
+
+/* The trail sign: the countdown and the socials in one row, low on the left. */
+.scene[data-theme="forest-night"] .scene-side {
+  grid-area: 5 / 1;
+  justify-self: start;
+  flex-direction: row;
+  align-items: center;
+  gap: 56px;
+  min-width: 0;
+}
+
+.scene[data-theme="forest-night"] .countdown {
+  padding: 28px 40px 24px;
+}
+
+.scene[data-theme="forest-night"] .countdown-time {
+  font-size: 72px;
+}
+
+.scene[data-theme="forest-night"] .scene-socials {
+  grid-auto-flow: column;
+  column-gap: 48px;
+}
+
+/* 10. Abyss: the depth gauge. A dive: a depth scale runs down the right edge (fine ticks every 40px, long ones every
+   200px, on a hairline seam), and the stack floats centered in the water: the title where the light still reaches,
+   the countdown read like an instrument between two seams, the socials in a row. Centered by concept (suspended). */
+.scene[data-theme="abyss"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 0 minmax(0, 1fr) auto auto auto auto minmax(0, 1fr);
+  row-gap: 0;
+  justify-items: center;
+  text-align: center;
+}
+
+.scene[data-theme="abyss"] .scene-main::before {
+  content: "";
+  position: absolute;
+  top: 88px;
+  bottom: 72px;
+  right: 48px;
+  width: 36px;
+  border-right: 1px solid #16343a;
+  background:
+    repeating-linear-gradient(#5d8a96 0 2px, transparent 2px 200px) right / 36px 100% no-repeat,
+    repeating-linear-gradient(#2a5560 0 1px, transparent 1px 40px) right / 16px 100% no-repeat;
+}
+
+.scene[data-theme="abyss"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  left: 112px;
+}
+
+.scene[data-theme="abyss"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 1400px;
+}
+
+.scene[data-theme="abyss"] .scene-main:has(.scene-logo) .scene-title {
+  padding-inline: 184px;
+}
+
+/* The gauge is the mark; the rule above the title goes. */
+.scene[data-theme="abyss"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="abyss"] .scene-subtitle {
+  grid-area: 4 / 1;
+  max-width: 44ch;
+  margin-top: 20px;
+}
+
+.scene[data-theme="abyss"] .scene-side {
+  display: contents;
+}
+
+/* The instrument: the reading between two seams, no card. */
+.scene[data-theme="abyss"] .countdown {
+  grid-area: 5 / 1;
+  margin-top: 48px;
+  padding: 24px 96px 20px;
+  background: none;
+  border: 0;
+  border-block: 1px solid #16343a;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="abyss"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="abyss"] .scene-socials {
+  grid-area: 6 / 1;
+  margin-top: 40px;
+  grid-auto-flow: column;
+  column-gap: 56px;
+  text-align: left;
+}
+
+.scene[data-theme="abyss"][data-ticker] .scene-main::before {
+  bottom: 152px; /* stops above the band */
+}
+
+/* 13. Sakura: the hanging scroll. One tall paper scroll hangs on the right like a kakejiku, with a dark rod at each
+   end and the brush stroke under the top rod; the title, subtitle, countdown and socials are written down it. The
+   lantern's glow moves to the open left, where the petals drift. */
+.scene[data-bg="sakura"][data-theme="sakura"] {
+  background:
+    radial-gradient(
+      circle at 24% 26%,
+      rgb(255 214 170 / 0.32),
+      rgb(255 170 120 / 0.12) 160px,
+      transparent 420px
+    ),
+    radial-gradient(120% 70% at 50% 120%, rgb(255 145 180 / 0.12), transparent 70%),
+    linear-gradient(#1a1f45, var(--bg) 70%);
+}
+
+.scene[data-theme="sakura"] .scene-main {
+  grid-template-columns: minmax(0, 1fr) 680px;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto auto minmax(0, 1fr);
+  column-gap: 0;
+  row-gap: 0;
+}
+
+/* The scroll: paper between two rods, running the height of the scene. */
+.scene[data-theme="sakura"] .scene-main::before {
+  content: "";
+  grid-area: 1 / 2 / -1 / 3;
+  align-self: stretch;
+  justify-self: stretch;
+  margin: -40px 0 -24px;
+  background: var(--surface);
+  border-block: 16px solid #0b0e24;
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+}
+
+.scene[data-theme="sakura"] :is(.scene-title, .scene-subtitle, .countdown, .scene-socials) {
+  grid-column: 2;
+  justify-self: center;
+  max-width: 560px;
+  text-align: center;
+}
+
+.scene[data-theme="sakura"] .scene-title {
+  grid-row: 3;
+  font-size: 128px;
+}
+
+/* The brush stroke sits centered under the rod. */
+.scene[data-theme="sakura"] .scene-title::before {
+  margin-inline: auto;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+.scene[data-theme="sakura"] .scene-subtitle {
+  grid-row: 4;
+  margin-top: 20px;
+}
+
+.scene[data-theme="sakura"] .scene-side {
+  display: contents;
+}
+
+.scene[data-theme="sakura"] .countdown {
+  grid-row: 5;
+  margin-top: 40px;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="sakura"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="sakura"] .countdown-time {
+  font-size: 80px;
+}
+
+.scene[data-theme="sakura"] .scene-socials {
+  grid-row: 6;
+  margin-top: 40px;
+  text-align: left;
+}
+
+/* The scroll is narrow, so its smaller pieces are set tighter, and the longest text still fits above a ticker. */
+.scene[data-theme="sakura"] .scene-title::before {
+  margin-bottom: 32px;
+}
+
+.scene[data-theme="sakura"] .scene-subtitle {
+  font-size: 34px;
+}
+
+.scene[data-theme="sakura"] .scene-socials {
+  gap: 12px;
+}
+
+.scene[data-theme="sakura"] .scene-icon {
+  width: 56px;
+  height: 56px;
+  padding: 14px;
+}
+
+/* The logo sits in the open sky's corner, out of the grid, so its row never takes height from the scroll. */
+.scene[data-theme="sakura"] .scene-logo {
+  position: absolute;
+  top: 88px;
+  left: 112px;
+}
+
+/* 16. Quest: the quest log. One tall parchment panel on the left holds the whole quest: its title, the description,
+   then under a gilt line the countdown and the socials. The dark hall and its embers stay open on the right. On
+   parchment the text takes the ink colors: ink title, wax-red last word (6.7:1), muted ink description; the gold and
+   the forge orange stay for the hall. A framed panel is the RPG concept, one panel only. */
+.scene[data-theme="quest"] .scene-main {
+  grid-template-columns: 760px minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
+  column-gap: 0;
+  row-gap: 0;
+}
+
+.scene[data-theme="quest"] .scene-main::before {
+  content: "";
+  grid-area: 1 / 1 / -1 / 2;
+  align-self: stretch;
+  justify-self: stretch;
+  margin: -24px 0 -16px -32px;
+  background: url("/images/themes/paper-grain.svg"), var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow:
+    var(--shadow),
+    inset 0 0 0 8px var(--surface),
+    inset 0 0 0 9px #b88f3e;
+}
+
+.scene[data-theme="quest"]
+  :is(.scene-logo, .scene-title, .scene-subtitle, .countdown, .scene-socials) {
+  grid-column: 1;
+  margin-inline: 32px 48px;
+}
+
+.scene[data-theme="quest"] .scene-logo {
+  grid-row: 1;
+  margin-top: 40px;
+}
+
+.scene[data-theme="quest"] .scene-title {
+  grid-row: 2;
+  margin-top: 56px;
+  font-size: 104px;
+  color: var(--text);
+  text-shadow: none;
+}
+
+.scene[data-theme="quest"] .scene-title-end {
+  color: var(--accent);
+  text-shadow: none;
+}
+
+.scene[data-theme="quest"] .scene-subtitle {
+  grid-row: 3;
+  margin-top: 24px;
+  color: var(--text-muted);
+}
+
+.scene[data-theme="quest"] .scene-side {
+  display: contents;
+}
+
+/* Inside the log, the countdown and the socials are lines of it, not panels of their own. */
+.scene[data-theme="quest"] :is(.countdown, .scene-socials) {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="quest"] .countdown {
+  grid-row: 5;
+  align-items: flex-start;
+  padding: 28px 0 0;
+  border-top: 1px solid #b88f3e;
+  text-align: left;
+}
+
+.scene[data-theme="quest"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="quest"] .scene-socials {
+  grid-row: 6;
+  margin-top: 28px;
+  margin-bottom: 40px;
+  padding: 0;
+}
+
+.scene[data-theme="quest"] .scene-main:not(:has(.countdown)) .scene-socials {
+  padding-top: 28px;
+  border-top: 1px solid #b88f3e;
+}
+
+/* The gilt lines run the width of the log. */
+.scene[data-theme="quest"] :is(.countdown, .scene-socials) {
+  justify-self: stretch;
+}
+
+.scene[data-theme="quest"] .scene-subtitle {
+  max-width: none;
+}
+
+/* The logo is a crest in the log's top right corner, out of the flow, so a long quest still fits. */
+.scene[data-theme="quest"] .scene-logo {
+  position: absolute;
+  top: 104px;
+  left: calc(112px + 760px - 48px - 96px);
+  max-width: 96px;
+  max-height: 96px;
+  margin: 0;
+}
+
+.scene[data-theme="quest"] .scene-main:has(.scene-logo) .scene-title {
+  padding-right: 112px;
+}
