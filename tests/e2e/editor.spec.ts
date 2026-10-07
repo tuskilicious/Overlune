@@ -576,6 +576,23 @@ test("editor redesign: nudges, frame sizes and what's filled in (T6.118)", async
   await expect(socials).toHaveAccessibleName("Socials (filled in)");
 });
 
+test("Lite stops the moving backgrounds but keeps the entrances (T6.119)", async ({ page }) => {
+  await page.getByRole("radio", { name: "Neon Grid" }).check();
+  await page.getByRole("radio", { name: "Lite" }).check();
+  await expect(page.locator(".editor-side")).toHaveClass(/editor-lite/);
+  const link = await page
+    .locator(".editor-link", { hasText: "Starting Soon" })
+    .locator("input")
+    .inputValue();
+  await page.goto(link);
+  await expect(page.locator("html")).toHaveAttribute("data-lite", "");
+  const floor = () =>
+    page.locator(".scene").evaluate((el) => getComputedStyle(el, "::before").animationName);
+  // Entrances still play; the grid floor stops scrolling.
+  await expect(page.locator(".scene-word").first()).toHaveCSS("animation-name", "scene-slide-fade");
+  expect(await floor()).toBe("none");
+});
+
 test("quick picks set the countdown, and No countdown clears it (T6.113)", async ({ page }) => {
   await page.getByRole("button", { name: "In 30 min" }).click();
   // Rounded up to the next whole minute, so 30:00 to 30:59 left.
@@ -1301,12 +1318,12 @@ test("the logo field explains how to get an image link (T6.73)", async ({ page }
   await expect(help).toContainText("Discord stop working after a day");
 });
 
-test("Less motion goes into every overlay link and turns the motion off (T6.74)", async ({
+test("Still goes into every overlay link and turns the motion off (T6.74)", async ({
   page,
   context,
 }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  await page.getByLabel("Less motion").check();
+  await page.getByRole("radio", { name: "Still" }).check();
   await expect(page.locator(".editor-side")).toHaveClass(/editor-shot/); // the preview holds still too
   await page.getByRole("button", { name: "Copy Starting Soon link" }).click();
   const link = await page.evaluate(() => navigator.clipboard.readText());

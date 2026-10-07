@@ -47,6 +47,7 @@ const sample: Settings = {
   },
   frame: { width: 800, height: 450, label: "Ronni" },
   lessMotion: true,
+  liteMotion: true,
   advanced: {
     colors: { accent: "#ff2bd6", surface: "#101010" },
     fontHeading: "Orbitron",
@@ -76,6 +77,11 @@ describe("settings link", () => {
   it("keeps full motion for links made before the Less motion option (T6.74)", () => {
     expect(decode(raw({ theme: "neon-grid" })).settings.lessMotion).toBe(false);
     expect(decode(raw({ theme: "neon-grid", lessMotion: true })).settings.lessMotion).toBe(true);
+  });
+
+  it("keeps full motion for links made before the Lite option (T6.119)", () => {
+    expect(decode(raw({ theme: "neon-grid" })).settings.liteMotion).toBe(false);
+    expect(decode(raw({ theme: "neon-grid", liteMotion: true })).settings.liteMotion).toBe(true);
   });
 
   it("fills in BRB and Ending defaults for links made before those scenes existed", () => {
