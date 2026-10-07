@@ -505,7 +505,7 @@ The owner OBS-tested T6.107-T6.111 (all passed, merged as #147-#151) and asked t
 - [x] **T6.113 Quick countdown picks.** The countdown is set with a date-time field, which is fiddly when you go live soon.
   - Accept: "In 15 min", "In 30 min" and "In 1 hour" under the field set the countdown (whole minutes), and "No countdown" clears it; one-time countdowns only. e2e.
   - *Built 2026-10-07 on `qol/countdown-picks` (stacked on `design/looks-uplift`). Editor only, no overlay or link change. e2e: picks set the preview countdown and the field, No countdown clears both. Owner checked the preview and approved it 2026-10-07.*
-- [ ] **T6.114 Preview each link before OBS.** There was no way to see an overlay full size before pasting it into OBS.
+- [x] **T6.114 Preview each link before OBS.** There was no way to see an overlay full size before pasting it into OBS.
   - Accept: every link row has a Preview link that opens the overlay in a new tab; the Alerts preview plays one sample of each alert (`?test=1`). e2e.
-  - *Built 2026-10-07 on `qol/open-links` (stacked on `qol/countdown-picks`). A text link under Copy link. Editor only. e2e: targets a new tab, the Alerts preview carries test=1, and Be Right Back opens with its title. Waiting for the owner's check.*
+  - *Built 2026-10-07 on `qol/open-links` (stacked on `qol/countdown-picks`). A text link under Copy link. Editor only. e2e: targets a new tab, the Alerts preview carries test=1, and Be Right Back opens with its title. Owner checked the preview and approved it 2026-10-07.*
 
