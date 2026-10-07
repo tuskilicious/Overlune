@@ -390,6 +390,110 @@ const promise =
 const button =
   "inline-flex items-center justify-center rounded-full px-7 py-3.5 font-heading text-lg font-bold transition-colors duration-300";
 
+/** The looks the stream stage can switch between (T6.124). */
+const stageLooks: ThemeId[] = [
+  "abyss",
+  "session",
+  "shonen",
+  "neon-grid",
+  "cozy-cafe",
+  "vaporwave-sunset",
+];
+
+/** What the stage shows, said in words under it (T6.124). */
+const stageNotes = [
+  ["Chat in your colors", "Your Twitch chat, styled to match. Bots and commands stay out of it."],
+  ["Alerts with sound", "Raids, subs, gift subs and bits, each with its look’s sound."],
+  ["A frame for your camera", "Placed where your camera sits, in the same look."],
+  [
+    "Your link is your save file",
+    "No account to make. Bookmark the editor and come back any time.",
+  ],
+] as const;
+
+/**
+ * The whole kit on a stream (T6.124): chat, an alert and the webcam frame over a game, in one look, switchable. The
+ * game is a plain stand-in drawn in CSS, labeled as such, so the overlays are the only real thing in the picture.
+ */
+function StreamStage() {
+  const [look, setLook] = useState<ThemeId>("abyss");
+  const settings = sampleScene(look);
+  // A new alert every 6.5 seconds (each shows for 5), so the stage stays alive. Reduced motion: one, held still.
+  const [alert, setAlert] = useState(2);
+  const [moving] = useState(() => matchMedia("(prefers-reduced-motion: no-preference)").matches);
+  useEffect(() => {
+    if (!moving) return;
+    const id = setInterval(() => setAlert((n) => (n + 1) % testAlerts.length), 6500);
+    return () => clearInterval(id);
+  }, [moving]);
+  return (
+    <div className="mx-auto max-w-7xl">
+      <div className="grid grid-cols-1 gap-8">
+        <div>
+          <h2
+            id="stage-heading"
+            data-reveal
+            className="font-heading text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.02] font-bold"
+          >
+            Your whole stream, in one look.
+          </h2>
+          <p className="mt-6 max-w-xl text-lg text-haze">
+            Chat, alerts and your webcam frame sit over your game in the same colors and fonts as
+            your scenes. Switch the look and they all change together.
+          </p>
+        </div>
+        <div role="group" aria-label="Show it in" className="flex flex-wrap gap-2">
+          {stageLooks.map((id) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={look === id}
+              onClick={() => setLook(id)}
+              className="cursor-pointer rounded-full border border-white/15 bg-transparent px-4 py-2 font-body text-sm text-haze hover:border-moon hover:text-moon aria-pressed:border-violet aria-pressed:bg-violet aria-pressed:text-night"
+            >
+              {themes[id].name}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="landing-stage mt-12">
+        <div key={look} className="landing-stage-swap">
+          <LazyPreview>
+            <div className="landing-stage-canvas">
+              <div aria-hidden className="landing-stage-game">
+                <span>Your game</span>
+              </div>
+              <Frame
+                settings={{
+                  ...settings,
+                  frame: { width: 560, height: 315, label: "yourname", x: 64, y: 701 },
+                }}
+              />
+              <div className="landing-stage-chat">
+                <ChatView
+                  settings={{ ...settings, chat: { ...settings.chat, width: 420, height: 620 } }}
+                  messages={chatSamples}
+                />
+              </div>
+              <div className={`landing-stage-alert${moving ? "" : " landing-still"}`}>
+                <AlertView key={alert} settings={settings} alert={testAlerts[alert]!} />
+              </div>
+            </div>
+          </LazyPreview>
+        </div>
+      </div>
+      <ul className="landing-stage-notes mt-12">
+        {stageNotes.map(([title, text]) => (
+          <li key={title}>
+            <h3 className="font-heading text-xl font-bold">{title}</h3>
+            <p className="mt-2 text-haze">{text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 /** One line per look for the showcase (T6.124): what it is, in its own words. */
 const blurbs: Record<ThemeId, string> = {
   "clean-slate": "Quiet and sharp, with one blue accent.",
@@ -808,7 +912,7 @@ export default function LandingPage() {
                     <div className="landing-still aspect-video overflow-hidden rounded-xl bg-night">
                       <ElementShot part={e.part} theme={e.theme} />
                     </div>
-                    <div className="relative mt-auto pt-10">
+                    <div className="relative mt-auto pt-6">
                       <h3 className="font-heading text-2xl font-bold">{e.name}</h3>
                       <p className="mt-2 text-haze group-hover:text-moon">{e.line}</p>
                     </div>
@@ -819,91 +923,9 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Interest: four cards. From 1280px, 4 × 2 cells with no gaps (A 2×2, B 2×1, C 1×1, D 1×1); from 768px,
-            two columns with A and B full width (T6.56); below that, one column. */}
-        <section className="px-6 py-32 md:px-12 md:py-48" aria-labelledby="bento-heading">
-          <div className="mx-auto max-w-7xl">
-            <h2
-              id="bento-heading"
-              data-reveal
-              className="max-w-5xl font-heading text-[clamp(2.25rem,4.5vw,4rem)] leading-tight font-bold"
-            >
-              One{" "}
-              {/* A slice of a real scene inside the heading: Neon Grid's lower half, with the title, the glowing
-                  horizon and the grid floor. Scenes are empty in the middle since the redesign (T6.46). */}
-              <span className="mx-1 inline-flex h-[0.8em] w-[2.4em] items-end overflow-hidden rounded-full border border-white/10 align-middle">
-                <span className="w-full shrink-0">
-                  <Scene theme="neon-grid" />
-                </span>
-              </span>{" "}
-              look, every overlay to match.
-            </h2>
-            <ul className="mt-16 grid grid-flow-dense grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 xl:grid-rows-2">
-              <li className="group flex flex-col justify-between gap-6 overflow-hidden rounded-3xl border border-white/10 bg-deep p-6 md:col-span-2 xl:row-span-2">
-                <div>
-                  <h3 className="font-heading text-2xl font-bold">Twelve looks, ready to go</h3>
-                  <p className="mt-2 text-haze">
-                    Every theme is free, with fonts and sounds licensed for streaming.
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {(["clean-slate", "cozy-cafe", "arcade-8bit", "forest-night"] as const).map(
-                    (id) => (
-                      <div key={id} className="overflow-hidden rounded-xl">
-                        <div className="transition-transform duration-700 ease-out group-hover:scale-105">
-                          <Scene theme={id} />
-                        </div>
-                      </div>
-                    ),
-                  )}
-                </div>
-              </li>
-              {/* On phones the chat picture sits under the text, so neither is squeezed (T6.57). */}
-              <li className="group flex flex-col gap-6 overflow-hidden rounded-3xl border border-white/10 bg-deep p-6 md:col-span-2 md:flex-row">
-                <div className="flex-1">
-                  <h3 className="font-heading text-2xl font-bold">Chat in your colors</h3>
-                  <p className="mt-2 text-haze">
-                    Your Twitch chat, styled to match. Bots and commands stay out of it.
-                  </p>
-                </div>
-                <div className="landing-still w-60 shrink-0 self-center overflow-hidden rounded-xl transition-transform duration-700 ease-out group-hover:scale-105 md:w-36 md:self-auto">
-                  <LazyPreview width={400} height={600}>
-                    <ChatView settings={sampleScene("pastel-cloud")} messages={chatSamples} />
-                  </LazyPreview>
-                </div>
-              </li>
-              <li className="group flex flex-col justify-between gap-4 overflow-hidden rounded-3xl border border-white/10 bg-deep p-6">
-                <div>
-                  <h3 className="font-heading text-2xl font-bold">Alerts with sound</h3>
-                  <p className="mt-2 text-haze">
-                    Raids, subs, gift subs and bits, each with its look’s sound.
-                  </p>
-                </div>
-                <div className="landing-still landing-alert mt-4 flex flex-col gap-3 transition-transform duration-700 ease-out group-hover:scale-105">
-                  {/* Just the alert cards, cropped from their 1920×1080 canvases so the text is readable, in two
-                      looks (T6.48). */}
-                  {(
-                    [
-                      ["bold-esports", 0],
-                      ["cozy-cafe", 1],
-                    ] as const
-                  ).map(([theme, i]) => (
-                    <div key={theme} className="overflow-hidden rounded-xl">
-                      <LazyPreview width={1000} height={200}>
-                        <AlertView settings={sampleScene(theme)} alert={testAlerts[i]!} />
-                      </LazyPreview>
-                    </div>
-                  ))}
-                </div>
-              </li>
-              <li className="rounded-3xl border border-white/10 bg-violet p-6 text-night">
-                <h3 className="font-heading text-2xl font-bold">Your link is your save file</h3>
-                <p className="mt-2">
-                  No account to make. Bookmark the editor and come back any time.
-                </p>
-              </li>
-            </ul>
-          </div>
+        {/* Interest (T6.124): the whole kit over a game in one look, with the look switchable. */}
+        <section className="px-6 py-32 md:px-12 md:py-48" aria-labelledby="stage-heading">
+          <StreamStage />
         </section>
 
         {/* Desire: the title stays put while every look scrolls past. */}

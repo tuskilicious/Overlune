@@ -211,7 +211,8 @@
   background: linear-gradient(135deg, #6b7486, #3a414f);
 }
 
-.landing .editor-preview > .frame {
+.landing .editor-preview > .frame,
+.landing .editor-preview > .landing-stage-canvas {
   transform: scale(var(--scale));
   transform-origin: 0 0;
 }
@@ -297,30 +298,38 @@
   }
 }
 
-/* The six overlays: tall cards in a row that scrolls sideways when they don't fit. */
+/* The six overlays: cards that always fit, three across on wide windows, never a scrollbar. */
 .landing-cards {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(17rem, 1fr);
+  grid-template-columns: minmax(
+    0,
+    1fr
+  ); /* never wider than the window, whatever a picture inside measures */
   gap: 0.75rem;
   margin: 0;
-  padding: 0 0 1rem;
+  padding: 0;
   list-style: none;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
 }
 
-.landing-cards > li {
-  scroll-snap-align: start;
+@media (min-width: 640px) {
+  .landing-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .landing-card {
+  box-sizing: border-box; /* fills its grid cell exactly, padding and border included */
   position: relative;
   isolation: isolate;
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-height: 26rem;
   padding: 1rem 1rem 1.5rem;
   overflow: hidden;
   border: 1px solid rgb(255 255 255 / 0.1);
@@ -546,8 +555,72 @@
     radial-gradient(60% 80% at 0% 0%, rgb(74 42 227 / 0.6), transparent 60%), var(--color-deep);
 }
 
-@media (max-width: 767px) {
-  .landing-card {
-    min-height: 21rem;
-  }
+/* The stream stage (T6.124): the kit over a game in one look. */
+.landing-stage {
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 1.75rem;
+  box-shadow: 0 40px 120px -40px rgb(74 42 227 / 0.55);
+}
+
+.landing-stage-swap {
+  animation: look-swap 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landing-stage-canvas {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+}
+
+.landing-stage-canvas > * {
+  position: absolute;
+}
+
+/* A stand-in for the game: dusk over hills, drawn in CSS and labeled, so it never passes for a real one. */
+.landing-stage-game {
+  inset: 0;
+  background:
+    radial-gradient(60% 50% at 70% 38%, rgb(255 190 140 / 0.35), transparent 70%),
+    linear-gradient(170deg, transparent 58%, #1d2a3f 58.2%, #141d2e 75%, transparent 75.2%),
+    linear-gradient(190deg, transparent 64%, #10182a 64.2%),
+    linear-gradient(#3b4a78, #8a6f9e 45%, #d79a83 62%, #2a2f4a 63%);
+}
+
+.landing-stage-game span {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  translate: -50% -50%;
+  font-family: var(--font-heading);
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.35);
+}
+
+.landing-stage-canvas > .frame-canvas,
+.landing-stage-alert {
+  inset: 0;
+}
+
+.landing-stage-chat {
+  right: 64px;
+  bottom: 64px;
+}
+
+.landing-stage-notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-stage-notes > li {
+  padding-top: 1.25rem;
+  border-top: 1px solid rgb(255 255 255 / 0.15);
 }

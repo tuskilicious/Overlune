@@ -117,27 +117,29 @@ for (const [width, height] of [
   });
 }
 
-test("the alert pictures show whole alert cards, large enough to read (T6.48)", async ({
+test("the stream stage shows the whole kit in one look, and switching the look restyles all of it (T6.124)", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-  // Settled cards only: no bounce mid-entrance. The web fonts can swap in after the cards are built (the fallback
-  // font wraps an alert to more lines), so poll until they have.
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const card = page.locator("li", { hasText: "Alerts with sound" });
-  await card.scrollIntoViewIfNeeded(); // previews are built when they come near the screen (T6.78)
-  await expect(card.locator(".landing-alert .alert-box")).toHaveCount(2);
-  const fits = () =>
-    card.locator(".landing-alert .editor-preview").evaluateAll((els) =>
-      els.every((el) => {
-        const crop = el.getBoundingClientRect();
-        const box = el.querySelector(".alert-box")!.getBoundingClientRect();
-        // The card fills the picture, not a strip in a canvas, and none of it is cut off.
-        return box.width > crop.width * 0.9 && box.bottom <= crop.bottom;
-      }),
-    );
-  await expect.poll(fits).toBe(true);
+  const stage = page.locator(".landing-stage");
+  await stage.scrollIntoViewIfNeeded(); // previews are built when they come near the screen (T6.78)
+  for (const part of [".chat", ".alert-box", ".frame"])
+    await expect(stage.locator(part)).toHaveCount(1);
+  const themesShown = () =>
+    stage
+      .locator("[data-theme]")
+      .evaluateAll((els) => [...new Set(els.map((el) => el.getAttribute("data-theme")))]);
+  expect(await themesShown()).toEqual(["abyss"]);
+  await page.getByRole("button", { name: "Shonen", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Shonen", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect.poll(themesShown).toEqual(["shonen"]);
+  // Held still for reduced motion: the alert stays on screen, whole.
+  await expect(stage.locator(".alert-box")).toBeVisible();
 });
 
 test("the cropped alert pictures fit their cards, with no empty space under them (T6.85)", async ({
@@ -145,7 +147,7 @@ test("the cropped alert pictures fit their cards, with no empty space under them
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  // The hero's two alerts and the looks section's one, each cropped to its card's height (T6.59). The crop was
+  // The hero's two alerts and the Alerts card's one, each cropped to its card's height (T6.59). The crop was
   // lost when previews started building after load (T6.78): it measured before the card existed.
   const crops = page.locator("div.landing-alert.overflow-hidden");
   await expect(crops).toHaveCount(3);
@@ -162,18 +164,30 @@ test("the cropped alert pictures fit their cards, with no empty space under them
   await expect.poll(gaps).toEqual([0, 0, 0]);
 });
 
-// T6.56, T6.57: no feature card squeezes its text into a narrow column, from phones to wide windows.
+// No sideways scrolling anywhere on the page (owner, 2026-10-07): the overlay cards always fit, and their text has
+// room, from phones to wide windows.
 for (const width of [390, 768, 1024, 1280, 1440]) {
-  test(`at ${width}px every feature card's text has room`, async ({ page }) => {
+  test(`at ${width}px the overlay cards fit without scrolling, and their text has room`, async ({
+    page,
+  }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
-    const cards = page
-      .getByRole("region", { name: /One .*look, every overlay to match/ })
-      .locator("li h3");
-    await expect(cards).toHaveCount(4);
-    for (const w of await cards.evaluateAll((els) =>
-      els.map((el) => el.parentElement!.getBoundingClientRect().width),
-    ))
+    const cards = page.locator(".landing-cards > li");
+    await expect(cards).toHaveCount(6);
+    for (const box of await cards.evaluateAll((els) => els.map((el) => el.getBoundingClientRect())))
+      expect(box.right).toBeLessThanOrEqual(width);
+    const scrollers = await page.evaluate(
+      () =>
+        [...document.querySelectorAll(".landing-cards, .landing-cards *")].filter(
+          (el) =>
+            el.scrollWidth > el.clientWidth + 1 &&
+            /auto|scroll/.test(getComputedStyle(el).overflowX),
+        ).length,
+    );
+    expect(scrollers).toBe(0);
+    for (const w of await page
+      .locator(".landing-stage-notes > li, .landing-cards h3")
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().width)))
       expect(w).toBeGreaterThanOrEqual(200);
   });
 }
@@ -233,6 +247,9 @@ test("each overlay card opens its part of the editor", async ({ page }) => {
   );
 
   await cards.filter({ hasText: "Be Right Back" }).click();
+  // The landing page has look buttons too (the stream stage), and stays on screen while the editor loads, so wait
+  // for the editor's own gallery before picking one.
+  await expect(page.getByRole("heading", { name: "Pick a look to start" })).toBeVisible();
   // A first visit picks a look first; the part opens after that.
   await page.getByRole("button", { name: "Cozy Café", exact: true }).click();
   await expect(page.getByRole("radio", { name: "Be Right Back" })).toBeChecked();
