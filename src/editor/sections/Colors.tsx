@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { contrast } from "../../lib/contrast";
 import type { Settings } from "../../settings/schema";
 import { themes } from "../../themes";
@@ -21,7 +22,19 @@ const asHex = (c: string) => (/^#[0-9a-fA-F]{6}$/.test(c) ? c : "#000000");
 export default function Colors({ settings, setSettings, update }: SectionProps) {
   const updateAdvanced = (patch: Partial<Settings["advanced"]>) =>
     setSettings((s) => ({ ...s, advanced: { ...s.advanced, ...patch } }));
-  const look = applyOverrides(themes[settings.theme], settings.advanced);
+  const base = themes[settings.theme];
+  const look = applyOverrides(base, settings.advanced);
+  /** The look's own colors as swatches, once each, named by the tokens that use them ("Titles and text"). A gradient
+   *  background isn't a single color, so it isn't one. */
+  const palette = Object.values(
+    colorTokens.reduce<Record<string, { hex: string; names: string }>>((all, t) => {
+      const hex = base[t].toLowerCase();
+      if (!/^#[0-9a-f]{6}$/.test(hex)) return all;
+      const name = colorNames[t].toLowerCase();
+      all[hex] = { hex, names: all[hex] ? `${all[hex].names} and ${name}` : name };
+      return all;
+    }, {}),
+  );
   // Themes are checked for AA contrast in tests; only overrides can break it.
   const hardToRead =
     Object.keys(settings.advanced.colors).length > 0 &&
@@ -36,38 +49,75 @@ export default function Colors({ settings, setSettings, update }: SectionProps) 
       </p>
       <fieldset>
         <legend>Colors</legend>
-        {colorTokens.map((token) => (
-          <div key={token} className="editor-color">
-            <label>
-              <input
-                id={`color-${token}`}
-                type="color"
-                value={asHex(look[token])}
-                onChange={(e) =>
-                  updateAdvanced({
-                    colors: { ...settings.advanced.colors, [token]: e.target.value },
-                  })
-                }
-              />
-              {colorNames[token]}
-            </label>
-            <code className="editor-hex">{asHex(look[token]).toUpperCase()}</code>
-            {settings.advanced.colors[token] && (
-              <button
-                type="button"
-                aria-label={`Reset ${colorNames[token]} to the theme`}
-                onClick={() => {
-                  const colors = { ...settings.advanced.colors };
-                  delete colors[token];
-                  updateAdvanced({ colors });
-                  focusSoon(`color-${token}`);
-                }}
-              >
-                Reset
-              </button>
-            )}
-          </div>
-        ))}
+        {colorTokens.map((token) => {
+          const current = asHex(look[token]).toLowerCase();
+          const own = !palette.some((c) => c.hex === current);
+          const pick = (hex: string) => {
+            const colors = { ...settings.advanced.colors };
+            // The look's own value for this token clears the override instead of storing a copy of it.
+            if (hex === asHex(base[token]).toLowerCase()) delete colors[token];
+            else colors[token] = hex;
+            updateAdvanced({ colors });
+          };
+          return (
+            <div
+              key={token}
+              className="editor-color"
+              role="group"
+              aria-labelledby={`color-name-${token}`}
+            >
+              <span id={`color-name-${token}`} className="editor-color-name">
+                {colorNames[token]}
+              </span>
+              {/* Swatches from the look's own colors (T6.135), then your own color: the native picker. */}
+              <div className="editor-swatches">
+                {palette.map((c) => (
+                  <button
+                    key={c.hex}
+                    type="button"
+                    className="editor-swatch"
+                    aria-label={`${colorNames[token]}: the look's ${c.names} color`}
+                    aria-pressed={c.hex === current}
+                    style={{ "--swatch": c.hex } as CSSProperties}
+                    onClick={() => pick(c.hex)}
+                  />
+                ))}
+                <label
+                  className="editor-swatch editor-swatch-own"
+                  data-picked={own || undefined}
+                  style={own ? ({ "--swatch": current } as CSSProperties) : undefined}
+                >
+                  <input
+                    id={`color-${token}`}
+                    type="color"
+                    aria-label={`${colorNames[token]}: your own color`}
+                    value={current}
+                    onChange={(e) =>
+                      updateAdvanced({
+                        colors: { ...settings.advanced.colors, [token]: e.target.value },
+                      })
+                    }
+                  />
+                </label>
+              </div>
+              <code className="editor-hex">{current.toUpperCase()}</code>
+              {settings.advanced.colors[token] && (
+                <button
+                  type="button"
+                  aria-label={`Reset ${colorNames[token]} to the theme`}
+                  onClick={() => {
+                    const colors = { ...settings.advanced.colors };
+                    delete colors[token];
+                    updateAdvanced({ colors });
+                    focusSoon(`color-${token}`);
+                  }}
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+          );
+        })}
         <p className="editor-error" role="status">
           {hardToRead &&
             "Your text may be hard to read on stream. Try a lighter text color or a darker “Boxes and cards” color."}

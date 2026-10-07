@@ -151,7 +151,7 @@ test("the whole editor works from the keyboard", async ({ page }) => {
 
   await page.locator("#advanced-summary").focus();
   await page.keyboard.press("Enter");
-  await expect(page.getByLabel("Titles")).toBeVisible();
+  await expect(page.locator("#color-primary")).toBeVisible();
 });
 
 test("focus stays in place when the button you pressed goes away", async ({ page }) => {
@@ -160,11 +160,11 @@ test("focus stays in place when the button you pressed goes away", async ({ page
   await expect(page.getByRole("button", { name: "Add a social" })).toBeFocused();
 
   await page.getByText("Advanced: colors and fonts").click();
-  await page.getByLabel("Titles").fill("#ff0000");
+  await page.locator("#color-primary").fill("#ff0000");
   await page.getByRole("button", { name: "Reset Titles to the theme" }).press("Enter");
-  await expect(page.getByLabel("Titles")).toBeFocused();
+  await expect(page.locator("#color-primary")).toBeFocused();
 
-  await page.getByLabel("Titles").fill("#ff0000");
+  await page.locator("#color-primary").fill("#ff0000");
   await page.getByRole("button", { name: "Reset all to the theme" }).press("Enter");
   await expect(page.locator("#advanced-summary")).toBeFocused();
 
@@ -862,7 +862,7 @@ test("Advanced starts closed, and overrides reach the preview and the OBS link",
   context,
 }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  const titleColor = page.getByLabel("Titles");
+  const titleColor = page.locator("#color-primary");
   await expect(titleColor).toBeHidden();
   await page.getByText("Advanced: colors and fonts").click();
   await expect(titleColor).toHaveValue("#e8eaed");
@@ -885,16 +885,16 @@ test("Advanced starts closed, and overrides reach the preview and the OBS link",
 test("hard-to-read colors show a warning, and reset brings the theme back", async ({ page }) => {
   await page.getByText("Advanced: colors and fonts").click();
   const warning = page.getByRole("status").filter({ hasText: "hard to read" });
-  await page.getByLabel("Text", { exact: true }).fill("#20232a");
+  await page.locator("#color-text").fill("#20232a");
   await expect(warning).toBeVisible();
 
   await page.getByRole("button", { name: "Reset Text to the theme" }).click();
   await expect(warning).toHaveCount(0);
-  await expect(page.getByLabel("Text", { exact: true })).toHaveValue("#e8eaed");
+  await expect(page.locator("#color-text")).toHaveValue("#e8eaed");
 
-  await page.getByLabel("Titles").fill("#00ff00");
+  await page.locator("#color-primary").fill("#00ff00");
   await page.getByRole("button", { name: "Reset all to the theme" }).click();
-  await expect(page.getByLabel("Titles")).toHaveValue("#e8eaed");
+  await expect(page.locator("#color-primary")).toHaveValue("#e8eaed");
   await expect(page.getByRole("button", { name: /^Reset (?!all).* to the theme$/ })).toHaveCount(0);
 });
 
@@ -1221,7 +1221,7 @@ test.describe("three-column shell on wide windows (T6.60)", () => {
     );
     await expect(page.locator(".editor-chat-preview")).toBeInViewport();
     await list.getByRole("link", { name: "Colors" }).click();
-    await expect(page.getByLabel("Titles")).toBeVisible(); // the closed Advanced section opens
+    await expect(page.locator("#color-primary")).toBeVisible(); // the closed Advanced section opens
     await list.getByRole("link", { name: "Links" }).click();
     await expect(page.locator("#obs-links")).toBeFocused();
     await expect(page).toHaveURL(/\/editor#1\./); // jumping never replaces the settings in the address
@@ -1283,7 +1283,7 @@ test("look filters show only that group, with the names under each card (T6.60)"
 
 test("colors show their hex value and the volume shows its number (T6.60)", async ({ page }) => {
   await page.getByText("Advanced: colors and fonts").click();
-  await page.getByLabel("Titles").fill("#ff0000");
+  await page.locator("#color-primary").fill("#ff0000");
   await expect(
     page.locator(".editor-color", { hasText: "Titles" }).locator(".editor-hex"),
   ).toHaveText("#FF0000");
@@ -1562,4 +1562,42 @@ test("segmented controls, switches and the slider work from the keyboard (T6.135
   await page.keyboard.press("ArrowRight");
   await expect(volume).toHaveValue("75");
   await expect(volume).toHaveAttribute("style", /--pct: 75%/);
+});
+
+test("colors pick from the look's own swatches, and the last swatch is your own (T6.135)", async ({
+  page,
+}) => {
+  await page.getByText("Advanced: colors and fonts").click();
+  const titles = page.getByRole("group", { name: "Titles" });
+  const highlights = titles.getByRole("button", { name: "Titles: the look's highlights color" });
+  await expect(titles.getByRole("button", { name: /^Titles: the look's titles/ })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+
+  // A swatch sets the color, by keyboard too, and shows a ring and aria-pressed.
+  await highlights.focus();
+  await page.keyboard.press("Enter");
+  await expect(highlights).toHaveAttribute("aria-pressed", "true");
+  await expect(previewTitle(page, "Starting soon")).toHaveCSS("color", "rgb(79, 140, 255)");
+  await expect(page.getByRole("button", { name: "Reset Titles to the theme" })).toBeVisible();
+
+  // The look's own color clears the override instead of storing a copy.
+  await titles.getByRole("button", { name: /^Titles: the look's titles/ }).click();
+  await expect(page.getByRole("button", { name: "Reset Titles to the theme" })).toHaveCount(0);
+
+  // Your own color is the native picker; picked, its swatch takes the ring.
+  await page.locator("#color-primary").fill("#ffd400");
+  await expect(titles.locator(".editor-swatch-own")).toHaveAttribute("data-picked");
+  await expect(titles.getByRole("button", { pressed: true })).toHaveCount(0);
+});
+
+test("quick rows are chips, and a picked frame size is pressed (T6.135)", async ({ page }) => {
+  const sizes = page.getByRole("group", { name: "Common camera sizes" });
+  await sizes.getByRole("button", { name: "800 × 450" }).click();
+  await expect(sizes.getByRole("button", { name: "800 × 450" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(sizes.getByRole("button", { pressed: true })).toHaveCount(1);
 });
