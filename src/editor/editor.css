@@ -1254,18 +1254,6 @@
   color: var(--accent);
 }
 
-/* Line icons (components/Icon.tsx, T6.118): one stroke weight, sized and colored by the text beside them. */
-.icon {
-  width: 0.85em;
-  height: 0.85em;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vertical-align: -0.05em;
-}
-
 /* A section's Reset (T6.120): small, at the top right of its panel, beside the header. */
 .editor .editor-form fieldset {
   position: relative;

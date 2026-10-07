@@ -117,27 +117,29 @@ for (const [width, height] of [
   });
 }
 
-test("the alert pictures show whole alert cards, large enough to read (T6.48)", async ({
+test("the stream stage shows the whole kit in one look, and switching the look restyles all of it (T6.124)", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-  // Settled cards only: no bounce mid-entrance. The web fonts can swap in after the cards are built (the fallback
-  // font wraps an alert to more lines), so poll until they have.
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const card = page.locator("li", { hasText: "Alerts with sound" });
-  await card.scrollIntoViewIfNeeded(); // previews are built when they come near the screen (T6.78)
-  await expect(card.locator(".landing-alert .alert-box")).toHaveCount(2);
-  const fits = () =>
-    card.locator(".landing-alert .editor-preview").evaluateAll((els) =>
-      els.every((el) => {
-        const crop = el.getBoundingClientRect();
-        const box = el.querySelector(".alert-box")!.getBoundingClientRect();
-        // The card fills the picture, not a strip in a canvas, and none of it is cut off.
-        return box.width > crop.width * 0.9 && box.bottom <= crop.bottom;
-      }),
-    );
-  await expect.poll(fits).toBe(true);
+  const stage = page.locator(".landing-stage");
+  await stage.scrollIntoViewIfNeeded(); // previews are built when they come near the screen (T6.78)
+  for (const part of [".chat", ".alert-box", ".frame"])
+    await expect(stage.locator(part)).toHaveCount(1);
+  const themesShown = () =>
+    stage
+      .locator("[data-theme]")
+      .evaluateAll((els) => [...new Set(els.map((el) => el.getAttribute("data-theme")))]);
+  expect(await themesShown()).toEqual(["abyss"]);
+  await page.getByRole("button", { name: "Shonen", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Shonen", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect.poll(themesShown).toEqual(["shonen"]);
+  // Held still for reduced motion: the alert stays on screen, whole.
+  await expect(stage.locator(".alert-box")).toBeVisible();
 });
 
 test("the cropped alert pictures fit their cards, with no empty space under them (T6.85)", async ({
@@ -145,7 +147,7 @@ test("the cropped alert pictures fit their cards, with no empty space under them
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  // The hero's two alerts and the looks section's one, each cropped to its card's height (T6.59). The crop was
+  // The hero's two alerts and the Alerts card's one, each cropped to its card's height (T6.59). The crop was
   // lost when previews started building after load (T6.78): it measured before the card existed.
   const crops = page.locator("div.landing-alert.overflow-hidden");
   await expect(crops).toHaveCount(3);
@@ -162,18 +164,30 @@ test("the cropped alert pictures fit their cards, with no empty space under them
   await expect.poll(gaps).toEqual([0, 0, 0]);
 });
 
-// T6.56, T6.57: no feature card squeezes its text into a narrow column, from phones to wide windows.
+// No sideways scrolling anywhere on the page (owner, 2026-10-07): the overlay cards always fit, and their text has
+// room, from phones to wide windows.
 for (const width of [390, 768, 1024, 1280, 1440]) {
-  test(`at ${width}px every feature card's text has room`, async ({ page }) => {
+  test(`at ${width}px the overlay cards fit without scrolling, and their text has room`, async ({
+    page,
+  }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
-    const cards = page
-      .getByRole("region", { name: /One .*look, every overlay to match/ })
-      .locator("li h3");
-    await expect(cards).toHaveCount(4);
-    for (const w of await cards.evaluateAll((els) =>
-      els.map((el) => el.parentElement!.getBoundingClientRect().width),
-    ))
+    const cards = page.locator(".landing-cards > li");
+    await expect(cards).toHaveCount(6);
+    for (const box of await cards.evaluateAll((els) => els.map((el) => el.getBoundingClientRect())))
+      expect(box.right).toBeLessThanOrEqual(width);
+    const scrollers = await page.evaluate(
+      () =>
+        [...document.querySelectorAll(".landing-cards, .landing-cards *")].filter(
+          (el) =>
+            el.scrollWidth > el.clientWidth + 1 &&
+            /auto|scroll/.test(getComputedStyle(el).overflowX),
+        ).length,
+    );
+    expect(scrollers).toBe(0);
+    for (const w of await page
+      .locator(".landing-stage-notes > li, .landing-cards h3")
+      .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().width)))
       expect(w).toBeGreaterThanOrEqual(200);
   });
 }
@@ -215,7 +229,7 @@ test("with reduced motion the hero kit starts paused on one look", async ({ page
 test("the hero lists four facts, all true for v1", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("list", { name: "At a glance" }).getByRole("listitem")).toHaveText([
-    "9 looks",
+    `${themeIds.length} looks`,
     "Scenes, chat and alerts",
     "One link per overlay",
     "Free, no account",
@@ -233,6 +247,9 @@ test("each overlay card opens its part of the editor", async ({ page }) => {
   );
 
   await cards.filter({ hasText: "Be Right Back" }).click();
+  // The landing page has look buttons too (the stream stage), and stays on screen while the editor loads, so wait
+  // for the editor's own gallery before picking one.
+  await expect(page.getByRole("heading", { name: "Pick a look to start" })).toBeVisible();
   // A first visit picks a look first; the part opens after that.
   await page.getByRole("button", { name: "Cozy Café", exact: true }).click();
   await expect(page.getByRole("radio", { name: "Be Right Back" })).toBeChecked();
@@ -266,12 +283,17 @@ test("the nav marks the section in view", async ({ page }) => {
 test("the landing page says what works where (T6.69, T6.79)", async ({ page }) => {
   await page.goto("/");
   const know = page.getByRole("region", { name: "Good to know" });
-  await expect(know.locator("dt")).toHaveText([
+  await expect(know.locator("summary")).toHaveText([
     "What you’ll need",
     "Works in OBS and Streamlabs",
     "Extras for your channel",
     "Your links never break",
   ]);
+  // The answers open in place (T6.124).
+  const answer = know.getByText("Paste a link once.");
+  await expect(answer).toBeHidden();
+  await know.getByText("Your links never break").click();
+  await expect(answer).toBeVisible();
   // One row per overlay, one column per platform, in words.
   const table = page.getByRole("table", { name: "Which overlays work on which platform" });
   const row = (name: string) => table.getByRole("row").filter({ hasText: name }).locator("td");
@@ -303,45 +325,62 @@ test("the landing page offers optional support and says Overlune stays free (T6.
   );
 });
 
-// T6.105: the looks orbit their heading while the pointer is over them; still for reduced motion; a grid when narrow.
-test("the looks ring orbits on hover, holds still for reduced motion, and is a grid on narrow windows", async ({
+// T6.124: the looks as a list beside one big live preview, after the owner's reference.
+test("the looks list drives one big preview by hover, focus and scroll, with a picture per look when narrow", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  const ring = page.locator("#looks");
-  await ring.scrollIntoViewIfNeeded();
-  const card = page.locator("[data-ring-card]").first();
-  const at = () => card.evaluate((el) => el.style.transform);
-  const rest = await at();
-  expect(rest).toContain("translate(");
-  await page.mouse.move(0, 0);
-  await page.waitForTimeout(600);
-  expect(await at()).toBe(rest); // resting until the pointer arrives
-  const box = (await ring.boundingBox())!;
-  await page.mouse.move(box.x + box.width * 0.3, box.y + box.height / 2); // clear of the fixed nav
-  await expect.poll(at).not.toBe(rest);
+  const preview = page.locator(".landing-look-preview .scene");
+  const row = (name: string) => page.locator("[data-look-row]").filter({ hasText: name });
+  await page.locator("#looks").scrollIntoViewIfNeeded();
+  await row("Session").locator(".landing-look-row").hover();
+  await expect(preview).toHaveAttribute("data-theme", "session");
+  await expect(row("Session")).toHaveAttribute("aria-current", "true");
+  await row("Daylight").locator(".landing-look-row").focus();
+  await expect(preview).toHaveAttribute("data-theme", "daylight");
+  // The scene buttons switch the preview's scene.
+  await page.getByRole("button", { name: "Be Right Back", exact: true }).click();
+  await expect(page.locator(".landing-look-preview .scene-title")).toContainText("right back");
+  // Scrolling a row to the middle of the window hands it the preview.
+  await page.mouse.move(5, 450);
+  await row("Neon Grid").evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await expect(preview).toHaveAttribute("data-theme", "neon-grid");
+  await expect(page.getByRole("link", { name: "Use Neon Grid" })).toHaveAttribute(
+    "href",
+    "/editor",
+  );
+
+  await page.setViewportSize({ width: 800, height: 900 });
+  await expect(page.locator(".landing-look-stage")).toBeHidden();
+  await expect(page.locator("[data-look]").first()).toBeVisible();
+});
+
+test("on wide windows the hero card zooms out into a collage of the looks; reduced motion keeps it still (T6.124)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const scale = () =>
+    page
+      .locator("[data-hero-card]")
+      .evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).a);
+  expect(await scale()).toBe(1);
+  await page.evaluate(() => scrollTo(0, 600));
+  await expect.poll(scale).toBeLessThan(0.8);
+  await expect(page.locator("[data-collage]")).toBeVisible();
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  await ring.scrollIntoViewIfNeeded();
-  const still = await at();
-  const b2 = (await ring.boundingBox())!;
-  await page.mouse.move(b2.x + b2.width * 0.3, b2.y + b2.height / 2);
-  await page.waitForTimeout(1200);
-  expect(await at()).toBe(still);
-
-  await page.setViewportSize({ width: 800, height: 900 });
-  await expect
-    .poll(() =>
-      page.locator("[data-ring-card]").evaluateAll((els) => els.map((el) => el.style.transform)),
-    )
-    .toEqual(Array(themeIds.length).fill(""));
+  await page.evaluate(() => scrollTo(0, 600));
+  await page.waitForTimeout(500);
+  expect(await scale()).toBe(1);
+  await expect(page.locator("[data-collage]")).toBeHidden();
 });
 
 test("a look opens full screen on click and closes with Esc or Close", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.emulateMedia({ reducedMotion: "reduce" }); // the ring holds still to be clicked
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const look = page.getByRole("dialog", { name: "Neon Grid, full screen" });
   const fullscreen = () => page.evaluate(() => document.fullscreenElement?.className ?? null);
