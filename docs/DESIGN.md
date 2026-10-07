@@ -189,6 +189,7 @@ Set on 2026-10-07 from the owner's design handoff, an audit of the looks against
 - Its heading face is its own, and it uses two type roles at most, clearly different from each other.
 - It has its own alert sound.
 - It covers every surface: Starting Soon, Be Right Back, Stream Ending, chat, alerts, webcam frame, Twitch panels and the offline banner.
+- Its layout is chosen for its concept: the shared layout v2 or one of its own (see "Scene layout"), never a recolor by default.
 - Its colors pass "Contrast as rendered" on the ground and on the surface.
 - It reads on a phone: check the scene scaled down to 1280×720 and 640×360.
 - Its motion follows the motion grammar (T6.117), uses CSS or canvas only, and every loop stops in Lite and Still.
@@ -207,7 +208,7 @@ Set on 2026-10-07 from the owner's design handoff, an audit of the looks against
 **Known gaps (2026-10-07):**
 - Sounds: eight looks reuse another look's sound: Daylight (Clean Slate's), Abyss and Quest (Forest Night's), Session (Cozy Café's), Shonen (Bold Esports'), Sakura (Pastel Cloud's), Skate Deck (Arcade 8-Bit's), Phosphor (Neon Grid's).
 - Fonts: Space Grotesk is Daylight's heading and Vaporwave Sunset's body. Body faces shared by two looks: Nunito Sans (Forest Night, Daylight), Nunito (Cozy Café, Sakura), Barlow (Bold Esports, Skate Deck).
-- Composition: every look shares one scene layout (below), so looks differ by color, type, shape and effect, not by structure. Paid packs vary frames and shapes from pack to pack. Giving looks their own layouts would change the rule that the composition stays the same; that's the owner's decision.
+- Composition: all 16 looks still use layout v2, so they differ by color, type, shape and effect, not by structure. Paid packs vary frames and shapes from pack to pack. Looks may now have their own layouts (owner, 2026-10-07; see "Scene layout"), so this closes look by look.
 - Shipped looks that match a tell keep it until they are reworked: Bold Esports (near-black with one red), Neon Grid (neon with a grid).
 
 ## Overlay layout rules
@@ -217,11 +218,18 @@ Set on 2026-10-07 from the owner's design handoff, an audit of the looks against
 - Error states use the theme's surface and text colors, stay readable, and never flash.
 
 ### Scene layout (T6.35)
-All the themes share one composed layout, rolled out one theme at a time (T6.35-T6.42); the original centered layout was retired in T6.43. Theme ids, settings and links never changed, so pasted links picked up the new design. Per-theme tweaks key on `data-theme` (and `data-bg` for background effects) on `.scene`, `.chat` and `.alerts`.
+Layout v2 below is the shared default. It was rolled out one theme at a time (T6.35-T6.42); the original centered layout was retired in T6.43. Theme ids, settings and links never changed, so pasted links picked up the new design.
+
+**A look may have its own layout** (owner, 2026-10-07): looks don't have to share one composition. Paid packs differ in structure, not just color, and a layout is part of a look's world (a teletext page, a manga panel, a quest log). What every layout keeps:
+- The 1920×1080 canvas, the 64px safe margin, and the open space the look's motif needs.
+- The same pieces and settings: logo, headline, subtitle, countdown, socials, ticker and the error card. A layout is part of the look, never a link setting, so old links simply pick it up.
+- The shared markup (`SceneFrame`): a layout changes the CSS, keyed on `data-theme`, not the components, so fit-to-screen (T6.26, T6.52) keeps working. If several looks share a layout, add it as a token through `types.ts`, with a test.
+- The longest text still fits, "Contrast as rendered" holds for the new placements, it reads at 640×360, and the motion grammar and Lite and Still apply.
+- The scene, BRB, Stream Ending, offline banner and panels of one look read as one layout. Compare screenshots against the current scene before shipping. Per-theme tweaks key on `data-theme` (and `data-bg` for background effects) on `.scene`, `.chat` and `.alerts`.
 - **Scenes (layout v2, T6.107, after the maintainer's broadcast kits):** 88px top / 112px side / 72px bottom margins (inside the 64px safe margin). Logo top left (160px max). On the left, anchored to the bottom: a 96×8px accent rule, then a two-tone display headline (184px, -0.04em tracking, 0.94 leading, balanced, so "Starting soon" sets on two lines) whose last word takes the accent color, then the subtitle (40px, 30ch max). It shrinks to fit per T6.26 and fits again when the countdown widens as it ticks (T6.52). On the right, also bottom-anchored, one column (480px min): the countdown card (96px digits on one line, in the text color, so the accent stays with the headline) over the socials as a list, each an accent-tinted 72px icon tile with the platform name (small tracked caps) over the handle (36px bold). The open sky above both columns is where each theme's motif lives.
 - **Alerts:** still centered at the top. A wider card (760-1100px) with a 6px accent band, an uppercase event label ("Raid", "New subscriber", "Resub", "Gift subs", "Cheer"), then the streamer's message at 56px; resub and cheer text below in the muted color.
 - **Chat:** one panel instead of a card per message: no borders between cards, hairline separators, only the top and bottom of the stack rounded. Badges are small square-cornered tags tinted with the accent.
-- Each theme can restyle these pieces in its own CSS (fonts, background effect, shapes), keyed on `data-theme`; the composition stays the same so the set reads as one product.
+- Each theme can restyle these pieces in its own CSS (fonts, background effect, shapes), keyed on `data-theme`, or move them into its own layout (above). The set reads as one product through the shared pieces, settings and motion grammar, not through one composition.
 - **Neon Grid (T6.36):** horizon at 82% with the content kept above it; socials float on the grid floor as a glowing panel; smaller type for the wide Orbitron; the chat stack has one neon edge.
 - **Cozy Café (T6.37):** the steam wisps rise in the open space (between the title block and the countdown card, and from behind the card) instead of behind the title.
 - **Arcade 8-Bit (T6.38):** pixel-font sizes (title 68px, countdown 56px, done text 44px, alert title 40px per T6.55) so the title and countdown sit side by side; square accent rule; wider subtitle measure for VT323.
