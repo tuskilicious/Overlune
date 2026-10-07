@@ -508,4 +508,7 @@ The owner OBS-tested T6.107-T6.111 (all passed, merged as #147-#151) and asked t
 - [ ] **T6.114 Preview each link before OBS.** There was no way to see an overlay full size before pasting it into OBS.
   - Accept: every link row has a Preview link that opens the overlay in a new tab; the Alerts preview plays one sample of each alert (`?test=1`). e2e.
   - *Built 2026-10-07 on `qol/open-links` (stacked on `qol/countdown-picks`). A text link under Copy link. Editor only. e2e: targets a new tab, the Alerts preview carries test=1, and Be Right Back opens with its title. Waiting for the owner's check.*
+- [ ] **T6.115 Undo.** A wrong look, a cleared field or a loaded link couldn't be taken back.
+  - Accept: an Undo button in the save bar (only while there's something to undo) and Ctrl/Cmd+Z outside text fields take back the last change; a burst of typing is one step; inside a text field the browser's own undo still works on the text. e2e.
+  - *Built 2026-10-07 on `qol/undo` (stacked on `qol/open-links`). Up to 50 snapshots of the settings; edits less than a second apart join one step; a new object with the same settings (picking the look already shown) is no step. Undo also restores the logo and bots fields. Editor only. e2e: typing then Undo restores the title in one step and the button goes away; Ctrl+Z on the look picker undoes a look change. Full suite passes (309 unit, 232 e2e). Waiting for the owner's check.*
 
