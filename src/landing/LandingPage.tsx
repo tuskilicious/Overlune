@@ -39,11 +39,15 @@ function buildWhenIdle() {
   if (idleScheduled || !waiting.length) return;
   idleScheduled = true;
   const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 200)); // Safari has none
-  idle(() => {
-    idleScheduled = false;
-    waiting.shift()?.();
-    buildWhenIdle();
-  });
+  // The timeout: a page that's never idle (a weak CPU running the live scenes) still builds them, just later.
+  idle(
+    () => {
+      idleScheduled = false;
+      waiting.shift()?.();
+      buildWhenIdle();
+    },
+    { timeout: 300 },
+  );
 }
 
 /** A preview that's built later (T6.78): when the browser is idle after loading, or as soon as it comes near the

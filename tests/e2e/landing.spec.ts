@@ -310,7 +310,10 @@ test("previews off screen are built after load, without scrolling (T6.78)", asyn
   await page.goto("/");
   await expect(page.locator("figure[data-kit] .scene")).toHaveCount(1); // the hero right away
   // The rest are built one per idle moment, so they're ready before anyone scrolls to them.
-  await expect(page.locator("[data-look]").last().locator(".scene")).toHaveCount(1);
+  // On a slow machine that can take a while: the promise is that they build without a scroll, not how fast.
+  await expect(page.locator("[data-look]").last().locator(".scene")).toHaveCount(1, {
+    timeout: 30_000,
+  });
   await expect(page.locator("[data-look] .scene")).toHaveCount(themeIds.length);
 });
 
