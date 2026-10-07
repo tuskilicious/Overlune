@@ -238,7 +238,7 @@ const sectionPreview: Partial<Record<string, string>> = {
 
 const loadedMessage = (ok: boolean) =>
   ok
-    ? "Loaded! You can keep editing."
+    ? "Loaded. You can keep editing."
     : "Loaded, but some settings couldn’t be read, so defaults are showing for those.";
 
 const freshSettings = (): Settings => ({
@@ -443,6 +443,25 @@ export default function EditorPage() {
   /** Anything changed from a fresh editor, including work restored from a link or autosave. */
   const madeSomething = JSON.stringify(settings) !== freshJson;
   const motion = settings.lessMotion ? "still" : settings.liteMotion ? "lite" : "full";
+  /** A section's Reset (T6.120), after the kits' docks: shown only when the section differs from the defaults.
+   *  Undo brings it back, so there's no confirm step. */
+  const fresh = freshSettings();
+  const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+  const resetButton = (what: string, changed: boolean, apply: () => void) =>
+    changed && (
+      <button
+        type="button"
+        className="editor-reset"
+        aria-label={`Reset ${what}`}
+        onClick={() => {
+          lastEdit.current = 0; // a reset is always its own undo step, never part of a typing burst
+          apply();
+          setLoadStatus(`${what} reset. Undo brings it back.`);
+        }}
+      >
+        Reset
+      </button>
+    );
   const filled: Partial<Record<string, boolean>> = {
     "part-socials": settings.socials.some((s) => s.handle.trim()),
     "part-chat": settings.chat.channel !== "",
@@ -802,6 +821,9 @@ export default function EditorPage() {
 
               <fieldset>
                 <legend>{overlays[scene].name} text</legend>
+                {resetButton(`${overlays[scene].name} text`, !same(current, fresh[scene]), () =>
+                  updateScene(scene, fresh[scene]),
+                )}
                 <label>
                   Title
                   <input
@@ -1013,6 +1035,7 @@ export default function EditorPage() {
 
               <fieldset id="part-socials" className="editor-part" tabIndex={-1}>
                 <legend>Your socials (shown on every scene)</legend>
+                {resetButton("Socials", settings.socials.length > 0, () => update({ socials: [] }))}
                 {settings.socials.map((s, i) => (
                   <div key={i} className="editor-social">
                     <label>
@@ -1065,6 +1088,17 @@ export default function EditorPage() {
 
               <fieldset id="part-chat" className="editor-part" tabIndex={-1}>
                 <legend>Chat</legend>
+                {resetButton(
+                  "Chat settings",
+                  !same({ ...settings.chat, channel: "" }, { ...fresh.chat, channel: "" }),
+                  () => {
+                    setSettings((st) => ({
+                      ...st,
+                      chat: { ...fresh.chat, channel: st.chat.channel },
+                    }));
+                    setBotsInput(fresh.chat.bots.join("\n"));
+                  },
+                )}
                 <label>
                   Your Twitch channel name
                   <input
@@ -1178,6 +1212,9 @@ export default function EditorPage() {
 
               <fieldset id="part-alerts" className="editor-part" tabIndex={-1}>
                 <legend>Alerts</legend>
+                {resetButton("Alerts", !same(settings.alerts, fresh.alerts), () =>
+                  update({ alerts: fresh.alerts }),
+                )}
                 <p className="editor-hint">
                   Alerts use your channel name from Chat. Chat and alerts work with Twitch only;
                   YouTube isn’t supported yet.
@@ -1284,6 +1321,9 @@ export default function EditorPage() {
 
               <fieldset id="part-frame" className="editor-part" tabIndex={-1}>
                 <legend>Webcam frame</legend>
+                {resetButton("Webcam frame", !same(settings.frame, fresh.frame), () =>
+                  update({ frame: fresh.frame }),
+                )}
                 <p className="editor-hint">
                   A border in your look to put around your camera. In OBS, add its link as its own
                   Browser source above your camera, and line the two up.
@@ -1341,6 +1381,10 @@ export default function EditorPage() {
 
               <fieldset id="part-logo" className="editor-part" tabIndex={-1}>
                 <legend>Logo (optional)</legend>
+                {resetButton("Logo", settings.logo !== "" || logoInput !== "", () => {
+                  update({ logo: "" });
+                  setLogoInput("");
+                })}
                 <label>
                   Link to your logo image (starts with https://)
                   <input
@@ -1407,6 +1451,9 @@ export default function EditorPage() {
               {/* OBS doesn't always pass on the computer's reduced-motion setting, so it's a choice here (T6.74). */}
               <fieldset id="part-motion" className="editor-part" tabIndex={-1}>
                 <legend>Motion</legend>
+                {resetButton("Motion", motion !== "full", () =>
+                  update({ lessMotion: false, liteMotion: false }),
+                )}
                 {/* Three steps, after the ICARUS kit's graphics load (T6.119). */}
                 <div
                   className="editor-scenes editor-segmented"

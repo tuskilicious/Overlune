@@ -1265,3 +1265,16 @@
   stroke-linejoin: round;
   vertical-align: -0.05em;
 }
+
+/* A section's Reset (T6.120): small, at the top right of its panel, beside the header. */
+.editor .editor-form fieldset {
+  position: relative;
+}
+
+.editor .editor-reset {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  padding: 4px 10px;
+  font-size: 13px;
+}

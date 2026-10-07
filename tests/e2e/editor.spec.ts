@@ -593,6 +593,25 @@ test("Lite stops the moving backgrounds but keeps the entrances (T6.119)", async
   expect(await floor()).toBe("none");
 });
 
+test("each section resets on its own, and Undo brings it back (T6.120)", async ({ page }) => {
+  const reset = (what: string) => page.getByRole("button", { name: `Reset ${what}` });
+  await expect(reset("Webcam frame")).toHaveCount(0); // nothing to reset yet
+  await page.getByRole("button", { name: "800 × 450" }).click();
+  await reset("Webcam frame").click();
+  await expect(page.getByLabel("Frame width")).toHaveValue("640");
+  await expect(reset("Webcam frame")).toHaveCount(0);
+  await expect(page.getByText("Webcam frame reset. Undo brings it back.")).toBeVisible();
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect(page.getByLabel("Frame width")).toHaveValue("800");
+
+  // Chat keeps the channel name.
+  await page.getByLabel("Your Twitch channel name").fill("tuskilicious");
+  await page.getByLabel("Hide chat commands (messages starting with !)").uncheck();
+  await reset("Chat settings").click();
+  await expect(page.getByLabel("Your Twitch channel name")).toHaveValue("tuskilicious");
+  await expect(page.getByLabel("Hide chat commands (messages starting with !)")).toBeChecked();
+});
+
 test("quick picks set the countdown, and No countdown clears it (T6.113)", async ({ page }) => {
   await page.getByRole("button", { name: "In 30 min" }).click();
   // Rounded up to the next whole minute, so 30:00 to 30:59 left.
@@ -672,7 +691,7 @@ test("an old link loads back into the editor", async ({ page, context }) => {
   await openLoad(page);
   await page.getByLabel("Paste a link from Overlune").fill(link);
   await page.getByRole("button", { name: "Load", exact: true }).click();
-  await expect(page.getByRole("status").filter({ hasText: "Loaded!" })).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Loaded." })).toBeVisible();
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Grabbing snacks");
   await expect(page.getByLabel("Link to your logo image")).toHaveValue(
     "https://example.com/logo.png",
@@ -703,7 +722,7 @@ test("the editor's own address saves the work, so reload or a bookmark keeps it"
   await expect(page).toHaveURL(/\/editor#1\./);
   await page.reload();
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Bookmarked title");
-  await expect(page.getByRole("status").filter({ hasText: "Loaded!" })).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Loaded." })).toBeVisible();
 });
 
 test("autosave restores the last overlay when the editor opens without a link", async ({
