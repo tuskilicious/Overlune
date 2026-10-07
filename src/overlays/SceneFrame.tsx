@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import type { Settings } from "../settings/schema";
 import { themes } from "../themes";
 import "../themes/fonts";
@@ -24,16 +32,21 @@ interface Props {
   children?: ReactNode;
 }
 
-/** A two-tone headline (T6.107): the last word takes the accent color. Plain text, rendered as React elements. */
+/** A two-tone headline (T6.107): the last word takes the accent color. Each word is its own span so the entrance
+ *  can land them one after another (T6.117). Plain text, rendered as React elements. */
 function TwoTone({ text }: { text: string }) {
-  const i = text.trimEnd().lastIndexOf(" ");
-  if (i < 0) return text;
-  return (
-    <>
-      {text.slice(0, i + 1)}
-      <span className="scene-title-end">{text.slice(i + 1)}</span>
-    </>
-  );
+  const words = text.trim().split(/\s+/);
+  return words.map((w, i) => (
+    <Fragment key={i}>
+      {i > 0 && " "}
+      <span
+        className={i > 0 && i === words.length - 1 ? "scene-word scene-title-end" : "scene-word"}
+        style={{ "--i": i } as CSSProperties}
+      >
+        {w}
+      </span>
+    </Fragment>
+  ));
 }
 
 /** Shared 1920×1080 scene layout for Starting Soon, BRB and Stream Ending. */
@@ -109,7 +122,7 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
             {socials.length > 0 && (
               <ul className="scene-socials">
                 {socials.map((s, i) => (
-                  <li key={i}>
+                  <li key={i} style={{ "--i": i } as CSSProperties}>
                     <SocialIcon platform={s.platform} />
                     <span className="scene-platform">{platformLabel[s.platform]}</span>{" "}
                     <span className="scene-handle">{s.handle}</span>

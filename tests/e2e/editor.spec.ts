@@ -1288,7 +1288,7 @@ test("Less motion goes into every overlay link and turns the motion off (T6.74)"
   await page.goto(link);
   await expect(page.locator(".scene")).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("data-rm", "");
-  await expect(page.locator(".scene-main")).toHaveCSS("animation-name", "none");
+  await expect(page.locator(".scene-word").first()).toHaveCSS("animation-name", "none");
 });
 
 test("the alert time goes into the Alerts link, and the hint says where position and size live (T6.75)", async ({

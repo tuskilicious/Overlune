@@ -34,6 +34,8 @@ export default function AlertView({ settings, alert, error }: Props) {
   return (
     <div className="alerts" data-anim={theme.alertAnim} data-theme={theme.id} style={style}>
       {error}
+      {/* A burst of the look's light behind the box as each alert lands (T6.117); hidden at rest. */}
+      {alert && <div className="alert-burst" aria-hidden />}
       {alert && (
         <div className="alert-box" data-kind={alert.kind}>
           <p className="alert-kind">{kindLabel[alert.kind]}</p>
