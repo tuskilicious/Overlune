@@ -450,3 +450,92 @@
   column-gap: 48px;
   text-align: left;
 }
+
+/* 9. Daylight: the poster colophon. A Swiss poster: the headline very large and flush left at the top, the vermilion
+   disc in the top right (scene.css), and the details set like a poster's small print in ruled columns along the
+   bottom. Hairline rules, no boxes; the disc is the only color besides the headline's last word. */
+.scene[data-theme="daylight"] .scene-main {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  column-gap: 48px;
+  align-items: start;
+}
+
+.scene[data-theme="daylight"] .scene-main:has(.countdown) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.scene[data-theme="daylight"] .scene-title {
+  grid-area: 2 / 1 / auto / -1;
+  max-width: 1150px;
+  margin-top: 8px;
+  font-size: 216px;
+}
+
+/* The disc is the poster's mark; the rule above the headline goes. */
+.scene[data-theme="daylight"] .scene-title::before {
+  height: 0;
+  margin-bottom: 0;
+}
+
+.scene[data-theme="daylight"] .scene-side {
+  display: contents;
+}
+
+/* The colophon: each column under an ink hairline. */
+.scene[data-theme="daylight"] :is(.scene-subtitle, .countdown, .scene-socials) {
+  grid-row: 4;
+  align-self: stretch;
+  justify-self: stretch;
+  box-sizing: border-box;
+  margin: 0;
+  padding-top: 24px;
+  border-top: 2px solid var(--text);
+}
+
+.scene[data-theme="daylight"] .scene-subtitle {
+  grid-column: 1;
+  max-width: none;
+  font-size: 36px;
+}
+
+.scene[data-theme="daylight"] .countdown {
+  grid-column: 2;
+  align-items: flex-start;
+  gap: 8px;
+  padding-inline: 0;
+  padding-bottom: 0;
+  text-align: left;
+  background: none;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.scene[data-theme="daylight"] .countdown::after {
+  display: none;
+}
+
+.scene[data-theme="daylight"] .countdown-time {
+  font-size: 80px;
+}
+
+.scene[data-theme="daylight"] .scene-socials {
+  grid-column: -2;
+  gap: 16px;
+}
+
+/* No subtitle: the rule still runs under the first column, so the colophon keeps its grid. */
+.scene[data-theme="daylight"] .scene-main::before {
+  content: "";
+  grid-area: 4 / 1;
+  justify-self: stretch;
+  border-top: 2px solid var(--text);
+}
+
+.scene[data-theme="daylight"]
+  .scene-main:not(:has(.countdown, .scene-socials, .scene-subtitle))::before {
+  display: none;
+}
