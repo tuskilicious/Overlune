@@ -111,16 +111,20 @@
     alert-out 400ms ease-in calc(var(--alert-ms) - 400ms) forwards;
 }
 
+/* Fluid (T6.123): the box drops in out of a blur and leaves the same way, rising. */
 @keyframes alert-in {
   from {
     opacity: 0;
     transform: translateY(-32px);
+    filter: blur(8px);
   }
 }
 
 @keyframes alert-out {
   to {
     opacity: 0;
+    transform: translateY(-16px);
+    filter: blur(6px);
   }
 }
 

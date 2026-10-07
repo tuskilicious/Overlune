@@ -45,6 +45,15 @@
     linear-gradient(var(--accent), var(--accent)) bottom right / var(--arm) var(--line),
     linear-gradient(var(--accent), var(--accent)) bottom right / var(--line) var(--arm);
   background-repeat: no-repeat;
+  /* The brackets close in on the frame as it appears (T6.123). */
+  animation: bracket-in 800ms cubic-bezier(0.16, 1, 0.3, 1) 150ms both;
+}
+
+@keyframes bracket-in {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+  }
 }
 
 .frame[data-theme="cozy-cafe"] .frame-edge::after,

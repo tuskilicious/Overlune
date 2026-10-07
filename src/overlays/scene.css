@@ -415,10 +415,12 @@
   color: var(--accent);
 }
 
+/* Fluid (T6.123): each piece rises out of a soft blur into focus. */
 @keyframes scene-slide-fade {
   from {
     opacity: 0;
     transform: translateY(24px);
+    filter: blur(10px);
   }
 }
 
@@ -974,30 +976,62 @@
 
 /* Bold Esports: angled speed slabs cutting across the top-right corner, like a broadcast package. Static. */
 .scene[data-theme="bold-esports"] {
-  background:
-    linear-gradient(
-        115deg,
-        transparent 0 56%,
-        var(--accent) 56% 60%,
-        transparent 60% 63%,
-        color-mix(in srgb, var(--accent) 45%, transparent) 63% 65%,
-        transparent 65% 68%,
-        color-mix(in srgb, var(--accent) 20%, transparent) 68% 69%,
-        transparent 69%
-      )
-      right top / 70% 38% no-repeat,
-    radial-gradient(
-      70% 80% at 100% 0%,
-      color-mix(in srgb, var(--accent) 10%, transparent),
-      transparent 70%
-    ),
-    var(--bg);
+  position: relative;
+  isolation: isolate;
+}
+
+/* The slabs are their own layer so they drive in and settle, again and again (T6.123). */
+.scene[data-theme="bold-esports"]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  width: 70%;
+  height: 38%;
+  background: linear-gradient(
+    115deg,
+    transparent 0 56%,
+    var(--accent) 56% 60%,
+    transparent 60% 63%,
+    color-mix(in srgb, var(--accent) 45%, transparent) 63% 65%,
+    transparent 65% 68%,
+    color-mix(in srgb, var(--accent) 20%, transparent) 68% 69%,
+    transparent 69%
+  );
+  animation: esports-slabs 4.5s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+}
+
+@keyframes esports-slabs {
+  from {
+    transform: translateX(36px);
+  }
 }
 
 /* Daylight: a Swiss-poster vermilion disc in the open top right. Static. */
 .scene[data-theme="daylight"] {
-  background:
-    radial-gradient(circle at 80% 21%, var(--accent) 0 190px, transparent 191px), var(--bg);
+  position: relative;
+  isolation: isolate;
+}
+
+/* The disc is its own layer so it can breathe (T6.123). */
+.scene[data-theme="daylight"]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: calc(21% - 190px);
+  right: calc(20% - 190px);
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: daylight-breathe 7s ease-in-out infinite alternate;
+}
+
+@keyframes daylight-breathe {
+  to {
+    transform: scale(1.05);
+  }
 }
 
 /* The ticker (T6.121), after the Tuskilicious kit: a band along the bottom of every scene with an optional tab in
@@ -1102,13 +1136,96 @@
 }
 
 /* With a ticker the content sits higher, so the top-right motifs shrink to stay clear of the right column. */
-.scene[data-theme="daylight"][data-ticker] {
-  background:
-    radial-gradient(circle at 80% 15%, var(--accent) 0 140px, transparent 141px), var(--bg);
+.scene[data-theme="daylight"][data-ticker]::before {
+  top: calc(15% - 140px);
+  right: calc(20% - 140px);
+  width: 280px;
+  height: 280px;
 }
 
 .scene[data-bg="sunset"][data-ticker]::before {
   top: 24px;
   width: 340px;
   height: 340px;
+}
+
+/* Bolder pass (T6.123): every look has something alive in the background. All of these loop, so Lite and Still
+   hold them (index.css stops .scene::before and ::after). */
+
+/* Clean Slate: its corner glow drifts slowly, like light through a window. */
+.scene[data-theme="clean-slate"] {
+  position: relative;
+  isolation: isolate;
+  background: var(--bg);
+}
+
+.scene[data-theme="clean-slate"]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -20%;
+  right: -15%;
+  width: 75%;
+  height: 90%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--accent) 16%, transparent),
+    transparent
+  );
+  animation: glow-drift 14s ease-in-out infinite alternate;
+}
+
+@keyframes glow-drift {
+  to {
+    transform: translate(-8%, 10%) scale(1.15);
+  }
+}
+
+/* Session: the print grain flickers like film running through a projector. */
+.scene[data-bg="session"]::after {
+  inset: -40px;
+  animation: grain-jitter 0.5s steps(1) infinite;
+}
+
+@keyframes grain-jitter {
+  33% {
+    transform: translate(-14px, 9px);
+  }
+  66% {
+    transform: translate(11px, -13px);
+  }
+}
+
+/* Shonen: the speed lines throb from the focal point. */
+.scene[data-bg="shonen"]::after {
+  transform-origin: 78% 22%;
+  animation: shonen-throb 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes shonen-throb {
+  to {
+    transform: scale(1.05);
+  }
+}
+
+/* Vaporwave Sunset: the sun bobs on the horizon. */
+.scene[data-bg="sunset"]::before {
+  animation: sun-bob 6s ease-in-out infinite alternate;
+}
+
+@keyframes sun-bob {
+  to {
+    transform: translateY(-12px);
+  }
+}
+
+/* Neon Grid: the horizon hums. */
+.scene[data-bg="grid"]::after {
+  animation: horizon-hum 2.2s ease-in-out infinite alternate;
+}
+
+@keyframes horizon-hum {
+  to {
+    opacity: 0.7;
+  }
 }

@@ -31,7 +31,8 @@ html[data-rm] *::after {
 :is(html[data-lite], .editor-lite) .scene-title::after,
 :is(html[data-lite], .editor-lite) .countdown-time,
 :is(html[data-lite], .editor-lite) .alerts-test-label,
-:is(html[data-lite], .editor-lite) .scene-ticker-track {
+:is(html[data-lite], .editor-lite) .scene-ticker-track,
+:is(html[data-lite], .editor-lite) .countdown::after {
   animation: none !important;
 }
 
