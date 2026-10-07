@@ -1,4 +1,13 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { Link } from "react-router";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -30,11 +39,15 @@ function buildWhenIdle() {
   if (idleScheduled || !waiting.length) return;
   idleScheduled = true;
   const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 200)); // Safari has none
-  idle(() => {
-    idleScheduled = false;
-    waiting.shift()?.();
-    buildWhenIdle();
-  });
+  // The timeout: a page that's never idle (a weak CPU running the live scenes) still builds them, just later.
+  idle(
+    () => {
+      idleScheduled = false;
+      waiting.shift()?.();
+      buildWhenIdle();
+    },
+    { timeout: 300 },
+  );
 }
 
 /** A preview that's built later (T6.78): when the browser is idle after loading, or as soon as it comes near the
@@ -678,6 +691,51 @@ function LooksShowcase() {
   );
 }
 
+/** The hero's headline, revealed a word at a time (T6.129). */
+const headline = "Free stream overlays that look pro.";
+
+/**
+ * The hero's night (T6.129, after the Kage reference): three ridges standing in front of the sky, the nearest with a
+ * crest of pines, and motes rising past them. They rise in from the card's foot on load and part as you scroll.
+ */
+function HeroNight() {
+  return (
+    <div aria-hidden className="landing-night">
+      <div className="landing-motes" />
+      {/* One svg per ridge: animating an svg element is composited, a path inside one runs on the main thread. */}
+      <div className="landing-ridges">
+        <svg
+          data-ridge
+          className="landing-ridge-far"
+          style={{ "--i": 0 } as CSSProperties}
+          viewBox="0 0 1440 320"
+          preserveAspectRatio="xMidYMax slice"
+        >
+          <path d="M0 320L0 75L24 83L48 92L72 99L96 105L120 107L144 106L168 102L192 98L216 94L240 92L264 92L288 95L312 99L336 104L360 110L384 115L408 120L432 124L456 129L480 136L504 144L528 154L552 165L576 175L600 185L624 191L648 193L672 191L696 185L720 177L744 167L768 157L792 148L816 141L840 136L864 132L888 128L912 125L936 120L960 115L984 110L1008 106L1032 104L1056 104L1080 105L1104 108L1128 111L1152 113L1176 113L1200 109L1224 102L1248 92L1272 82L1296 73L1320 65L1344 60L1368 58L1392 59L1416 62L1440 66L1440 320Z" />
+        </svg>
+        <svg
+          data-ridge
+          className="landing-ridge-mid"
+          style={{ "--i": 1 } as CSSProperties}
+          viewBox="0 0 1440 320"
+          preserveAspectRatio="xMidYMax slice"
+        >
+          <path d="M0 320L0 145L24 147L48 148L72 149L96 154L120 163L144 177L168 194L192 212L216 226L240 234L264 235L288 232L312 227L336 223L360 221L384 220L408 219L432 215L456 208L480 200L504 193L528 189L552 191L576 196L600 201L624 204L648 202L672 194L696 183L720 171L744 160L768 153L792 149L816 147L840 143L864 139L888 135L912 134L936 137L960 147L984 163L1008 181L1032 197L1056 210L1080 216L1104 218L1128 217L1152 217L1176 218L1200 221L1224 222L1248 221L1272 217L1296 210L1320 203L1344 199L1368 199L1392 205L1416 212L1440 218L1440 320Z" />
+        </svg>
+        <svg
+          data-ridge
+          className="landing-ridge-near"
+          style={{ "--i": 2 } as CSSProperties}
+          viewBox="0 0 1440 320"
+          preserveAspectRatio="xMidYMax slice"
+        >
+          <path d="M0 320L0 250L24 256L48 261L72 268L96 275L120 279L144 277L168 271L192 264L216 262L240 265L264 271L288 275L312 273L336 266L360 257L384 250L408 244L432 239L456 231L480 222L504 214L528 211L552 217L576 229L600 241L624 250L648 254L672 255L696 257L720 261L744 266L768 268L792 268L816 266L840 265L864 269L888 277L912 283L936 284L960 277L984 266L1008 253L1032 244L1056 237L1080 232L1104 226L1128 220L1152 217L1176 220L1200 228L1224 239L1248 247L1272 250L1296 248L1320 245L1344 246L1368 251L1392 258L1416 264L1440 268L1440 320ZM663 259L671 232L678 259ZM258 275L266 248L274 275ZM1135 222L1142 205L1148 222ZM122 283L131 248L139 283ZM50 269L60 229L70 269ZM936 287L942 257L947 287ZM16 259L22 232L27 259ZM269 277L274 257L279 277ZM659 259L668 233L677 259ZM740 270L748 240L755 270ZM948 284L954 258L960 284ZM1427 271L1437 231L1446 271ZM1013 252L1019 230L1025 252ZM407 247L416 231L425 247ZM570 233L577 197L584 233ZM1375 258L1380 222L1385 258ZM295 278L302 241L309 278ZM1406 267L1412 243L1417 267ZM900 286L906 252L913 286ZM116 283L125 260L135 283ZM1085 234L1092 217L1098 234ZM137 281L146 265L154 281ZM249 273L256 244L263 273ZM269 277L275 244L280 277ZM920 289L927 272L934 289ZM297 278L307 257L316 278ZM1147 221L1157 199L1166 221ZM294 278L303 254L313 278ZM914 289L924 272L934 289ZM298 278L307 257L316 278ZM468 228L474 207L479 228ZM124 283L130 254L136 283ZM859 274L866 250L873 274ZM1373 259L1381 232L1389 259ZM1242 251L1248 232L1254 251ZM1302 250L1308 215L1314 250ZM264 277L273 244L283 277ZM274 278L283 240L293 278ZM864 275L869 250L875 275ZM50 267L56 228L62 267ZM1005 254L1015 234L1024 254ZM853 272L859 250L865 272ZM1031 246L1037 230L1043 246ZM797 271L805 235L814 271ZM397 249L404 211L410 249ZM17 260L24 239L31 260Z" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
 /** The marketing page at / for first-time visitors (T6.34). Saved work and old editor links go to /editor (App.tsx). */
 export default function LandingPage() {
   const root = useRef<HTMLDivElement>(null);
@@ -707,6 +765,7 @@ export default function LandingPage() {
           },
         });
         tl.to("[data-hero-card]", { scale: 0.56, ease: "none" }, 0)
+          .to("[data-ridge]", { y: (i: number) => 40 + i * 50, ease: "none" }, 0)
           .fromTo("[data-collage]", { opacity: 0 }, { opacity: 1, ease: "none" }, 0)
           .fromTo(
             "[data-collage-row]:nth-child(odd)",
@@ -825,10 +884,20 @@ export default function LandingPage() {
               className="landing-hero-card landing-sky relative z-10 mx-auto w-full max-w-[90rem] px-6 py-16 md:px-12 md:py-20"
             >
               <span aria-hidden className="landing-moon" />
+              <HeroNight />
               <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
                 <div>
                   <h1 className="max-w-5xl font-heading text-[clamp(2.75rem,5.5vw,5.25rem)] leading-[1.05] font-bold">
-                    Free stream overlays that look pro.
+                    {headline.split(" ").map((word, i) => (
+                      <Fragment key={i}>
+                        {i > 0 && " "}
+                        <span className="landing-word-mask">
+                          <span className="landing-word" style={{ "--i": i } as CSSProperties}>
+                            {word}
+                          </span>
+                        </span>
+                      </Fragment>
+                    ))}
                   </h1>
                   <p className="mt-8 max-w-xl text-xl leading-relaxed text-haze">
                     Pick a look, add your text, and paste one link per overlay into OBS. Starting

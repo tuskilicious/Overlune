@@ -261,6 +261,9 @@ Write for a streamer opening OBS for the first time: concise, confident, helpful
 - One filled button style (Lune Violet, Night text). No meta-labels ("SECTION 01"), no invented reviews or stats.
 - Responsive down to 390px with no sideways scroll (e2e check).
 
+### The hero's night (T6.129)
+After the Kage reference the owner shared, rebuilt in Overlune's own palette with no code or art from it. Three ridges stand in front of the hero card's sky (far: Lune Violet haze at 30%, mid: `#2A1D7A`, near: Midnight with a crest of pines), with violet mist between them and motes in violet, cyan and moon white rising out of them (26s loop). The moon's air breathes (8s). On load the ridges rise in from the card's foot, 90ms apart, and the headline arrives a word at a time out of its own mask (72ms apart). On wide windows with motion, scrolling parts the ridges, the nearest furthest, while the card zooms out. All of it is `aria-hidden` and sits behind the hero's text; with reduced motion every piece sits where it ends. Left out on purpose: the custom cursor and its trail (cursor effects stay off this site), and the vertical Japanese text.
+
 ### UI review checklist
 - [ ] Colors, fonts, sizes and spacing come from the tokens above, with no unexplained raw values.
 - [ ] Every new control has a label and a visible focus ring, and works by keyboard.

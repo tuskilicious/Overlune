@@ -310,7 +310,10 @@ test("previews off screen are built after load, without scrolling (T6.78)", asyn
   await page.goto("/");
   await expect(page.locator("figure[data-kit] .scene")).toHaveCount(1); // the hero right away
   // The rest are built one per idle moment, so they're ready before anyone scrolls to them.
-  await expect(page.locator("[data-look]").last().locator(".scene")).toHaveCount(1);
+  // On a slow machine that can take a while: the promise is that they build without a scroll, not how fast.
+  await expect(page.locator("[data-look]").last().locator(".scene")).toHaveCount(1, {
+    timeout: 30_000,
+  });
   await expect(page.locator("[data-look] .scene")).toHaveCount(themeIds.length);
 });
 
@@ -405,4 +408,36 @@ test("a look opens full screen on click and closes with Esc or Close", async ({ 
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toBeHidden();
   await expect.poll(fullscreen).toBeNull();
+});
+
+test("the hero's night rises in, parts on scroll, and holds still for reduced motion (T6.129)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const night = page.locator(".landing-night");
+  await expect(night).toHaveAttribute("aria-hidden", "true");
+  await expect(night.locator("[data-ridge]")).toHaveCount(3);
+  // The headline arrives a word at a time but still reads as one sentence.
+  await expect(page.locator(".landing-word")).toHaveCount(6);
+  await expect(page.locator(".landing-word").first()).toHaveCSS("animation-name", "word-rise");
+  await expect(page.locator(".landing-motes")).toHaveCSS("animation-name", "motes-rise");
+  // Scrolling parts the ridges, the nearest furthest.
+  await page.mouse.wheel(0, 600);
+  await expect
+    .poll(async () => {
+      const ys = await page
+        .locator("[data-ridge]")
+        .evaluateAll((els) => els.map((el) => new DOMMatrix(getComputedStyle(el).transform).f));
+      return ys[0]! > 0 && ys[2]! > ys[0]!;
+    })
+    .toBe(true);
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Free stream overlays that look pro.",
+  );
+  for (const sel of [".landing-word", ".landing-motes", ".landing-ridges > svg"])
+    await expect(page.locator(sel).first()).toHaveCSS("animation-name", "none");
 });
