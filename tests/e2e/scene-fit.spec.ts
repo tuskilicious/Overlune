@@ -30,6 +30,15 @@ for (const theme of themeIds) {
     );
     await expect(page.locator(".scene-logo")).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
+    // Measure where things land, not mid-entrance (they rise in from below).
+    await page.evaluate(() =>
+      Promise.allSettled(
+        document
+          .getAnimations()
+          .filter((a) => a.effect?.getTiming().iterations !== Infinity)
+          .map((a) => a.finished),
+      ),
+    );
     for (const sel of [".scene-title", ".scene-subtitle", ".countdown-at", ".scene-socials"]) {
       const box = (await page.locator(sel).boundingBox())!;
       expect(box.y, sel).toBeGreaterThanOrEqual(0);
