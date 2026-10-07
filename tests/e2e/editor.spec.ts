@@ -515,6 +515,16 @@ test("the preview runs the real overlay, countdown included", async ({ page }) =
   await expect(preview(page).getByText(/^Starts (at|tomorrow,) .* UTC$/)).toBeVisible();
 });
 
+test("each link has a preview that opens the overlay full size (T6.114)", async ({ page }) => {
+  const open = (name: string) => page.getByRole("link", { name: `Preview ${name} in a new tab` });
+  await expect(open("Starting Soon")).toHaveAttribute("target", "_blank");
+  await expect(open("Starting Soon")).toHaveAttribute("href", /\/o\/starting#1\./);
+  // Alerts wait for events, so their preview plays the samples.
+  await expect(open("Alerts")).toHaveAttribute("href", /\/o\/alerts\?test=1#1\./);
+  const [tab] = await Promise.all([page.waitForEvent("popup"), open("Be Right Back").click()]);
+  await expect(tab.locator(".scene-title")).toHaveText("Be right back");
+});
+
 test("quick picks set the countdown, and No countdown clears it (T6.113)", async ({ page }) => {
   await page.getByRole("button", { name: "In 30 min" }).click();
   // Rounded up to the next whole minute, so 30:00 to 30:59 left.

@@ -742,6 +742,13 @@
 }
 
 /* Copied marks and the progress line (T6.24). */
+/* Under Copy link: a quieter text link (T6.114). */
+.editor-link-open {
+  grid-column: 2;
+  justify-self: center;
+  font-size: 14px;
+}
+
 .editor-link-done,
 .editor-link-stale {
   grid-column: 1;
