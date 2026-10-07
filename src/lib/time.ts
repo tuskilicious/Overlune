@@ -1,3 +1,20 @@
+/** Whether the browser can format dates in this IANA time zone. */
+export function isTimeZone(tz: string): boolean {
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: tz });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** This computer's time zone, or UTC when the browser reports one it can't use itself: some Linux setups report
+ *  "Etc/Unknown", and formatting with it threw in the editor (Sentry JAVASCRIPT-REACT-9). */
+export function localZone(): string {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return tz && isTimeZone(tz) ? tz : "UTC";
+}
+
 /** Whole seconds until `endsAt`, rounded up so "00:01" shows until time is really up. Never negative. */
 export function secondsLeft(endsAt: number, now: number): number {
   return Math.max(0, Math.ceil((endsAt - now) / 1000));

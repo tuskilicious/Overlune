@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isTimeZone } from "../lib/time";
 import { isHttpsUrl } from "../lib/url-safety";
 import { colorTokens, fontIds, themeIds } from "../themes/types";
 
@@ -11,15 +12,6 @@ const text = (max: number, fallback = "") =>
     .string()
     .transform((s) => Array.from(s).slice(0, max).join(""))
     .default(fallback);
-
-const isTimeZone = (tz: string) => {
-  try {
-    new Intl.DateTimeFormat("en", { timeZone: tz });
-    return true;
-  } catch {
-    return false;
-  }
-};
 
 /** Only plain #rrggbb, never arbitrary CSS (no url(), gradients or other tricks). */
 const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/, "Colors must look like #1a2b3c");

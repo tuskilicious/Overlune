@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { Link } from "react-router";
-import { fromZoneInput, toZoneInput, zoneName } from "../lib/time";
+import { fromZoneInput, localZone, toZoneInput, zoneName } from "../lib/time";
 import { isHttpsUrl } from "../lib/url-safety";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
@@ -51,7 +51,7 @@ const platformNames: Record<Platform, string> = {
   discord: "Discord",
 };
 
-const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const browserTz = localZone();
 type RepeatMode = Settings["starting"]["repeat"]["mode"];
 /** Monday first; values are JavaScript weekdays (0 = Sunday), as stored in the link. */
 const weekdays = [

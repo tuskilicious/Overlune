@@ -3,7 +3,9 @@ const dsn = import.meta.env.VITE_SENTRY_DSN;
 export const sentryEnvironment: string =
   import.meta.env.VITE_SENTRY_ENVIRONMENT ?? (import.meta.env.DEV ? "development" : "production");
 
-export const sentryEnabled = Boolean(dsn);
+/** Off on the local dev server: hot reloads there fail imports on purpose and only add noise. Staging previews and
+ *  production report. */
+export const sentryEnabled = Boolean(dsn) && !import.meta.env.DEV;
 
 type Capture = (error: unknown, componentStack?: string) => void;
 
@@ -35,7 +37,7 @@ export function reportError(error: unknown, componentStack?: string): void {
 
 /** Starts Sentry after the page's load event. Window errors from before then are queued, not lost. */
 export function startSentry(): void {
-  if (!dsn) return;
+  if (!dsn || !sentryEnabled) return;
   const early = (e: ErrorEvent | PromiseRejectionEvent) =>
     reportError("reason" in e ? e.reason : (e.error ?? e.message));
   addEventListener("error", early);
