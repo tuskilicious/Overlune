@@ -186,6 +186,20 @@ const sections = [
   ["obs-links", "Links"],
 ] as const;
 
+/** How much moves in the overlays (T6.119). */
+const motionLevels = [
+  ["full", "Full"],
+  ["lite", "Lite"],
+  ["still", "Still"],
+] as const;
+
+const motionHints = {
+  full: "Everything moves: entrances, countdown flips, alerts and the moving backgrounds.",
+  lite: "Entrances, countdown flips and alerts still move; moving backgrounds stop. Good for a slower PC.",
+  still:
+    "Nothing moves: no entrances and no moving backgrounds. Good if movement bothers you or your viewers.",
+} as const;
+
 /** The kinds of countdown, as a segmented control (T6.118). */
 const repeatModes: [RepeatMode, string][] = [
   ["off", "One time"],
@@ -428,6 +442,7 @@ export default function EditorPage() {
   const { starting } = settings;
   /** Anything changed from a fresh editor, including work restored from a link or autosave. */
   const madeSomething = JSON.stringify(settings) !== freshJson;
+  const motion = settings.lessMotion ? "still" : settings.liteMotion ? "lite" : "full";
   const filled: Partial<Record<string, boolean>> = {
     "part-socials": settings.socials.some((s) => s.handle.trim()),
     "part-chat": settings.chat.channel !== "",
@@ -1392,19 +1407,30 @@ export default function EditorPage() {
               {/* OBS doesn't always pass on the computer's reduced-motion setting, so it's a choice here (T6.74). */}
               <fieldset id="part-motion" className="editor-part" tabIndex={-1}>
                 <legend>Motion</legend>
-                <label className="editor-check">
-                  <input
-                    type="checkbox"
-                    checked={settings.lessMotion}
-                    aria-describedby="motion-hint"
-                    onChange={(e) => update({ lessMotion: e.target.checked })}
-                  />
-                  Less motion
-                </label>
+                {/* Three steps, after the ICARUS kit's graphics load (T6.119). */}
+                <div
+                  className="editor-scenes editor-segmented"
+                  role="radiogroup"
+                  aria-label="How much moves"
+                  aria-describedby="motion-hint"
+                >
+                  {motionLevels.map(([level, label]) => (
+                    <label key={level}>
+                      <input
+                        type="radio"
+                        name="motion"
+                        value={level}
+                        checked={motion === level}
+                        onChange={() =>
+                          update({ lessMotion: level === "still", liteMotion: level === "lite" })
+                        }
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
                 <p id="motion-hint" className="editor-hint">
-                  Turns off entrances and moving backgrounds in all your overlays. Good if movement
-                  bothers you or your viewers, or if your PC is slow. The preview here holds still
-                  too.
+                  {motionHints[motion]} The preview here follows it too.
                 </p>
               </fieldset>
 
@@ -1483,7 +1509,9 @@ export default function EditorPage() {
               </details>
             </form>
 
-            <div className={`editor-side${settings.lessMotion ? " editor-shot" : ""}`}>
+            <div
+              className={`editor-side${settings.lessMotion ? " editor-shot" : motion === "lite" ? " editor-lite" : ""}`}
+            >
               {/* In narrow windows this docks to the bottom behind a "Show preview" bar (editor.css). */}
               <section
                 className="editor-preview-wrap editor-scene-preview"

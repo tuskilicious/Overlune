@@ -142,6 +142,9 @@ export const settingsV1 = z.object({
   /** Less motion in every overlay (T6.74): the same as the ?rm=1 flag, kept in the link so the editor remembers
    *  it. Old links have no field and keep full motion. */
   lessMotion: z.boolean().default(false),
+  /** Lite motion (T6.119): entrances, countdown flips and alerts keep moving, the looping backgrounds stop. For
+   *  slower PCs. Old links have no field and keep full motion; lessMotion wins when both are set. */
+  liteMotion: z.boolean().default(false),
   /** "Advanced" overrides on top of the theme (T2.7). Empty means the theme as designed. */
   advanced: z
     .object({

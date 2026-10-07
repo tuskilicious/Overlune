@@ -12,9 +12,11 @@ export default function FromLink({
 }) {
   const { hash } = useLocation();
   const { settings, ok } = useMemo(() => decode(hash), [hash]);
-  // "Less motion" in the link works like ?rm=1 (main.tsx), before the first paint (T6.74).
+  // "Less motion" in the link works like ?rm=1 (main.tsx), before the first paint (T6.74); "Lite" stops only the
+  // looping backgrounds (T6.119, index.css).
   useLayoutEffect(() => {
     if (settings.lessMotion) document.documentElement.dataset.rm = "";
-  }, [settings.lessMotion]);
+    if (settings.liteMotion) document.documentElement.dataset.lite = "";
+  }, [settings.lessMotion, settings.liteMotion]);
   return children(settings, !ok && <OverlayError />);
 }
