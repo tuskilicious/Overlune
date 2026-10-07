@@ -779,6 +779,49 @@ export default function EditorPage() {
                   </Preview>
                 </div>
               </section>
+              {/* The looks filmstrip under the preview (T6.135, the Studio board): the real Starting Soon scenes, held
+                  still, as one radio group (one tab stop, arrow keys move), filtered by the same chips as the form. */}
+              <section className="editor-strip" aria-labelledby="strip-heading">
+                <div className="editor-strip-bar">
+                  <h2 id="strip-heading">Looks</h2>
+                  <div className="editor-pills" role="group" aria-label="Show looks in the strip">
+                    {(["All", "Calm", "Retro", "Bold"] as const).map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        aria-pressed={mood === m}
+                        onClick={() => setMood(m)}
+                      >
+                        {m}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="editor-hint">Pick one and every scene restyles.</p>
+                </div>
+                <div
+                  className="editor-strip-track"
+                  role="radiogroup"
+                  aria-labelledby="strip-heading"
+                >
+                  {themeIds.map((id) => (
+                    <label
+                      key={id}
+                      className="editor-strip-look"
+                      hidden={mood !== "All" && !(moods[mood] as readonly ThemeId[]).includes(id)}
+                    >
+                      <input
+                        type="radio"
+                        name="strip-look"
+                        value={id}
+                        checked={settings.theme === id}
+                        onChange={() => update({ theme: id })}
+                      />
+                      <ThemeShot id={id} />
+                      <span>{themes[id].name}</span>
+                    </label>
+                  ))}
+                </div>
+              </section>
               <section
                 className="editor-preview-wrap editor-chat-preview"
                 aria-label="Chat preview"

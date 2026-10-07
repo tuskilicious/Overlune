@@ -138,9 +138,11 @@ test("the whole editor works from the keyboard", async ({ page }) => {
   await expect(page.locator("#obs-links")).toBeFocused();
   await expect(page).toHaveURL(/\/editor#1\./); // the skip link never replaces the settings in the address
 
-  await page.getByRole("radio", { name: "Starting Soon" }).focus();
+  await page.locator(".editor-form").getByRole("radio", { name: "Starting Soon" }).focus();
   await page.keyboard.press("ArrowRight");
-  await expect(page.getByRole("radio", { name: "Be Right Back" })).toBeChecked();
+  await expect(
+    page.locator(".editor-form").getByRole("radio", { name: "Be Right Back" }),
+  ).toBeChecked();
   await page.keyboard.press("Tab");
   await page.keyboard.type("Keyboard title");
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Keyboard title");
@@ -246,8 +248,12 @@ test.describe("first visit (T6.16, T6.17)", () => {
   test("picking a look from the keyboard opens the editor on it", async ({ page }) => {
     await page.getByRole("button", { name: "Neon Grid" }).focus();
     await page.keyboard.press("Enter");
-    await expect(page.getByRole("radio", { name: "Neon Grid" })).toBeChecked();
-    await expect(page.getByRole("radio", { name: "Neon Grid" })).toBeFocused();
+    await expect(
+      page.locator(".editor-form").getByRole("radio", { name: "Neon Grid" }),
+    ).toBeChecked();
+    await expect(
+      page.locator(".editor-form").getByRole("radio", { name: "Neon Grid" }),
+    ).toBeFocused();
     await expect.poll(() => page.evaluate(() => scrollY)).toBe(0); // opens at the top (T6.29)
     await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "grid");
   });
@@ -255,14 +261,16 @@ test.describe("first visit (T6.16, T6.17)", () => {
   test("setting everything back to the defaults keeps the editor", async ({ page }) => {
     await page.getByRole("button", { name: "Neon Grid" }).click();
     await page.reload();
-    await page.getByRole("radio", { name: "Clean Slate" }).check();
+    await page.locator(".editor-form").getByRole("radio", { name: "Clean Slate" }).check();
     await expect(page.getByLabel("Title", { exact: true })).toBeVisible();
   });
 
   test("picking the last look by mouse still opens at the top (T6.29)", async ({ page }) => {
     await page.setViewportSize({ width: 1366, height: 768 });
     await page.getByRole("button", { name: "Vaporwave Sunset" }).click();
-    await expect(page.getByRole("radio", { name: "Vaporwave Sunset" })).toBeFocused();
+    await expect(
+      page.locator(".editor-form").getByRole("radio", { name: "Vaporwave Sunset" }),
+    ).toBeFocused();
     await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
     await expect(page.getByRole("heading", { name: "1. Pick a look" })).toBeInViewport();
   });
@@ -293,7 +301,9 @@ test.describe("first visit (T6.16, T6.17)", () => {
     await page.getByRole("button", { name: "Forest Night" }).click();
     await page.reload();
     await expect(page.getByRole("region", { name: "Pick a look to start" })).toHaveCount(0);
-    await expect(page.getByRole("radio", { name: "Forest Night" })).toBeChecked();
+    await expect(
+      page.locator(".editor-form").getByRole("radio", { name: "Forest Night" }),
+    ).toBeChecked();
   });
 });
 
@@ -451,23 +461,27 @@ test("the look picker shows each theme as a picture you can click", async ({ pag
     .locator(".editor-themes .editor-card", { hasText: "Vaporwave Sunset" })
     .locator(".editor-shot")
     .click();
-  await expect(page.getByRole("radio", { name: "Vaporwave Sunset" })).toBeChecked();
+  await expect(
+    page.locator(".editor-form").getByRole("radio", { name: "Vaporwave Sunset" }),
+  ).toBeChecked();
   await expect(page.locator(".editor-themes .scene")).toHaveCount(themeIds.length);
 });
 
 test("the editor shows Starting Soon in the preview by default", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Overlune" })).toBeVisible();
-  await expect(page.getByRole("radio", { name: "Clean Slate" })).toBeChecked();
+  await expect(
+    page.locator(".editor-form").getByRole("radio", { name: "Clean Slate" }),
+  ).toBeChecked();
   await expect(previewTitle(page, "Starting soon")).toBeVisible();
 });
 
 test("typing a title updates the preview of the chosen scene", async ({ page }) => {
-  await page.getByRole("radio", { name: "Be Right Back" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Be Right Back" }).check();
   await expect(previewTitle(page, "Be right back")).toBeVisible();
   await page.getByLabel("Title", { exact: true }).fill("Grabbing snacks");
   await expect(previewTitle(page, "Grabbing snacks")).toBeVisible();
 
-  await page.getByRole("radio", { name: "Stream Ending" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Stream Ending" }).check();
   await expect(previewTitle(page, "Thanks for watching!")).toBeVisible();
 });
 
@@ -544,7 +558,7 @@ test("Undo takes back the last change, a burst of typing as one step (T6.115)", 
 });
 
 test("Ctrl+Z outside a text field undoes a look change (T6.115)", async ({ page }) => {
-  const neon = page.getByRole("radio", { name: "Neon Grid" });
+  const neon = page.locator(".editor-form").getByRole("radio", { name: "Neon Grid" });
   await neon.check();
   await expect(preview(page).locator(".scene")).toHaveAttribute("data-theme", "neon-grid");
   await neon.press("Control+z");
@@ -558,7 +572,7 @@ test("Redo puts back what Undo took, and a new change clears it (T6.135)", async
   await expect(redo).toHaveCount(0); // nothing to redo yet
   await expect(page.getByText("Saved in your link")).toHaveCount(0);
 
-  const neon = page.getByRole("radio", { name: "Neon Grid" });
+  const neon = page.locator(".editor-form").getByRole("radio", { name: "Neon Grid" });
   await neon.check();
   await expect(page.getByText("Saved in your link")).toBeVisible();
   await undo.click();
@@ -571,7 +585,10 @@ test("Redo puts back what Undo took, and a new change clears it (T6.135)", async
   // The keys, outside a text field: Ctrl+Z, then Ctrl+Shift+Z and Ctrl+Y.
   await neon.press("Control+z");
   await expect(neon).not.toBeChecked();
-  await page.getByRole("radio", { name: "Clean Slate" }).press("Control+Shift+z");
+  await page
+    .locator(".editor-form")
+    .getByRole("radio", { name: "Clean Slate" })
+    .press("Control+Shift+z");
   await expect(neon).toBeChecked();
   await neon.press("Control+z");
   await neon.press("Control+y");
@@ -610,8 +627,8 @@ test("editor redesign: nudges, frame sizes and what's filled in (T6.118)", async
 });
 
 test("Lite stops the moving backgrounds but keeps the entrances (T6.119)", async ({ page }) => {
-  await page.getByRole("radio", { name: "Neon Grid" }).check();
-  await page.getByRole("radio", { name: "Lite" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Neon Grid" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Lite" }).check();
   await expect(page.locator(".editor-side")).toHaveClass(/editor-lite/);
   const link = await page
     .locator(".editor-link", { hasText: "Starting Soon" })
@@ -659,7 +676,7 @@ test("the webcam frame can be placed here, and its link goes full screen (T6.122
 }) => {
   const row = page.locator(".editor-link", { hasText: "Webcam frame" });
   await expect(row).toContainText("Width 640");
-  await page.getByRole("radio", { name: "Place it here" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Place it here" }).check();
   await page.getByRole("button", { name: "Move the frame to the top right" }).click();
   await expect(page.getByText("1232 across, 48 down, 640 × 360")).toBeVisible();
   const box = page.getByRole("button", { name: /^Webcam frame position/ });
@@ -685,7 +702,7 @@ test("a full-size frame placed at the far edges still makes a working link", asy
   // Both used to put the frame at -48, which the link format rejects: an error card on stream.
   const row = page.locator(".editor-link", { hasText: "Webcam frame" });
   for (const place of [
-    () => page.getByRole("radio", { name: "Place it here" }).check(),
+    () => page.locator(".editor-form").getByRole("radio", { name: "Place it here" }).check(),
     () => page.getByRole("button", { name: "Move the frame to the bottom right" }).click(),
   ]) {
     await place();
@@ -700,7 +717,7 @@ test("a full-size frame placed at the far edges still makes a working link", asy
 });
 
 test("dragging the frame on the pad moves it in stream pixels (T6.122)", async ({ page }) => {
-  await page.getByRole("radio", { name: "Place it here" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Place it here" }).check();
   await page.getByRole("button", { name: "Move the frame to the top left" }).click();
   const pad = (await page.locator(".frame-placer-pad").boundingBox())!;
   const box = (await page.getByRole("button", { name: /^Webcam frame position/ }).boundingBox())!;
@@ -740,13 +757,13 @@ test("quick picks set the countdown, and No countdown clears it (T6.113)", async
 
 test("a repeating countdown counts to the next stream and is saved", async ({ page }) => {
   await pickTimeZone(page, "UTC");
-  await page.getByRole("radio", { name: "Every day" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Every day" }).check();
   await expect(page.getByLabel("Countdown ends at")).toHaveCount(0);
   const inTwoHours = new Date(Date.now() + 2 * 3_600_000).toISOString().slice(11, 16);
   await page.getByLabel("Stream starts at").fill(inTwoHours);
   await expect(preview(page).locator(".countdown-time")).toHaveText(/^1:5\d:\d{2}$|^2:00:00$/);
 
-  await page.getByRole("radio", { name: "On set days" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "On set days" }).check();
   await page.getByRole("checkbox", { name: "Sat" }).check();
   const scan = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
@@ -754,7 +771,9 @@ test("a repeating countdown counts to the next stream and is saved", async ({ pa
   expect(scan.violations).toEqual([]);
 
   await page.reload();
-  await expect(page.getByRole("radio", { name: "On set days" })).toBeChecked();
+  await expect(
+    page.locator(".editor-form").getByRole("radio", { name: "On set days" }),
+  ).toBeChecked();
   await expect(page.getByRole("checkbox", { name: "Sat" })).toBeChecked();
   await expect(page.getByLabel("Stream starts at")).toHaveValue(inTwoHours);
 });
@@ -789,7 +808,7 @@ test("a pasted Twitch link becomes the channel name in the chat link", async ({ 
 
 test("an old link loads back into the editor", async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  await page.getByRole("radio", { name: "Be Right Back" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Be Right Back" }).check();
   await page.getByLabel("Title", { exact: true }).fill("Grabbing snacks");
   await page.getByLabel("Link to your logo image").fill("https://example.com/logo.png");
   await page.getByRole("button", { name: "Copy Be Right Back link" }).click();
@@ -798,7 +817,7 @@ test("an old link loads back into the editor", async ({ page, context }) => {
   await page.evaluate(() => localStorage.clear()); // a different browser, no autosave
   await page.goto("/editor");
   await startEditing(page);
-  await page.getByRole("radio", { name: "Be Right Back" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Be Right Back" }).check();
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Be right back");
 
   await openLoad(page);
@@ -932,7 +951,7 @@ test("hard-to-read colors show a warning, and reset brings the theme back", asyn
 
 test("a copied link opens the overlay with the editor's settings", async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  await page.getByRole("radio", { name: "Be Right Back" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Be Right Back" }).check();
   await page.getByLabel("Title", { exact: true }).fill("Grabbing snacks");
 
   await page.getByRole("button", { name: "Copy Be Right Back link" }).click();
@@ -1057,7 +1076,7 @@ test("every preview is scaled to fit its box", async ({ page }) => {
 });
 
 test("picking Neon Grid restyles the preview, alerts and sound", async ({ page }) => {
-  await page.getByRole("radio", { name: "Neon Grid" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Neon Grid" }).check();
   const scene = preview(page).locator(".scene");
   await expect(scene).toHaveAttribute("data-bg", "grid");
   await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Orbitron/);
@@ -1070,11 +1089,13 @@ test("picking Neon Grid restyles the preview, alerts and sound", async ({ page }
   await sound;
 
   await page.reload();
-  await expect(page.getByRole("radio", { name: "Neon Grid" })).toBeChecked();
+  await expect(
+    page.locator(".editor-form").getByRole("radio", { name: "Neon Grid" }),
+  ).toBeChecked();
 });
 
 test("picking Cozy Café restyles the preview, alerts and sound", async ({ page }) => {
-  await page.getByRole("radio", { name: "Cozy Café" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Cozy Café" }).check();
   await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "steam");
   await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Fredoka/);
 
@@ -1086,11 +1107,13 @@ test("picking Cozy Café restyles the preview, alerts and sound", async ({ page 
   await sound;
 
   await page.reload();
-  await expect(page.getByRole("radio", { name: "Cozy Café" })).toBeChecked();
+  await expect(
+    page.locator(".editor-form").getByRole("radio", { name: "Cozy Café" }),
+  ).toBeChecked();
 });
 
 test("picking Arcade 8-Bit restyles the preview, alerts and sound", async ({ page }) => {
-  await page.getByRole("radio", { name: "Arcade 8-Bit" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Arcade 8-Bit" }).check();
   await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "scanlines");
   await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Press Start 2P/);
 
@@ -1102,11 +1125,13 @@ test("picking Arcade 8-Bit restyles the preview, alerts and sound", async ({ pag
   await sound;
 
   await page.reload();
-  await expect(page.getByRole("radio", { name: "Arcade 8-Bit" })).toBeChecked();
+  await expect(
+    page.locator(".editor-form").getByRole("radio", { name: "Arcade 8-Bit" }),
+  ).toBeChecked();
 });
 
 test("picking Pastel Cloud restyles the preview, alerts and sound", async ({ page }) => {
-  await page.getByRole("radio", { name: "Pastel Cloud" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Pastel Cloud" }).check();
   await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "clouds");
   await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Baloo 2/);
 
@@ -1118,11 +1143,13 @@ test("picking Pastel Cloud restyles the preview, alerts and sound", async ({ pag
   await sound;
 
   await page.reload();
-  await expect(page.getByRole("radio", { name: "Pastel Cloud" })).toBeChecked();
+  await expect(
+    page.locator(".editor-form").getByRole("radio", { name: "Pastel Cloud" }),
+  ).toBeChecked();
 });
 
 test("picking Forest Night restyles the preview, alerts and sound", async ({ page }) => {
-  await page.getByRole("radio", { name: "Forest Night" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Forest Night" }).check();
   await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "fireflies");
   await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Lora/);
 
@@ -1134,11 +1161,13 @@ test("picking Forest Night restyles the preview, alerts and sound", async ({ pag
   await sound;
 
   await page.reload();
-  await expect(page.getByRole("radio", { name: "Forest Night" })).toBeChecked();
+  await expect(
+    page.locator(".editor-form").getByRole("radio", { name: "Forest Night" }),
+  ).toBeChecked();
 });
 
 test("picking Bold Esports restyles the preview, alerts and sound", async ({ page }) => {
-  await page.getByRole("radio", { name: "Bold Esports" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Bold Esports" }).check();
   await expect(preview(page).locator(".scene")).toHaveAttribute("data-enter", "wipe");
   await expect(previewTitle(page, "Starting soon")).toHaveCSS("font-family", /Anton/);
 
@@ -1150,11 +1179,13 @@ test("picking Bold Esports restyles the preview, alerts and sound", async ({ pag
   await sound;
 
   await page.reload();
-  await expect(page.getByRole("radio", { name: "Bold Esports" })).toBeChecked();
+  await expect(
+    page.locator(".editor-form").getByRole("radio", { name: "Bold Esports" }),
+  ).toBeChecked();
 });
 
 test("picking Vaporwave Sunset restyles the preview, alerts and sound", async ({ page }) => {
-  await page.getByRole("radio", { name: "Vaporwave Sunset" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Vaporwave Sunset" }).check();
   await expect(preview(page).locator(".scene")).toHaveAttribute("data-bg", "sunset");
   // The look cards may have fetched it already, so check the page's resource log rather than wait for a request.
   await expect
@@ -1180,7 +1211,9 @@ test("picking Vaporwave Sunset restyles the preview, alerts and sound", async ({
   await sound;
 
   await page.reload();
-  await expect(page.getByRole("radio", { name: "Vaporwave Sunset" })).toBeChecked();
+  await expect(
+    page.locator(".editor-form").getByRole("radio", { name: "Vaporwave Sunset" }),
+  ).toBeChecked();
 });
 
 test.describe("narrow editor window (T6.10)", () => {
@@ -1297,7 +1330,7 @@ test.describe("three-column shell on wide windows (T6.60)", () => {
 test("look filters show only that group, with the names under each card (T6.60)", async ({
   page,
 }) => {
-  const filters = page.getByRole("group", { name: "Show looks" });
+  const filters = page.getByRole("group", { name: "Show looks", exact: true });
   await filters.getByRole("button", { name: "Retro" }).click();
   await expect(filters.getByRole("button", { name: "Retro" })).toHaveAttribute(
     "aria-pressed",
@@ -1456,7 +1489,7 @@ test("Still goes into every overlay link and turns the motion off (T6.74)", asyn
   context,
 }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  await page.getByRole("radio", { name: "Still" }).check();
+  await page.locator(".editor-form").getByRole("radio", { name: "Still" }).check();
   await expect(page.locator(".editor-side")).toHaveClass(/editor-shot/); // the preview holds still too
   await page.getByRole("button", { name: "Copy Starting Soon link" }).click();
   const link = await page.evaluate(() => navigator.clipboard.readText());
@@ -1700,4 +1733,33 @@ test("the section list folds to icons, keeps its names for screen readers, and r
   await expect(page.getByRole("button", { name: "Expand menu" })).toBeVisible();
   await page.getByRole("button", { name: "Expand menu" }).click();
   await expect(page.getByRole("button", { name: "Collapse menu" })).toBeVisible();
+});
+
+test("the looks filmstrip under the preview picks a look with the arrow keys (T6.135)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const strip = page.getByRole("radiogroup", { name: "Looks" });
+  const current = strip.getByRole("radio", { checked: true });
+  await expect(current).toHaveCount(1);
+  const first = await current.getAttribute("value");
+  await current.focus();
+  await page.keyboard.press("ArrowRight");
+  const next = await strip.getByRole("radio", { checked: true }).getAttribute("value");
+  expect(next).not.toBe(first);
+  // The form's picker and the preview follow.
+  await expect(page.locator(`#theme-${next}`)).toBeChecked();
+  await expect(preview(page).locator(".scene")).toHaveAttribute("data-theme", next!);
+
+  // Its chips filter the strip like the form's.
+  await page
+    .getByRole("group", { name: "Show looks in the strip" })
+    .getByRole("button", { name: "Retro" })
+    .click();
+  await expect(strip.locator("label:not([hidden])")).toHaveCount(4);
+  await expect(strip.getByRole("radio", { name: "Phosphor" })).toBeVisible();
+
+  // Narrow windows dock the preview; the form's grid is enough there.
+  await page.setViewportSize({ width: 800, height: 900 });
+  await expect(page.locator(".editor-strip")).toBeHidden();
 });

@@ -1694,3 +1694,91 @@
   top: 0;
   left: 0;
 }
+
+/* The looks filmstrip under the scene preview (T6.135, the Studio board): real Starting Soon scenes, held still, in a
+   row that scrolls sideways; one radio group, so one tab stop and arrow keys. The picked look has the selected card's
+   Lune Violet ring. At 800px and below the preview docks, and the form's look grid is enough. */
+.editor-strip {
+  margin-top: 16px;
+}
+
+.editor-strip-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 10px;
+}
+
+.editor .editor-strip-bar h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.editor .editor-strip-bar .editor-pills {
+  margin: 0;
+}
+
+.editor .editor-strip-bar .editor-hint {
+  margin: 0 0 0 auto;
+  font-size: 13px;
+}
+
+.editor-strip-track {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 4px 10px;
+  scroll-snap-type: x proximity;
+}
+
+.editor .editor-strip-look {
+  position: relative;
+  flex: none;
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+
+.editor .editor-strip-look[hidden] {
+  display: none;
+}
+
+.editor-strip-look input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.editor-strip-look .editor-shot {
+  display: block;
+  border-radius: var(--radius);
+  outline: var(--border);
+}
+
+.editor-strip-look:has(:checked) {
+  color: var(--text);
+}
+
+.editor-strip-look:has(:checked) .editor-shot {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.editor-strip-look:has(:focus-visible) .editor-shot {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+@media (max-width: 800px) {
+  .editor-strip {
+    display: none;
+  }
+}
