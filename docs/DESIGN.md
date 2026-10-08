@@ -332,8 +332,13 @@ Write for a streamer opening OBS for the first time: concise, confident, helpful
 - Don't add fonts, sounds or images to the chrome without recording them in `docs/ASSETS.md`.
 - Don't mark a box with a thick colored bar down one side; use the callout outline (T6.53).
 
+### Outside components (T6.136)
+- Component galleries such as 21st.dev are a reference for the editor chrome and the landing page only, never for overlays (an e2e guard in `tests/e2e/smoke.spec.ts` fails if an overlay loads an animation or UI-kit package other than GSAP through `src/lib/motion.ts`).
+- Port the behavior into our own markup and CSS, with native form semantics and the brand tokens, as T6.135 did. Copy code only when the component states a license that allows it, and record its source and license in `docs/ASSETS.md`. Add no dependency without the owner's approval (STACK.md).
+- Hosted AI generation stays off (CLAUDE.md: no AI in v1).
+
 ### Landing page (`/`)
-- The one page built with Tailwind and GSAP (STACK.md). It uses the same brand tokens, exposed as Tailwind colors (`night`, `deep`, `moon`, `haze`, `violet`, …) and fonts (`font-heading`, `font-body`) in `src/landing/landing.css`.
+- The one page built with Tailwind (STACK.md); its motion is GSAP through `animate()` in `src/lib/motion.ts` (T6.137). It uses the same brand tokens, exposed as Tailwind colors (`night`, `deep`, `moon`, `haze`, `violet`, …) and fonts (`font-heading`, `font-body`) in `src/landing/landing.css`.
 - Images are real Overlune scenes rendered live (the editor's `Preview`) with the same sample content as the look cards, never stock photos. Only the hero moves; the rest are held still (`landing-still`).
 - **Hero (T6.59):** the whole kit. A live scene in a 16:9 stream frame with a small Signal Cyan LIVE badge, two real alert cards in the same look (over the frame's empty top-left on wide screens, under it on phones), and the three scene names with the current one filled. It tours a look and a scene every 4.5 seconds. A "Pause the looks" button stops the tour and holds the scene still (WCAG 2.2.2); with reduced motion it starts paused on Vaporwave Sunset. Under the buttons, a fact row: the number of looks (counted from `themeIds`, never typed in), Scenes, chat and alerts, One link per overlay, Free, no account. Since T6.124 the hero is one big rounded card that, on wide windows with motion, zooms out into a drifting collage of every look as you scroll.
 - **Night sky (T6.59):** CSS only, static: a few small stars, a soft violet arc and a crescent moon behind the hero. No image files.

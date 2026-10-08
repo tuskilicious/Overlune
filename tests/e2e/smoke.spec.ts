@@ -158,3 +158,27 @@ test("the bolder pass: a light runs round the countdown, and Lite holds it (T6.1
   // Entrances still blur into focus in Lite.
   await expect(page.locator(".scene-word").first()).toHaveCSS("animation-name", "scene-slide-fade");
 });
+
+// Outside UI kits like 21st.dev are for the editor and landing page only (T6.136), and overlay motion is CSS, canvas
+// or GSAP through src/lib/motion.ts (T6.137, checked in landing.spec.ts). The dev server serves each package from
+// /node_modules/, so no overlay may request another animation or headless-UI package.
+test("no overlay loads an animation or UI-kit package (T6.136)", async ({ page }) => {
+  for (const overlay of ["starting", "brb", "ending", "chat", "alerts", "frame"]) {
+    const packages: string[] = [];
+    page.on("request", (r) => {
+      if (r.url().includes("/node_modules/")) packages.push(r.url());
+    });
+    await page.goto(`/o/${overlay}`);
+    await page.waitForLoadState("networkidle");
+    // The check only means something if packages show up here at all (React always does).
+    expect(
+      packages.some((url) => /react/.test(url)),
+      overlay,
+    ).toBe(true);
+    expect(
+      packages.filter((url) => /framer-motion|[/_]motion|base-ui|radix-ui/i.test(url)),
+      overlay,
+    ).toEqual([]);
+    page.removeAllListeners("request");
+  }
+});

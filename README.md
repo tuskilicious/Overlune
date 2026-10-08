@@ -65,6 +65,9 @@ All are optional for local development. Without `VITE_SENTRY_DSN`, Sentry stays 
 
 Deploys use the Cloudflare Pages Git integration, so no Cloudflare token is needed.
 
+## Optional tooling
+- **21st.dev plugin for Claude Code.** A design reference for the editor and landing page only, never overlays (`docs/DESIGN.md`, "Outside components"). It reads `API_KEY_21ST`: set it in the plugin's own settings or in `.env.local`, which git ignores. It isn't an app variable (no `VITE_` prefix), so the build never puts it in client code. Never add it to CI, Cloudflare Pages or a URL, and don't use install commands that put the key in a URL. Hosted AI generation stays off: v1 has no AI (`CLAUDE.md`).
+
 ## Run
 ```bash
 npm run dev          # editor at http://localhost:5173, guide at /guide, overlays at /o/<name>

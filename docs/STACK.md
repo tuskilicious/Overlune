@@ -14,7 +14,7 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 | Twitch chat | **Own minimal IRC client** over native `WebSocket` (`wss://irc-ws.chat.twitch.tv`), anonymous `justinfan` login | No heavy dependency; the parser is small and fully unit-testable |
 | Fonts | `@fontsource/*` (self-hosted, SIL OFL) | No Google Fonts CDN calls (privacy), works offline in OBS, licenses recorded |
 | Error tracking | `@sentry/react` | CLAUDE.md §2. PII off, URL fragments stripped |
-| Landing page motion | `gsap` + `@gsap/react` (GSAP's Standard "no charge" license, free for this use) | Approved by the owner 2026-10-02 (T6.34). **Landing page only**: lazy-loaded with it, never in the editor or overlays (e2e check). All animation sits behind `prefers-reduced-motion: no-preference` |
+| Motion | `gsap` (GSAP Standard "no charge" license, https://gsap.com/standard-license, checked 2026-10-08: free, including commercial use and every plugin. It forbids no-code tools that let people build their own visual animations in competition with Webflow; Overlune offers ready-made looks and no animation builder, so it isn't one. Check the license again before adding anything that lets streamers design their own animations. Its notices must stay in the build: `comments.legal` in `vite.config.ts`) | Approved by the owner for the landing page 2026-10-02 (T6.34), and for the editor and overlays 2026-10-08 (T6.137). **Always through `animate()` in `src/lib/motion.ts`** (ESLint blocks direct imports): GSAP and its plugins are dynamic imports, so each use is its own lazy chunk and GSAP is never a dependency of the overlay core bundle (the main entry) or the editor's chunk. Every sequence runs inside `gsap.matchMedia("(prefers-reduced-motion: no-preference)")`, never under `?rm=1` or Still motion, and is reverted on unmount. Budgets, gzipped: GSAP core 30 KB, each plugin 20 KB (measured 26.8 and 17.2 KB for core and ScrollTrigger with their notices; e2e build check in `tests/e2e/landing.spec.ts`, which also checks the notices are kept) |
 | Landing page styling | Tailwind CSS v4 (`tailwindcss`, `@tailwindcss/vite`, dev only) | Approved by the owner 2026-10-02 (T6.34). **Landing page only**: `src/landing/landing.css` imports Tailwind's theme and utilities without its preflight reset, and generates classes from `src/landing` only, so the editor's plain CSS is untouched |
 | Panel and banner export | `html-to-image` (MIT, no dependencies) | Approved by the owner 2026-10-06 (T6.86) for downloading Twitch panels and the offline banner as PNG (T6.91). **Editor only**, loaded when someone presses Download, never in overlays. It draws through a `data:` SVG image, so the CSP allows `data:` images; streamer logo links still accept `https:` only |
 | Platform icons | `simple-icons` (CC0 data; brand logos are their owners' trademarks) | Approved by the owner 2026-10-02 (T6.35). Six named imports (`src/overlays/social-icons.tsx`), tree-shaken into the bundle as inline SVG paths: no CDN, so the CSP is unchanged |
@@ -77,7 +77,7 @@ overlune/
 │  ├─ twitch/           irc.ts (connection), parse.ts (IRC → typed events), emotes.ts
 │  ├─ alerts/           queue.ts, sound.ts, templates.ts
 │  ├─ components/       shared UI primitives
-│  └─ lib/              time.ts, url-safety.ts, sentry.ts
+│  └─ lib/              time.ts, url-safety.ts, sentry.ts, motion.ts (the only GSAP entry point)
 ├─ tests/
 │  ├─ unit/             mirrors src/
 │  ├─ e2e/              Playwright overlay smoke tests
