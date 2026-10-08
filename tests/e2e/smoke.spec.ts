@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import lz from "lz-string";
 import { themeIds } from "../../src/themes/types";
+import offlineLink from "../fixtures/links/v1/offline.json" with { type: "json" };
 
 const link = (data: unknown) =>
   `/o/starting#1.${lz.compressToEncodedURIComponent(JSON.stringify(data))}`;
@@ -251,5 +252,21 @@ test.describe("cheap effects (T6.144)", () => {
     await expect.poll(states).toEqual(["paused"]);
     await obs(true);
     await expect.poll(states).toContain("running");
+  });
+});
+
+test.describe("Offline scene (T6.147)", () => {
+  test("Offline is a full scene in the look's layout, from its saved link", async ({ page }) => {
+    await page.goto(offlineLink.link);
+    await expect(page.locator(".scene-title")).toHaveText("See you Friday");
+    await expect(page.locator(".scene-subtitle")).toHaveText(
+      "Streams Mon, Wed and Fri at 8 PM IST",
+    );
+    await expect(page.locator(".scene")).toHaveAttribute("data-theme", "quest");
+  });
+
+  test("has defaults for links made before it existed", async ({ page }) => {
+    await page.goto("/o/offline#1.N4IgLgFgpgtlIC4QDsoHtkFoDmAnAlgCYgC+QA");
+    await expect(page.locator(".scene-title")).toHaveText("Offline right now");
   });
 });

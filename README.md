@@ -3,7 +3,7 @@
 Free, open-source stream overlays that look professionally designed. Paste one link per overlay into OBS. No account, no payment.
 
 It includes:
-- Starting Soon, BRB and Stream Ending scenes
+- Starting Soon, BRB, Stream Ending and Offline scenes
 - A Twitch chat skin
 - Alerts for raids, subs, gift subs and bits, with sound
 - A webcam frame in your look

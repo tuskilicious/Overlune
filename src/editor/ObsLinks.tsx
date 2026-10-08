@@ -5,11 +5,13 @@ import { encode } from "../settings/url";
 import { sceneCollection } from "./scene-collection";
 import Icon from "../components/Icon";
 
-/** The full-screen scenes, with the Browser Source size to enter in OBS. */
+/** The full-screen scenes, with the Browser Source size to enter in OBS. `short` labels the editor's scene picker,
+ *  where the full names wrap; Offline is an extra, so it doesn't count toward "You're set" (T6.147). */
 export const overlays = {
-  starting: { name: "Starting Soon", width: 1920, height: 1080 },
-  brb: { name: "Be Right Back", width: 1920, height: 1080 },
-  ending: { name: "Stream Ending", width: 1920, height: 1080 },
+  starting: { name: "Starting Soon", short: "Starting", width: 1920, height: 1080 },
+  brb: { name: "Be Right Back", short: "BRB", width: 1920, height: 1080 },
+  ending: { name: "Stream Ending", short: "Ending", width: 1920, height: 1080 },
+  offline: { name: "Offline", short: "Offline", width: 1920, height: 1080, optional: true },
 } as const;
 
 export type OverlayId = keyof typeof overlays;

@@ -23,6 +23,7 @@ describe("OBS scene collection (T6.90)", () => {
       "Overlune Starting Soon",
       "Overlune Be Right Back",
       "Overlune Stream Ending",
+      "Overlune Offline",
       "Overlune Chat",
       "Overlune Webcam frame",
       "Overlune Alerts",
@@ -34,7 +35,7 @@ describe("OBS scene collection (T6.90)", () => {
     for (const b of browsers) {
       const url = String((b.settings as { url: string }).url);
       expect(url).toMatch(
-        /^https:\/\/overlune\.in\/o\/(starting|brb|ending|chat|frame|alerts)#1\./,
+        /^https:\/\/overlune\.in\/o\/(starting|brb|ending|offline|chat|frame|alerts)#1\./,
       );
       expect(decode(url.slice(url.indexOf("#")))).toEqual({ settings, ok: true });
     }
@@ -47,19 +48,21 @@ describe("OBS scene collection (T6.90)", () => {
       );
   });
 
-  it("makes four scenes, Starting Soon first, with Alerts on top of each", () => {
+  it("makes five scenes, Starting Soon first, with Alerts on top of each but Offline (T6.147)", () => {
     expect(c.scene_order.map((s) => s.name)).toEqual([
       "Overlune: Starting Soon",
       "Overlune: Live",
       "Overlune: Be Right Back",
       "Overlune: Stream Ending",
+      "Overlune: Offline",
     ]);
     expect(c.current_scene).toBe("Overlune: Starting Soon");
     const uuids = new Set(browsers.map((b) => b.uuid));
     for (const s of scenes) {
       const items = (s.settings as { items: { name: string; source_uuid: string }[] }).items;
       for (const it of items) expect(uuids.has(it.source_uuid)).toBe(true);
-      expect(items.at(-1)!.name).toBe("Overlune Alerts");
+      // Nothing sends alerts while you're offline.
+      if (s.name !== "Overlune: Offline") expect(items.at(-1)!.name).toBe("Overlune Alerts");
     }
   });
 

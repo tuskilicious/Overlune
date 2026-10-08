@@ -50,7 +50,7 @@ function TwoTone({ text }: { text: string }) {
   ));
 }
 
-/** Shared 1920×1080 scene layout for Starting Soon, BRB and Stream Ending. */
+/** Shared 1920×1080 scene layout for Starting Soon, BRB, Stream Ending and Offline. */
 export default function SceneFrame({ settings, title, subtitle, error, children }: Props) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
   // A row added in the editor but not filled in yet would show as a bare "Twitch" box on stream (T6.27).

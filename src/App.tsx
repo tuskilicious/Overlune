@@ -68,6 +68,14 @@ export default function App() {
             }
           />
           <Route
+            path="/o/offline"
+            element={
+              <FromLink>
+                {(s, error) => <TextScene scene="offline" settings={s} error={error} />}
+              </FromLink>
+            }
+          />
+          <Route
             path="/o/brb"
             element={
               <FromLink>

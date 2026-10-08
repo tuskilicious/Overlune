@@ -27,6 +27,7 @@ export function sceneCollection(
     { name: "Starting Soon", route: "starting", width: 1920, height: 1080 },
     { name: "Be Right Back", route: "brb", width: 1920, height: 1080 },
     { name: "Stream Ending", route: "ending", width: 1920, height: 1080 },
+    { name: "Offline", route: "offline", width: 1920, height: 1080 },
     { name: "Chat", route: "chat", width: chat.width, height: chat.height },
     framePosition(frame)
       ? { name: "Webcam frame", route: "frame", width: 1920, height: 1080 }
@@ -95,6 +96,7 @@ export function sceneCollection(
     ]),
     scene("Be Right Back", [full("Be Right Back"), full("Alerts")]),
     scene("Stream Ending", [full("Stream Ending"), full("Alerts")]),
+    scene("Offline", [full("Offline")]),
   ];
 
   return {
