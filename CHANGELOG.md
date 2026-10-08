@@ -2,6 +2,18 @@
 
 What changed in each Overlune release. Overlay links from every release keep working: the link format only ever gains optional settings.
 
+## 1.3.1 (2026-10-08)
+
+Every look now sounds like itself, and the moving backgrounds are much lighter on your PC. Every earlier link keeps working and picks up the changes on its own.
+
+### Looks and overlays
+- **A sound for every look:** the eight looks that borrowed another look's alert sound now have their own. Daylight rings a bell, Abyss sends a sonar ping, Session plays a brush and horn stab, Shonen a taiko hit, Sakura a koto pluck, Skate Deck a board pop, Phosphor a pair of terminal beeps and Quest a lute and horn call. All play at about the same loudness as the others.
+- **Lighter on your PC:** the countdown's edge light, Abyss's breathing countdown and Phosphor's scanline sweep now run on the graphics card. In tests on a simulated slow PC they kept up to a quarter of the processor busy; every look now needs about 1 to 2%. They look the same.
+- **Hidden sources rest:** when you hide an Overlune source in OBS (another scene, or the eye icon), its animations pause until it's shown again.
+
+### Site
+- Cookie-free visit counts (Cloudflare Web Analytics) now load properly, and the privacy policy explains what they collect. They never see the part of a link after `#`, where your settings are.
+
 ## 1.3.0 (2026-10-08)
 
 Every look gets its own layout, and the editor gets a studio layout that's quicker to use. Every earlier link keeps working and picks up the new designs on its own: there is nothing to re-paste.
