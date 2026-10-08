@@ -1911,6 +1911,33 @@ test.describe("GSAP in the editor (T6.137)", () => {
     await expect(rail.locator(".editor-rail-name[style*='opacity']")).toHaveCount(0);
   });
 
+  test("the preview's highlight glides from one part to the next", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.getByLabel("Subtitle").fill("Grab a drink");
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          performance.getEntriesByType("resource").some((e) => /gsap/.test(e.name)),
+        ),
+      )
+      .toBe(true);
+    await page.waitForTimeout(300);
+    const center = async (selector: string) => {
+      const b = (await page.locator(`.editor-pick ${selector}`).boundingBox())!;
+      return [b.x + b.width / 2, b.y + b.height / 2] as const;
+    };
+    const box = page.locator(".editor-pick-box");
+    await page.mouse.move(...(await center(".scene-title")));
+    await expect(box).toHaveText("Title");
+    await page.mouse.move(...(await center(".scene-subtitle")));
+    await expect(box).toHaveText("Subtitle");
+    // On its way it carries a transform; it ends without one.
+    await expect
+      .poll(() => box.evaluate((e) => e.style.transform), { intervals: [20] })
+      .toContain("translate");
+    await expect.poll(() => box.evaluate((e) => e.style.transform)).toBe("");
+  });
+
   for (const [name, setup] of [
     [
       "the OS setting",

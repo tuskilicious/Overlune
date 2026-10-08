@@ -594,6 +594,36 @@ export default function EditorPage() {
   const { alert: testAlert, play: playAlert } = useTestAlerts(settings);
   const nextAlert = useRef(0);
   const [picked, setPicked] = useState<Picked | null>(null);
+  // The highlight glides from one part of the preview to the next instead of jumping (T6.137): React draws it at the
+  // new part, then GSAP plays it in from where it was (FLIP). It moves with transforms; its size eases with it.
+  const [pickArea, pickMotion] = useMotion({ still: settings.lessMotion });
+  const lastPick = useRef<Picked | null>(null);
+  useLayoutEffect(() => {
+    const from = lastPick.current;
+    lastPick.current = picked;
+    if (!from || !picked || from.name === picked.name) return;
+    pickMotion((gsap, _, scope) =>
+      gsap.fromTo(
+        scope.querySelector(".editor-pick-box"),
+        {
+          x: from.left - picked.left,
+          y: from.top - picked.top,
+          width: from.width,
+          height: from.height,
+        },
+        {
+          x: 0,
+          y: 0,
+          width: picked.width,
+          height: picked.height,
+          duration: 0.18,
+          ease: "power2.out",
+          overwrite: true,
+          clearProps: "transform",
+        },
+      ),
+    );
+  }, [picked, pickMotion]);
   // Folding the section list (T6.137): the names fade and slide out before the column narrows, and back in, one after
   // another, once it has opened. The column and the icons move in CSS. Without motion it just folds.
   const [rail, railMotion] = useMotion({
@@ -1029,6 +1059,7 @@ export default function EditorPage() {
                   {/* Click a part to jump to its settings; hover outlines it and names it (T6.135, the Studio board).
                       A mouse shortcut only: the section list and the form already reach every setting by keyboard. */}
                   <div
+                    ref={pickArea}
                     className="editor-pick"
                     data-hover={picked ? "" : undefined}
                     onPointerMove={(e) => setPicked(partAt(e.currentTarget, e.clientX, e.clientY))}
