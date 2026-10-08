@@ -1,9 +1,11 @@
-/** Each site page's title and description: the tab title (App.tsx) and its link preview, written at build time (T6.87). */
+import { themeIds } from "../themes/types.ts";
+
+/** Each site page's title and description: the tab title (App.tsx) and its link preview, written at build time (T6.87).
+ *  Counts come from the theme list, never typed in (T6.138). */
 export const pages: Record<string, { title: string; description: string }> = {
   "/": {
     title: "Overlune: free stream overlays for OBS",
-    description:
-      "Free stream overlays that look pro. Paste one link per overlay into OBS. No account, no payment.",
+    description: `Free stream overlays that look pro: ${themeIds.length} matching looks for Starting Soon, BRB and Ending scenes, chat and alerts. One link per overlay in OBS. No account, no payment.`,
   },
   "/editor": {
     title: "Make your overlays · Overlune",

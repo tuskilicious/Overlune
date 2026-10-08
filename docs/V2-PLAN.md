@@ -112,7 +112,7 @@ The palette already matches BRAND.md (Night, Deep Space, Lune Violet, Signal Cya
 - **Hero:** real scenes, alerts and chat rendered live in a 16:9 stream frame and cycling through the themes, over a CSS night sky with a crescent moon. No stock or AI images. Reduced motion: one still theme.
 - **Gradient:** the signature gradient appears once per page (the mark or one hero word), never as text on every heading.
 - **Glow:** only on the stream frame and the primary button, never on every card.
-- **Copy:** use BRAND.md's voice and real numbers ("8 looks"). Drop "Create Stunning…", "Hundreds of templates", "No design skills needed. Just your creativity." and setup-time promises like "under 10 minutes".
+- **Copy:** use BRAND.md's voice and real numbers (the current number of looks). Drop "Create Stunning…", "Hundreds of templates", "No design skills needed. Just your creativity." and setup-time promises like "under 10 minutes".
 - **Feature rows:** each card shows a real screenshot or live mini preview, not a generic icon plus a hype line.
 - **Editor shell:** follow the mockups' three-column layout (nav, canvas, properties), with DESIGN.md spacing, Quicksand/Nunito, and visible focus rings.
 
