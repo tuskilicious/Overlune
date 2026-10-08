@@ -626,3 +626,8 @@ The owner asked for more looks (2026-10-07), picked all four from impeccable's s
 - [x] **T6.145 Release v1.3.1.** T6.142 to T6.144 are live but not in a release: every look's own alert sound, Web Analytics through the security policy, and the cheaper effects with the OBS pause. The owner asked for 1.3.1.
   - Accept: version 1.3.1; a dated changelog section in plain words; README and FUTURE-SCOPE.md name 1.3.1; the GitHub release published after the deploy is checked.
   - *Built 2026-10-08 on `chore/release-1.3.1`. `package.json` 1.3.1; CHANGELOG "1.3.1 (2026-10-08)": Looks and overlays (the sounds, lighter effects, hidden sources rest) and Site (visit counts). Each change was OBS-tested in its own PR (#183, #185); #184 was checked live.*
+
+### Square webcam frame (2026-10-08)
+- [ ] **T6.146 A square webcam frame.** The handoff's P1-3 asked for 16:9, 4:3 and 1:1 frames; the editor's quick sizes had 16:9 and 4:3 but no square.
+  - Accept: a square is one click; it draws cleanly in every look; no link format change. OBS check.
+  - *Built 2026-10-08 on `feat/square-frame`. Width and height were already free numbers (160 to 1920, 120 to 1080), so a typed square always worked; now 480 × 480 sits with the quick sizes. Rendered at 480 × 480 in all 16 looks with and without the name tab: clean edges, corner brackets and a clear middle. e2e: the chip sets 480 × 480, is pressed, and the link's overlay is 480 × 480.*
