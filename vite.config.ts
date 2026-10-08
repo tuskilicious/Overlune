@@ -68,6 +68,8 @@ export default defineConfig(({ mode }) => {
       sourcemap: upload ? "hidden" : false,
       // Never inline small fonts or images as data: URLs. The CSP (font-src/img-src) blocks them.
       assetsInlineLimit: 0,
+      // Keep libraries' /*! license notices: GSAP's license says its notices must not be removed (T6.137).
+      rolldownOptions: { output: { comments: { legal: true } } },
     },
     test: {
       environment: "node",

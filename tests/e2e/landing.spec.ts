@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { themeIds } from "../../src/themes/types";
 import lz from "lz-string";
+import { build } from "vite";
 
 // T6.34: "/" is the landing page for first-time visitors; the editor lives at /editor.
 
@@ -52,16 +53,66 @@ test("the editor's logo leads back to the landing page (T6.67)", async ({ page }
   );
 });
 
-test("the editor and overlays never load the landing page's animation library", async ({
-  page,
-}) => {
-  const gsap: string[] = [];
-  page.on("request", (r) => /gsap|LandingPage/i.test(r.url()) && gsap.push(r.url()));
-  await page.goto("/editor");
-  await page.getByRole("button", { name: "Clean Slate", exact: true }).click();
-  await page.goto("/o/starting");
-  await expect(page.locator(".scene")).toBeVisible();
-  expect(gsap).toEqual([]);
+/** GSAP budgets (T6.137), measured 2026-10-08: core 26.8 KB and ScrollTrigger 17.2 KB, gzipped, with their license notices. */
+const gsapBudgetKb = { core: 30, plugin: 20 };
+
+/** Gzipped size, with the web's CompressionStream (Node has it too). */
+const gzipKb = async (code: string) =>
+  (
+    await new Response(
+      new Blob([code]).stream().pipeThrough(new CompressionStream("gzip")),
+    ).arrayBuffer()
+  ).byteLength / 1024;
+
+type Chunk = {
+  type: "chunk";
+  fileName: string;
+  code: string;
+  imports: string[];
+  isEntry: boolean;
+  isDynamicEntry: boolean;
+  facadeModuleId: string | null;
+  moduleIds: string[];
+};
+
+test("GSAP never reaches the editor's or the overlays' bundles, arrives only by dynamic import, and stays in budget (T6.137)", async () => {
+  test.setTimeout(240_000);
+  // The real production chunks, built in memory (the dev server serves unbundled modules).
+  const out = (await build({ logLevel: "silent", build: { write: false } })) as {
+    output: (Chunk | { type: "asset" })[];
+  };
+  const chunks = out.output.filter((c): c is Chunk => c.type === "chunk");
+  const byFile = new Map(chunks.map((c) => [c.fileName, c]));
+  const hasGsap = (c: Chunk) => c.moduleIds.some((m) => m.includes("/node_modules/gsap/"));
+  /** A chunk and everything it imports statically: what loads with it, before any dynamic import. */
+  const loadsWith = (c: Chunk, seen = new Set<string>()): Set<string> => {
+    if (!seen.has(c.fileName)) {
+      seen.add(c.fileName);
+      for (const f of c.imports) loadsWith(byFile.get(f)!, seen);
+    }
+    return seen;
+  };
+  const gsapIn = (c: Chunk) => [...loadsWith(c)].filter((f) => hasGsap(byFile.get(f)!));
+
+  // (a) The main entry (which holds the overlays) and the editor's chunk load no GSAP.
+  const entry = chunks.find((c) => c.isEntry)!;
+  const editor = chunks.find((c) => c.facadeModuleId?.endsWith("src/editor/EditorPage.tsx"))!;
+  expect(gsapIn(entry)).toEqual([]);
+  expect(gsapIn(editor)).toEqual([]);
+
+  // (b) No page loads GSAP with it: it only arrives through a dynamic import (src/lib/motion.ts).
+  const gsapChunks = chunks.filter(hasGsap);
+  expect(gsapChunks.length).toBeGreaterThan(0);
+  for (const page of chunks.filter((c) => c.isDynamicEntry && !hasGsap(c)))
+    expect(gsapIn(page), page.fileName).toEqual([]);
+
+  // (c) Each GSAP chunk stays in its budget, and keeps GSAP's license notice (its license says not to remove it).
+  for (const c of gsapChunks) {
+    expect(c.code, c.fileName).toContain("gsap.com/standard-license");
+    const kb = await gzipKb(c.code);
+    const core = c.facadeModuleId?.endsWith("node_modules/gsap/index.js");
+    expect(kb, c.fileName).toBeLessThanOrEqual(core ? gsapBudgetKb.core : gsapBudgetKb.plugin);
+  }
 });
 
 test("with reduced motion the page is still and fully visible", async ({ page }) => {

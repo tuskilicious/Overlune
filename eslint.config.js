@@ -42,5 +42,25 @@ export default tseslint.config(
       ],
     },
   },
+  // GSAP goes through src/lib/motion.ts only, which loads it lazily behind the reduced-motion checks (T6.137).
+  // Plugins are passed to it as dynamic imports, which this rule doesn't cover.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/lib/motion.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["gsap", "gsap/*", "@gsap/*"],
+              allowTypeImports: true,
+              message: "Use animate() from src/lib/motion.ts (lazy, reduced-motion aware).",
+            },
+          ],
+        },
+      ],
+    },
+  },
   prettier,
 );

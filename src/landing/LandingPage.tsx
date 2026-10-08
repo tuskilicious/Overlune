@@ -9,9 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { Link } from "react-router";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
+import { animate } from "../lib/motion";
 import { testAlerts } from "../alerts/events";
 import Icon from "../components/Icon";
 import SiteFooter, { repoUrl, supportUrl } from "../components/SiteFooter";
@@ -28,8 +26,6 @@ import { themes } from "../themes";
 import { themeIds, type ThemeId } from "../themes/types";
 import "../editor/brand"; // brand fonts (Quicksand, Nunito)
 import "./landing.css";
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 /** Previews still waiting, built one per idle moment after the page has loaded, so they're ready before anyone
  *  scrolls to them without blocking the load or a scroll (T6.78). */
@@ -749,76 +745,81 @@ export default function LandingPage() {
       "hover:text-moon aria-[current=location]:text-moon aria-[current=location]:underline aria-[current=location]:decoration-violet aria-[current=location]:decoration-2 aria-[current=location]:underline-offset-8",
   });
 
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-      // Every animation has a reduced-motion version: none at all (CLAUDE.md).
-      // The hero card zooms out into a drifting collage of every look as you scroll (T6.124), on wide windows.
-      mm.add("(prefers-reduced-motion: no-preference) and (min-width: 1024px)", () => {
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: "[data-hero-stage]",
-            start: "top top",
-            end: "+=900",
-            pin: true,
-            scrub: 0.6,
+  // Every animation has a reduced-motion version: none at all (CLAUDE.md). GSAP and ScrollTrigger load lazily, through
+  // the shared helper (T6.137).
+  useEffect(
+    () =>
+      animate(
+        root.current!,
+        {
+          // The hero card zooms out into a drifting collage of every look as you scroll (T6.124), on wide windows.
+          "(min-width: 1024px)": (gsap) => {
+            const tl = gsap.timeline({
+              scrollTrigger: {
+                trigger: "[data-hero-stage]",
+                start: "top top",
+                end: "+=900",
+                pin: true,
+                scrub: 0.6,
+              },
+            });
+            tl.to("[data-hero-card]", { scale: 0.56, ease: "none" }, 0)
+              .to("[data-ridge]", { y: (i: number) => 40 + i * 50, ease: "none" }, 0)
+              .fromTo("[data-collage]", { opacity: 0 }, { opacity: 1, ease: "none" }, 0)
+              .fromTo(
+                "[data-collage-row]:nth-child(odd)",
+                { xPercent: 6 },
+                { xPercent: -6, ease: "none" },
+                0,
+              )
+              .fromTo(
+                "[data-collage-row]:nth-child(even)",
+                { xPercent: -6 },
+                { xPercent: 6, ease: "none" },
+                0,
+              );
+            // The looks section rises over the page on its curve.
+            gsap.from("[data-curve]", {
+              yPercent: 8,
+              ease: "none",
+              scrollTrigger: {
+                trigger: "[data-curve]",
+                start: "top bottom",
+                end: "top 30%",
+                scrub: true,
+              },
+            });
           },
-        });
-        tl.to("[data-hero-card]", { scale: 0.56, ease: "none" }, 0)
-          .to("[data-ridge]", { y: (i: number) => 40 + i * 50, ease: "none" }, 0)
-          .fromTo("[data-collage]", { opacity: 0 }, { opacity: 1, ease: "none" }, 0)
-          .fromTo(
-            "[data-collage-row]:nth-child(odd)",
-            { xPercent: 6 },
-            { xPercent: -6, ease: "none" },
-            0,
-          )
-          .fromTo(
-            "[data-collage-row]:nth-child(even)",
-            { xPercent: -6 },
-            { xPercent: 6, ease: "none" },
-            0,
-          );
-        // The looks section rises over the page on its curve.
-        gsap.from("[data-curve]", {
-          yPercent: 8,
-          ease: "none",
-          scrollTrigger: {
-            trigger: "[data-curve]",
-            start: "top bottom",
-            end: "top 30%",
-            scrub: true,
+          "": (gsap) => {
+            gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) =>
+              gsap.from(el, {
+                y: 48,
+                opacity: 0,
+                duration: 0.9,
+                ease: "power3.out",
+                scrollTrigger: { trigger: el, start: "top 85%" },
+              }),
+            );
+            gsap.fromTo(
+              "[data-word]",
+              { opacity: 0.4 }, // still 3:1 for this large text before it lights up (WCAG 1.4.3)
+              {
+                opacity: 1,
+                stagger: 0.05,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: "[data-promise]",
+                  start: "top 80%",
+                  end: "bottom 45%",
+                  scrub: true,
+                },
+              },
+            );
           },
-        });
-      });
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) =>
-          gsap.from(el, {
-            y: 48,
-            opacity: 0,
-            duration: 0.9,
-            ease: "power3.out",
-            scrollTrigger: { trigger: el, start: "top 85%" },
-          }),
-        );
-        gsap.fromTo(
-          "[data-word]",
-          { opacity: 0.4 }, // still 3:1 for this large text before it lights up (WCAG 1.4.3)
-          {
-            opacity: 1,
-            stagger: 0.05,
-            ease: "none",
-            scrollTrigger: {
-              trigger: "[data-promise]",
-              start: "top 80%",
-              end: "bottom 45%",
-              scrub: true,
-            },
-          },
-        );
-      });
-    },
-    { scope: root },
+        },
+        { plugins: [() => import("gsap/ScrollTrigger").then((m) => m.ScrollTrigger)] },
+      ),
+    [],
   );
 
   return (

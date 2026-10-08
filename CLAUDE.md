@@ -16,7 +16,7 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 - **The overlay URL format is a public contract.** Streamers paste a link once and never touch it again. Every payload carries a schema version. Never break an old link: add a migration plus a test instead.
 - **Never put login tokens or secrets in an overlay URL.** Streamers show their screens.
 - **Chat text is hostile input.** Render messages and emotes as React elements. Never use `innerHTML` or `dangerouslySetInnerHTML`.
-- **Overlays must be lightweight:** CSS or canvas effects only, no video backgrounds, and they must run smoothly on low-end PCs. Every animation needs a reduced-motion version.
+- **Overlays must be lightweight:** CSS or canvas effects, plus GSAP in lazy chunks for alert and scene sequences (always through `animate()` in `src/lib/motion.ts`, `docs/STACK.md`). No video backgrounds, and they must run smoothly on low-end PCs. Every animation needs a reduced-motion version.
 - **Write UI copy for beginners.** Say "Link to paste into OBS", not "Browser Source URL".
 - **Use only free-licensed fonts, sounds and art,** and record each one in `docs/ASSETS.md`.
 

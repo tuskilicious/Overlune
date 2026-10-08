@@ -159,9 +159,9 @@ test("the bolder pass: a light runs round the countdown, and Lite holds it (T6.1
   await expect(page.locator(".scene-word").first()).toHaveCSS("animation-name", "scene-slide-fade");
 });
 
-// Overlays stay plain CSS and canvas (CLAUDE.md); outside UI kits like 21st.dev are for the editor and landing page
-// only (T6.136). The dev server serves each package from /node_modules/, so no overlay may request an animation or
-// headless-UI package.
+// Outside UI kits like 21st.dev are for the editor and landing page only (T6.136), and overlay motion is CSS, canvas
+// or GSAP through src/lib/motion.ts (T6.137, checked in landing.spec.ts). The dev server serves each package from
+// /node_modules/, so no overlay may request another animation or headless-UI package.
 test("no overlay loads an animation or UI-kit package (T6.136)", async ({ page }) => {
   for (const overlay of ["starting", "brb", "ending", "chat", "alerts", "frame"]) {
     const packages: string[] = [];
