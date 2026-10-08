@@ -228,3 +228,41 @@ test("each alert lands with a burst and a name pop, invisible at rest under redu
   await expect(page.locator(".alert-burst")).toHaveCSS("opacity", "0");
   await expect(page.locator(".alert-user")).toHaveCSS("opacity", "1");
 });
+
+test.describe("Clean Slate's alert lines follow the card in (T6.137)", () => {
+  const titleOpacity = (page: Page) =>
+    box(page)
+      .locator(".alert-title")
+      .evaluate((e) => Number(getComputedStyle(e).opacity));
+
+  test("the lines fade up one after another, in CSS, and GSAP never loads", async ({ page }) => {
+    const gsap: string[] = [];
+    page.on("request", (r) => /gsap/.test(r.url()) && gsap.push(r.url()));
+    const twitch = await fakeTwitch(page);
+    await page.goto(link({ chat: { channel: "dallas" } }));
+    await twitch.send(raid("Raider", 5));
+    await expect.poll(() => titleOpacity(page), { intervals: [20] }).toBeLessThan(1);
+    await expect.poll(() => titleOpacity(page)).toBe(1);
+    await expect(box(page).locator(".alert-title")).toHaveCSS("animation-name", "alert-line-in");
+    // The label goes first, then the title.
+    await expect(box(page).locator(".alert-kind")).toHaveCSS("animation-delay", "0.15s");
+    await expect(box(page).locator(".alert-title")).toHaveCSS("animation-delay", "0.23s");
+    expect(gsap).toEqual([]);
+  });
+
+  test("with ?rm=1 the lines are simply there", async ({ page }) => {
+    const twitch = await fakeTwitch(page);
+    await page.goto(link({ chat: { channel: "dallas" } }, "?rm=1"));
+    await twitch.send(raid("Raider", 5));
+    await expect(box(page).locator(".alert-title")).toHaveCSS("animation-name", "none");
+    expect(await titleOpacity(page)).toBe(1);
+  });
+
+  test("other looks keep their own alert", async ({ page }) => {
+    const twitch = await fakeTwitch(page);
+    await page.goto(link({ theme: "neon-grid", chat: { channel: "dallas" } }));
+    await twitch.send(raid("Raider", 5));
+    await expect(box(page)).toHaveCSS("animation-name", /alert-glitch/);
+    await expect(box(page).locator(".alert-title")).toHaveCSS("animation-name", "none");
+  });
+});

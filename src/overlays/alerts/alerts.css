@@ -128,6 +128,28 @@
   }
 }
 
+/* Clean Slate (T6.137): the card's lines follow it in, one after another, as it drops. Kept in CSS on purpose: the
+   same alert as a GSAP timeline dropped frames on a slow PC (docs/STACK.md), while CSS opacity and transform
+   animations run off the main thread. Reduced motion (index.css): the lines are simply there. */
+.alerts[data-theme="clean-slate"] .alert-box > * {
+  animation: alert-line-in 300ms ease-out 150ms both;
+}
+
+.alerts[data-theme="clean-slate"] .alert-box > :nth-child(2) {
+  animation-delay: 230ms;
+}
+
+.alerts[data-theme="clean-slate"] .alert-box > :nth-child(3) {
+  animation-delay: 310ms;
+}
+
+@keyframes alert-line-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
 /* Neon Grid: the box glitches in (sliced and jittering), then fades out like slide-fade. */
 .alerts[data-anim="glitch"] .alert-box {
   animation:
