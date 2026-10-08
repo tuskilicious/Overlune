@@ -646,3 +646,26 @@ The owner asked for more looks (2026-10-07), picked all four from impeccable's s
 - [x] **T6.149 Release v1.4.0.** T6.146 to T6.148 are merged but not in a release: the square webcam frame, the Offline scene, and the landing refresh (21st.dev picks and the ruler scrollbar). The owner asked to merge and release.
   - Accept: version 1.4.0 (a new overlay link, so a minor version); a dated changelog section in plain words; README and FUTURE-SCOPE.md name 1.4.0; the GitHub release published after the deploy is checked.
   - *Built 2026-10-08 on `chore/release-1.4.0`. `package.json` 1.4.0; CHANGELOG "1.4.0 (2026-10-08)": New (Offline scene, square frame) and Site (home page refresh, ruler scrollbar, footer). The overlay changes were OBS-tested in their own PRs (#187, #188); the landing refresh (#189) was reviewed by the owner on its preview.*
+
+## Phase 7: v2 foundation, accounts on Cloudflare
+Approved by the owner 2026-10-09 (`docs/PRD.md` "v2 Phase 1", `docs/STACK.md` "Backend"). From the first task that adds server code, CLAUDE.md §4, §5 and §8 are mandatory. Nothing in this phase changes an overlay or an overlay link; the editor keeps working signed out. Each task is its own PR, tested on its preview deploy against staging.
+
+- [ ] **T7.1 Plan and rules.** Move v2 Phase 1 into the PRD, the Cloudflare backend into STACK.md, and update CLAUDE.md §4, §5 and §8 for D1 (one data layer instead of row-level security), Twitch-only sign-in and backups (Time Travel plus an off-site copy). FUTURE-SCOPE.md and V2-PLAN.md follow.
+  - Accept: the owner approves the PR; no code changes.
+- [ ] **T7.2 Backend skeleton.** `functions/` (Pages Functions, TypeScript), `wrangler` config with a staging and a production D1 database, `migrations/0001_init.sql`, `GET /api/health`, Sentry in Functions (`@sentry/cloudflare`, same scrubbing as the site), `_headers` and the CSP still pinned by the CSP test, Function tests on a local D1 in CI (`@cloudflare/vitest-pool-workers`), `.env.example` names.
+  - Accept: `/api/health` answers on the PR preview (staging) and production; Function tests run in CI; no secret in the repo or the client; every v1 test still passes.
+- [ ] **T7.3 Sign in with Twitch.** `GET /api/auth/twitch` starts the authorization code flow with PKCE and `state`; the callback checks both, fetches the Twitch user (no extra scopes) and starts a session. Sessions: a random 256-bit token in a `__Host-` cookie (`HttpOnly`, `Secure`, `SameSite=Lax`, 30 days), stored only as a hash; `POST /api/auth/signout` and "sign out everywhere". State-changing routes check `Origin`. The OAuth library is picked here (license, size, maintenance) and recorded in STACK.md.
+  - Accept: sign in and out on staging; a tampered `state`, a replayed callback, a missing PKCE verifier and a forged cookie all fail; no Twitch token is stored or logged; the editor works exactly as before when signed out.
+- [ ] **T7.4 Profiles and the data layer.** `users` (Twitch ID, login, display name, avatar link, created) and `sessions` tables; every query in one module that takes the signed-in user; `GET /api/me` (only the fields the editor needs), `DELETE /api/me` (removes the account and its sessions). The editor shows "Sign in with Twitch" and, signed in, the avatar with sign out and delete.
+  - Accept: unit tests for the data layer; axe clean; the delete really removes every row for that user.
+- [ ] **T7.5 Access-control tests.** For every route: signed out, user A against user B's data, guessed and malformed IDs. Every attempt answers 401 or 404, the same way whether or not the target exists. They run in CI, and a new route can't merge without its test.
+  - Accept: the suite runs in CI against a local D1; a deliberately broken check makes it fail.
+- [ ] **T7.6 Abuse limits.** Rate limits per IP on the sign-in routes and per account on the API (the Workers rate limiting binding); request body size limits; Turnstile on sign-in if the limits alone aren't enough (decide here with numbers).
+  - Accept: tests show the limits trip and recover; the limits are written in DESIGN.md or STACK.md.
+- [ ] **T7.7 Backups and a restore drill.** D1 Time Travel on (7 days on the free plan); a nightly GitHub Actions job runs `wrangler d1 export` on production with a token limited to that, encrypts the file and stores it outside the Cloudflare account; `docs/BACKUPS.md` has the restore steps. Do a real restore of last night's copy into staging.
+  - Accept: the drill is logged with its date and result; the token can't do anything but read D1.
+- [ ] **T7.8 Privacy policy and terms.** Rewrite `docs/legal/` for accounts: what's stored (Twitch ID, login, display name, avatar link, sessions), why, how long, how to see and delete it, minimum age 13, still no tracking cookies (the session cookie is essential). Self-written, not legal advice.
+  - Accept: the owner reviews and approves the text; the footer links still work.
+- [ ] **T7.9 Phase 1 launch check.** Re-run the pre-launch checklist with items 2 to 4 active (access tests, backups and the drill, 2FA on GitHub, Cloudflare, Sentry and the Twitch developer console). Ship sign-in on production.
+  - Accept: every checklist item ticked with a note; a real sign-in on overlune.in; Sentry shows no session tokens or fragments.
+

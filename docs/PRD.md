@@ -80,7 +80,18 @@ The owner moved these into scope for v1.x (T6.86). They keep v1's rules: a stati
 4. Remaining polish: logo-to-palette, theme import/export, community gallery with artist credits.
 5. YouTube and Kick chat.
 
-The realistic plan beyond this list (v1.x goals, v2 phases on Supabase, open decisions): `docs/FUTURE-SCOPE.md`.
+The realistic plan beyond this list (v1.x goals, v2 phases on Cloudflare, open decisions): `docs/FUTURE-SCOPE.md`.
+
+## v2 Phase 1: accounts on Cloudflare (approved 2026-10-09)
+The v2 gate (5 real streamers, T6.6) is met, and the owner approved starting v2 on Cloudflare (`docs/STACK.md` "Backend"). Phase 1 is the foundation the later phases build on; it adds no overlay features yet.
+- **Optional "Sign in with Twitch".** The editor, every overlay and every old link keep working signed out.
+- **A profile:** Twitch ID, login, display name and avatar link. Nothing else is stored.
+- **Your data, yours:** see what's stored, sign out everywhere, delete the account.
+- **Safety from day one:** every rule in CLAUDE.md §4, §5 and §8 (access control in one data layer, access tests in CI, rate limits, sessions), backups with a real test restore, and a rewritten privacy policy and terms (minimum age 13).
+- **Cost:** Cloudflare's free plan. Moving to Workers Paid needs the owner's OK.
+- **Done when:** a streamer can sign in and out on production; user A can't read, change or delete user B's data through any route (tested in CI); a test restore from the off-site backup worked.
+
+Later phases (saved overlays with live edits, follow alerts, logo upload) each move into this PRD when they start.
 
 ## Success metrics
 We measure these without tracking users:

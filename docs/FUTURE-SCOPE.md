@@ -35,19 +35,19 @@ Still open, in any order:
 - **TypeScript 7:** waits for typescript-eslint to support it (8.71 needs below 6.1). We're on 6.0 (T6.97). Dependabot holds TypeScript majors until then; remove that rule in `.github/dependabot.yml` when support lands.
 - **Dependabot:** merge the weekly minor-and-patch group once CI passes; take each major in its own PR with the full suite and an OBS check.
 
-## v2: accounts and a backend (Supabase)
-The owner chose Supabase (2026-10-03): sign-in, Postgres with row-level security, file storage, live updates and server functions in one place. A free project for staging and a paid one for production. Check current pricing before signing up.
+## v2: accounts and a backend (Cloudflare)
+The owner chose Cloudflare (2026-10-09), replacing the earlier Supabase plan: Pages Functions for server code, D1 for the database (with Time Travel for point-in-time restore), Durable Objects for live updates and R2 for uploads, all next to the site on overlune.in. It doesn't pause idle projects, and its free plan covers Phase 1 and an early Phase 2. Details: `docs/STACK.md` "Backend".
 
-The moment Phase 1 starts, CLAUDE.md sections 4 (data), 5 (auth) and 8 (abuse) apply, and pre-launch checklist items 2 to 4 are no longer N/A.
+The moment Phase 1 code lands, CLAUDE.md sections 4 (data), 5 (auth) and 8 (abuse) apply, and pre-launch checklist items 2 to 4 are no longer N/A. D1 has no row-level security, so access control lives in one server-side data layer, checked by user A vs user B tests in CI.
 
 | Phase | Goal | Size | Done when |
 |---|---|---|---|
-| **1. Foundation** | Supabase staging and production; optional "Sign in with Twitch"; a profiles table with row-level security; access-control tests in CI; backups and a real test restore; privacy policy and terms rewritten (what's stored, how to delete it, minimum age 13). | L | A streamer can sign in and out, user A can't read or change user B's data through any route (tested in CI), and a test restore worked. |
-| **2. Saved overlays** | Save an overlay to your account and get a short link that never changes. Edits in the editor reach OBS live, with no re-paste. The link also carries a snapshot, so the overlay still shows if the backend is down. | L | Edit → OBS updates within seconds; backend off → the overlay still renders; every old link still loads. |
-| **3. Follow alerts** | Twitch tells a server function about new follows, which passes them to the overlay live. The overlay never holds a Twitch token. | M | Follow alerts pass the OBS test; no token appears in any link or in the overlay's code. |
-| **4. Logo upload** | Upload a logo image instead of finding an image link. | M | Only PNG, JPEG, WebP and GIF (checked by file content), a size limit, a per-account quota, random file names; the abuse cases are tested. |
+| **1. Foundation** (approved, `docs/TASKS.md` Phase 7) | Optional "Sign in with Twitch"; sessions; a profiles table behind one data layer; access-control tests in CI; rate limits; Time Travel plus an off-site nightly backup and a real test restore; privacy policy and terms rewritten (what's stored, how to delete it, minimum age 13). | L | A streamer can sign in and out, user A can't read or change user B's data through any route (tested in CI), and a test restore worked. |
+| **2. Saved overlays** | Save an overlay to your account and get a short link that never changes. Edits in the editor reach OBS live through a Durable Object, with no re-paste. The link also carries a snapshot, so the overlay still shows if the API is down. | L | Edit → OBS updates within seconds; API off → the overlay still renders; every old link still loads. |
+| **3. Follow alerts** | Twitch EventSub sends new follows to a Function, which passes them to the overlay through its Durable Object. The overlay never holds a Twitch token. | M | Follow alerts pass the OBS test; no token appears in any link or in the overlay's code. |
+| **4. Logo upload** | Upload a logo image to R2 instead of finding an image link. | M | Only PNG, JPEG, WebP and GIF (checked by file content), a size limit, a per-account quota, random file names; the abuse cases are tested. |
 
-Follow alerts could skip the backend by connecting to Streamer.bot running on the streamer's PC. That works without an account, but it means installing and setting up another app, which is too much for the beginners Overlune is for. So the backend route is the plan.
+Follow alerts could skip the backend by connecting to Streamer.bot running on the streamer's PC. That works without an account, but it means installing and setting up another app, which is too much for the beginners Overlune is for. So the backend route is the plan (confirmed with the Cloudflare choice, 2026-10-09).
 
 ## Later, maybe
 Bigger ideas, to decide on after v2 Phase 2 and real use:
@@ -69,14 +69,14 @@ Bigger ideas, to decide on after v2 Phase 2 and real use:
 ## Costs
 | Item | Cost |
 |---|---|
-| Cloudflare Pages, GitHub, Sentry (free tier) | Free |
+| Cloudflare Pages, Functions, D1, Durable Objects, R2 (free plan); GitHub; Sentry (free tier) | Free |
 | overlune.in | Yearly domain renewal |
-| Supabase staging | Free |
-| Supabase production (from v2 Phase 1) | Paid plan, monthly. Check current pricing. Point-in-time recovery costs extra. |
+| Workers Paid, only when a free limit gets close (30-day Time Travel, more requests) | $5 a month, with the owner's OK |
 
-Paid for by GitHub Sponsors and the owner. Nothing in v1.x costs money.
+Paid for by GitHub Sponsors and the owner. Nothing so far costs money beyond the domain.
 
 ## Decisions for the owner
-1. **Backups:** Supabase's paid plan includes daily backups; point-in-time recovery, which CLAUDE.md asks for, is an extra monthly cost. Proposed: daily backups plus a nightly copy to a separate account, and change CLAUDE.md's backup rule to match. Needed before Phase 1.
-2. **Follow alerts:** confirm the backend route over Streamer.bot.
-3. **The drag-and-drop editor:** keep it under "Later, maybe" until Phase 2 is live?
+Settled on 2026-10-09: **Cloudflare** over Supabase; **backups** are D1 Time Travel plus a nightly encrypted copy outside the Cloudflare account, restore-tested (CLAUDE.md §4 updated); **follow alerts** go through the backend, not Streamer.bot.
+
+Still open:
+1. **The drag-and-drop editor:** keep it under "Later, maybe" until Phase 2 is live?
