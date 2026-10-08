@@ -1,6 +1,6 @@
 # Overlune v2: Redesign Plan (draft for owner approval)
 
-Status: **proposal**. Nothing here is approved yet. Once the owner signs off, this plan becomes the new `docs/PRD.md` scope, `docs/STACK.md` changes and `docs/TASKS.md` phases. Until then, CLAUDE.md's v1 rules (no backend, no accounts) still apply.
+Status: **proposal**, except the backend: on 2026-10-09 the owner approved v2 on **Cloudflare** (Pages Functions, D1, Durable Objects, R2) instead of Supabase. `docs/STACK.md` "Backend" and `docs/FUTURE-SCOPE.md` are the current plan; where this page still says Supabase, Supabase Auth, Postgres, RLS, Realtime or Edge Functions, read Twitch OAuth with our own sessions, D1 behind one data layer, Durable Objects and Pages Functions. Phase 1 is in `docs/TASKS.md` (Phase 7). The rest of this page is still a proposal. Once the owner signs off, this plan becomes the new `docs/PRD.md` scope, `docs/STACK.md` changes and `docs/TASKS.md` phases. Until then, CLAUDE.md's v1 rules (no backend, no accounts) still apply.
 
 ## What the owner asked for (2026-10-01)
 - Keep this repo and stack, and add a backend.
@@ -18,18 +18,18 @@ Note: the PRD gates v2 on "5 real streamers using v1 live" (T5.7, T6.6). This pl
 - **No tokens or secrets in overlay URLs.** Overlay IDs are public and safe to show on stream.
 - Overlays stay lightweight (<5% CPU in OBS), with reduced-motion versions. Chat text stays hostile input.
 
-## Proposed stack additions (need approval, per STACK.md)
-| Area | Recommendation | Why | Alternative |
-|---|---|---|---|
-| Auth | **Supabase Auth, Twitch provider** | Managed (CLAUDE.md §5), Twitch built in, MFA available | Clerk (managed, but no database/RLS) |
-| Database | **Supabase Postgres** | Row-level security is required by CLAUDE.md §4, and Postgres has it natively | Cloudflare D1 (no RLS: every rule would live in app code) |
-| Uploads | **Supabase Storage** with per-user folders and storage policies | Same RLS model as the data | Cloudflare R2 |
-| Live updates | **Supabase Realtime** | Overlays update the moment a streamer saves, with no re-paste | Polling |
-| Server code | Supabase Edge Functions (Twitch EventSub webhooks, upload checks, moderation) | Keeps secrets server-side | Cloudflare Pages Functions |
-| Frontend hosting | Cloudflare Pages (unchanged) at **overlune.in** | Already built, headers in place | — |
-| Bot protection | Cloudflare Turnstile | CLAUDE.md §8 | hCaptcha |
+## Stack additions (approved 2026-10-09: Cloudflare)
+| Area | Choice | Why |
+|---|---|---|
+| Auth | Twitch OAuth (authorization code + PKCE), our own sessions in D1 | Twitch is the identity provider, so no passwords anywhere; CLAUDE.md §5 sets the session rules |
+| Database | Cloudflare D1 | No row-level security, so every read and write goes through one data layer scoped to the signed-in user, checked by access tests in CI (CLAUDE.md §4) |
+| Uploads | Cloudflare R2 | Same account and deploy as the site |
+| Live updates | Durable Objects with WebSocket hibernation | Idle OBS sources cost nothing; no connection ceiling like Supabase's free 200 |
+| Server code | Cloudflare Pages Functions, same origin as the site | No CORS; secrets stay server-side |
+| Frontend hosting | Cloudflare Pages (unchanged) at **overlune.in** | Already built, headers in place |
+| Bot protection | Cloudflare Turnstile | CLAUDE.md §8 |
 
-**Cost warning:** CLAUDE.md requires daily backups with point-in-time recovery, and staging/production separation. On Supabase that means a paid plan for production (the free tier has no backups and pauses inactive projects, which would also stall live overlay updates). Check current pricing before approving. Staging can stay on the free tier.
+**Cost:** Cloudflare's free plan to start, including D1 Time Travel (7 days of point-in-time restore). Workers Paid ($5 a month) only when a free limit gets close. The earlier Supabase plan needed a paid production plan for backups and to stop idle projects pausing.
 
 ## Domain move (Phase 0)
 1. Add overlune.in (and www) as a **custom domain on the Cloudflare Pages project** instead of a redirect. pages.dev keeps serving the same site, so old links keep working.
@@ -122,7 +122,7 @@ The palette already matches BRAND.md (Night, Deep Space, Lune Violet, Signal Cya
 - **Phase 5b, Site redesign:** after Phase 5, rebuild the landing page and nav around the finished features, then remove anything left from the v1 look.
 
 ## Decisions needed from the owner
-1. Approve Supabase (auth, Postgres, storage, realtime) and its paid production plan.
+1. ~~Approve Supabase and its paid production plan.~~ Settled 2026-10-09: Cloudflare, free plan first.
 2. Fonts: self-hosted library + font uploads, or allow Google Fonts CDN?
 3. Build v2 now, or launch v1 (T5.7) first and build v2 in parallel?
 4. Built-in forum later, or Discord forum only?

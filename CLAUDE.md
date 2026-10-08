@@ -12,6 +12,7 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 
 ## Overlune-specific rules
 - **v1 is a static site:** no backend, no database, no accounts, no payments, no AI. Adding any of these needs approval first. Sections 4, 5 and 8 become mandatory the moment one is added.
+- **v2 is approved (2026-10-09) on Cloudflare only:** Pages Functions, D1, Durable Objects and R2, with sign-in through Twitch (`docs/STACK.md`, `docs/TASKS.md` Phase 7). Still no payments and no AI.
 - **Test every overlay inside OBS** (OBS uses its own Chromium) before a task is done. Follow `docs/OBS-TESTING.md`.
 - **The overlay URL format is a public contract.** Streamers paste a link once and never touch it again. Every payload carries a schema version. Never break an old link: add a migration plus a test instead.
 - **Never put login tokens or secrets in an overlay URL.** Streamers show their screens.
@@ -51,31 +52,30 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 - Add secret scanning: a gitleaks pre-commit hook and GitHub secret scanning with push protection. Run gitleaks in CI too.
 
 ## 4. Data and database
-> **v1 status: not active.** v1 has no database or server. These rules become mandatory as soon as any change adds one.
+> **Status: approved for v2, not active yet.** v1 has no database or server. These rules become mandatory with the first change that adds one (v2 Phase 1, on Cloudflare D1).
 
-- Enable row-level security (RLS) on every table. Default deny, then add explicit policies.
+- D1 has no row-level security, so access control lives in one server-side data layer: every read and write goes through it, scoped to the signed-in user, default deny. Route handlers never query D1 directly.
 - Check record ownership on the server for every read, update and delete. Never trust client-supplied IDs or roles.
 - Block field tampering: allowlist writable fields (no mass assignment), and never let clients set `role`, `price`, `owner_id` or similar.
 - Encrypt sensitive data at rest, and use field-level encryption for the most sensitive values.
 - Collect only the data the product needs. (v1 collects none: settings live in the user's link and browser.)
-- Give the app's DB user least-privilege permissions. No superuser in app code.
+- Least privilege: each Function gets only the bindings it needs, and CI tokens get only the permissions their job needs. No account-wide tokens in app code.
 - Trim API responses to the fields the client needs. Never return password hashes, tokens or internal fields.
 - **Access-control tests (required):** user A tries to read, edit and delete user B's records through every endpoint and by guessing IDs. Every attempt must return 403/404. Run them in CI. A new route does not ship without its test.
-- **Backups (required):** automated daily backups with point-in-time recovery, stored in a separate account or region. Do a real test restore before launch and after major schema changes.
+- **Backups (required):** point-in-time recovery (D1 Time Travel) plus a nightly encrypted copy stored outside the Cloudflare account. Do a real test restore before launch and after major schema changes.
 
 ## 5. Auth and sessions
-> **v1 status: not active.** v1 has no accounts. v2 follow alerts will use Twitch OAuth (a managed provider). When that lands, every rule below applies. Tokens must also never appear in overlay URLs.
+> **Status: approved for v2, not active yet.** v1 has no accounts. v2 signs in with Twitch only. When that lands, every rule below applies. Tokens must also never appear in overlay URLs.
 
-- Prefer a managed auth provider over building auth from scratch.
+- Sign-in is Twitch OAuth only (authorization code with PKCE and a `state` check): Twitch is the identity provider, and Overlune never sees or stores a password. Use a small, well-reviewed OAuth library over hand-rolled protocol code.
 - Enforce auth on the server for every protected route. Client-side checks are UX only.
-- Hash passwords with argon2id or bcrypt. Never store or log plaintext, and never use fast hashes like MD5 or SHA-1.
+- Session tokens are random (256 bits) and stored only as a hash. Never store or log a token or a Twitch access token, and never use fast hashes like MD5 or SHA-1 for anything secret.
 - Session cookies: `HttpOnly`, `Secure`, `SameSite=Lax` or `Strict`, with a sensible expiry.
 - Add CSRF protection for cookie-authenticated state-changing requests.
-- Invalidate all other sessions on password change.
-- Password reset links: single-use, short expiry, high-entropy tokens.
-- Prevent user enumeration: identical responses and timing for "user exists" and "user not found" on login, signup and reset.
-- Throttle or progressively delay after failed logins. Avoid hard account lockouts, which attackers can use to lock out real users.
-- **MFA:** support TOTP or passkeys for all users, and require it for admin accounts. Use the provider's built-in MFA where available.
+- "Sign out everywhere" deletes every session of that account. There are no passwords, so no password resets.
+- Prevent user enumeration: any route that looks up an account or overlay by ID answers "not found" and "not yours" the same way.
+- Rate limit the sign-in routes (start and callback) per IP. Avoid hard account lockouts, which attackers can use to lock out real users.
+- **MFA:** Twitch handles it for users (Twitch two-factor). Require 2FA on every admin account: GitHub, Cloudflare, Sentry and the Twitch developer console.
 
 ## 6. Input, output and injection
 - Use parameterized queries or an ORM. Never build SQL by string concatenation. (No SQL in v1.)
@@ -94,11 +94,12 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 - Scan dependencies in CI (`npm audit` plus Dependabot). Pin versions and review new packages before adding them.
 
 ## 8. Abuse, payments and AI
-> **v1 status: not active.** There are no public endpoints, payments or AI features. Donations are handled by third-party services the streamer already uses. The rules apply if any of these are added.
+> **Status: abuse rules apply from v2 Phase 1** (public endpoints on Cloudflare). There are still no payments or AI features. Donations are handled by third-party services the streamer already uses.
 
 - Rate limit login, signup, password reset, and any expensive or public endpoint. Use stricter limits on reset flows.
 - Add bot protection (CAPTCHA or Turnstile) on signup, login and public forms.
-- Payments: verify webhook signatures, make handlers idempotent, and set prices **server-side** only.
+- Webhooks (Twitch EventSub in v2): verify the signature and the timestamp, reject replays, and make handlers idempotent.
+- Payments: none. If that ever changes, set prices **server-side** only.
 - AI features: cap usage per user and globally, and set provider-side budget alerts.
 - Prompt injection: treat model output as untrusted, give tools least privilege, confirm destructive actions, keep secrets out of prompts, and validate model output.
 

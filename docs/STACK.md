@@ -38,6 +38,25 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 - Headers: `public/_headers`. SPA fallback: built in (Pages serves `index.html` for unknown paths when there is no `404.html`), so no `_redirects`.
 - **Antideploy:** a second copy ran at overlune.antideploy.app from 2026-10-01; the owner scrapped it on 2026-10-07. Cloudflare Pages is the only host, so the security headers in `public/_headers` are the only place the CSP lives.
 
+## Backend (v2, approved 2026-10-09)
+All on Cloudflare, next to the site: one provider, one deploy, one domain, so the API needs no CORS. Chosen over Supabase (the earlier plan) because it doesn't pause idle projects, includes point-in-time restore on the free plan, keeps idle live connections free, and is already where Overlune runs. Free plan first; move to Workers Paid ($5 a month) when a limit below gets close. Check current limits before relying on them.
+
+| Area | Choice | Free plan (checked 2026-10-09) |
+|---|---|---|
+| Server code | Cloudflare Pages Functions (Workers) in `functions/`, TypeScript, same origin as the site under `/api/...` | 100,000 requests a day, 10 ms CPU each |
+| Database | D1 (SQLite), schema changes as numbered SQL migrations in `migrations/` | 500 MB per database, 5 GB per account |
+| Point-in-time restore | D1 Time Travel | 7 days (30 on Workers Paid) |
+| Live updates (v2 Phase 2 and 3) | Durable Objects with the WebSocket Hibernation API | On the free plan since April 2025; idle connections cost nothing; 100,000 requests a day, with 100 incoming WebSocket messages counted as 5 |
+| Uploads (v2 Phase 4) | R2 | Free allowance |
+| Sign-in | Twitch OAuth (authorization code + PKCE), sessions in D1 (CLAUDE.md §5) | Free |
+| Bot protection and rate limits | Turnstile; the Workers rate limiting binding | Free |
+| Backups | Time Travel plus a nightly encrypted `wrangler d1 export`, stored outside the Cloudflare account (CLAUDE.md §4) | Free |
+
+- **Staging and production:** one D1 database each, with separate secrets and Twitch redirect URLs. Preview deploys (each PR) use staging; `main` uses production. Sentry environments match.
+- **Secrets** (`TWITCH_CLIENT_SECRET`, the session key, `CLOUDFLARE_API_TOKEN` for the backup job) live in Cloudflare's encrypted variables or GitHub Actions secrets, never in the repo or the client. `.env.example` lists the names.
+- **New dependencies this needs**, approved with this plan and each pinned and reviewed in the PR that adds it: `wrangler` and `@cloudflare/workers-types` (dev), `@cloudflare/vitest-pool-workers` (dev, to test Functions against a real local D1), a small OAuth library such as `arctic` (MIT; chosen in T7.3 after a review), and `@sentry/cloudflare` for errors in Functions.
+- **Overlays keep working without it:** a saved overlay's link also carries a snapshot, so it still renders if the API is down (v2 Phase 2).
+
 ## Twitch data without login
 - Chat, sub, resub, gift sub, raid and bits events arrive over anonymous IRC: `PRIVMSG` and `USERNOTICE` (which carries `msg-id`), plus the `bits` tag.
 - `CLEARMSG` and `CLEARCHAT` remove deleted messages and banned users' messages.
@@ -45,7 +64,7 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 - Badge **images** need the authenticated Helix API. Instead, we render **theme-styled badges** from the `badges` tag (broadcaster, moderator, vip, subscriber). This also matches the theme better.
 
 ## URL settings format
-- Route per overlay: `/o/starting`, `/o/brb`, `/o/ending`, `/o/chat`, `/o/alerts`, `/o/frame` (T6.88).
+- Route per overlay: `/o/starting`, `/o/brb`, `/o/ending`, `/o/offline` (T6.147), `/o/chat`, `/o/alerts`, `/o/frame` (T6.88).
 - Settings are in the **hash fragment**: `#<version>.<lz-string payload>`. The fragment is never sent to servers, and it is stripped from Sentry events.
 - Optional query flag `?rm=1` (before the `#`) forces reduced motion: every animation is turned off, same as the OS "reduce motion" setting. Never remove or repurpose it.
 - Optional payload field `frame` (added T6.88): the webcam frame's `width` (160 to 1920, default 640), `height` (120 to 1080, default 360) and `label` (up to 40 characters, default none). Overlay route `/o/frame`. Links without it get the defaults.
