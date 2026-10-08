@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import lz from "lz-string";
 import { themeIds } from "../../src/themes/types";
 
-// Contrast as rendered (T6.139, the handoff's P0-2; docs/DESIGN.md "Contrast as rendered"). Token pairs miss what a
+// Contrast as rendered (T6.140, the handoff's P0-2; docs/DESIGN.md "Contrast as rendered"). Token pairs miss what a
 // viewer actually reads: text straight on a scene's ground, gradients, a look's CSS overrides, outlines drawn under the
 // letters. So each look's Starting Soon scene, filled in like the editor's samples, is screenshotted twice: as is, and
 // with every letter's fill made transparent (glows are off in both; icons keep their color). The pixels that
