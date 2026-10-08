@@ -532,3 +532,28 @@ test("with reduced motion the steps' line is drawn and every stop is filled", as
       .evaluate((el) => getComputedStyle(el, "::after").transform),
   ).toBe("none");
 });
+
+// T6.148: on wide windows with a mouse the page's scrollbar is a ruler (after getartcraft.com's): it replaces the
+// browser's scrollbar, follows the scroll, names the section, and moves the page on a click. Phones keep their own.
+test("wide windows scroll with the ruler; phones keep the browser's scrollbar", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const ruler = page.getByRole("scrollbar", { name: "Page position" });
+  await expect(ruler).toHaveAttribute("aria-valuenow", "0");
+  await expect(page.locator("html")).toHaveAttribute("data-ruler", "");
+  await page
+    .locator("#looks")
+    .evaluate((el) => scrollTo(0, el.getBoundingClientRect().top + scrollY + 200));
+  await expect(ruler.locator(".landing-ruler-section")).toHaveText("Looks");
+  expect(Number(await ruler.getAttribute("aria-valuenow"))).toBeGreaterThan(30);
+  const box = (await ruler.boundingBox())!;
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height - 2);
+  await expect(ruler).toHaveAttribute("aria-valuenow", "100");
+  expect((await scan(page)).violations).toEqual([]);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(ruler).toHaveCount(0);
+  await expect(page.locator("html")).not.toHaveAttribute("data-ruler");
+});

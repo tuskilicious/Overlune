@@ -381,6 +381,121 @@ function useSectionInView(ids: string[]) {
 
 const sections = ["kit", "looks", "how"];
 
+/** The ruler's sections (T6.148): the name it shows next to its marker. */
+const rulerSections: [id: string, name: string][] = [
+  ["kit", "Overlays"],
+  ["stage", "On stream"],
+  ["looks", "Looks"],
+  ["how", "How it works"],
+  ["works", "Where it works"],
+  ["know", "Good to know"],
+  ["start", "Get started"],
+];
+const rulerIds = rulerSections.map(([id]) => id);
+/** Wide windows with a mouse. Touch screens keep the browser's own scrollbar. */
+const rulerQuery = "(min-width: 1024px) and (hover: hover) and (pointer: fine)";
+/** One tick per 56px of page, a number every fifth. */
+const TICK = 56;
+
+/**
+ * The page's scrollbar on wide windows (T6.148, after getartcraft.com's ruler; no code from it): a strip on the right
+ * edge whose ticks are fixed to the page, so it scrolls past like a measuring tape, and a Signal Cyan marker that
+ * moves down it with the share read and the section's name. Click or drag on it to move through the page. It
+ * replaces the browser's scrollbar (html[data-ruler]); the keyboard and wheel scroll the page as always.
+ */
+function Ruler() {
+  const [wide, setWide] = useState(() => matchMedia(rulerQuery).matches);
+  useEffect(() => {
+    const mq = matchMedia(rulerQuery);
+    const change = () => setWide(mq.matches);
+    mq.addEventListener("change", change);
+    return () => mq.removeEventListener("change", change);
+  }, []);
+  return wide ? <RulerStrip /> : null;
+}
+
+function RulerStrip() {
+  const tape = useRef<HTMLDivElement>(null);
+  const mark = useRef<HTMLDivElement>(null);
+  const [pct, setPct] = useState(0);
+  const [height, setHeight] = useState(() => document.documentElement.scrollHeight);
+  const current = useSectionInView(rulerIds);
+  useEffect(() => {
+    const html = document.documentElement;
+    html.dataset.ruler = "";
+    let frame = 0;
+    const draw = () => {
+      frame = 0;
+      const max = html.scrollHeight - innerHeight;
+      const share = max > 0 ? Math.min(1, scrollY / max) : 0;
+      tape.current!.style.transform = `translateY(${-scrollY}px)`;
+      mark.current!.style.transform = `translateY(${16 + share * (innerHeight - 32)}px)`;
+      mark.current!.toggleAttribute("data-low", share < 0.5);
+      setPct(Math.round(share * 100));
+    };
+    const later = () => {
+      if (!frame) frame = requestAnimationFrame(draw);
+    };
+    // The page grows as previews build and images load.
+    const ro = new ResizeObserver(() => {
+      setHeight(html.scrollHeight);
+      later();
+    });
+    ro.observe(document.body);
+    draw();
+    addEventListener("scroll", later, { passive: true });
+    addEventListener("resize", later);
+    return () => {
+      delete html.dataset.ruler;
+      removeEventListener("scroll", later);
+      removeEventListener("resize", later);
+      ro.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+  const seek = (ev: PointerEvent<HTMLDivElement>) => {
+    const r = ev.currentTarget.getBoundingClientRect();
+    const share = Math.min(1, Math.max(0, (ev.clientY - r.top) / r.height));
+    scrollTo({
+      top: share * (document.documentElement.scrollHeight - innerHeight),
+      behavior: "instant",
+    });
+  };
+  return (
+    <div
+      role="scrollbar"
+      aria-controls="main"
+      aria-orientation="vertical"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={pct}
+      aria-label="Page position"
+      className="landing-ruler"
+      onPointerDown={(ev) => {
+        ev.currentTarget.setPointerCapture(ev.pointerId);
+        seek(ev);
+      }}
+      onPointerMove={(ev) => {
+        if (ev.currentTarget.hasPointerCapture(ev.pointerId)) seek(ev);
+      }}
+    >
+      <div ref={tape} aria-hidden className="landing-ruler-tape" style={{ height }}>
+        {Array.from({ length: Math.ceil(height / (TICK * 5)) }, (_, i) => (
+          <span key={i} style={{ top: i * TICK * 5 }}>
+            {i * 5}
+          </span>
+        ))}
+      </div>
+      <div ref={mark} aria-hidden className="landing-ruler-mark">
+        <span className="landing-ruler-pct">{pct}%</span>
+        <span className="landing-ruler-section">
+          {rulerSections.find(([id]) => id === current)?.[1] ?? "Overlune"}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 /** What works where, said plainly (T6.69): streamers couldn't tell which platforms are supported. */
 const goodToKnow = [
   [
@@ -1046,7 +1161,11 @@ export default function LandingPage() {
         </section>
 
         {/* Interest (T6.124): the whole kit over a game in one look, with the look switchable. */}
-        <section className="px-6 py-32 md:px-12 md:py-48" aria-labelledby="stage-heading">
+        <section
+          id="stage"
+          className="px-6 py-32 md:px-12 md:py-48"
+          aria-labelledby="stage-heading"
+        >
           <StreamStage />
         </section>
 
@@ -1159,7 +1278,7 @@ export default function LandingPage() {
         </section>
 
         {/* Good to know (T6.69). A heading beside a ruled list, not three equal cards. */}
-        <section className="px-6 pb-32 md:px-12 md:pb-48" aria-labelledby="know-heading">
+        <section id="know" className="px-6 pb-32 md:px-12 md:pb-48" aria-labelledby="know-heading">
           <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
             <h2
               id="know-heading"
@@ -1198,7 +1317,7 @@ export default function LandingPage() {
         </section>
 
         {/* Action. */}
-        <section className="px-3 pb-6 md:px-6" aria-labelledby="cta-heading">
+        <section id="start" className="px-3 pb-6 md:px-6" aria-labelledby="cta-heading">
           <div className="landing-cta mx-auto max-w-[90rem] px-6 pt-20 pb-24 text-center md:px-12 md:pt-28 md:pb-32">
             <h2
               id="cta-heading"
@@ -1229,6 +1348,7 @@ export default function LandingPage() {
         </section>
       </main>
       <SiteFooter />
+      <Ruler />
     </div>
   );
 }
