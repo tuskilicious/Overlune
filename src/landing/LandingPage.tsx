@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type PointerEvent,
   type ReactNode,
 } from "react";
 import { Link } from "react-router";
@@ -115,7 +116,7 @@ function Scene({ theme, live = false }: { theme: ThemeId; live?: boolean }) {
   );
 }
 
-type KitScene = "starting" | "brb" | "ending";
+type KitScene = "starting" | "brb" | "ending" | "offline";
 
 /** One alert card on its own, cropped to the card's height so long and short alerts both fit (T6.59). The card
  *  sits at its 1920x1080 canvas's top left (landing.css), and the crop follows it as the width or text changes. */
@@ -142,7 +143,7 @@ function AlertCard({ theme, alert }: { theme: ThemeId; alert: number }) {
   );
 }
 
-/** One scene of a look, live (TextScene for BRB and Stream Ending). */
+/** One scene of a look, live (TextScene for BRB, Stream Ending and Offline). */
 function SceneOf({ theme, scene }: { theme: ThemeId; scene: KitScene }) {
   const settings = sampleScene(theme);
   return scene === "starting" ? (
@@ -156,6 +157,7 @@ const sceneNames: Record<KitScene, string> = {
   starting: "Starting Soon",
   brb: "Be Right Back",
   ending: "Stream Ending",
+  offline: "Offline",
 };
 
 /** The hero frame's tour: a look and a scene each, so it shows the whole kit over time (T6.59). */
@@ -163,19 +165,19 @@ const tour: [ThemeId, KitScene][] = [
   ["vaporwave-sunset", "starting"],
   ["cozy-cafe", "brb"],
   ["neon-grid", "ending"],
-  ["pastel-cloud", "starting"],
-  ["forest-night", "brb"],
-  ["bold-esports", "ending"],
-  ["arcade-8bit", "starting"],
-  ["clean-slate", "brb"],
-  ["daylight", "ending"],
-  ["abyss", "starting"],
-  ["session", "brb"],
-  ["shonen", "ending"],
+  ["pastel-cloud", "offline"],
+  ["forest-night", "starting"],
+  ["bold-esports", "brb"],
+  ["arcade-8bit", "ending"],
+  ["clean-slate", "offline"],
+  ["daylight", "starting"],
+  ["abyss", "brb"],
+  ["session", "ending"],
+  ["shonen", "offline"],
   ["sakura", "starting"],
   ["skate-deck", "brb"],
   ["phosphor", "ending"],
-  ["quest", "starting"],
+  ["quest", "offline"],
 ];
 
 /** The hero picture: a live scene in a stream frame, two alerts in the same look, and the scene names. It tours
@@ -243,7 +245,8 @@ function HeroKit() {
   );
 }
 
-/** The five overlays, each a live thumbnail that opens its part of the editor (T6.59). */
+/** The seven overlays, each a live thumbnail that opens its part of the editor (T6.59): the four scenes, then the
+ *  three that sit over the game (T6.148). */
 const elements: { part: string; name: string; line: string; theme: ThemeId }[] = [
   {
     part: "starting",
@@ -262,6 +265,12 @@ const elements: { part: string; name: string; line: string; theme: ThemeId }[] =
     name: "Stream Ending",
     line: "Thanks, and where to find you.",
     theme: "neon-grid",
+  },
+  {
+    part: "offline",
+    name: "Offline",
+    line: "For when you're not live.",
+    theme: "daylight",
   },
   { part: "chat", name: "Chat", line: "Your Twitch chat in the same look.", theme: "cozy-cafe" },
   {
@@ -314,6 +323,42 @@ function ElementShot({ part, theme }: { part: string; theme: ThemeId }) {
   );
 }
 
+/** A card's live thumbnail with a magnifier that follows the mouse (T6.148, after 21st.dev's "Magnified Bento";
+ *  behavior only): a 2x copy of the overlay shows through a round lens, so small type and detail read. The copy is
+ *  built only while the pointer is over this card, and touch screens skip it. */
+function Magnified({ part, theme }: { part: string; theme: ThemeId }) {
+  const [on, setOn] = useState(false);
+  const aim = (ev: PointerEvent<HTMLDivElement>) => {
+    const r = ev.currentTarget.getBoundingClientRect();
+    ev.currentTarget.style.setProperty("--lx", `${ev.clientX - r.left}px`);
+    ev.currentTarget.style.setProperty("--ly", `${ev.clientY - r.top}px`);
+  };
+  return (
+    <div
+      className="landing-still relative aspect-video overflow-hidden rounded-xl bg-night"
+      onPointerEnter={(ev) => {
+        if (ev.pointerType === "touch") return;
+        aim(ev);
+        setOn(true);
+      }}
+      onPointerMove={aim}
+      onPointerLeave={() => setOn(false)}
+    >
+      <ElementShot part={part} theme={theme} />
+      {on && (
+        <>
+          <div aria-hidden className="landing-lens">
+            <div className="landing-lens-zoom">
+              <ElementShot part={part} theme={theme} />
+            </div>
+          </div>
+          <span aria-hidden className="landing-lens-ring" />
+        </>
+      )}
+    </div>
+  );
+}
+
 /** Which of the page's sections is in the middle of the window, for the nav (T6.59). */
 function useSectionInView(ids: string[]) {
   const [current, setCurrent] = useState<string | null>(null);
@@ -335,6 +380,121 @@ function useSectionInView(ids: string[]) {
 }
 
 const sections = ["kit", "looks", "how"];
+
+/** The ruler's sections (T6.148): the name it shows next to its marker. */
+const rulerSections: [id: string, name: string][] = [
+  ["kit", "Overlays"],
+  ["stage", "On stream"],
+  ["looks", "Looks"],
+  ["how", "How it works"],
+  ["works", "Where it works"],
+  ["know", "Good to know"],
+  ["start", "Get started"],
+];
+const rulerIds = rulerSections.map(([id]) => id);
+/** Wide windows with a mouse. Touch screens keep the browser's own scrollbar. */
+const rulerQuery = "(min-width: 1024px) and (hover: hover) and (pointer: fine)";
+/** One tick per 56px of page, a number every fifth. */
+const TICK = 56;
+
+/**
+ * The page's scrollbar on wide windows (T6.148, after getartcraft.com's ruler; no code from it): a strip on the right
+ * edge whose ticks are fixed to the page, so it scrolls past like a measuring tape, and a Signal Cyan marker that
+ * moves down it with the share read and the section's name. Click or drag on it to move through the page. It
+ * replaces the browser's scrollbar (html[data-ruler]); the keyboard and wheel scroll the page as always.
+ */
+function Ruler() {
+  const [wide, setWide] = useState(() => matchMedia(rulerQuery).matches);
+  useEffect(() => {
+    const mq = matchMedia(rulerQuery);
+    const change = () => setWide(mq.matches);
+    mq.addEventListener("change", change);
+    return () => mq.removeEventListener("change", change);
+  }, []);
+  return wide ? <RulerStrip /> : null;
+}
+
+function RulerStrip() {
+  const tape = useRef<HTMLDivElement>(null);
+  const mark = useRef<HTMLDivElement>(null);
+  const [pct, setPct] = useState(0);
+  const [height, setHeight] = useState(() => document.documentElement.scrollHeight);
+  const current = useSectionInView(rulerIds);
+  useEffect(() => {
+    const html = document.documentElement;
+    html.dataset.ruler = "";
+    let frame = 0;
+    const draw = () => {
+      frame = 0;
+      const max = html.scrollHeight - innerHeight;
+      const share = max > 0 ? Math.min(1, scrollY / max) : 0;
+      tape.current!.style.transform = `translateY(${-scrollY}px)`;
+      mark.current!.style.transform = `translateY(${16 + share * (innerHeight - 32)}px)`;
+      mark.current!.toggleAttribute("data-low", share < 0.5);
+      setPct(Math.round(share * 100));
+    };
+    const later = () => {
+      if (!frame) frame = requestAnimationFrame(draw);
+    };
+    // The page grows as previews build and images load.
+    const ro = new ResizeObserver(() => {
+      setHeight(html.scrollHeight);
+      later();
+    });
+    ro.observe(document.body);
+    draw();
+    addEventListener("scroll", later, { passive: true });
+    addEventListener("resize", later);
+    return () => {
+      delete html.dataset.ruler;
+      removeEventListener("scroll", later);
+      removeEventListener("resize", later);
+      ro.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+  const seek = (ev: PointerEvent<HTMLDivElement>) => {
+    const r = ev.currentTarget.getBoundingClientRect();
+    const share = Math.min(1, Math.max(0, (ev.clientY - r.top) / r.height));
+    scrollTo({
+      top: share * (document.documentElement.scrollHeight - innerHeight),
+      behavior: "instant",
+    });
+  };
+  return (
+    <div
+      role="scrollbar"
+      aria-controls="main"
+      aria-orientation="vertical"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={pct}
+      aria-label="Page position"
+      className="landing-ruler"
+      onPointerDown={(ev) => {
+        ev.currentTarget.setPointerCapture(ev.pointerId);
+        seek(ev);
+      }}
+      onPointerMove={(ev) => {
+        if (ev.currentTarget.hasPointerCapture(ev.pointerId)) seek(ev);
+      }}
+    >
+      <div ref={tape} aria-hidden className="landing-ruler-tape" style={{ height }}>
+        {Array.from({ length: Math.ceil(height / (TICK * 5)) }, (_, i) => (
+          <span key={i} style={{ top: i * TICK * 5 }}>
+            {i * 5}
+          </span>
+        ))}
+      </div>
+      <div ref={mark} aria-hidden className="landing-ruler-mark">
+        <span className="landing-ruler-pct">{pct}%</span>
+        <span className="landing-ruler-section">
+          {rulerSections.find(([id]) => id === current)?.[1] ?? "Overlune"}
+        </span>
+      </div>
+    </div>
+  );
+}
 
 /** What works where, said plainly (T6.69): streamers couldn't tell which platforms are supported. */
 const goodToKnow = [
@@ -959,22 +1119,23 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* The six overlays, each opening its part of the editor (T6.59), in two rows of three. */}
-        <section id="kit" className="px-6 pt-32 md:px-12 md:pt-48" aria-labelledby="kit-heading">
+        {/* The seven overlays, each opening its part of the editor (T6.59): the scenes in one row, the overlays that
+            sit over the game in a wider row under them (T6.148). */}
+        <section id="kit" className="px-6 pt-24 md:px-12 md:pt-32" aria-labelledby="kit-heading">
           <div className="mx-auto max-w-7xl">
             <h2
               id="kit-heading"
               data-reveal
               className="font-heading text-[clamp(2.25rem,4vw,3.5rem)] font-bold"
             >
-              Six overlays in every look
+              Seven overlays in every look
             </h2>
             <p className="mt-4 max-w-xl text-lg text-haze">Open any of them in the editor.</p>
-            {/* A row of tall cards, after the reference's services row (T6.124): the one under the pointer fills with
-                violet from where the pointer is. Sideways scroll when they don't fit. */}
+            {/* Tall cards, after the reference's services row (T6.124): the one under the pointer fills with violet from
+                where the pointer is. Two tiers on wide windows, a bento after the 21st.dev galleries (T6.148). */}
             <ul className="landing-cards mt-12">
               {elements.map((e) => (
-                <li key={e.part}>
+                <li key={e.part} data-part={e.part}>
                   <Link
                     to={`/editor?part=${e.part}`}
                     className="landing-card group"
@@ -987,9 +1148,7 @@ export default function LandingPage() {
                     <span aria-hidden className="landing-card-arrow">
                       <Icon name="arrow" />
                     </span>
-                    <div className="landing-still aspect-video overflow-hidden rounded-xl bg-night">
-                      <ElementShot part={e.part} theme={e.theme} />
-                    </div>
+                    <Magnified part={e.part} theme={e.theme} />
                     <div className="relative mt-auto pt-6">
                       <h3 className="font-heading text-2xl font-bold">{e.name}</h3>
                       <p className="mt-2 text-haze group-hover:text-moon">{e.line}</p>
@@ -1002,7 +1161,11 @@ export default function LandingPage() {
         </section>
 
         {/* Interest (T6.124): the whole kit over a game in one look, with the look switchable. */}
-        <section className="px-6 py-32 md:px-12 md:py-48" aria-labelledby="stage-heading">
+        <section
+          id="stage"
+          className="px-6 py-32 md:px-12 md:py-48"
+          aria-labelledby="stage-heading"
+        >
           <StreamStage />
         </section>
 
@@ -1016,8 +1179,8 @@ export default function LandingPage() {
           <LooksShowcase />
         </section>
 
-        {/* How it works: slices that widen on hover or focus. */}
-        <section id="how" className="px-6 py-32 md:px-12 md:py-48" aria-labelledby="how-heading">
+        {/* How it works: three numbered stops on a line that draws as the steps scroll in (T6.148). */}
+        <section id="how" className="px-6 py-24 md:px-12 md:py-32" aria-labelledby="how-heading">
           <div className="mx-auto max-w-7xl">
             <h2
               id="how-heading"
@@ -1026,20 +1189,15 @@ export default function LandingPage() {
             >
               Live in three steps
             </h2>
-            <ol className="mt-12 flex flex-col gap-4 md:flex-row">
+            {/* Numbered stops on one line, after 21st.dev's "How It Works Steps" (behavior only, T6.148). */}
+            <ol className="landing-steps mt-16">
               {steps.map(([title, text], i) => (
-                <li
-                  key={title}
-                  tabIndex={0}
-                  className="group flex flex-col gap-10 rounded-3xl border border-white/10 bg-deep p-8 transition-[flex-grow] duration-500 ease-out hover:grow-[2.5] focus:grow-[2.5] md:grow"
-                >
-                  <span aria-hidden className="font-heading text-6xl font-bold text-violet">
+                <li key={title} style={{ "--i": i } as CSSProperties}>
+                  <span aria-hidden className="landing-step-num">
                     {i + 1}
                   </span>
-                  <div>
-                    <h3 className="font-heading text-2xl font-bold">{title}</h3>
-                    <p className="mt-2 max-w-sm text-haze">{text}</p>
-                  </div>
+                  <h3 className="mt-6 font-heading text-2xl font-bold">{title}</h3>
+                  <p className="mt-2 max-w-xs text-haze md:mx-auto">{text}</p>
                 </li>
               ))}
             </ol>
@@ -1120,7 +1278,7 @@ export default function LandingPage() {
         </section>
 
         {/* Good to know (T6.69). A heading beside a ruled list, not three equal cards. */}
-        <section className="px-6 pb-32 md:px-12 md:pb-48" aria-labelledby="know-heading">
+        <section id="know" className="px-6 pb-32 md:px-12 md:pb-48" aria-labelledby="know-heading">
           <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
             <h2
               id="know-heading"
@@ -1159,7 +1317,7 @@ export default function LandingPage() {
         </section>
 
         {/* Action. */}
-        <section className="px-3 pb-6 md:px-6" aria-labelledby="cta-heading">
+        <section id="start" className="px-3 pb-6 md:px-6" aria-labelledby="cta-heading">
           <div className="landing-cta mx-auto max-w-[90rem] px-6 pt-20 pb-24 text-center md:px-12 md:pt-28 md:pb-32">
             <h2
               id="cta-heading"
@@ -1190,6 +1348,7 @@ export default function LandingPage() {
         </section>
       </main>
       <SiteFooter />
+      <Ruler />
     </div>
   );
 }
