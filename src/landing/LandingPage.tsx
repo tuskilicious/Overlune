@@ -364,7 +364,7 @@ const platforms = ["Twitch", "YouTube", "Kick and others"] as const;
 const support: { overlay: string; detail: string; on: [Support, Support, Support] }[] = [
   {
     overlay: "Scenes",
-    detail: "Starting Soon, Be Right Back, Stream Ending",
+    detail: "Starting Soon, Just Chatting, Be Right Back, Stream Ending, Offline",
     on: ["Yes", "Yes", "Yes"],
   },
   { overlay: "Chat", detail: "Your chat, in your look", on: ["Yes", "Not yet", "Not yet"] },
@@ -618,8 +618,8 @@ function LooksShowcase() {
           {themeIds.length} looks. Every scene matches.
         </h2>
         <p className="mt-6 max-w-md text-lg text-moon/85">
-          Pick one and your Starting Soon, Be Right Back and Stream Ending scenes, chat and alerts
-          all change together. Switch any time.
+          Pick one and all five scenes, from Starting Soon to Offline, plus chat and alerts, change
+          together. Switch any time.
         </p>
       </div>
       <div className="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]">
@@ -901,8 +901,8 @@ export default function LandingPage() {
                     ))}
                   </h1>
                   <p className="mt-8 max-w-xl text-xl leading-relaxed text-haze">
-                    Pick a look, add your text, and paste one link per overlay into OBS. Starting
-                    Soon, Be Right Back, Stream Ending, chat and alerts, all matching.
+                    Pick a look, add your text, and paste one link per overlay into OBS. Five
+                    scenes, from Starting Soon to Offline, plus chat and alerts, all matching.
                   </p>
                   <div className="mt-10 flex flex-wrap gap-4">
                     <Link

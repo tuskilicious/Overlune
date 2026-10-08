@@ -5,7 +5,7 @@ import { themeIds } from "../themes/types.ts";
 export const pages: Record<string, { title: string; description: string }> = {
   "/": {
     title: "Overlune: free stream overlays for OBS",
-    description: `Free stream overlays that look pro: ${themeIds.length} matching looks for Starting Soon, BRB and Ending scenes, chat and alerts. One link per overlay in OBS. No account, no payment.`,
+    description: `Free stream overlays that look pro: ${themeIds.length} matching looks for five scenes, chat and alerts. One link per overlay in OBS. No account, no payment.`,
   },
   "/editor": {
     title: "Make your overlays · Overlune",
