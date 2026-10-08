@@ -845,6 +845,13 @@
   text-transform: uppercase;
 }
 
+/* The last word in a deeper brick than the accent (T6.139): the accent #B23A2E is exactly 3.0:1 on the mustard, and
+   the print grain over both takes part of the word below 3:1 (tests/e2e/contrast.spec.ts). #A3332A is 3.5:1. The
+   accent stays as it is everywhere else. */
+.scene[data-theme="session"] .scene-title-end {
+  color: #a3332a;
+}
+
 .scene[data-theme="session"] .scene-title::before {
   width: 140px;
   height: 14px;
