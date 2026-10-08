@@ -158,6 +158,26 @@ test("each alert plays the theme sound, served from this site", async ({ page })
   expect(response.headers()["content-type"]).toMatch(/ogg/);
 });
 
+for (const theme of [
+  "daylight",
+  "abyss",
+  "session",
+  "shonen",
+  "sakura",
+  "skate-deck",
+  "phosphor",
+  "quest",
+])
+  test(`${theme} plays its own alert sound (T6.142)`, async ({ page }) => {
+    const twitch = await fakeTwitch(page);
+    await page.goto(link({ theme, chat: { channel: "dallas" } }));
+    const sound = page.waitForResponse(new RegExp(`/sounds/${theme}[.]ogg$`));
+    await twitch.send(raid("Raider", 3));
+    const response = await sound;
+    expect([200, 206]).toContain(response.status());
+    expect(response.headers()["content-type"]).toMatch(/ogg/);
+  });
+
 test("volume 0 plays no sound", async ({ page }) => {
   const requests: string[] = [];
   page.on("request", (r) => requests.push(r.url()));

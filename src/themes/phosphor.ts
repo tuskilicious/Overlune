@@ -20,6 +20,6 @@ export const phosphor: Theme = {
   enter: { id: "steps", durationMs: 450 },
   exit: { id: "slide-fade", durationMs: 200 },
   alertAnim: "steps",
-  alertSound: "neon-grid.ogg",
+  alertSound: "phosphor.ogg",
   badgeStyle: "pill",
 };

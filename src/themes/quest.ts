@@ -20,6 +20,6 @@ export const quest: Theme = {
   enter: { id: "slide-fade", durationMs: 800 },
   exit: { id: "slide-fade", durationMs: 350 },
   alertAnim: "slide-fade",
-  alertSound: "forest-night.ogg",
+  alertSound: "quest.ogg",
   badgeStyle: "pill",
 };

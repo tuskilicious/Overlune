@@ -20,6 +20,6 @@ export const sakura: Theme = {
   enter: { id: "slide-fade", durationMs: 800 },
   exit: { id: "slide-fade", durationMs: 350 },
   alertAnim: "slide-fade",
-  alertSound: "pastel-cloud.ogg",
+  alertSound: "sakura.ogg",
   badgeStyle: "pill",
 };

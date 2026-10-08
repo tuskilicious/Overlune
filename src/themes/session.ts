@@ -20,6 +20,6 @@ export const session: Theme = {
   enter: { id: "wipe", durationMs: 350 },
   exit: { id: "wipe", durationMs: 250 },
   alertAnim: "wipe",
-  alertSound: "cozy-cafe.ogg",
+  alertSound: "session.ogg",
   badgeStyle: "pill",
 };

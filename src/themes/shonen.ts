@@ -20,6 +20,6 @@ export const shonen: Theme = {
   enter: { id: "slide-fade", durationMs: 300 },
   exit: { id: "slide-fade", durationMs: 250 },
   alertAnim: "bounce", // an impact, like a panel landing
-  alertSound: "bold-esports.ogg",
+  alertSound: "shonen.ogg",
   badgeStyle: "pill",
 };
