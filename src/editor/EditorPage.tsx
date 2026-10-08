@@ -12,7 +12,9 @@ import { themeIds, type ThemeId } from "../themes/types";
 import { themeVars } from "../themes/vars";
 import ChatView from "../overlays/chat/ChatView";
 import { chatSamples } from "./chat-samples";
-import AlertTester from "./AlertTester";
+import AlertTester, { useTestAlerts } from "./AlertTester";
+import AlertView from "../overlays/alerts/AlertView";
+import { testAlerts } from "../alerts/events";
 import ChannelPage from "./ChannelPage";
 import ObsLinks, { overlays, type OverlayId as Scene } from "./ObsLinks";
 import Preview from "./Preview";
@@ -31,17 +33,28 @@ import Colors from "./sections/Colors";
 
 const browserTz = localZone();
 
+/** Smooth scrolling shows where things go (T6.103); reduced motion jumps straight there. */
+const scrollBehavior = (): ScrollBehavior =>
+  matchMedia("(prefers-reduced-motion: reduce)").matches || "rm" in document.documentElement.dataset
+    ? "auto"
+    : "smooth";
+
 /** Scrolls to a section and moves focus there. No real #fragment jump: the address bar's fragment holds the settings. */
 const jumpTo = (e: MouseEvent, id: string) => {
   e.preventDefault();
   const target = document.getElementById(id);
-  // A smooth scroll shows where the section is (T6.103); reduced motion jumps straight there.
-  const still =
-    matchMedia("(prefers-reduced-motion: reduce)").matches ||
-    "rm" in document.documentElement.dataset;
-  target?.scrollIntoView({ behavior: still ? "auto" : "smooth" });
+  target?.scrollIntoView({ behavior: scrollBehavior() });
   target?.focus({ preventScroll: true });
 };
+
+/** Which ends of the looks filmstrip have more looks past them, for its faded edges and Previous/Next. */
+const moreIn = (el: HTMLElement) =>
+  [el.scrollLeft > 1 && "start", el.scrollLeft + el.clientWidth < el.scrollWidth - 1 && "end"]
+    .filter(Boolean)
+    .join(" ");
+
+/** One card and its gap: 150px + 12px (editor.css). */
+const stripStep = 162;
 
 /** The editor's three steps (T6.18), in the steps bar and as section headings. */
 const steps = [
@@ -50,20 +63,46 @@ const steps = [
   ["obs-links", "3. Links to paste into OBS"],
 ] as const;
 
+/** A step's heading. Wide windows drop the number (editor.css): step 1 is the filmstrip there, not a heading in the
+ *  form (T6.135). */
+const stepHeading = (name: string) => {
+  const [num, ...rest] = name.split(" ");
+  return (
+    <>
+      <span className="editor-step-num">{num} </span>
+      {rest.join(" ")}
+    </>
+  );
+};
+
 /** Wide windows (T6.60): the section list on the left. Each jumps to its place in the settings column. */
 const sections = [
-  ["step-look", "Look"],
-  ["part-scenes", "Text"],
-  ["part-socials", "Socials"],
-  ["part-chat", "Chat"],
-  ["part-alerts", "Alerts"],
-  ["part-frame", "Webcam frame"],
-  ["part-channel", "Channel page"],
-  ["part-logo", "Logo"],
-  ["part-motion", "Motion"],
-  ["part-colors", "Colors"],
-  ["obs-links", "Links"],
+  ["step-look", "Look", "look"],
+  ["part-scenes", "Text", "text"],
+  ["part-socials", "Socials", "socials"],
+  ["part-chat", "Chat", "chat"],
+  ["part-alerts", "Alerts", "alerts"],
+  ["part-frame", "Webcam frame", "frame"],
+  ["part-channel", "Channel page", "channel"],
+  ["part-logo", "Logo", "logo"],
+  ["part-motion", "Motion", "motion"],
+  ["part-colors", "Colors", "colors"],
+  ["obs-links", "Links", "links"],
 ] as const;
+
+/** The section list folded to icons (T6.135) is a per-browser convenience, kept outside the link. Storage can be
+ *  blocked (private windows), so every call is wrapped. */
+const railKey = "overlune:rail-collapsed";
+const readRail = () => {
+  try {
+    return localStorage.getItem(railKey) === "1";
+  } catch {
+    return false;
+  }
+};
+
+/** The order Test alert plays the samples in (T6.135). */
+const alertOrder = testAlerts.map((a) => a.kind);
 
 /** How much moves in the overlays (T6.119). */
 const motionLevels = [
@@ -91,6 +130,47 @@ type Mood = keyof typeof moods | "All";
 const sectionPreview: Partial<Record<string, string>> = {
   "part-chat": ".editor-chat-preview",
   "part-alerts": ".editor-alert-tester",
+};
+
+/** Click-to-select (T6.135, the Studio board): the scene preview's parts, their names and the section each jumps to. */
+const pickParts = [
+  [".scene-logo", "Logo", "part-logo"],
+  [".scene-title", "Title", "part-scenes"],
+  [".scene-subtitle", "Subtitle", "part-scenes"],
+  [".countdown", "Countdown", "part-scenes"],
+  [".scene-socials", "Socials", "part-socials"],
+  [".scene-ticker", "Ticker", "part-socials"],
+  [".alert-box", "Alert", "part-alerts"],
+] as const;
+
+type Picked = {
+  name: string;
+  id: string;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
+/** The smallest part under the pointer, placed relative to the preview. */
+const partAt = (wrap: HTMLElement, x: number, y: number): Picked | null => {
+  const box = wrap.getBoundingClientRect();
+  let best: Picked | null = null;
+  for (const [selector, name, id] of pickParts)
+    for (const el of wrap.querySelectorAll(selector)) {
+      const r = el.getBoundingClientRect();
+      const inside = x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+      if (inside && (!best || r.width * r.height < best.width * best.height))
+        best = {
+          name,
+          id,
+          left: r.left - box.left,
+          top: r.top - box.top,
+          width: r.width,
+          height: r.height,
+        };
+    }
+  return best;
 };
 
 const loadedMessage = (ok: boolean) =>
@@ -132,6 +212,134 @@ const ThemeShot = ({ id }: { id: ThemeId }) => (
   </span>
 );
 
+/** Wide windows show the filmstrip, narrower ones the grid (editor.css, 1200px). */
+const wide = () => matchMedia("(min-width: 1200px)").matches;
+/** The id of a look's radio in the picker on screen. */
+const lookRadio = (id: ThemeId) => `${wide() ? "strip" : "theme"}-${id}`;
+
+/** The look picker (T6.135): the filmstrip under the preview on wide windows, a card grid as step 1 in the form on
+ *  narrower ones. Both are always rendered and editor.css hides one with display: none, so screen readers and Tab
+ *  only ever meet one. The filter state is shared. */
+function LookPicker({
+  variant,
+  theme,
+  pick,
+  mood,
+  setMood,
+}: {
+  variant: "strip" | "grid";
+  theme: ThemeId;
+  pick: (id: ThemeId) => void;
+  mood: Mood;
+  setMood: (m: Mood) => void;
+}) {
+  const strip = variant === "strip";
+  const scroller = useRef<HTMLDivElement>(null);
+  const [more, setMore] = useState("");
+  useEffect(() => {
+    const el = scroller.current;
+    if (!el) return;
+    const update = () => setMore(moreIn(el));
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [mood]);
+  const pills = (
+    <div className="editor-pills" role="group" aria-label="Show looks">
+      {(["All", "Calm", "Retro", "Bold"] as const).map((m) => (
+        <button key={m} type="button" aria-pressed={mood === m} onClick={() => setMood(m)}>
+          {m}
+        </button>
+      ))}
+    </div>
+  );
+  const looks = themeIds.map((id) => {
+    const radio = (
+      <input
+        type="radio"
+        id={`${strip ? "strip" : "theme"}-${id}`}
+        name={strip ? "strip-look" : "theme"}
+        value={id}
+        checked={theme === id}
+        onChange={() => pick(id)}
+      />
+    );
+    return (
+      <label
+        key={id}
+        className={strip ? "editor-strip-look" : "editor-card"}
+        hidden={mood !== "All" && !(moods[mood] as readonly ThemeId[]).includes(id)}
+      >
+        {strip && radio}
+        <ThemeShot id={id} />
+        {strip ? (
+          <span>{themes[id].name}</span>
+        ) : (
+          <span className="editor-card-name">
+            {radio}
+            {themes[id].name}
+          </span>
+        )}
+      </label>
+    );
+  });
+  if (!strip)
+    return (
+      <fieldset aria-labelledby="step-look">
+        {pills}
+        <div className="editor-themes">{looks}</div>
+      </fieldset>
+    );
+  // The filmstrip (the Studio board): real Starting Soon scenes, held still, as one radio group (one tab stop, arrow
+  // keys move).
+  return (
+    <section className="editor-strip" aria-labelledby="strip-heading">
+      <div className="editor-strip-bar">
+        <h2 id="strip-heading">Looks</h2>
+        {pills}
+        <p className="editor-hint">Pick one and every scene restyles.</p>
+        <div className="editor-strip-nav">
+          {(
+            [
+              ["Previous looks", "back", "start", -1],
+              ["Next looks", "next", "end", 1],
+            ] as const
+          ).map(([label, icon, side, dir]) => (
+            <button
+              key={side}
+              type="button"
+              aria-label={label}
+              aria-controls="strip-scroller"
+              aria-disabled={!more.includes(side) || undefined}
+              onClick={() =>
+                scroller.current?.scrollBy({ left: dir * stripStep, behavior: scrollBehavior() })
+              }
+            >
+              <Icon name={icon} />
+            </button>
+          ))}
+        </div>
+      </div>
+      {/* Focusable so the arrow keys scroll it, with the bar hidden (axe: scrollable-region-focusable). */}
+      <div
+        id="strip-scroller"
+        ref={scroller}
+        className="editor-strip-scroller"
+        role="region"
+        aria-label="Looks, scrolls sideways"
+        tabIndex={0}
+        data-more={more || undefined}
+        onScroll={(e) => setMore(moreIn(e.currentTarget))}
+      >
+        <div className="editor-strip-track" role="radiogroup" aria-labelledby="strip-heading">
+          {looks}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /** Where the editor starts: a link in the address wins, then this browser's autosave, then defaults. */
 function initialState(): { settings: Settings; status: string } {
   const fromUrl = decodeLink(location.hash);
@@ -165,6 +373,7 @@ export default function EditorPage() {
   const [loadStatus, setLoadStatus] = useState(initial.status);
   const [confirmReset, setConfirmReset] = useState(false);
   const [mood, setMood] = useState<Mood>("All");
+  const [railCollapsed, setRailCollapsed] = useState(readRail);
   /** The editor shows instead of the welcome gallery (T6.16). Decided once, so setting everything back to the
    *  defaults never swaps the editor out from under the streamer. Picking Clean Slate changes no setting. */
   const [started, setStarted] = useState(
@@ -178,8 +387,10 @@ export default function EditorPage() {
     save(settings);
   }, [settings]);
 
-  /** Undo (T6.115): earlier settings, newest last. A burst of edits (typing a title) is one step. */
+  /** Undo (T6.115) and Redo (T6.135): earlier and undone settings, newest last. A burst of edits (typing a title) is
+   *  one step; any new edit clears Redo, as in every editor. */
   const [past, setPast] = useState<Settings[]>([]);
+  const [future, setFuture] = useState<Settings[]>([]);
   const shown = useRef(settings);
   const lastEdit = useRef(0);
   const undoing = useRef(false);
@@ -196,36 +407,56 @@ export default function EditorPage() {
     const now = Date.now();
     // ponytail: 50 steps of whole snapshots; settings are a few kB, so diffs aren't worth it
     if (now - lastEdit.current > 1000) setPast((p) => [...p.slice(-49), before]);
+    setFuture([]);
     lastEdit.current = now;
   }, [settings]);
+  /** Shows a snapshot from Undo or Redo, with the boxes that keep their own text. */
+  const restore = (to: Settings) => {
+    undoing.current = true;
+    lastEdit.current = 0; // the next edit is its own step
+    setSettings(to);
+    setLogoInput(to.logo);
+    setBotsInput(to.chat.bots.join("\n"));
+  };
   const undo = useCallback(() => {
     const before = past.at(-1);
     if (!before) return;
-    undoing.current = true;
     setPast(past.slice(0, -1));
-    setSettings(before);
-    setLogoInput(before.logo);
-    setBotsInput(before.chat.bots.join("\n"));
+    setFuture((f) => [...f, settings]);
+    restore(before);
     setLoadStatus("Undone.");
-  }, [past]);
-  // Ctrl+Z / Cmd+Z outside text fields; inside one, the browser's own undo works on the text.
+  }, [past, settings]);
+  const redo = useCallback(() => {
+    const next = future.at(-1);
+    if (!next) return;
+    setFuture(future.slice(0, -1));
+    setPast((p) => [...p.slice(-49), settings]);
+    restore(next);
+    setLoadStatus("Redone.");
+  }, [future, settings]);
+  // Ctrl+Z / Cmd+Z undoes, and Ctrl+Shift+Z / Cmd+Shift+Z or Ctrl+Y redoes, outside text fields; inside one, the
+  // browser's own undo and redo work on the text.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (!(e.ctrlKey || e.metaKey) || e.shiftKey || e.altKey || e.key.toLowerCase() !== "z")
-        return;
+      if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+      const key = e.key.toLowerCase();
+      const isRedo = (key === "z" && e.shiftKey) || (key === "y" && !e.shiftKey);
+      const isUndo = key === "z" && !e.shiftKey;
+      if (!isRedo && !isUndo) return;
       const t = e.target;
       const typing =
         t instanceof HTMLTextAreaElement ||
         (t instanceof HTMLElement && t.isContentEditable) ||
         (t instanceof HTMLInputElement &&
           !["checkbox", "radio", "range", "color", "button", "submit"].includes(t.type));
-      if (typing || !past.length) return;
+      if (typing || (isUndo ? !past.length : !future.length)) return;
       e.preventDefault();
-      undo();
+      if (isUndo) undo();
+      else redo();
     };
     addEventListener("keydown", onKey);
     return () => removeEventListener("keydown", onKey);
-  }, [undo, past.length]);
+  }, [undo, redo, past.length, future.length]);
 
   const startOver = () => {
     const fresh = freshSettings();
@@ -327,6 +558,17 @@ export default function EditorPage() {
     side.scrollTo({ top: el ? el.offsetTop - 4 : 0 });
   }, [welcome, currentSection]);
   const section: SectionProps = { settings, setSettings, update, fresh, resetButton };
+  /** Test alert by the scene preview (T6.135): each press plays the next sample, through the same queue as the ?test=1
+   *  link and the alert preview's buttons. */
+  const { alert: testAlert, play: playAlert } = useTestAlerts(settings);
+  const nextAlert = useRef(0);
+  const [picked, setPicked] = useState<Picked | null>(null);
+  const picker = {
+    theme: settings.theme,
+    pick: (id: ThemeId) => update({ theme: id }),
+    mood,
+    setMood,
+  };
 
   return (
     <div className="editor" style={themeVars(brandChrome)}>
@@ -378,6 +620,13 @@ export default function EditorPage() {
         </div>
         {/* The buttons stay put; each opens its own panel underneath, one at a time, and Escape closes it (T6.58). */}
         <div className="editor-save-actions">
+          {/* The address bar is rewritten on every change (above), so this is always true once something is made. */}
+          {madeSomething && (
+            <span className="editor-saved">
+              <Icon name="check" />
+              Saved in your link
+            </span>
+          )}
           {/* The editor link is the save file; this keeps it somewhere other than the browser (T6.70). */}
           {madeSomething && (
             <button
@@ -412,6 +661,11 @@ export default function EditorPage() {
           {past.length > 0 && (
             <button type="button" onClick={undo} aria-keyshortcuts="Control+Z">
               Undo
+            </button>
+          )}
+          {future.length > 0 && (
+            <button type="button" onClick={redo} aria-keyshortcuts="Control+Shift+Z Control+Y">
+              Redo
             </button>
           )}
           {madeSomething && (
@@ -502,7 +756,7 @@ export default function EditorPage() {
                     setStarted(true);
                     // Open at the top with the preview in view; focus still lands on the picked look (T6.29).
                     requestAnimationFrame(() => {
-                      document.getElementById(`theme-${id}`)?.focus({ preventScroll: true });
+                      document.getElementById(lookRadio(id))?.focus({ preventScroll: true });
                       if (!part) scrollTo(0, 0); // ?part= scrolls to its own place
                     });
                   }}
@@ -531,23 +785,35 @@ export default function EditorPage() {
               ))}
             </ol>
           </nav>
-          <div className="editor-body">
+          <div className="editor-body" data-rail={railCollapsed ? "collapsed" : undefined}>
             {/* Wide windows only (editor.css); narrower ones use the steps bar above. */}
-            <nav className="editor-rail" aria-label="Sections">
-              <ol>
-                {sections.map(([id, name]) => (
+            <nav
+              className="editor-rail"
+              aria-label="Sections"
+              data-collapsed={railCollapsed || undefined}
+            >
+              <ol id="editor-rail-list">
+                {sections.map(([id, name, icon]) => (
                   <li key={id}>
                     <a
                       href={`#${id}`}
+                      title={railCollapsed ? name : undefined}
                       aria-current={currentSection === id ? "location" : undefined}
                       onClick={(e) => {
                         const colors = document.getElementById("part-colors");
                         if (id === "part-colors" && colors instanceof HTMLDetailsElement)
                           colors.open = true;
-                        jumpTo(e, id);
+                        // Look: back to the top, where it's the current section, and onto the filmstrip's
+                        // checked look (T6.135).
+                        if (id !== "step-look") return jumpTo(e, id);
+                        e.preventDefault();
+                        scrollTo({ top: 0, behavior: scrollBehavior() });
+                        focusSoon(lookRadio(settings.theme));
                       }}
                     >
-                      {name}
+                      <Icon name={icon} />
+                      {/* Folded, the name stays for screen readers (and as a tooltip) but not on screen. */}
+                      <span className="editor-rail-name">{name}</span>
                       {/* What's already filled in, at a glance, as the kits' docks show their status (T6.118). */}
                       {filled[id] && (
                         <span className="editor-rail-set">
@@ -559,50 +825,46 @@ export default function EditorPage() {
                   </li>
                 ))}
               </ol>
+              {/* Folds the list to icons, as on the Studio board (T6.135). */}
+              <button
+                type="button"
+                className="editor-rail-toggle"
+                aria-expanded={!railCollapsed}
+                aria-controls="editor-rail-list"
+                aria-label={railCollapsed ? "Expand menu" : undefined}
+                title={railCollapsed ? "Expand menu" : undefined}
+                onClick={() => {
+                  const next = !railCollapsed;
+                  setRailCollapsed(next);
+                  try {
+                    localStorage.setItem(railKey, next ? "1" : "0");
+                  } catch {
+                    // Remembering it is a convenience; the menu still folds.
+                  }
+                }}
+              >
+                <Icon name={railCollapsed ? "open" : "collapse"} />
+                <span className="editor-rail-name">Collapse menu</span>
+              </button>
             </nav>
             <form className="editor-form" onSubmit={(e) => e.preventDefault()}>
-              <h2 id="step-look" className="editor-step" tabIndex={-1}>
-                {steps[0][1]}
-              </h2>
-              <fieldset aria-labelledby="step-look">
-                <div className="editor-pills" role="group" aria-label="Show looks">
-                  {(["All", "Calm", "Retro", "Bold"] as const).map((m) => (
-                    <button
-                      key={m}
-                      type="button"
-                      aria-pressed={mood === m}
-                      onClick={() => setMood(m)}
-                    >
-                      {m}
-                    </button>
-                  ))}
-                </div>
-                <div className="editor-themes">
-                  {themeIds.map((id) => (
-                    <label
-                      key={id}
-                      className="editor-card"
-                      hidden={mood !== "All" && !(moods[mood] as readonly ThemeId[]).includes(id)}
-                    >
-                      <ThemeShot id={id} />
-                      <span className="editor-card-name">
-                        <input
-                          type="radio"
-                          id={`theme-${id}`}
-                          name="theme"
-                          value={id}
-                          checked={settings.theme === id}
-                          onChange={() => update({ theme: id })}
-                        />
-                        {themes[id].name}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
+              {/* Wide windows: the column starts with the look's name; Change look goes to the filmstrip (T6.135). */}
+              <p className="editor-current-look">
+                Look: <strong>{themes[settings.theme].name}</strong>
+                <button type="button" onClick={() => focusSoon(lookRadio(settings.theme))}>
+                  Change look
+                </button>
+              </p>
+              {/* Narrower windows: the same picker as a card grid, as step 1 (editor.css shows exactly one). */}
+              <div className="editor-look-step">
+                <h2 id="step-look" className="editor-step" tabIndex={-1}>
+                  {stepHeading(steps[0][1])}
+                </h2>
+                <LookPicker variant="grid" {...picker} />
+              </div>
 
               <h2 id="step-details" className="editor-step" tabIndex={-1}>
-                {steps[1][1]}
+                {stepHeading(steps[1][1])}
               </h2>
               <SceneText {...section} scene={scene} setScene={setScene} />
               <Socials {...section} />
@@ -669,16 +931,63 @@ export default function EditorPage() {
                   {previewOpen ? "Hide preview" : "Show preview"}
                 </button>
                 <div id="scene-preview-body" className="editor-scene-preview-body">
-                  <h2>Preview: {overlays[scene].name}</h2>
-                  <Preview>
-                    {scene === "starting" ? (
-                      <StartingSoon settings={settings} />
-                    ) : (
-                      <TextScene scene={scene} settings={settings} />
+                  {/* The preview's bar (T6.135, the Studio board): its name, the canvas size and Test alert, which
+                      plays the next sample alert over the scene, as on stream. */}
+                  <div className="editor-preview-bar">
+                    <h2>Preview: {overlays[scene].name}</h2>
+                    <span className="editor-chip-static">1920 × 1080</span>
+                    <button
+                      type="button"
+                      className="editor-test-alert"
+                      onClick={() => {
+                        const kind = alertOrder[nextAlert.current % alertOrder.length]!;
+                        nextAlert.current += 1;
+                        playAlert(kind);
+                      }}
+                    >
+                      Test alert
+                    </button>
+                  </div>
+                  {/* Click a part to jump to its settings; hover outlines it and names it (T6.135, the Studio board).
+                      A mouse shortcut only: the section list and the form already reach every setting by keyboard. */}
+                  <div
+                    className="editor-pick"
+                    data-hover={picked ? "" : undefined}
+                    onPointerMove={(e) => setPicked(partAt(e.currentTarget, e.clientX, e.clientY))}
+                    onPointerLeave={() => setPicked(null)}
+                    onClick={(e) => {
+                      const part = partAt(e.currentTarget, e.clientX, e.clientY);
+                      if (part) jumpTo(e, part.id);
+                    }}
+                  >
+                    <Preview>
+                      {scene === "starting" ? (
+                        <StartingSoon settings={settings} />
+                      ) : (
+                        <TextScene scene={scene} settings={settings} />
+                      )}
+                      <AlertView settings={settings} alert={testAlert} />
+                    </Preview>
+                    {picked && (
+                      <div
+                        className="editor-pick-box"
+                        data-below={picked.top < 28 || undefined}
+                        style={{
+                          left: picked.left,
+                          top: picked.top,
+                          width: picked.width,
+                          height: picked.height,
+                        }}
+                        aria-hidden
+                      >
+                        <span>{picked.name}</span>
+                      </div>
                     )}
-                  </Preview>
+                  </div>
                 </div>
               </section>
+              {/* Wide windows: the look picker is the filmstrip under the preview (T6.135). */}
+              <LookPicker variant="strip" {...picker} />
               <section
                 className="editor-preview-wrap editor-chat-preview"
                 aria-label="Chat preview"
@@ -693,7 +1002,7 @@ export default function EditorPage() {
               </section>
               <AlertTester settings={settings} />
             </div>
-            <ObsLinks settings={settings} heading={steps[2][1]} />
+            <ObsLinks settings={settings} heading={stepHeading(steps[2][1])} />
           </div>
         </>
       )}

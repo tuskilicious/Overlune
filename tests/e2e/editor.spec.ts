@@ -151,7 +151,7 @@ test("the whole editor works from the keyboard", async ({ page }) => {
 
   await page.locator("#advanced-summary").focus();
   await page.keyboard.press("Enter");
-  await expect(page.getByLabel("Titles")).toBeVisible();
+  await expect(page.locator("#color-primary")).toBeVisible();
 });
 
 test("focus stays in place when the button you pressed goes away", async ({ page }) => {
@@ -160,11 +160,11 @@ test("focus stays in place when the button you pressed goes away", async ({ page
   await expect(page.getByRole("button", { name: "Add a social" })).toBeFocused();
 
   await page.getByText("Advanced: colors and fonts").click();
-  await page.getByLabel("Titles").fill("#ff0000");
+  await page.locator("#color-primary").fill("#ff0000");
   await page.getByRole("button", { name: "Reset Titles to the theme" }).press("Enter");
-  await expect(page.getByLabel("Titles")).toBeFocused();
+  await expect(page.locator("#color-primary")).toBeFocused();
 
-  await page.getByLabel("Titles").fill("#ff0000");
+  await page.locator("#color-primary").fill("#ff0000");
   await page.getByRole("button", { name: "Reset all to the theme" }).press("Enter");
   await expect(page.locator("#advanced-summary")).toBeFocused();
 
@@ -264,7 +264,8 @@ test.describe("first visit (T6.16, T6.17)", () => {
     await page.getByRole("button", { name: "Vaporwave Sunset" }).click();
     await expect(page.getByRole("radio", { name: "Vaporwave Sunset" })).toBeFocused();
     await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
-    await expect(page.getByRole("heading", { name: "1. Pick a look" })).toBeInViewport();
+    // Wide windows start the form with the look's name; the picker is the filmstrip (T6.135).
+    await expect(page.locator(".editor-current-look")).toBeInViewport();
   });
 
   test("look pictures show sample content, which never reaches the streamer's scene (T6.47)", async ({
@@ -426,7 +427,8 @@ test("the scene preview stays in view while the form scrolls (T6.30)", async ({ 
 });
 
 test("all 8 looks fit on a laptop screen without scrolling (T6.31)", async ({ page }) => {
-  await page.setViewportSize({ width: 1366, height: 768 });
+  // Below 1200px the form's grid is the picker; wider windows use the filmstrip (T6.135).
+  await page.setViewportSize({ width: 1100, height: 768 });
   await page.evaluate(() => scrollTo(0, 0));
   for (const name of ["Clean Slate", "Vaporwave Sunset"])
     await expect(page.locator(".editor-themes .editor-card", { hasText: name })).toBeInViewport({
@@ -447,6 +449,7 @@ test("the steps bar marks the step on screen (T6.32)", async ({ page }) => {
 });
 
 test("the look picker shows each theme as a picture you can click", async ({ page }) => {
+  await page.setViewportSize({ width: 1100, height: 768 }); // the grid; wider windows use the filmstrip
   await page
     .locator(".editor-themes .editor-card", { hasText: "Vaporwave Sunset" })
     .locator(".editor-shot")
@@ -550,6 +553,38 @@ test("Ctrl+Z outside a text field undoes a look change (T6.115)", async ({ page 
   await neon.press("Control+z");
   await expect(preview(page).locator(".scene")).not.toHaveAttribute("data-theme", "neon-grid");
   await expect(neon).not.toBeChecked();
+});
+
+test("Redo puts back what Undo took, and a new change clears it (T6.135)", async ({ page }) => {
+  const undo = page.getByRole("button", { name: "Undo", exact: true });
+  const redo = page.getByRole("button", { name: "Redo", exact: true });
+  await expect(redo).toHaveCount(0); // nothing to redo yet
+  await expect(page.getByText("Saved in your link")).toHaveCount(0);
+
+  const neon = page.getByRole("radio", { name: "Neon Grid" });
+  await neon.check();
+  await expect(page.getByText("Saved in your link")).toBeVisible();
+  await undo.click();
+  await expect(neon).not.toBeChecked();
+  await redo.click();
+  await expect(neon).toBeChecked();
+  await expect(page.getByText("Redone.")).toBeVisible();
+  await expect(redo).toHaveCount(0);
+
+  // The keys, outside a text field: Ctrl+Z, then Ctrl+Shift+Z and Ctrl+Y.
+  await neon.press("Control+z");
+  await expect(neon).not.toBeChecked();
+  await page.getByRole("radio", { name: "Clean Slate" }).press("Control+Shift+z");
+  await expect(neon).toBeChecked();
+  await neon.press("Control+z");
+  await neon.press("Control+y");
+  await expect(neon).toBeChecked();
+
+  // A new change after Undo clears Redo.
+  await neon.press("Control+z");
+  await expect(redo).toBeVisible();
+  await page.getByLabel("Title", { exact: true }).fill("Going live");
+  await expect(redo).toHaveCount(0);
 });
 
 test("editor redesign: nudges, frame sizes and what's filled in (T6.118)", async ({ page }) => {
@@ -862,7 +897,7 @@ test("Advanced starts closed, and overrides reach the preview and the OBS link",
   context,
 }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  const titleColor = page.getByLabel("Titles");
+  const titleColor = page.locator("#color-primary");
   await expect(titleColor).toBeHidden();
   await page.getByText("Advanced: colors and fonts").click();
   await expect(titleColor).toHaveValue("#e8eaed");
@@ -885,16 +920,16 @@ test("Advanced starts closed, and overrides reach the preview and the OBS link",
 test("hard-to-read colors show a warning, and reset brings the theme back", async ({ page }) => {
   await page.getByText("Advanced: colors and fonts").click();
   const warning = page.getByRole("status").filter({ hasText: "hard to read" });
-  await page.getByLabel("Text", { exact: true }).fill("#20232a");
+  await page.locator("#color-text").fill("#20232a");
   await expect(warning).toBeVisible();
 
   await page.getByRole("button", { name: "Reset Text to the theme" }).click();
   await expect(warning).toHaveCount(0);
-  await expect(page.getByLabel("Text", { exact: true })).toHaveValue("#e8eaed");
+  await expect(page.locator("#color-text")).toHaveValue("#e8eaed");
 
-  await page.getByLabel("Titles").fill("#00ff00");
+  await page.locator("#color-primary").fill("#00ff00");
   await page.getByRole("button", { name: "Reset all to the theme" }).click();
-  await expect(page.getByLabel("Titles")).toHaveValue("#e8eaed");
+  await expect(page.locator("#color-primary")).toHaveValue("#e8eaed");
   await expect(page.getByRole("button", { name: /^Reset (?!all).* to the theme$/ })).toHaveCount(0);
 });
 
@@ -1017,7 +1052,7 @@ test.describe("alert test buttons", () => {
 test("every preview is scaled to fit its box", async ({ page }) => {
   await page.getByRole("button", { name: "Test raid" }).click();
   for (const sel of [".scene", ".chat", ".alerts"]) {
-    const el = page.locator(`.editor-preview > ${sel}`).first();
+    const el = page.locator(`.editor-preview > ${sel}:visible`).first();
     const box = await el.boundingBox();
     const frame = await el.locator("..").boundingBox();
     expect(box!.width).toBeLessThanOrEqual(frame!.width + 1);
@@ -1221,7 +1256,7 @@ test.describe("three-column shell on wide windows (T6.60)", () => {
     );
     await expect(page.locator(".editor-chat-preview")).toBeInViewport();
     await list.getByRole("link", { name: "Colors" }).click();
-    await expect(page.getByLabel("Titles")).toBeVisible(); // the closed Advanced section opens
+    await expect(page.locator("#color-primary")).toBeVisible(); // the closed Advanced section opens
     await list.getByRole("link", { name: "Links" }).click();
     await expect(page.locator("#obs-links")).toBeFocused();
     await expect(page).toHaveURL(/\/editor#1\./); // jumping never replaces the settings in the address
@@ -1265,7 +1300,8 @@ test.describe("three-column shell on wide windows (T6.60)", () => {
 test("look filters show only that group, with the names under each card (T6.60)", async ({
   page,
 }) => {
-  const filters = page.getByRole("group", { name: "Show looks" });
+  await page.setViewportSize({ width: 1100, height: 768 }); // the grid; wider windows use the filmstrip
+  const filters = page.getByRole("group", { name: "Show looks", exact: true });
   await filters.getByRole("button", { name: "Retro" }).click();
   await expect(filters.getByRole("button", { name: "Retro" })).toHaveAttribute(
     "aria-pressed",
@@ -1283,7 +1319,7 @@ test("look filters show only that group, with the names under each card (T6.60)"
 
 test("colors show their hex value and the volume shows its number (T6.60)", async ({ page }) => {
   await page.getByText("Advanced: colors and fonts").click();
-  await page.getByLabel("Titles").fill("#ff0000");
+  await page.locator("#color-primary").fill("#ff0000");
   await expect(
     page.locator(".editor-color", { hasText: "Titles" }).locator(".editor-hex"),
   ).toHaveText("#FF0000");
@@ -1533,4 +1569,265 @@ test("channel page pictures download at Twitch's sizes (T6.91)", async ({ page }
     height: 1080,
   });
   await expect(part.getByRole("status")).toHaveText("Saved. Check your downloads.");
+});
+
+test("segmented controls, switches and the slider work from the keyboard (T6.135)", async ({
+  page,
+}) => {
+  // Segmented: native radios, so the arrow keys move the choice, and the highlight follows it.
+  const motion = page.getByRole("radiogroup", { name: "How much moves" });
+  await motion.getByRole("radio", { name: "Full" }).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(motion.getByRole("radio", { name: "Lite" })).toBeChecked();
+  const slot = () => motion.evaluate((el) => getComputedStyle(el).getPropertyValue("--i").trim());
+  expect(await slot()).toBe("1");
+  await page.keyboard.press("ArrowRight");
+  await expect(motion.getByRole("radio", { name: "Still" })).toBeChecked();
+  expect(await slot()).toBe("2");
+
+  // Switch: still a checkbox, so Space toggles it.
+  const commands = page.getByLabel("Hide chat commands (messages starting with !)");
+  await expect(commands).toBeChecked();
+  await commands.focus();
+  await page.keyboard.press("Space");
+  await expect(commands).not.toBeChecked();
+
+  // Slider: the arrow keys move it, and the fill follows the value.
+  const volume = page.getByLabel("Alert volume");
+  await volume.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(volume).toHaveValue("75");
+  await expect(volume).toHaveAttribute("style", /--pct: 75%/);
+});
+
+test("colors pick from the look's own swatches, and the last swatch is your own (T6.135)", async ({
+  page,
+}) => {
+  await page.getByText("Advanced: colors and fonts").click();
+  const titles = page.getByRole("group", { name: "Titles" });
+  const highlights = titles.getByRole("button", { name: "Titles: the look's highlights color" });
+  await expect(titles.getByRole("button", { name: /^Titles: the look's titles/ })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+
+  // A swatch sets the color, by keyboard too, and shows a ring and aria-pressed.
+  await highlights.focus();
+  await page.keyboard.press("Enter");
+  await expect(highlights).toHaveAttribute("aria-pressed", "true");
+  await expect(previewTitle(page, "Starting soon")).toHaveCSS("color", "rgb(79, 140, 255)");
+  await expect(page.getByRole("button", { name: "Reset Titles to the theme" })).toBeVisible();
+
+  // The look's own color clears the override instead of storing a copy.
+  await titles.getByRole("button", { name: /^Titles: the look's titles/ }).click();
+  await expect(page.getByRole("button", { name: "Reset Titles to the theme" })).toHaveCount(0);
+
+  // Your own color is the native picker; picked, its swatch takes the ring.
+  await page.locator("#color-primary").fill("#ffd400");
+  await expect(titles.locator(".editor-swatch-own")).toHaveAttribute("data-picked");
+  await expect(titles.getByRole("button", { pressed: true })).toHaveCount(0);
+});
+
+test("quick rows are chips, and a picked frame size is pressed (T6.135)", async ({ page }) => {
+  const sizes = page.getByRole("group", { name: "Common camera sizes" });
+  await sizes.getByRole("button", { name: "800 × 450" }).click();
+  await expect(sizes.getByRole("button", { name: "800 × 450" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(sizes.getByRole("button", { pressed: true })).toHaveCount(1);
+});
+
+test("disclosures open by height, and closed content never takes focus (T6.135)", async ({
+  page,
+}) => {
+  const more = page.locator("#part-chat details.editor-more");
+  const body = more.locator(".editor-disclosure");
+  const summary = more.getByText("More chat options");
+  const badges = page.getByLabel("Show badges (Mod, Sub, VIP) before names");
+
+  // Closed: Tab from the summary skips the hidden content.
+  await summary.focus();
+  await page.keyboard.press("Tab");
+  await expect(badges).not.toBeFocused();
+  await expect(body).toHaveCSS("visibility", "hidden");
+
+  // Open: it grows to its full height (220ms) and the content takes focus.
+  await expect(body).toHaveCSS("transition-duration", "0.22s, 0.22s");
+  await summary.click();
+  await expect(body).toHaveCSS("visibility", "visible");
+  await summary.focus();
+  await page.keyboard.press("Tab");
+  await expect(badges).toBeFocused();
+
+  // Reduced motion: it opens and closes at once.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(body).toHaveCSS("transition-duration", "0s");
+});
+
+test("Test alert by the scene preview plays the samples over the scene, in turn (T6.135)", async ({
+  page,
+}) => {
+  await page.clock.install();
+  const bar = page.locator(".editor-scene-preview .editor-preview-bar");
+  await expect(bar.getByText("1920 × 1080")).toBeVisible();
+  const box = page.locator(".editor-scene-preview .alert-box");
+  await expect(box).toHaveCount(0);
+  await bar.getByRole("button", { name: "Test alert" }).press("Enter");
+  await expect(box).toContainText("FriendlyRaider");
+  await bar.getByRole("button", { name: "Test alert" }).click(); // the next one waits its turn
+  await page.clock.runFor(6000); // 5 s on screen, then the half-second gap
+  await expect(box).toContainText("NewSubscriber");
+});
+
+test("the section list folds to icons, keeps its names for screen readers, and remembers it (T6.135)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const rail = page.getByRole("navigation", { name: "Sections" });
+  const toggle = rail.getByRole("button", { name: "Collapse menu" });
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await toggle.press("Enter");
+  const expand = rail.getByRole("button", { name: "Expand menu" });
+  await expect(expand).toHaveAttribute("aria-expanded", "false");
+  // Folded: the names leave the screen but the links keep them.
+  await expect(rail.getByRole("link", { name: "Webcam frame" })).toBeVisible();
+  await expect(rail.locator(".editor-rail-name").first()).toHaveCSS("position", "absolute");
+  const axe = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .include(".editor-rail")
+    .analyze();
+  expect(axe.violations).toEqual([]);
+  // A folded menu stays folded in this browser. (A change first, so the reload reopens the editor, not the gallery.)
+  await page.getByLabel("Title", { exact: true }).fill("Going live");
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Expand menu" })).toBeVisible();
+  await page.getByRole("button", { name: "Expand menu" }).click();
+  await expect(page.getByRole("button", { name: "Collapse menu" })).toBeVisible();
+});
+
+test("the looks filmstrip under the preview picks a look with the arrow keys (T6.135)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const strip = page.getByRole("radiogroup", { name: "Looks" });
+  const current = strip.getByRole("radio", { checked: true });
+  await expect(current).toHaveCount(1);
+  const first = await current.getAttribute("value");
+  await current.focus();
+  await page.keyboard.press("ArrowRight");
+  const next = await strip.getByRole("radio", { checked: true }).getAttribute("value");
+  expect(next).not.toBe(first);
+  // The form's picker and the preview follow.
+  await expect(page.locator(`#theme-${next}`)).toBeChecked();
+  await expect(preview(page).locator(".scene")).toHaveAttribute("data-theme", next!);
+
+  // Its chips filter the strip like the form's.
+  await page
+    .getByRole("group", { name: "Show looks" })
+    .getByRole("button", { name: "Retro" })
+    .click();
+  await expect(strip.locator("label:not([hidden])")).toHaveCount(4);
+  await expect(strip.getByRole("radio", { name: "Phosphor" })).toBeVisible();
+
+  // Narrow windows dock the preview; the form's grid is enough there.
+  await page.setViewportSize({ width: 800, height: 900 });
+  await expect(page.locator(".editor-strip")).toBeHidden();
+});
+
+test("clicking a part of the scene preview jumps to its settings (T6.135)", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const title = page.locator(".editor-pick .scene-title");
+  const box = (await title.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page.locator(".editor-pick-box")).toHaveText("Title");
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page.locator("#part-scenes")).toBeFocused();
+  // Off the parts, nothing is outlined.
+  await page.mouse.move(0, 0);
+  await expect(page.locator(".editor-pick-box")).toHaveCount(0);
+});
+
+test("the filmstrip scrolls by Previous, Next and the arrow keys, with its bar hidden (T6.135)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  // The page is dark while the editor is open, so the window's scrollbar matches.
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)).toBe(
+    "dark",
+  );
+  const scroller = page.getByRole("region", { name: "Looks, scrolls sideways" });
+  const left = () => scroller.evaluate((el) => el.scrollLeft);
+  await expect(scroller).toHaveAttribute("data-more", "end");
+  await expect(page.getByRole("button", { name: "Previous looks" })).toHaveAttribute(
+    "aria-disabled",
+    "true",
+  );
+  await page.getByRole("button", { name: "Next looks" }).click();
+  await expect.poll(left).toBeGreaterThan(100);
+  await expect(scroller).toHaveAttribute("data-more", "start end");
+  await page.getByRole("button", { name: "Previous looks" }).click();
+  await expect.poll(left).toBe(0);
+  // Keyboard: the strip itself takes focus, and the arrow keys scroll it.
+  await scroller.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(left).toBeGreaterThan(0);
+});
+
+test("exactly one look picker shows at every width (T6.135)", async ({ page }) => {
+  for (const width of [1920, 1280, 1100, 800, 600]) {
+    await page.setViewportSize({ width, height: 900 });
+    // One Clean Slate radio and one set of filters in the accessibility tree, wherever the picker is.
+    await expect(page.getByRole("radio", { name: "Clean Slate" }), `${width}px`).toHaveCount(1);
+    await expect(page.getByRole("group", { name: "Show looks" }), `${width}px`).toHaveCount(1);
+    const strip = page.locator(".editor-strip");
+    const grid = page.locator(".editor-look-step");
+    if (width >= 1200) {
+      await expect(strip).toBeVisible();
+      await expect(grid).toBeHidden();
+    } else {
+      await expect(strip).toBeHidden();
+      await expect(grid).toBeVisible();
+    }
+  }
+});
+
+test("on wide windows the form names the look, and Change look and the menu's Look go to the filmstrip (T6.135)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const line = page.locator(".editor-current-look");
+  await expect(line).toContainText("Look: Clean Slate");
+  await page.getByRole("radio", { name: "Neon Grid" }).check();
+  await expect(line).toContainText("Look: Neon Grid");
+  await page.getByRole("button", { name: "Change look" }).click();
+  await expect(page.locator("#strip-neon-grid")).toBeFocused();
+
+  await page
+    .getByRole("navigation", { name: "Sections" })
+    .getByRole("link", { name: "Socials" })
+    .click();
+  await page
+    .getByRole("navigation", { name: "Sections" })
+    .getByRole("link", { name: "Look" })
+    .click();
+  await expect(page.locator("#strip-neon-grid")).toBeFocused();
+  await expect(
+    page.getByRole("navigation", { name: "Sections" }).getByRole("link", { name: "Look" }),
+  ).toHaveAttribute("aria-current", "location");
+});
+
+test("wide windows drop the step numbers, since step 1 is the filmstrip there (T6.135)", async ({
+  page,
+}) => {
+  // What's on screen (innerText), not textContent, which keeps the hidden number.
+  const shown = (id: string) => () =>
+    page.locator(id).evaluate((el) => (el as HTMLElement).innerText);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect.poll(shown("#step-details")).toBe("Add your details");
+  await expect.poll(shown("#links-heading")).toBe("Links to paste into OBS");
+  await page.setViewportSize({ width: 1100, height: 900 });
+  await expect.poll(shown("#step-details")).toBe("2. Add your details");
+  await expect.poll(shown("#links-heading")).toBe("3. Links to paste into OBS");
 });

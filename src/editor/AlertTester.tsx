@@ -20,8 +20,9 @@ const buttons: [AlertKind, string][] = [
 /** Unix seconds 15 minutes from now. */
 const testLinkExpiry = () => Math.floor(Date.now() / 1000) + 15 * 60;
 
-/** "Preview: Alerts": test buttons play sample alerts through the real queue, sound included. */
-export default function AlertTester({ settings }: { settings: Settings }) {
+/** Sample alerts (the ones the ?test=1 link plays) through the real queue, sound included, for as long as each will
+ *  show on stream (T6.75). Shared by the alert preview's test buttons and the scene preview's Test alert (T6.135). */
+export function useTestAlerts(settings: Settings) {
   const [alert, setAlert] = useState<AlertEvent | null>(null);
   const queue = useRef<ReturnType<typeof createAlertQueue> | null>(null);
   // The latest sound settings, read when an alert starts.
@@ -45,6 +46,14 @@ export default function AlertTester({ settings }: { settings: Settings }) {
     queue.current = q;
     return () => q.stop();
   }, [seconds]);
+
+  const play = (kind: AlertKind) => queue.current?.push(testAlerts.find((a) => a.kind === kind)!);
+  return { alert, play };
+}
+
+/** "Preview: Alerts": test buttons play sample alerts through the real queue, sound included. */
+export default function AlertTester({ settings }: { settings: Settings }) {
+  const { alert, play } = useTestAlerts(settings);
 
   // The test link stops playing samples 15 minutes after it's copied (docs/STACK.md). Restamped every minute,
   // so it has about 15 minutes left however it's copied.
@@ -83,11 +92,7 @@ export default function AlertTester({ settings }: { settings: Settings }) {
       </p>
       <div className="editor-test-buttons">
         {buttons.map(([kind, label]) => (
-          <button
-            key={kind}
-            type="button"
-            onClick={() => queue.current?.push(testAlerts.find((a) => a.kind === kind)!)}
-          >
+          <button key={kind} type="button" onClick={() => play(kind)}>
             {label}
           </button>
         ))}
