@@ -88,7 +88,7 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 
 ## 7. Network and hardening
 - Force HTTPS everywhere and redirect HTTP to HTTPS. Cloudflare Pages does this.
-- Security headers live in `public/_headers`: HSTS, `Content-Security-Policy`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` and `frame-ancestors 'self'`. The CSP must allow only what is needed: Twitch IRC WebSocket, the Twitch emote CDN, Sentry and `https:` images for logos.
+- Security headers live in `public/_headers`: HSTS, `Content-Security-Policy`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` and `frame-ancestors 'self'`. The CSP must allow only what is needed: Twitch IRC WebSocket, the Twitch emote CDN, Sentry, Cloudflare Web Analytics and `https:` images for logos.
 - Disable directory listing. Ship no debug routes or sample pages.
 - Logs: v1 has no server logs. Sentry must use `sendDefaultPii: false` and strip URL fragments, which hold user settings. Never send tokens or full URLs.
 - Scan dependencies in CI (`npm audit` plus Dependabot). Pin versions and review new packages before adding them.
@@ -107,7 +107,7 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 
 - **Documents:** privacy policy and terms of service, in `docs/legal/` and linked in the footer. No refund policy is needed while the product is free. The footer shows a contact email. An individual maintainer does not publish a home address.
 - **Privacy policy must state:** no accounts; settings live in the user's link and browser; Twitch chat is read anonymously; what Sentry collects; any analytics.
-- **Consent:** no cookie banner as long as there are no non-essential cookies or trackers. Adding analytics needs approval and must be cookie-free.
+- **Consent:** no cookie banner as long as there are no non-essential cookies or trackers. Adding analytics needs approval and must be cookie-free. Approved (2026-10-08): Cloudflare Web Analytics, injected by Cloudflare Pages; cookie-free, and it never sends the part of a link after `#`.
 - **Fair practice:** no dark patterns and no unsupported claims. License all fonts, sounds and images, and record them in `docs/ASSETS.md`.
 - **Accessibility:** editor meets WCAG AA contrast, has full keyboard navigation with visible focus, and has meaningful alt text. Overlays support reduced motion.
 

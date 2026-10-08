@@ -2,13 +2,13 @@
 
 > **Self-written, not legal advice.** Overlune is a free, non-commercial hobby project. This document was written by the maintainer, has not been reviewed by a lawyer, and does not guarantee compliance with any law.
 
-_Last updated: 2026-10-03_
+_Last updated: 2026-10-08_
 
 Overlune is a free, open-source stream overlay maker at overlune.in. This page describes, in plain language, what the app actually does with data.
 
 ## The short version
 - **No accounts.** You never sign up or log in.
-- **No analytics, no ads, no cookies.**
+- **Cookie-free visit counts, no ads, no cookies.** Cloudflare Web Analytics counts page visits and load times without cookies (details below).
 - **Your settings live in your link and your browser**, not on our servers. We don't have servers that store data.
 - **Error reporting is on.** Error reports and a small sample of performance data go to Sentry, with your settings and console output removed (details below).
 
@@ -37,6 +37,16 @@ Error reporting is **on** in the live site. It uses Sentry (Functional Software,
 
 The app removes the part of every address after `#` and never sends console output. It is built not to send chat messages, and it does not turn on Sentry's collection of personal data (such as IP addresses or cookies). Sentry still sees your IP address when the report arrives, as any web server does, but our Sentry project is set to not store it. Sentry's privacy policy: https://sentry.io/privacy/
 
+## Visit counts (Cloudflare Web Analytics)
+We use Cloudflare Web Analytics, run by our host, to see how many people visit and how fast pages load. It loads a small script from Cloudflare on every page, including the overlays in your streaming software. It does not use cookies or your browser's storage, and Cloudflare says it does not follow visitors across websites. For each page load it sends Cloudflare:
+
+- the page address, **without** the part after `#` (so your settings are not included);
+- the page you came from, if your browser shares it;
+- how long the page took to load and how it performed;
+- your browser and device type, and the country Cloudflare works out from the connection.
+
+We see these only as totals, never per person. Cloudflare's privacy policy: https://www.cloudflare.com/privacypolicy/
+
 ## Hosting (Cloudflare)
 The site is hosted on Cloudflare Pages. Like any web host, Cloudflare processes basic request data (such as IP address and browser type) to deliver the site and protect it from attacks. Cloudflare's privacy policy: https://www.cloudflare.com/privacypolicy/
 
@@ -44,7 +54,7 @@ The site is hosted on Cloudflare Pages. Like any web host, Cloudflare processes 
 The "Support Overlune" link goes to GitHub Sponsors. Supporting is optional and unlocks nothing: every part of Overlune is free for everyone. Overlune never sees or handles payments. If you sponsor, GitHub processes it under its own privacy statement: https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement
 
 ## Cookies
-Overlune sets no cookies and uses no trackers, so there is no cookie banner.
+Overlune sets no cookies and uses no trackers. Its visit counts (above) are cookie-free too, so there is no cookie banner.
 
 ## Children
 Overlune is not directed at children under 13. It never asks for personal information from anyone.
