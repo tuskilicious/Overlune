@@ -257,6 +257,7 @@ Each look has its own scene composition (T6.134, plan and sketches in `docs/LAYO
 ## Editor and site UI
 The editor, setup guide, privacy and terms pages share one quiet, high-contrast chrome in Overlune's brand (`docs/BRAND.md`), so the colorful theme previews stay the loudest thing on the page. Tokens live in `src/editor/brand.ts` and reach CSS as variables on `.editor` (`themeVars`). "Must" rules are hard requirements; "should" rules are defaults.
 
+- **Just Chatting and Offline (T6.147):** Offline uses each look's full layout, like Stream Ending. Just Chatting keeps only the look's backdrop and puts the title, subtitle and socials on a tag card in the top-left safe area (at most 760px wide), in the look's panel tokens (text, muted and accent on `surface`, which the contrast tests cover), with its own class names so no layout rule restyles it. The rest of the screen is left for the camera and chat sources on top. The OBS scene file's Just Chatting scene puts the webcam frame and chat where the Live scene does.
 ### Tokens and foundations
 | Token (CSS var) | Value | Use | Contrast |
 |---|---|---|---|
