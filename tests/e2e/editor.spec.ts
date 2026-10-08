@@ -1817,3 +1817,17 @@ test("on wide windows the form names the look, and Change look and the menu's Lo
     page.getByRole("navigation", { name: "Sections" }).getByRole("link", { name: "Look" }),
   ).toHaveAttribute("aria-current", "location");
 });
+
+test("wide windows drop the step numbers, since step 1 is the filmstrip there (T6.135)", async ({
+  page,
+}) => {
+  // What's on screen (innerText), not textContent, which keeps the hidden number.
+  const shown = (id: string) => () =>
+    page.locator(id).evaluate((el) => (el as HTMLElement).innerText);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect.poll(shown("#step-details")).toBe("Add your details");
+  await expect.poll(shown("#links-heading")).toBe("Links to paste into OBS");
+  await page.setViewportSize({ width: 1100, height: 900 });
+  await expect.poll(shown("#step-details")).toBe("2. Add your details");
+  await expect.poll(shown("#links-heading")).toBe("3. Links to paste into OBS");
+});

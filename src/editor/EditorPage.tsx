@@ -63,6 +63,18 @@ const steps = [
   ["obs-links", "3. Links to paste into OBS"],
 ] as const;
 
+/** A step's heading. Wide windows drop the number (editor.css): step 1 is the filmstrip there, not a heading in the
+ *  form (T6.135). */
+const stepHeading = (name: string) => {
+  const [num, ...rest] = name.split(" ");
+  return (
+    <>
+      <span className="editor-step-num">{num} </span>
+      {rest.join(" ")}
+    </>
+  );
+};
+
 /** Wide windows (T6.60): the section list on the left. Each jumps to its place in the settings column. */
 const sections = [
   ["step-look", "Look", "look"],
@@ -846,13 +858,13 @@ export default function EditorPage() {
               {/* Narrower windows: the same picker as a card grid, as step 1 (editor.css shows exactly one). */}
               <div className="editor-look-step">
                 <h2 id="step-look" className="editor-step" tabIndex={-1}>
-                  {steps[0][1]}
+                  {stepHeading(steps[0][1])}
                 </h2>
                 <LookPicker variant="grid" {...picker} />
               </div>
 
               <h2 id="step-details" className="editor-step" tabIndex={-1}>
-                {steps[1][1]}
+                {stepHeading(steps[1][1])}
               </h2>
               <SceneText {...section} scene={scene} setScene={setScene} />
               <Socials {...section} />
@@ -990,7 +1002,7 @@ export default function EditorPage() {
               </section>
               <AlertTester settings={settings} />
             </div>
-            <ObsLinks settings={settings} heading={steps[2][1]} />
+            <ObsLinks settings={settings} heading={stepHeading(steps[2][1])} />
           </div>
         </>
       )}

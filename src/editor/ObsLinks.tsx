@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router";
 import { framePosition, type Settings } from "../settings/schema";
 import { encode } from "../settings/url";
@@ -114,7 +114,13 @@ function downloadCollection(settings: Settings) {
 }
 
 /** "Link to paste into OBS" for each overlay. Every link carries all settings. */
-export default function ObsLinks({ settings, heading }: { settings: Settings; heading: string }) {
+export default function ObsLinks({
+  settings,
+  heading,
+}: {
+  settings: Settings;
+  heading: ReactNode;
+}) {
   const hash = encode(settings);
   // Every overlay that gets a link: the scenes, chat (sized in the editor), alerts and the webcam frame (T6.88).
   const links: LinkInfo[] = [

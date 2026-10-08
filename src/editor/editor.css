@@ -1941,7 +1941,8 @@
 }
 
 @media (min-width: 1200px) {
-  .editor-look-step {
+  .editor-look-step,
+  .editor-step-num {
     display: none;
   }
 
