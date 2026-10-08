@@ -12,7 +12,7 @@ New Twitch streamers, 0 to 6 months in and usually not yet Affiliate, on OBS Stu
 Their viewers are the second audience of every overlay: people watching on Twitch, often at 720p on a phone, who glance at a scene for a few seconds.
 
 ## Product Purpose
-Overlune (overlune.pages.dev) gets a new streamer from zero to a stream that looks professionally designed, with no account and no payment. A streamer picks one look, personalizes it, and pastes one link per overlay into OBS. Success is a matching, working stream: scenes, chat and alerts that look like a paid pack and keep working without the streamer touching the links again.
+Overlune (overlune.in) gets a new streamer from zero to a stream that looks professionally designed, with no account and no payment. A streamer picks one look, personalizes it, and pastes one link per overlay into OBS. Success is a matching, working stream: scenes, chat and alerts that look like a paid pack and keep working without the streamer touching the links again.
 
 ## Positioning
 Free, open-source and account-free, with taste and cohesion as the edge: one choice restyles every surface (Starting Soon, BRB, Stream Ending, chat, alerts, webcam frame, Twitch panels and offline banner), so the stream reads as one brand. Setup is written for beginners. Built live on stream by a streamer who uses it.

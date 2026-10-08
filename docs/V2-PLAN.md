@@ -4,7 +4,7 @@ Status: **proposal**. Nothing here is approved yet. Once the owner signs off, th
 
 ## What the owner asked for (2026-10-01)
 - Keep this repo and stack, and add a backend.
-- Serve the site from **overlune.in** (owned; it currently redirects to overlune.pages.dev).
+- Serve the site from **overlune.in** (owned; it then redirected to overlune.pages.dev). *Done: overlune.in is production, and overlune.pages.dev still serves the same site, so old links keep working.*
 - **Full customization:** drag-and-drop layout, uploads (images, logos, backgrounds, sounds), any color and font, and themes built from a blank canvas.
 - **Community:** theme gallery, creator profiles, a help forum / Q&A, and a Discord link.
 - **Accounts:** Twitch login.
