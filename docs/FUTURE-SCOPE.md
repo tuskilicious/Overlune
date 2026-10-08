@@ -5,7 +5,7 @@ Realistic goals after v1.0.0 (2026-10-03). These are goals, not promises: nothin
 Sizes are rough, for one maintainer working with Claude: **S** a day or two, **M** about a week, **L** several weeks.
 
 ## Where v1 stands
-- Live at overlune.in (v1.2.0): three scenes, Twitch chat, Twitch alerts, a webcam frame, a socials ticker, 16 looks, Twitch panels and an offline banner, an OBS scene collection file, an editor and a setup guide. No accounts, no backend.
+- Live at overlune.in (v1.3.0): three scenes, Twitch chat, Twitch alerts, a webcam frame, a socials ticker, 16 looks, Twitch panels and an offline banner, an OBS scene collection file, an editor and a setup guide. No accounts, no backend.
 - Five streamers have used it and sent 38 points of feedback (T6.6). Most were fixed in v1 (T6.68 to T6.79). The rest are below.
 - The PRD's gate for v2 ("5 real streamers using v1") is met (T5.7, T6.6).
 - Funding: GitHub Sponsors is live. Overlune stays free; support unlocks nothing.

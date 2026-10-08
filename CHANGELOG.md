@@ -2,6 +2,34 @@
 
 What changed in each Overlune release. Overlay links from every release keep working: the link format only ever gains optional settings.
 
+## 1.3.0 (2026-10-08)
+
+Every look gets its own layout, and the editor gets a studio layout that's quicker to use. Every earlier link keeps working and picks up the new designs on its own: there is nothing to re-paste.
+
+### New
+- **A layout for every look:** each of the 16 looks now arranges its scenes in its own way, from Clean Slate's shelf and Arcade's high-score screen to Shonen's manga page and Quest's quest log. Vaporwave Sunset now moves: the grid floor scrolls, the sun's stripes slide and the palms sway.
+- **Looks filmstrip:** on wide windows, every look sits in a strip under the preview. Pick one and every scene restyles. Previous and Next buttons, or the arrow keys, scroll it.
+- **Click a part of the preview** (the title, the countdown, your socials) to jump to its settings. Hovering shows what each part is.
+- **Test alert** beside the preview plays the next sample alert over your scene, with its sound.
+- **Redo**, next to Undo (Ctrl+Shift+Z or Ctrl+Y), and a "Saved in your link" status.
+- **Fold the section menu** to icons to give the preview more room. Overlune remembers it in this browser.
+
+### Editor
+- New controls: switches, sliding choices, a volume slider, quick-pick chips, and color swatches from your look's own palette, with your own color as the last swatch.
+- One look picker at a time: the filmstrip on wide windows, the card grid on narrower ones.
+- Smoother motion in the editor: the filmstrip's looks glide when you filter them, the menu's names fade as it folds, and the preview's highlight glides from part to part. All of it stops with Still motion or reduced motion.
+- Thin scrollbars in the brand colors.
+
+### Looks and overlays
+- Clean Slate's alert: its lines now follow the card in, one after another.
+- Session's last title word is a slightly deeper brick, so it reads clearly on the mustard.
+
+### Fixed
+- Shared links to overlune.in said "9 matching looks". They now show the real number.
+- The link-preview picture and the banners showed the old address. They now say overlune.in.
+- The editor's webcam frame preview only showed a corner of the frame once you had placed it.
+- Visitors who ask their device for reduced motion no longer download the animation code at all.
+
 ## 1.2.0 (2026-10-07)
 
 Seven new looks, bolder overlays and an editor that's quicker to use. Every 1.0 and 1.1 link keeps working and picks up the new designs on its own: there is nothing to re-paste.
