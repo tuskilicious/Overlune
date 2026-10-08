@@ -60,8 +60,9 @@ export default function SceneText({
                 value={id}
                 checked={scene === id}
                 onChange={() => setScene(id)}
+                aria-label={overlays[id].name}
               />
-              {overlays[id].name}
+              {overlays[id].short}
             </label>
           ))}
         </div>

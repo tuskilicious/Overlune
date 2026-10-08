@@ -25,8 +25,10 @@ export function sceneCollection(
   const { chat, frame } = settings;
   const browsers = [
     { name: "Starting Soon", route: "starting", width: 1920, height: 1080 },
+    { name: "Just Chatting", route: "chatting", width: 1920, height: 1080 },
     { name: "Be Right Back", route: "brb", width: 1920, height: 1080 },
     { name: "Stream Ending", route: "ending", width: 1920, height: 1080 },
+    { name: "Offline", route: "offline", width: 1920, height: 1080 },
     { name: "Chat", route: "chat", width: chat.width, height: chat.height },
     framePosition(frame)
       ? { name: "Webcam frame", route: "frame", width: 1920, height: 1080 }
@@ -93,8 +95,18 @@ export function sceneCollection(
       { source: "Chat", x: 1920 - chat.width - MARGIN, y: 1080 - chat.height - MARGIN },
       full("Alerts"),
     ]),
+    // The look's backdrop with the frame and chat on it; the streamer adds their camera under the frame (T6.147).
+    scene("Just Chatting", [
+      full("Just Chatting"),
+      framePosition(frame)
+        ? full("Webcam frame")
+        : { source: "Webcam frame", x: MARGIN, y: 1080 - frame.height - MARGIN },
+      { source: "Chat", x: 1920 - chat.width - MARGIN, y: 1080 - chat.height - MARGIN },
+      full("Alerts"),
+    ]),
     scene("Be Right Back", [full("Be Right Back"), full("Alerts")]),
     scene("Stream Ending", [full("Stream Ending"), full("Alerts")]),
+    scene("Offline", [full("Offline")]),
   ];
 
   return {

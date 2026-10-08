@@ -403,7 +403,9 @@ export default function EditorPage() {
   /** A landing-page card can open one part of the editor: /editor?part=brb (T6.59). Read once. */
   const [part] = useState(() => new URLSearchParams(location.search).get("part"));
   const [scene, setScene] = useState<Scene>(
-    part === "brb" || part === "ending" ? part : "starting",
+    part === "chatting" || part === "brb" || part === "ending" || part === "offline"
+      ? part
+      : "starting",
   );
   /** Narrow windows only: whether the docked preview is expanded. */
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -867,8 +869,8 @@ export default function EditorPage() {
         <section className="editor-welcome" aria-labelledby="welcome-heading">
           <h2 id="welcome-heading">Pick a look to start</h2>
           <p>
-            Each look comes with matching Starting Soon, Be Right Back and Stream Ending screens,
-            chat and alerts. You can switch any time.
+            Each look comes with five matching scenes (Starting Soon, Just Chatting, Be Right Back,
+            Stream Ending and Offline), chat and alerts. You can switch any time.
           </p>
           <ul className="editor-welcome-looks">
             {themeIds.map((id) => (
