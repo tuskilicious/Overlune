@@ -200,6 +200,134 @@ const ThemeShot = ({ id }: { id: ThemeId }) => (
   </span>
 );
 
+/** Wide windows show the filmstrip, narrower ones the grid (editor.css, 1200px). */
+const wide = () => matchMedia("(min-width: 1200px)").matches;
+/** The id of a look's radio in the picker on screen. */
+const lookRadio = (id: ThemeId) => `${wide() ? "strip" : "theme"}-${id}`;
+
+/** The look picker (T6.135): the filmstrip under the preview on wide windows, a card grid as step 1 in the form on
+ *  narrower ones. Both are always rendered and editor.css hides one with display: none, so screen readers and Tab
+ *  only ever meet one. The filter state is shared. */
+function LookPicker({
+  variant,
+  theme,
+  pick,
+  mood,
+  setMood,
+}: {
+  variant: "strip" | "grid";
+  theme: ThemeId;
+  pick: (id: ThemeId) => void;
+  mood: Mood;
+  setMood: (m: Mood) => void;
+}) {
+  const strip = variant === "strip";
+  const scroller = useRef<HTMLDivElement>(null);
+  const [more, setMore] = useState("");
+  useEffect(() => {
+    const el = scroller.current;
+    if (!el) return;
+    const update = () => setMore(moreIn(el));
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [mood]);
+  const pills = (
+    <div className="editor-pills" role="group" aria-label="Show looks">
+      {(["All", "Calm", "Retro", "Bold"] as const).map((m) => (
+        <button key={m} type="button" aria-pressed={mood === m} onClick={() => setMood(m)}>
+          {m}
+        </button>
+      ))}
+    </div>
+  );
+  const looks = themeIds.map((id) => {
+    const radio = (
+      <input
+        type="radio"
+        id={`${strip ? "strip" : "theme"}-${id}`}
+        name={strip ? "strip-look" : "theme"}
+        value={id}
+        checked={theme === id}
+        onChange={() => pick(id)}
+      />
+    );
+    return (
+      <label
+        key={id}
+        className={strip ? "editor-strip-look" : "editor-card"}
+        hidden={mood !== "All" && !(moods[mood] as readonly ThemeId[]).includes(id)}
+      >
+        {strip && radio}
+        <ThemeShot id={id} />
+        {strip ? (
+          <span>{themes[id].name}</span>
+        ) : (
+          <span className="editor-card-name">
+            {radio}
+            {themes[id].name}
+          </span>
+        )}
+      </label>
+    );
+  });
+  if (!strip)
+    return (
+      <fieldset aria-labelledby="step-look">
+        {pills}
+        <div className="editor-themes">{looks}</div>
+      </fieldset>
+    );
+  // The filmstrip (the Studio board): real Starting Soon scenes, held still, as one radio group (one tab stop, arrow
+  // keys move).
+  return (
+    <section className="editor-strip" aria-labelledby="strip-heading">
+      <div className="editor-strip-bar">
+        <h2 id="strip-heading">Looks</h2>
+        {pills}
+        <p className="editor-hint">Pick one and every scene restyles.</p>
+        <div className="editor-strip-nav">
+          {(
+            [
+              ["Previous looks", "back", "start", -1],
+              ["Next looks", "next", "end", 1],
+            ] as const
+          ).map(([label, icon, side, dir]) => (
+            <button
+              key={side}
+              type="button"
+              aria-label={label}
+              aria-controls="strip-scroller"
+              aria-disabled={!more.includes(side) || undefined}
+              onClick={() =>
+                scroller.current?.scrollBy({ left: dir * stripStep, behavior: scrollBehavior() })
+              }
+            >
+              <Icon name={icon} />
+            </button>
+          ))}
+        </div>
+      </div>
+      {/* Focusable so the arrow keys scroll it, with the bar hidden (axe: scrollable-region-focusable). */}
+      <div
+        id="strip-scroller"
+        ref={scroller}
+        className="editor-strip-scroller"
+        role="region"
+        aria-label="Looks, scrolls sideways"
+        tabIndex={0}
+        data-more={more || undefined}
+        onScroll={(e) => setMore(moreIn(e.currentTarget))}
+      >
+        <div className="editor-strip-track" role="radiogroup" aria-labelledby="strip-heading">
+          {looks}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /** Where the editor starts: a link in the address wins, then this browser's autosave, then defaults. */
 function initialState(): { settings: Settings; status: string } {
   const fromUrl = decodeLink(location.hash);
@@ -423,17 +551,12 @@ export default function EditorPage() {
   const { alert: testAlert, play: playAlert } = useTestAlerts(settings);
   const nextAlert = useRef(0);
   const [picked, setPicked] = useState<Picked | null>(null);
-  const strip = useRef<HTMLDivElement>(null);
-  const [stripMore, setStripMore] = useState("");
-  useEffect(() => {
-    const el = strip.current;
-    if (!el) return;
-    const update = () => setStripMore(moreIn(el));
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [welcome, mood]);
+  const picker = {
+    theme: settings.theme,
+    pick: (id: ThemeId) => update({ theme: id }),
+    mood,
+    setMood,
+  };
 
   return (
     <div className="editor" style={themeVars(brandChrome)}>
@@ -621,7 +744,7 @@ export default function EditorPage() {
                     setStarted(true);
                     // Open at the top with the preview in view; focus still lands on the picked look (T6.29).
                     requestAnimationFrame(() => {
-                      document.getElementById(`theme-${id}`)?.focus({ preventScroll: true });
+                      document.getElementById(lookRadio(id))?.focus({ preventScroll: true });
                       if (!part) scrollTo(0, 0); // ?part= scrolls to its own place
                     });
                   }}
@@ -668,7 +791,12 @@ export default function EditorPage() {
                         const colors = document.getElementById("part-colors");
                         if (id === "part-colors" && colors instanceof HTMLDetailsElement)
                           colors.open = true;
-                        jumpTo(e, id);
+                        // Look: back to the top, where it's the current section, and onto the filmstrip's
+                        // checked look (T6.135).
+                        if (id !== "step-look") return jumpTo(e, id);
+                        e.preventDefault();
+                        scrollTo({ top: 0, behavior: scrollBehavior() });
+                        focusSoon(lookRadio(settings.theme));
                       }}
                     >
                       <Icon name={icon} />
@@ -708,45 +836,20 @@ export default function EditorPage() {
               </button>
             </nav>
             <form className="editor-form" onSubmit={(e) => e.preventDefault()}>
-              <h2 id="step-look" className="editor-step" tabIndex={-1}>
-                {steps[0][1]}
-              </h2>
-              <fieldset aria-labelledby="step-look">
-                <div className="editor-pills" role="group" aria-label="Show looks">
-                  {(["All", "Calm", "Retro", "Bold"] as const).map((m) => (
-                    <button
-                      key={m}
-                      type="button"
-                      aria-pressed={mood === m}
-                      onClick={() => setMood(m)}
-                    >
-                      {m}
-                    </button>
-                  ))}
-                </div>
-                <div className="editor-themes">
-                  {themeIds.map((id) => (
-                    <label
-                      key={id}
-                      className="editor-card"
-                      hidden={mood !== "All" && !(moods[mood] as readonly ThemeId[]).includes(id)}
-                    >
-                      <ThemeShot id={id} />
-                      <span className="editor-card-name">
-                        <input
-                          type="radio"
-                          id={`theme-${id}`}
-                          name="theme"
-                          value={id}
-                          checked={settings.theme === id}
-                          onChange={() => update({ theme: id })}
-                        />
-                        {themes[id].name}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
+              {/* Wide windows: the column starts with the look's name; Change look goes to the filmstrip (T6.135). */}
+              <p className="editor-current-look">
+                Look: <strong>{themes[settings.theme].name}</strong>
+                <button type="button" onClick={() => focusSoon(lookRadio(settings.theme))}>
+                  Change look
+                </button>
+              </p>
+              {/* Narrower windows: the same picker as a card grid, as step 1 (editor.css shows exactly one). */}
+              <div className="editor-look-step">
+                <h2 id="step-look" className="editor-step" tabIndex={-1}>
+                  {steps[0][1]}
+                </h2>
+                <LookPicker variant="grid" {...picker} />
+              </div>
 
               <h2 id="step-details" className="editor-step" tabIndex={-1}>
                 {steps[1][1]}
@@ -871,85 +974,8 @@ export default function EditorPage() {
                   </div>
                 </div>
               </section>
-              {/* The looks filmstrip under the preview (T6.135, the Studio board): the real Starting Soon scenes, held
-                  still, as one radio group (one tab stop, arrow keys move), filtered by the same chips as the form. */}
-              <section className="editor-strip" aria-labelledby="strip-heading">
-                <div className="editor-strip-bar">
-                  <h2 id="strip-heading">Looks</h2>
-                  <div className="editor-pills" role="group" aria-label="Show looks in the strip">
-                    {(["All", "Calm", "Retro", "Bold"] as const).map((m) => (
-                      <button
-                        key={m}
-                        type="button"
-                        aria-pressed={mood === m}
-                        onClick={() => setMood(m)}
-                      >
-                        {m}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="editor-hint">Pick one and every scene restyles.</p>
-                  <div className="editor-strip-nav">
-                    {(
-                      [
-                        ["Previous looks", "back", "start", -1],
-                        ["Next looks", "next", "end", 1],
-                      ] as const
-                    ).map(([label, icon, side, dir]) => (
-                      <button
-                        key={side}
-                        type="button"
-                        aria-label={label}
-                        aria-controls="strip-scroller"
-                        aria-disabled={!stripMore.includes(side) || undefined}
-                        onClick={() =>
-                          strip.current?.scrollBy({
-                            left: dir * stripStep,
-                            behavior: scrollBehavior(),
-                          })
-                        }
-                      >
-                        <Icon name={icon} />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                {/* Focusable so the arrow keys scroll it, with the bar hidden (axe: scrollable-region-focusable). */}
-                <div
-                  id="strip-scroller"
-                  ref={strip}
-                  className="editor-strip-scroller"
-                  role="region"
-                  aria-label="Looks, scrolls sideways"
-                  tabIndex={0}
-                  data-more={stripMore || undefined}
-                  onScroll={(e) => setStripMore(moreIn(e.currentTarget))}
-                >
-                  <div
-                    className="editor-strip-track"
-                    role="radiogroup"
-                    aria-labelledby="strip-heading"
-                  >
-                    {themeIds.map((id) => (
-                      <label
-                        key={id}
-                        className="editor-strip-look"
-                        hidden={mood !== "All" && !(moods[mood] as readonly ThemeId[]).includes(id)}
-                      >
-                        <input
-                          type="radio"
-                          name="strip-look"
-                          value={id}
-                          checked={settings.theme === id}
-                          onChange={() => update({ theme: id })}
-                        />
-                        <ThemeShot id={id} />
-                        <span>{themes[id].name}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </section>
+              {/* Wide windows: the look picker is the filmstrip under the preview (T6.135). */}
+              <LookPicker variant="strip" {...picker} />
               <section
                 className="editor-preview-wrap editor-chat-preview"
                 aria-label="Chat preview"

@@ -39,9 +39,7 @@ test("returning visitors land on the landing page and can continue their overlay
   );
   await page.getByRole("link", { name: "Continue your overlay" }).click();
   await expect(page).toHaveURL(/\/editor/);
-  await expect(
-    page.locator(".editor-form").getByRole("radio", { name: "Neon Grid" }),
-  ).toBeChecked();
+  await expect(page.getByRole("radio", { name: "Neon Grid" })).toBeChecked();
 });
 
 test("the editor's logo leads back to the landing page (T6.67)", async ({ page }) => {
