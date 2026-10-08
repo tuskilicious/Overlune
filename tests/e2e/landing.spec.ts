@@ -500,3 +500,35 @@ test("the hero's night rises in, parts on scroll, and holds still for reduced mo
   for (const sel of [".landing-word", ".landing-motes", ".landing-ridges > svg"])
     await expect(page.locator(sel).first()).toHaveCSS("animation-name", "none");
 });
+
+// T6.148: the overlay cards' magnifier (after 21st.dev's Magnified Bento) follows the mouse, and is only built
+// while the pointer is over a card.
+test("an overlay card's picture shows a magnifier under the mouse", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const thumb = page.locator('.landing-cards > [data-part="starting"] .aspect-video');
+  await thumb.scrollIntoViewIfNeeded();
+  await expect(page.locator(".landing-lens")).toHaveCount(0);
+  const box = (await thumb.boundingBox())!;
+  await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.5);
+  await expect(thumb.locator(".landing-lens .scene")).toHaveCount(1);
+  await expect(thumb.locator(".landing-lens-ring")).toBeVisible();
+  await page.mouse.move(5, 5);
+  await expect(page.locator(".landing-lens")).toHaveCount(0);
+});
+
+// T6.148: the steps' line and stops show their finished state with reduced motion.
+test("with reduced motion the steps' line is drawn and every stop is filled", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const stops = page.locator(".landing-step-num");
+  await expect(stops).toHaveText(["1", "2", "3"]);
+  for (const stop of await stops.all())
+    await expect(stop).toHaveCSS("background-color", "rgb(164, 94, 252)");
+  expect(
+    await page
+      .locator(".landing-steps")
+      .evaluate((el) => getComputedStyle(el, "::after").transform),
+  ).toBe("none");
+});

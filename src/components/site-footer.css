@@ -1,0 +1,47 @@
+/* The site footer's layout (T6.148), shared by every page that has one: link groups over a large outlined
+   wordmark. Each page sets the colors (editor.css, landing.css); --footer-mark-stroke colors the wordmark's outline and --footer-mark-fill is the page background.
+   The wordmark is decoration (aria-hidden, drawn as CSS content so it isn't page text): a thin stroke with no fill, its foot cropped by the footer. */
+.site-footer {
+  overflow: hidden;
+}
+
+.site-footer-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 24px;
+}
+
+.site-footer-groups p {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.site-footer ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.site-footer-mark::before {
+  content: "Overlune";
+  display: block;
+  margin: 32px 0 -0.18em;
+  font-family: var(--font-heading);
+  font-size: clamp(4rem, 15vw, 12rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  /* Filled with the page's background over a 2px stroke (painted first), so only the outer edge shows: a plain
+     stroke would also trace where the font's strokes overlap (inside the e, where the r joins). */
+  color: var(--footer-mark-fill, transparent);
+  -webkit-text-stroke: 2px var(--footer-mark-stroke, rgb(164 94 252 / 0.5));
+  paint-order: stroke fill;
+  user-select: none;
+}

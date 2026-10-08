@@ -974,22 +974,15 @@
   margin: 8px 0 0;
 }
 
-/* Footer on the editor and guide pages (SiteFooter). */
+/* Footer colors on the editor, guide, legal and not-found pages; its layout is in site-footer.css (T6.148). */
 .site-footer {
+  --footer-mark-stroke: color-mix(in srgb, var(--text-muted) 45%, transparent);
+  --footer-mark-fill: var(--bg);
   margin-top: 48px;
-  padding-top: 16px;
+  padding-top: 24px;
   border-top: var(--border);
   font-size: 14px;
   color: var(--text-muted);
-}
-
-.site-footer ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
 }
 
 /* Look filters (T6.60): pills above the picker; a filtered-out look is hidden, not removed. */

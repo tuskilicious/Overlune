@@ -80,20 +80,20 @@
 .landing .site-footer {
   margin: 0 auto;
   max-width: 80rem;
-  padding: 24px 32px 48px;
+  --footer-mark-stroke: color-mix(in srgb, var(--color-violet) 55%, transparent);
+  --footer-mark-fill: var(--color-night);
+  padding: 32px 32px 0; /* the wordmark sits on the page's foot */
   border-top: 1px solid #24285c;
   color: var(--color-haze);
   font-size: 14px;
 }
 
-.landing .site-footer ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
-}
-
 .landing .site-footer a {
   color: var(--color-violet);
+}
+
+.landing .site-footer-groups p {
+  color: var(--color-moon);
 }
 
 /* The alert card on its own: moved to the canvas's top left so the preview can crop to it (T6.48). */
@@ -777,34 +777,123 @@
   }
 }
 
-/* How it works (T6.148): a bar along the top of each step fills in turn as the steps scroll into view, like a
-   progress track across them (after 21st.dev's feature steps; CSS only). Drawn in full without scroll timelines
-   or with reduced motion (index.css turns the animation off). Transform only, so it never relayouts. */
-.landing-step::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 3px;
-  background: linear-gradient(90deg, var(--color-violet), var(--color-cyan));
-  transform-origin: 0 50%;
+/* How it works (T6.148): three numbered stops on one line, after 21st.dev's "How It Works Steps" (behavior only).
+   On wide windows the line runs from the first stop to the last and draws as the steps scroll in, each stop
+   filling as the line reaches it (a CSS scroll timeline; the line is transform only). Without scroll timelines,
+   or with reduced motion (index.css turns animations off), it shows the finished state: line drawn, stops filled.
+   Phones stack the steps with no line. */
+.landing-steps {
+  position: relative;
+  display: grid;
+  gap: 3rem;
+  margin-bottom: 0;
+  padding: 0;
+  list-style: none;
+  view-timeline: --landing-steps;
 }
 
-@supports (animation-timeline: view()) {
-  @keyframes landing-step-fill {
-    from {
-      transform: scaleX(0);
+.landing-step-num {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border: 2px solid var(--color-violet);
+  border-radius: 50%;
+  background: var(--color-violet);
+  color: var(--color-night);
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .landing-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+    text-align: center;
+  }
+
+  .landing-step-num {
+    margin-inline: auto;
+  }
+
+  /* From the first stop's center to the last's: (100% - two 2rem gaps) / 6 in from each side. */
+  .landing-steps::before,
+  .landing-steps::after {
+    content: "";
+    position: absolute;
+    top: calc(2rem - 1px);
+    left: calc((100% - 4rem) / 6);
+    right: calc((100% - 4rem) / 6);
+    height: 2px;
+  }
+
+  .landing-steps::before {
+    background: rgb(255 255 255 / 0.12);
+  }
+
+  .landing-steps::after {
+    background: linear-gradient(90deg, var(--color-violet), var(--color-cyan));
+    transform-origin: 0 50%;
+  }
+
+  @supports (animation-timeline: view()) {
+    @keyframes landing-steps-line {
+      from {
+        transform: scaleX(0);
+      }
+    }
+
+    @keyframes landing-step-reach {
+      from {
+        background: var(--color-night);
+        color: var(--color-violet);
+      }
+    }
+
+    .landing-steps::after {
+      animation: landing-steps-line linear both;
+      animation-timeline: --landing-steps;
+      animation-range: cover 25% cover 45%;
+    }
+
+    .landing-step-num {
+      animation: landing-step-reach linear both;
+      animation-timeline: --landing-steps;
+      animation-range: cover calc(24% + var(--i) * 10%) cover calc(27% + var(--i) * 10%);
     }
   }
+}
 
-  /* The card's own view timeline, not the 3px bar's: each bar fills while the steps rise to mid-window, one after
-     another. */
-  .landing-step {
-    view-timeline: --landing-step;
-  }
+/* The overlay cards' magnifier (T6.148): a 2x copy of the thumbnail, clipped to a circle at the pointer and scaled
+   from that point, so what's under the pointer stays put and grows. Pointer-driven, not animated, so it needs no
+   reduced-motion version. */
+.landing-lens {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--color-night);
+  clip-path: circle(4.5rem at var(--lx, 50%) var(--ly, 50%));
+}
 
-  .landing-step::before {
-    animation: landing-step-fill linear both;
-    animation-timeline: --landing-step;
-    animation-range: cover calc(10% + var(--i) * 8%) cover calc(22% + var(--i) * 8%);
-  }
+.landing-lens-zoom {
+  width: 100%;
+  height: 100%;
+  transform: scale(2);
+  transform-origin: var(--lx, 50%) var(--ly, 50%);
+}
+
+.landing-lens-ring {
+  position: absolute;
+  top: var(--ly, 50%);
+  left: var(--lx, 50%);
+  width: 9rem;
+  height: 9rem;
+  margin: -4.5rem 0 0 -4.5rem;
+  border: 2px solid rgb(255 255 255 / 0.75);
+  border-radius: 50%;
+  box-shadow: 0 10px 28px rgb(0 0 0 / 0.5);
+  pointer-events: none;
 }

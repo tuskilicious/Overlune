@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type PointerEvent,
   type ReactNode,
 } from "react";
 import { Link } from "react-router";
@@ -319,6 +320,42 @@ function ElementShot({ part, theme }: { part: string; theme: ThemeId }) {
     <LazyPreview>
       <SceneOf theme={theme} scene={part as KitScene} />
     </LazyPreview>
+  );
+}
+
+/** A card's live thumbnail with a magnifier that follows the mouse (T6.148, after 21st.dev's "Magnified Bento";
+ *  behavior only): a 2x copy of the overlay shows through a round lens, so small type and detail read. The copy is
+ *  built only while the pointer is over this card, and touch screens skip it. */
+function Magnified({ part, theme }: { part: string; theme: ThemeId }) {
+  const [on, setOn] = useState(false);
+  const aim = (ev: PointerEvent<HTMLDivElement>) => {
+    const r = ev.currentTarget.getBoundingClientRect();
+    ev.currentTarget.style.setProperty("--lx", `${ev.clientX - r.left}px`);
+    ev.currentTarget.style.setProperty("--ly", `${ev.clientY - r.top}px`);
+  };
+  return (
+    <div
+      className="landing-still relative aspect-video overflow-hidden rounded-xl bg-night"
+      onPointerEnter={(ev) => {
+        if (ev.pointerType === "touch") return;
+        aim(ev);
+        setOn(true);
+      }}
+      onPointerMove={aim}
+      onPointerLeave={() => setOn(false)}
+    >
+      <ElementShot part={part} theme={theme} />
+      {on && (
+        <>
+          <div aria-hidden className="landing-lens">
+            <div className="landing-lens-zoom">
+              <ElementShot part={part} theme={theme} />
+            </div>
+          </div>
+          <span aria-hidden className="landing-lens-ring" />
+        </>
+      )}
+    </div>
   );
 }
 
@@ -996,9 +1033,7 @@ export default function LandingPage() {
                     <span aria-hidden className="landing-card-arrow">
                       <Icon name="arrow" />
                     </span>
-                    <div className="landing-still aspect-video overflow-hidden rounded-xl bg-night">
-                      <ElementShot part={e.part} theme={e.theme} />
-                    </div>
+                    <Magnified part={e.part} theme={e.theme} />
                     <div className="relative mt-auto pt-6">
                       <h3 className="font-heading text-2xl font-bold">{e.name}</h3>
                       <p className="mt-2 text-haze group-hover:text-moon">{e.line}</p>
@@ -1025,7 +1060,7 @@ export default function LandingPage() {
           <LooksShowcase />
         </section>
 
-        {/* How it works: slices that widen on hover or focus, with a bar that fills across them in turn (T6.148). */}
+        {/* How it works: three numbered stops on a line that draws as the steps scroll in (T6.148). */}
         <section id="how" className="px-6 py-24 md:px-12 md:py-32" aria-labelledby="how-heading">
           <div className="mx-auto max-w-7xl">
             <h2
@@ -1035,21 +1070,15 @@ export default function LandingPage() {
             >
               Live in three steps
             </h2>
-            <ol className="mt-12 flex flex-col gap-4 md:flex-row">
+            {/* Numbered stops on one line, after 21st.dev's "How It Works Steps" (behavior only, T6.148). */}
+            <ol className="landing-steps mt-16">
               {steps.map(([title, text], i) => (
-                <li
-                  key={title}
-                  tabIndex={0}
-                  style={{ "--i": i } as CSSProperties}
-                  className="landing-step group relative flex flex-col gap-10 overflow-hidden rounded-3xl border border-white/10 bg-deep p-8 transition-[flex-grow] duration-500 ease-out hover:grow-[2.5] focus:grow-[2.5] md:grow"
-                >
-                  <span aria-hidden className="font-heading text-6xl font-bold text-violet">
+                <li key={title} style={{ "--i": i } as CSSProperties}>
+                  <span aria-hidden className="landing-step-num">
                     {i + 1}
                   </span>
-                  <div>
-                    <h3 className="font-heading text-2xl font-bold">{title}</h3>
-                    <p className="mt-2 max-w-sm text-haze">{text}</p>
-                  </div>
+                  <h3 className="mt-6 font-heading text-2xl font-bold">{title}</h3>
+                  <p className="mt-2 max-w-xs text-haze md:mx-auto">{text}</p>
                 </li>
               ))}
             </ol>
