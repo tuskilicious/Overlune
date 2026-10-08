@@ -228,7 +228,7 @@ for (const width of [390, 768, 1024, 1280, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const cards = page.locator(".landing-cards > li");
-    await expect(cards).toHaveCount(6);
+    await expect(cards).toHaveCount(7);
     for (const box of await cards.evaluateAll((els) => els.map((el) => el.getBoundingClientRect())))
       expect(box.right).toBeLessThanOrEqual(width);
     const scrollers = await page.evaluate(
@@ -257,7 +257,7 @@ test("the hero kit tours the looks and scenes, and Pause stops it", async ({ pag
   await expect(kit.getByText("LIVE", { exact: true })).toBeVisible();
   await expect(kit.locator(".alert-box")).toHaveCount(2);
   const tags = kit.getByRole("list", { name: "Scenes in every look" }).getByRole("listitem");
-  await expect(tags).toHaveText(["Starting Soon", "Be Right Back", "Stream Ending"]);
+  await expect(tags).toHaveText(["Starting Soon", "Be Right Back", "Stream Ending", "Offline"]);
   await expect(tags.first()).toHaveAttribute("aria-current", "true");
   await expect(kit).toHaveAttribute("data-kit", "vaporwave-sunset");
 
@@ -294,11 +294,15 @@ test("the hero lists four facts, all true for v1", async ({ page }) => {
 
 test("each overlay card opens its part of the editor", async ({ page }) => {
   await page.goto("/");
-  const cards = page.getByRole("region", { name: "Six overlays in every look" }).getByRole("link");
-  await expect(cards).toHaveCount(6);
+  const cards = page
+    .getByRole("region", { name: "Seven overlays in every look" })
+    .getByRole("link");
+  await expect(cards).toHaveCount(7);
   const hrefs = await cards.evaluateAll((els) => els.map((el) => el.getAttribute("href")));
   expect(hrefs).toEqual(
-    ["starting", "brb", "ending", "chat", "frame", "alerts"].map((p) => `/editor?part=${p}`),
+    ["starting", "brb", "ending", "offline", "chat", "frame", "alerts"].map(
+      (p) => `/editor?part=${p}`,
+    ),
   );
 
   await cards.filter({ hasText: "Be Right Back" }).click();

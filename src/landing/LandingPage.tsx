@@ -115,7 +115,7 @@ function Scene({ theme, live = false }: { theme: ThemeId; live?: boolean }) {
   );
 }
 
-type KitScene = "starting" | "brb" | "ending";
+type KitScene = "starting" | "brb" | "ending" | "offline";
 
 /** One alert card on its own, cropped to the card's height so long and short alerts both fit (T6.59). The card
  *  sits at its 1920x1080 canvas's top left (landing.css), and the crop follows it as the width or text changes. */
@@ -142,7 +142,7 @@ function AlertCard({ theme, alert }: { theme: ThemeId; alert: number }) {
   );
 }
 
-/** One scene of a look, live (TextScene for BRB and Stream Ending). */
+/** One scene of a look, live (TextScene for BRB, Stream Ending and Offline). */
 function SceneOf({ theme, scene }: { theme: ThemeId; scene: KitScene }) {
   const settings = sampleScene(theme);
   return scene === "starting" ? (
@@ -156,6 +156,7 @@ const sceneNames: Record<KitScene, string> = {
   starting: "Starting Soon",
   brb: "Be Right Back",
   ending: "Stream Ending",
+  offline: "Offline",
 };
 
 /** The hero frame's tour: a look and a scene each, so it shows the whole kit over time (T6.59). */
@@ -163,19 +164,19 @@ const tour: [ThemeId, KitScene][] = [
   ["vaporwave-sunset", "starting"],
   ["cozy-cafe", "brb"],
   ["neon-grid", "ending"],
-  ["pastel-cloud", "starting"],
-  ["forest-night", "brb"],
-  ["bold-esports", "ending"],
-  ["arcade-8bit", "starting"],
-  ["clean-slate", "brb"],
-  ["daylight", "ending"],
-  ["abyss", "starting"],
-  ["session", "brb"],
-  ["shonen", "ending"],
+  ["pastel-cloud", "offline"],
+  ["forest-night", "starting"],
+  ["bold-esports", "brb"],
+  ["arcade-8bit", "ending"],
+  ["clean-slate", "offline"],
+  ["daylight", "starting"],
+  ["abyss", "brb"],
+  ["session", "ending"],
+  ["shonen", "offline"],
   ["sakura", "starting"],
   ["skate-deck", "brb"],
   ["phosphor", "ending"],
-  ["quest", "starting"],
+  ["quest", "offline"],
 ];
 
 /** The hero picture: a live scene in a stream frame, two alerts in the same look, and the scene names. It tours
@@ -243,7 +244,8 @@ function HeroKit() {
   );
 }
 
-/** The five overlays, each a live thumbnail that opens its part of the editor (T6.59). */
+/** The seven overlays, each a live thumbnail that opens its part of the editor (T6.59): the four scenes, then the
+ *  three that sit over the game (T6.148). */
 const elements: { part: string; name: string; line: string; theme: ThemeId }[] = [
   {
     part: "starting",
@@ -262,6 +264,12 @@ const elements: { part: string; name: string; line: string; theme: ThemeId }[] =
     name: "Stream Ending",
     line: "Thanks, and where to find you.",
     theme: "neon-grid",
+  },
+  {
+    part: "offline",
+    name: "Offline",
+    line: "For when you're not live.",
+    theme: "daylight",
   },
   { part: "chat", name: "Chat", line: "Your Twitch chat in the same look.", theme: "cozy-cafe" },
   {
@@ -959,22 +967,23 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* The six overlays, each opening its part of the editor (T6.59), in two rows of three. */}
-        <section id="kit" className="px-6 pt-32 md:px-12 md:pt-48" aria-labelledby="kit-heading">
+        {/* The seven overlays, each opening its part of the editor (T6.59): the scenes in one row, the overlays that
+            sit over the game in a wider row under them (T6.148). */}
+        <section id="kit" className="px-6 pt-24 md:px-12 md:pt-32" aria-labelledby="kit-heading">
           <div className="mx-auto max-w-7xl">
             <h2
               id="kit-heading"
               data-reveal
               className="font-heading text-[clamp(2.25rem,4vw,3.5rem)] font-bold"
             >
-              Six overlays in every look
+              Seven overlays in every look
             </h2>
             <p className="mt-4 max-w-xl text-lg text-haze">Open any of them in the editor.</p>
-            {/* A row of tall cards, after the reference's services row (T6.124): the one under the pointer fills with
-                violet from where the pointer is. Sideways scroll when they don't fit. */}
+            {/* Tall cards, after the reference's services row (T6.124): the one under the pointer fills with violet from
+                where the pointer is. Two tiers on wide windows, a bento after the 21st.dev galleries (T6.148). */}
             <ul className="landing-cards mt-12">
               {elements.map((e) => (
-                <li key={e.part}>
+                <li key={e.part} data-part={e.part}>
                   <Link
                     to={`/editor?part=${e.part}`}
                     className="landing-card group"
@@ -1016,8 +1025,8 @@ export default function LandingPage() {
           <LooksShowcase />
         </section>
 
-        {/* How it works: slices that widen on hover or focus. */}
-        <section id="how" className="px-6 py-32 md:px-12 md:py-48" aria-labelledby="how-heading">
+        {/* How it works: slices that widen on hover or focus, with a bar that fills across them in turn (T6.148). */}
+        <section id="how" className="px-6 py-24 md:px-12 md:py-32" aria-labelledby="how-heading">
           <div className="mx-auto max-w-7xl">
             <h2
               id="how-heading"
@@ -1031,7 +1040,8 @@ export default function LandingPage() {
                 <li
                   key={title}
                   tabIndex={0}
-                  className="group flex flex-col gap-10 rounded-3xl border border-white/10 bg-deep p-8 transition-[flex-grow] duration-500 ease-out hover:grow-[2.5] focus:grow-[2.5] md:grow"
+                  style={{ "--i": i } as CSSProperties}
+                  className="landing-step group relative flex flex-col gap-10 overflow-hidden rounded-3xl border border-white/10 bg-deep p-8 transition-[flex-grow] duration-500 ease-out hover:grow-[2.5] focus:grow-[2.5] md:grow"
                 >
                   <span aria-hidden className="font-heading text-6xl font-bold text-violet">
                     {i + 1}

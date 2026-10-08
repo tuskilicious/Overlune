@@ -291,7 +291,7 @@
   }
 }
 
-/* The six overlays: cards that always fit, three across on wide windows, never a scrollbar. */
+/* The seven overlays: cards that always fit, never a scrollbar. */
 .landing-cards {
   display: grid;
   grid-template-columns: minmax(
@@ -299,9 +299,8 @@
     1fr
   ); /* never wider than the window, whatever a picture inside measures */
   gap: 0.75rem;
-  margin: 0;
   padding: 0;
-  list-style: none;
+  list-style: none; /* no margin rule: it would beat Tailwind's mt-12 on the list */
 }
 
 @media (min-width: 640px) {
@@ -310,9 +309,42 @@
   }
 }
 
+/* Odd one out: Alerts takes the whole last row, where a wide card suits a wide alert. */
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .landing-cards > [data-part="alerts"] {
+    grid-column: span 2;
+  }
+
+  /* ...as a letterbox, so the row stays the height of the others. */
+  .landing-cards > [data-part="alerts"] .aspect-video {
+    aspect-ratio: 32 / 9;
+  }
+
+  .landing-cards > [data-part="alerts"] .aspect-video > div {
+    width: 55%;
+    margin-top: 5%;
+  }
+}
+
+/* Two tiers (T6.148): the four scenes, then the three overlays that sit over the game, in wider cards. Twelve
+   columns so both tiers share one grid: two scenes a row until four fit with room for their names (200px+). */
 @media (min-width: 1024px) {
   .landing-cards {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .landing-cards > li {
+    grid-column: span 6;
+  }
+
+  .landing-cards > :is([data-part="chat"], [data-part="frame"], [data-part="alerts"]) {
+    grid-column: span 4;
+  }
+}
+
+@media (min-width: 1280px) {
+  .landing-cards > li {
+    grid-column: span 3;
   }
 }
 
@@ -742,5 +774,37 @@
   from {
     opacity: 0;
     transform: translateY(110%);
+  }
+}
+
+/* How it works (T6.148): a bar along the top of each step fills in turn as the steps scroll into view, like a
+   progress track across them (after 21st.dev's feature steps; CSS only). Drawn in full without scroll timelines
+   or with reduced motion (index.css turns the animation off). Transform only, so it never relayouts. */
+.landing-step::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-violet), var(--color-cyan));
+  transform-origin: 0 50%;
+}
+
+@supports (animation-timeline: view()) {
+  @keyframes landing-step-fill {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  /* The card's own view timeline, not the 3px bar's: each bar fills while the steps rise to mid-window, one after
+     another. */
+  .landing-step {
+    view-timeline: --landing-step;
+  }
+
+  .landing-step::before {
+    animation: landing-step-fill linear both;
+    animation-timeline: --landing-step;
+    animation-range: cover calc(10% + var(--i) * 8%) cover calc(22% + var(--i) * 8%);
   }
 }
