@@ -51,7 +51,7 @@ The wordmark is artwork. Don't retype "Overlune" in a font to stand in for it.
 Friendly, plain and confident, like a streamer friend who knows OBS.
 - Lead with what people get: "Free stream overlays that look pro."
 - Say "free" and "no account" plainly. Never "premium", "unlock" or anything that hints at a paywall.
-- Short sentences, real numbers ("8 looks"), no hype words, and no promised setup times.
+- Short sentences, real numbers ("16 looks", always the current count: `tests/unit/look-count.test.ts` checks it), no hype words, and no promised setup times.
 
 Taglines:
 - Primary: **Free stream overlays that look pro.**
@@ -69,4 +69,4 @@ Taglines:
 | `overlune-discord-banner-960x540.png` | 960×540 | Discord server banner |
 
 ## Relationship to the themes
-The brand is Overlune's own look: the editor, the setup guide, social pages and launch material. The 8 overlay themes (`docs/DESIGN.md`) stay independent. The editor chrome uses Night as its ground so it stays quiet next to any theme preview.
+The brand is Overlune's own look: the editor, the setup guide, social pages and launch material. The overlay looks (`docs/DESIGN.md`) stay independent. The editor chrome uses Night as its ground so it stays quiet next to any theme preview.

@@ -7,11 +7,12 @@ import tailwindcss from "@tailwindcss/vite";
 import { pageHtml, pages } from "./src/lib/page-meta.ts";
 
 // Link previews (T6.87): a copy of index.html per site page with its own title and tags. Cloudflare Pages serves
-// guide.html at /guide, so addresses don't change.
+// guide.html at /guide, so addresses don't change. index.html itself gets "/"'s tags, so they never drift from
+// page-meta.ts (T6.138).
 const pagePreviews: Plugin = {
   name: "overlune-page-previews",
-  apply: "build",
   enforce: "post", // after Vite has written index.html into the bundle
+  transformIndexHtml: (html) => pageHtml(html, "/"),
   generateBundle(_, bundle) {
     const index = bundle["index.html"];
     if (index?.type !== "asset") throw new Error("index.html missing from the build");

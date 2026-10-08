@@ -389,7 +389,7 @@ const facts = [
 ];
 
 const steps = [
-  ["Pick a look", "Sixteen looks, each with matching scenes, chat and alerts."],
+  ["Pick a look", `${themeIds.length} looks, each with matching scenes, chat and alerts.`],
   ["Add your details", "Your title, countdown, socials and Twitch channel name."],
   [
     "Paste into OBS",
@@ -615,7 +615,7 @@ function LooksShowcase() {
           data-reveal
           className="font-heading text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.02] font-bold"
         >
-          Sixteen looks. Every scene matches.
+          {themeIds.length} looks. Every scene matches.
         </h2>
         <p className="mt-6 max-w-md text-lg text-moon/85">
           Pick one and your Starting Soon, Be Right Back and Stream Ending scenes, chat and alerts
