@@ -20,6 +20,6 @@ export const abyss: Theme = {
   enter: { id: "slide-fade", durationMs: 700 },
   exit: { id: "slide-fade", durationMs: 300 },
   alertAnim: "slide-fade",
-  alertSound: "forest-night.ogg",
+  alertSound: "abyss.ogg",
   badgeStyle: "pill",
 };

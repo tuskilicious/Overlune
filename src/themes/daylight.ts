@@ -19,6 +19,6 @@ export const daylight: Theme = {
   enter: { id: "slide-fade", durationMs: 350 },
   exit: { id: "slide-fade", durationMs: 300 },
   alertAnim: "slide-fade",
-  alertSound: "clean-slate.ogg",
+  alertSound: "daylight.ogg",
   badgeStyle: "pill",
 };

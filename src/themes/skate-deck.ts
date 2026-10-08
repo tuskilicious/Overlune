@@ -19,6 +19,6 @@ export const skateDeck: Theme = {
   enter: { id: "bounce", durationMs: 500 },
   exit: { id: "slide-fade", durationMs: 250 },
   alertAnim: "bounce",
-  alertSound: "arcade-8bit.ogg",
+  alertSound: "skate-deck.ogg",
   badgeStyle: "pill",
 };
