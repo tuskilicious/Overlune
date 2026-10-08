@@ -33,15 +33,15 @@ The tokens alone don't tell you what a viewer reads: scenes put the headline, it
 - **Text on the scene ground:** the subtitle needs 4.5:1. The headline is large text (68px and up in every look), so it and its accented last word need 3:1. The countdown and its done text sit on the countdown card (`surface`).
 - **Graphics** (the accent rule, icon tiles, outlines that carry meaning): 3:1.
 - **Gradient grounds** (Pastel Cloud, Vaporwave Sunset): measure against the part of the gradient behind the text, not the `bg` token (Vaporwave keeps all text on its purple top).
-- **Not yet tested automatically:** the ground pairs and the CSS overrides. Until a test covers them, a look that changes `bg`, `primary`, `accent`, `textMuted` or one of the overrides below gets checked by hand.
+- **Tested as rendered (T6.140):** `tests/e2e/contrast.spec.ts` renders every look's Starting Soon scene with sample content and motion off, and compares each text with the pixels actually behind it: the letters' solid insides against the same pixels with the letters hidden, so gradients, the print grain, overrides and outlines all count. Large text needs 3:1 and the rest 4.5:1, at the 10th-percentile pixel. Lettering with a thick outline (Shonen, Skate Deck) is judged against its outline; glows are left out. A look that changes `bg`, `primary`, `accent`, `textMuted` or an override below just has to keep that test green.
 
-Overrides on the ground today, and the tightest pairs (WCAG ratios from the shipped values, 2026-10-07):
+Overrides on the ground today, and the tightest pairs (WCAG ratios from the shipped values, 2026-10-07; Session updated 2026-10-08):
 | Look | On the ground | Ratio | Why it holds |
 |---|---|---|---|
 | Skate Deck | Subtitle `#3A2410` instead of `textMuted` (made for the grip tape) | 8.0:1 | Override |
 | Skate Deck | Last word in `accent` `#FF4FA3` | 1.7:1 on maple | It sits on its 16px white sticker outline: about 3.0:1, large text |
 | Quest | Subtitle `#D9C08E`, last word `#FFB547` instead of `textMuted` and `accent` (made for parchment) | 10.4:1 each | Override |
-| Session | Last word in brick `#B23A2E` | 3.0:1 | Large text only, at the limit; don't lighten the brick or the mustard |
+| Session | Last word in a deeper brick `#A3332A` than the accent `#B23A2E` | 3.5:1 | The accent is exactly 3.0:1 on the mustard, and the print grain over both took part of the word to 2.7:1 as rendered (T6.140); the accent stays everywhere else. Don't lighten the brick or the mustard |
 | Pastel Cloud | Headline in `primary` `#7B5BD6` | 4.1:1 | Large text |
 | Cozy Café, Daylight, Shonen | Last word in `accent` | 4.5-4.6:1 | Large text; also passes the 4.5:1 body rule, barely |
 | Bold Esports | `accent` on `surface` (badges, alert band) | 4.7:1 | Passes; little room |
