@@ -628,6 +628,6 @@ The owner asked for more looks (2026-10-07), picked all four from impeccable's s
   - *Built 2026-10-08 on `chore/release-1.3.1`. `package.json` 1.3.1; CHANGELOG "1.3.1 (2026-10-08)": Looks and overlays (the sounds, lighter effects, hidden sources rest) and Site (visit counts). Each change was OBS-tested in its own PR (#183, #185); #184 was checked live.*
 
 ### Square webcam frame (2026-10-08)
-- [ ] **T6.146 A square webcam frame.** The handoff's P1-3 asked for 16:9, 4:3 and 1:1 frames; the editor's quick sizes had 16:9 and 4:3 but no square.
+- [x] **T6.146 A square webcam frame.** The handoff's P1-3 asked for 16:9, 4:3 and 1:1 frames; the editor's quick sizes had 16:9 and 4:3 but no square.
   - Accept: a square is one click; it draws cleanly in every look; no link format change. OBS check.
-  - *Built 2026-10-08 on `feat/square-frame`. Width and height were already free numbers (160 to 1920, 120 to 1080), so a typed square always worked; now 480 × 480 sits with the quick sizes. Rendered at 480 × 480 in all 16 looks with and without the name tab: clean edges, corner brackets and a clear middle. e2e: the chip sets 480 × 480, is pressed, and the link's overlay is 480 × 480.*
+  - *Built 2026-10-08 on `feat/square-frame`. Width and height were already free numbers (160 to 1920, 120 to 1080), so a typed square always worked; now 480 × 480 sits with the quick sizes. Rendered at 480 × 480 in all 16 looks with and without the name tab: clean edges, corner brackets and a clear middle. e2e: the chip sets 480 × 480, is pressed, and the link's overlay is 480 × 480. Passed in OBS (2026-10-08) on the PR #187 preview, per the owner.*
