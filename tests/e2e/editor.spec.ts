@@ -1831,3 +1831,76 @@ test("wide windows drop the step numbers, since step 1 is the filmstrip there (T
   await expect.poll(shown("#step-details")).toBe("2. Add your details");
   await expect.poll(shown("#links-heading")).toBe("3. Links to paste into OBS");
 });
+
+test.describe("GSAP in the editor (T6.137)", () => {
+  /** Whether any filmstrip card carries GSAP's inline styles at some point while a filter changes. */
+  const glides = async (page: import("@playwright/test").Page, filter: string) => {
+    await page.locator(".editor-strip").getByRole("button", { name: filter }).click();
+    for (let i = 0; i < 6; i++) {
+      const moving = await page
+        .locator(".editor-strip-look[style]")
+        .count()
+        .catch(() => 0);
+      if (moving) return true;
+      await page.waitForTimeout(40);
+    }
+    return false;
+  };
+
+  test("a filter makes the filmstrip's looks glide (Flip), and they settle with no leftover styles", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    // GSAP loads lazily after the editor shows.
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          performance.getEntriesByType("resource").some((e) => /gsap/.test(e.name)),
+        ),
+      )
+      .toBe(true);
+    await page.waitForTimeout(300);
+    expect(await glides(page, "Retro")).toBe(true);
+    // GSAP clears what it set (an empty style attribute is fine).
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            [...document.querySelectorAll(".editor-strip-look")].filter((e) =>
+              e.getAttribute("style"),
+            ).length,
+        ),
+      )
+      .toBe(0);
+    await expect(page.locator(".editor-strip-look:not([hidden])")).toHaveCount(4);
+  });
+
+  for (const [name, setup] of [
+    [
+      "the OS setting",
+      (p: import("@playwright/test").Page) => p.emulateMedia({ reducedMotion: "reduce" }),
+    ],
+    [
+      "?rm=1",
+      async (p: import("@playwright/test").Page) => {
+        await p.goto("/editor?rm=1");
+        await startEditing(p);
+      },
+    ],
+    [
+      "Still motion",
+      (p: import("@playwright/test").Page) =>
+        p
+          .getByRole("radiogroup", { name: "How much moves" })
+          .getByRole("radio", { name: "Still" })
+          .check(),
+    ],
+  ] as const)
+    test(`with ${name} the filmstrip changes at once`, async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await setup(page);
+      await page.waitForTimeout(800);
+      expect(await glides(page, "Retro")).toBe(false);
+      await expect(page.locator(".editor-strip-look:not([hidden])")).toHaveCount(4);
+    });
+});
