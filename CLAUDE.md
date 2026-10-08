@@ -19,6 +19,7 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 - **Overlays must be lightweight:** CSS or canvas effects, plus GSAP in lazy chunks for alert and scene sequences (always through `animate()` in `src/lib/motion.ts`, `docs/STACK.md`). No video backgrounds, and they must run smoothly on low-end PCs. Every animation needs a reduced-motion version.
 - **Write UI copy for beginners.** Say "Link to paste into OBS", not "Browser Source URL".
 - **Use only free-licensed fonts, sounds and art,** and record each one in `docs/ASSETS.md`.
+- **Component galleries (21st.dev) are a reference for the editor and landing page only,** never for overlays. Port the behavior; copy code only under a stated license (`docs/DESIGN.md`).
 
 ## 0. How to work
 - Read `docs/PRD.md` before starting. Work from `docs/TASKS.md`, one task at a time.
