@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test";
 import lz from "lz-string";
 import { themeIds } from "../../src/themes/types";
-import chattingLink from "../fixtures/links/v1/chatting.json" with { type: "json" };
 import offlineLink from "../fixtures/links/v1/offline.json" with { type: "json" };
 
 const link = (data: unknown) =>
@@ -256,23 +255,7 @@ test.describe("cheap effects (T6.144)", () => {
   });
 });
 
-test.describe("Just Chatting and Offline scenes (T6.147)", () => {
-  test("Just Chatting is the look's backdrop with a tag card in the corner, from its saved link", async ({
-    page,
-  }) => {
-    await page.goto(chattingLink.link);
-    const tag = page.locator(".scene-tag");
-    await expect(tag.getByRole("heading", { level: 1 })).toHaveText("Q&A night");
-    await expect(tag).toContainText("Ask me anything in chat");
-    await expect(tag).toContainText("tuskilicious");
-    // No headline layout: the rest of the screen stays clear for the camera and chat.
-    await expect(page.locator(".scene-main")).toHaveCount(0);
-    const box = (await tag.boundingBox())!;
-    expect(box.x).toBeGreaterThanOrEqual(64);
-    expect(box.y).toBeGreaterThanOrEqual(64);
-    expect(box.width).toBeLessThanOrEqual(760);
-  });
-
+test.describe("Offline scene (T6.147)", () => {
   test("Offline is a full scene in the look's layout, from its saved link", async ({ page }) => {
     await page.goto(offlineLink.link);
     await expect(page.locator(".scene-title")).toHaveText("See you Friday");
@@ -282,9 +265,7 @@ test.describe("Just Chatting and Offline scenes (T6.147)", () => {
     await expect(page.locator(".scene")).toHaveAttribute("data-theme", "quest");
   });
 
-  test("both have defaults for links made before they existed", async ({ page }) => {
-    await page.goto("/o/chatting#1.N4IgLgFgpgtlIC4QDsoHtkFoDmAnAlgCYgC+QA");
-    await expect(page.locator(".scene-tag h1")).toHaveText("Just chatting");
+  test("has defaults for links made before it existed", async ({ page }) => {
     await page.goto("/o/offline#1.N4IgLgFgpgtlIC4QDsoHtkFoDmAnAlgCYgC+QA");
     await expect(page.locator(".scene-title")).toHaveText("Offline right now");
   });

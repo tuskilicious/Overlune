@@ -140,8 +140,6 @@ test("the whole editor works from the keyboard", async ({ page }) => {
 
   await page.getByRole("radio", { name: "Starting Soon" }).focus();
   await page.keyboard.press("ArrowRight");
-  await expect(page.getByRole("radio", { name: "Just Chatting" })).toBeChecked(); // T6.147
-  await page.keyboard.press("ArrowRight");
   await expect(page.getByRole("radio", { name: "Be Right Back" })).toBeChecked();
   await page.keyboard.press("Tab");
   await page.keyboard.type("Keyboard title");
@@ -776,15 +774,14 @@ test("each overlay link shows the size to enter in OBS", async ({ page }) => {
   const rows = page
     .getByRole("region", { name: "Links to paste into OBS" })
     .locator(".editor-link");
-  await expect(rows).toHaveCount(8);
-  for (const row of (await rows.all()).slice(0, 5))
+  await expect(rows).toHaveCount(7);
+  for (const row of (await rows.all()).slice(0, 4))
     await expect(row).toContainText("Width 1920 · Height 1080");
-  // Just Chatting and Offline are extras (T6.147).
-  await expect(rows.nth(1)).toContainText("Just Chatting (optional)");
-  await expect(rows.nth(4)).toContainText("Offline (optional)");
-  await expect(rows.nth(5)).toContainText("Chat · Width 400 · Height 600");
-  await expect(rows.nth(6)).toContainText("Alerts · Width 1920 · Height 1080");
-  await expect(rows.nth(7)).toContainText("Webcam frame (optional) · Width 640 · Height 360");
+  // Offline is an extra (T6.147).
+  await expect(rows.nth(3)).toContainText("Offline (optional)");
+  await expect(rows.nth(4)).toContainText("Chat · Width 400 · Height 600");
+  await expect(rows.nth(5)).toContainText("Alerts · Width 1920 · Height 1080");
+  await expect(rows.nth(6)).toContainText("Webcam frame (optional) · Width 640 · Height 360");
 });
 
 test("a pasted Twitch link becomes the channel name in the chat link", async ({ page }) => {
@@ -984,7 +981,7 @@ test("chat size and text options update the link row and the chat preview", asyn
   const rows = page
     .getByRole("region", { name: "Links to paste into OBS" })
     .locator(".editor-link");
-  await expect(rows.nth(5)).toContainText("Chat · Width 500 · Height 800");
+  await expect(rows.nth(4)).toContainText("Chat · Width 500 · Height 800");
   await expect(preview.locator(".chat")).toHaveCSS("width", "500px");
   await expect(preview.locator(".chat")).toHaveCSS("font-size", "30px");
 
@@ -1334,8 +1331,7 @@ test("colors show their hex value and the volume shows its number (T6.60)", asyn
 });
 
 test("each link shows its size as chips (T6.60)", async ({ page }) => {
-  // The sixth row: Starting Soon, Just Chatting, BRB, Stream Ending and Offline come first (T6.147).
-  const chat = page.locator("#obs-links .editor-link").nth(5);
+  const chat = page.locator("#obs-links .editor-link", { hasText: "Chat" });
   await expect(chat.locator(".editor-chip")).toHaveText(["Width 400", "Height 600"]);
 });
 
@@ -1413,16 +1409,14 @@ test("Copy all links copies every link with its size, and marks them copied (T6.
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.getByRole("button", { name: "Copy all links" }).click();
   await expect(page.locator(".editor-copy-all [role=status]")).toHaveText(
-    "Copied all 8 links with their sizes.",
+    "Copied all 7 links with their sizes.",
   );
   const text = await page.evaluate(() => navigator.clipboard.readText());
   // Windows' clipboard turns line breaks into \r\n.
   expect(text).toMatch(/Starting Soon \(width 1920, height 1080\)\r?\n/);
   expect(text).toMatch(/Chat \(width 400, height 600\)\r?\n/);
   expect(text).toMatch(/Webcam frame \(width 640, height 360\)\r?\n/);
-  expect(
-    text.match(/\/o\/(starting|chatting|brb|ending|offline|chat|alerts|frame)#1\./g),
-  ).toHaveLength(8);
+  expect(text.match(/\/o\/(starting|brb|ending|offline|chat|alerts|frame)#1\./g)).toHaveLength(7);
   await expect(page.locator(".editor-links-progress")).toContainText("You’re set");
 });
 
@@ -1558,7 +1552,7 @@ test("Download OBS scene collection saves every scene with the streamer's links 
   const urls = file.sources
     .filter((s: { id: string }) => s.id === "browser_source")
     .map((s: { settings: { url: string } }) => s.settings.url);
-  expect(urls).toHaveLength(8); // with Just Chatting and Offline (T6.147)
+  expect(urls).toHaveLength(7); // with Offline (T6.147)
   // The same links as the rows below it.
   const starting = await page.getByRole("textbox", { name: /^Starting Soon/ }).inputValue();
   expect(urls).toContain(starting);
@@ -1995,18 +1989,15 @@ test.describe("GSAP in the editor (T6.137)", () => {
     });
 });
 
-test("Just Chatting and Offline are edited like the other scenes, with their own links (T6.147)", async ({
-  page,
-}) => {
-  await page.getByRole("radio", { name: "Just Chatting", exact: true }).check();
-  await page.getByLabel("Title", { exact: true }).fill("Q&A night");
-  await expect(preview(page).locator(".scene-tag h1")).toHaveText("Q&A night");
+test("Offline is edited like the other scenes, with its own link (T6.147)", async ({ page }) => {
+  await page.getByRole("radio", { name: "Be Right Back", exact: true }).check();
+  await page.getByLabel("Title", { exact: true }).fill("Snack break");
   await page.getByRole("radio", { name: "Offline", exact: true }).check();
   await page.getByLabel("Title", { exact: true }).fill("See you Friday");
   await expect(preview(page).locator(".scene-title")).toHaveText("See you Friday");
   const offline = await page.getByRole("textbox", { name: /^Offline/ }).inputValue();
   expect(offline).toMatch(/\/o\/offline#1\./);
   // Each scene keeps its own text.
-  await page.getByRole("radio", { name: "Just Chatting", exact: true }).check();
-  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Q&A night");
+  await page.getByRole("radio", { name: "Be Right Back", exact: true }).check();
+  await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Snack break");
 });

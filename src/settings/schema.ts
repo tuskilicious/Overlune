@@ -86,8 +86,7 @@ export const settingsV1 = z.object({
     .prefault({}),
   brb: z.object({ title: text(60, "Be right back"), subtitle: text(120) }).prefault({}),
   ending: z.object({ title: text(60, "Thanks for watching!"), subtitle: text(120) }).prefault({}),
-  /** Just Chatting and Offline scenes (T6.147). Optional settings: older links get these defaults. */
-  chatting: z.object({ title: text(60, "Just chatting"), subtitle: text(120) }).prefault({}),
+  /** Offline scene (T6.147). Optional settings: older links get these defaults. */
   offline: z.object({ title: text(60, "Offline right now"), subtitle: text(120) }).prefault({}),
   /** Chat overlay (T3.3). `channel` is a Twitch login; "" until the streamer adds it. */
   chat: z

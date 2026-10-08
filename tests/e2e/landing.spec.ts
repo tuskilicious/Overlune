@@ -351,11 +351,9 @@ test("the landing page says what works where (T6.69, T6.79)", async ({ page }) =
   await expect(answer).toBeVisible();
   // One row per overlay, one column per platform, in words.
   const table = page.getByRole("table", { name: "Which overlays work on which platform" });
-  const row = (name: string | RegExp) =>
-    table.getByRole("row").filter({ hasText: name }).locator("td");
+  const row = (name: string) => table.getByRole("row").filter({ hasText: name }).locator("td");
   await expect(row("Scenes")).toHaveText(["Yes", "Yes", "Yes"]);
-  // Anchored: the Scenes row mentions "Just Chatting" (T6.147).
-  await expect(row(/^Chat/)).toHaveText(["Yes", "Not yet", "Not yet"]);
+  await expect(row("Chat")).toHaveText(["Yes", "Not yet", "Not yet"]);
   await expect(row("Webcam frame")).toHaveText(["Yes", "Yes", "Yes"]);
   await expect(row("Raids, subs")).toHaveText(["Yes", "Not yet", "No"]);
   await expect(row("Follow alerts")).toHaveText(["Not yet", "No", "No"]);

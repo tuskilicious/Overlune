@@ -247,6 +247,7 @@ Each look has its own scene composition (T6.134, plan and sketches in `docs/LAYO
 - **Phosphor, the terminal window:** one full-screen window with a title bar; the boot log first, the headline at a `$` prompt, the countdown as `T-minus`, the socials as an `ls` listing.
 - **Quest, the quest log:** one tall parchment panel on the left with the title, description, countdown and socials (ink, wax red and muted ink on parchment; the logo a small crest in its corner); the hall and embers stay open on the right.
 - One decoration less (the handoff's rule): where a layout has its own mark (the bar, the disc, the gauge, the stickers), the short accent rule above the headline is set to zero height. The scene-fit test still measures it.
+- **Offline (T6.147):** each look's full layout, like Stream Ending, with its own title and subtitle.
 
 **Layout v2, the default (T6.107):**
 **Scenes (layout v2, T6.107, after the maintainer's broadcast kits):** 88px top / 112px side / 72px bottom margins (inside the 64px safe margin). Logo top left (160px max). On the left, anchored to the bottom: a 96×8px accent rule, then a two-tone display headline (184px, -0.04em tracking, 0.94 leading, balanced, so "Starting soon" sets on two lines) whose last word takes the accent color, then the subtitle (40px, 30ch max). It shrinks to fit per T6.26 and fits again when the countdown widens as it ticks (T6.52). On the right, also bottom-anchored, one column (480px min): the countdown card (96px digits on one line, in the text color, so the accent stays with the headline) over the socials as a list, each an accent-tinted 72px icon tile with the platform name (small tracked caps) over the handle (36px bold). The open sky above both columns is where each theme's motif lives.
@@ -257,7 +258,6 @@ Each look has its own scene composition (T6.134, plan and sketches in `docs/LAYO
 ## Editor and site UI
 The editor, setup guide, privacy and terms pages share one quiet, high-contrast chrome in Overlune's brand (`docs/BRAND.md`), so the colorful theme previews stay the loudest thing on the page. Tokens live in `src/editor/brand.ts` and reach CSS as variables on `.editor` (`themeVars`). "Must" rules are hard requirements; "should" rules are defaults.
 
-- **Just Chatting and Offline (T6.147):** Offline uses each look's full layout, like Stream Ending. Just Chatting keeps only the look's backdrop and puts the title, subtitle and socials on a tag card in the top-left safe area (at most 760px wide), in the look's panel tokens (text, muted and accent on `surface`, which the contrast tests cover), with its own class names so no layout rule restyles it. The rest of the screen is left for the camera and chat sources on top. The OBS scene file's Just Chatting scene puts the webcam frame and chat where the Live scene does.
 ### Tokens and foundations
 | Token (CSS var) | Value | Use | Contrast |
 |---|---|---|---|

@@ -67,17 +67,14 @@ export default function App() {
               <FromLink>{(s, error) => <StartingSoon settings={s} error={error} />}</FromLink>
             }
           />
-          {(["chatting", "offline"] as const).map((scene) => (
-            <Route
-              key={scene}
-              path={`/o/${scene}`}
-              element={
-                <FromLink>
-                  {(s, error) => <TextScene scene={scene} settings={s} error={error} />}
-                </FromLink>
-              }
-            />
-          ))}
+          <Route
+            path="/o/offline"
+            element={
+              <FromLink>
+                {(s, error) => <TextScene scene="offline" settings={s} error={error} />}
+              </FromLink>
+            }
+          />
           <Route
             path="/o/brb"
             element={

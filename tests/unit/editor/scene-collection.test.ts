@@ -21,7 +21,6 @@ describe("OBS scene collection (T6.90)", () => {
     );
     expect(Object.keys(by)).toEqual([
       "Overlune Starting Soon",
-      "Overlune Just Chatting",
       "Overlune Be Right Back",
       "Overlune Stream Ending",
       "Overlune Offline",
@@ -36,7 +35,7 @@ describe("OBS scene collection (T6.90)", () => {
     for (const b of browsers) {
       const url = String((b.settings as { url: string }).url);
       expect(url).toMatch(
-        /^https:\/\/overlune\.in\/o\/(starting|chatting|brb|ending|offline|chat|frame|alerts)#1\./,
+        /^https:\/\/overlune\.in\/o\/(starting|brb|ending|offline|chat|frame|alerts)#1\./,
       );
       expect(decode(url.slice(url.indexOf("#")))).toEqual({ settings, ok: true });
     }
@@ -49,11 +48,10 @@ describe("OBS scene collection (T6.90)", () => {
       );
   });
 
-  it("makes six scenes, Starting Soon first, with Alerts on top of each but Offline (T6.147)", () => {
+  it("makes five scenes, Starting Soon first, with Alerts on top of each but Offline (T6.147)", () => {
     expect(c.scene_order.map((s) => s.name)).toEqual([
       "Overlune: Starting Soon",
       "Overlune: Live",
-      "Overlune: Just Chatting",
       "Overlune: Be Right Back",
       "Overlune: Stream Ending",
       "Overlune: Offline",
@@ -68,18 +66,15 @@ describe("OBS scene collection (T6.90)", () => {
     }
   });
 
-  it.each(["Live", "Just Chatting"])(
-    "puts chat bottom right and the frame bottom left in the %s scene, on a 1920×1080 canvas",
-    (name) => {
-      const live = scenes.find((s) => s.name === `Overlune: ${name}`)!;
-      const items = (live.settings as { items: { name: string; pos: { x: number; y: number } }[] })
-        .items;
-      const pos = Object.fromEntries(items.map((i) => [i.name, i.pos]));
-      expect(pos["Overlune Chat"]).toEqual({ x: 1920 - 420 - 40, y: 1080 - 560 - 40 });
-      expect(pos["Overlune Webcam frame"]).toEqual({ x: 40, y: 1080 - 450 - 40 });
-      expect(pos["Overlune Alerts"]).toEqual({ x: 0, y: 0 });
-    },
-  );
+  it("puts chat bottom right and the frame bottom left in the Live scene, on a 1920×1080 canvas", () => {
+    const live = scenes.find((s) => s.name === "Overlune: Live")!;
+    const items = (live.settings as { items: { name: string; pos: { x: number; y: number } }[] })
+      .items;
+    const pos = Object.fromEntries(items.map((i) => [i.name, i.pos]));
+    expect(pos["Overlune Chat"]).toEqual({ x: 1920 - 420 - 40, y: 1080 - 560 - 40 });
+    expect(pos["Overlune Webcam frame"]).toEqual({ x: 40, y: 1080 - 450 - 40 });
+    expect(pos["Overlune Alerts"]).toEqual({ x: 0, y: 0 });
+  });
 
   it("gives every source and scene its own id", () => {
     const ids = c.sources.map((s) => s.uuid);

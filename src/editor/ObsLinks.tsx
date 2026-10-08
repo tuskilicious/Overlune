@@ -6,10 +6,9 @@ import { sceneCollection } from "./scene-collection";
 import Icon from "../components/Icon";
 
 /** The full-screen scenes, with the Browser Source size to enter in OBS. `short` labels the editor's scene picker,
- *  where five full names wrap; Just Chatting and Offline are extras, so they don't count toward "You're set" (T6.147). */
+ *  where the full names wrap; Offline is an extra, so it doesn't count toward "You're set" (T6.147). */
 export const overlays = {
   starting: { name: "Starting Soon", short: "Starting", width: 1920, height: 1080 },
-  chatting: { name: "Just Chatting", short: "Chatting", width: 1920, height: 1080, optional: true },
   brb: { name: "Be Right Back", short: "BRB", width: 1920, height: 1080 },
   ending: { name: "Stream Ending", short: "Ending", width: 1920, height: 1080 },
   offline: { name: "Offline", short: "Offline", width: 1920, height: 1080, optional: true },

@@ -31,9 +31,6 @@ interface Props {
   /** Shown above the content (e.g. <OverlayError />), which moves down to make room. */
   error?: ReactNode;
   children?: ReactNode;
-  /** Just Chatting (T6.147): a small heading in the corner instead of a headline, leaving room for the camera and
-   *  chat on top (scene.css). */
-  compact?: boolean;
 }
 
 /** A two-tone headline (T6.107): the last word takes the accent color. Each word is its own span so the entrance
@@ -53,8 +50,8 @@ function TwoTone({ text }: { text: string }) {
   ));
 }
 
-/** Shared 1920×1080 scene layout for Starting Soon, Just Chatting, BRB, Stream Ending and Offline. */
-export default function SceneFrame({ settings, title, subtitle, error, children, compact }: Props) {
+/** Shared 1920×1080 scene layout for Starting Soon, BRB, Stream Ending and Offline. */
+export default function SceneFrame({ settings, title, subtitle, error, children }: Props) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
   // A row added in the editor but not filled in yet would show as a bare "Twitch" box on stream (T6.27).
   const socials = settings.socials.filter((s) => s.handle.trim());
@@ -112,63 +109,34 @@ export default function SceneFrame({ settings, title, subtitle, error, children,
       data-enter={theme.enter.id}
       data-bg={theme.bgEffect}
       data-theme={theme.id}
-      data-compact={compact || undefined}
       style={themeVars(theme)}
     >
       {error}
-      {compact ? (
-        // Just Chatting (T6.147): a tag card in the top-left safe area, in the look's own panel colors, over the
-        // look's backdrop. The rest of the screen is left for the camera and chat sources on top.
-        <div className="scene-tag">
-          {settings.logo && (
-            <img className="scene-tag-logo" src={settings.logo} alt="Channel logo" />
-          )}
-          <div>
-            <h1 className="scene-tag-title">
-              <TwoTone text={title} />
-            </h1>
-            {subtitle && <p className="scene-tag-line">{subtitle}</p>}
+      <div className="scene-main">
+        {settings.logo && (
+          <img className="scene-logo" src={settings.logo} alt="Channel logo" onLoad={fit} />
+        )}
+        <h1 ref={titleEl} className="scene-title">
+          <TwoTone text={title} />
+        </h1>
+        {subtitle && <p className="scene-subtitle">{subtitle}</p>}
+        {(children || socials.length > 0) && (
+          <div className="scene-side">
+            {children}
             {socials.length > 0 && (
-              <ul className="scene-tag-socials">
+              <ul className="scene-socials">
                 {socials.map((s, i) => (
-                  <li key={i} className="scene-tag-line" style={{ "--i": i + 2 } as CSSProperties}>
+                  <li key={i} style={{ "--i": i } as CSSProperties}>
                     <SocialIcon platform={s.platform} />
-                    {/* Own class names: the looks' layouts restyle .scene-handle for their own panels. */}
-                    <span className="scene-tag-platform">{platformLabel[s.platform]}</span>{" "}
-                    {s.handle}
+                    <span className="scene-platform">{platformLabel[s.platform]}</span>{" "}
+                    <span className="scene-handle">{s.handle}</span>
                   </li>
                 ))}
               </ul>
             )}
           </div>
-        </div>
-      ) : (
-        <div className="scene-main">
-          {settings.logo && (
-            <img className="scene-logo" src={settings.logo} alt="Channel logo" onLoad={fit} />
-          )}
-          <h1 ref={titleEl} className="scene-title">
-            <TwoTone text={title} />
-          </h1>
-          {subtitle && <p className="scene-subtitle">{subtitle}</p>}
-          {(children || socials.length > 0) && (
-            <div className="scene-side">
-              {children}
-              {socials.length > 0 && (
-                <ul className="scene-socials">
-                  {socials.map((s, i) => (
-                    <li key={i} style={{ "--i": i } as CSSProperties}>
-                      <SocialIcon platform={s.platform} />
-                      <span className="scene-platform">{platformLabel[s.platform]}</span>{" "}
-                      <span className="scene-handle">{s.handle}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </div>
       {ticker && (
         <div className="scene-ticker">
           {label.trim() && <span className="scene-ticker-tab">{label}</span>}

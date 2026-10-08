@@ -25,7 +25,6 @@ const sample: Settings = {
   },
   brb: { title: "Snack break", subtitle: "Back in 5" },
   ending: { title: "GG!", subtitle: "Raiding a friend" },
-  chatting: { title: "Q&A time", subtitle: "Ask me anything" },
   offline: { title: "See you Friday", subtitle: "Streams Mon, Wed, Fri at 8 PM" },
   chat: {
     channel: "Tuskilicious",
