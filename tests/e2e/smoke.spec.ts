@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import lz from "lz-string";
+import { themeIds } from "../../src/themes/types";
 
 const link = (data: unknown) =>
   `/o/starting#1.${lz.compressToEncodedURIComponent(JSON.stringify(data))}`;
@@ -146,7 +147,10 @@ test("the bolder pass: a light runs round the countdown, and Lite holds it (T6.1
   const link = (extra = {}) =>
     `/o/starting#1.${lz.compressToEncodedURIComponent(JSON.stringify({ ...data, ...extra }))}`;
   const sweep = () =>
-    page.locator(".countdown").evaluate((el) => getComputedStyle(el, "::after").animationName);
+    // The light is the spinning layer inside .countdown-edge since T6.144.
+    page
+      .locator(".countdown-edge")
+      .evaluate((el) => getComputedStyle(el, "::before").animationName);
   const disc = () =>
     page.locator(".scene").evaluate((el) => getComputedStyle(el, "::before").animationName);
   await page.goto(link());
@@ -181,4 +185,71 @@ test("no overlay loads an animation or UI-kit package (T6.136)", async ({ page }
     ).toEqual([]);
     page.removeAllListeners("request");
   }
+});
+
+test.describe("cheap effects (T6.144)", () => {
+  const scene = (theme: string) =>
+    `/o/starting#1.${lz.compressToEncodedURIComponent(
+      JSON.stringify({
+        theme,
+        starting: { subtitle: "Chill games", endsAt: Date.now() + 26 * 3_600_000, tz: "UTC" },
+        socials: [{ platform: "twitch", handle: "yourname" }],
+        ticker: { show: true, label: "Follow" },
+      }),
+    )}`;
+
+  // Looping animations run for the whole stream, so they may only move, turn, scale or fade: the GPU does those
+  // without repainting. One allowed exception: Vaporwave's sun stripes slide a mask (the look's signature motion;
+  // Lite holds it).
+  const cheap = new Set(["transform", "translate", "rotate", "scale", "opacity"]);
+  const allowed = new Set(["sun-stripes"]);
+
+  for (const theme of themeIds)
+    test(`${theme}: every looping animation moves, turns, scales or fades`, async ({ page }) => {
+      await page.goto(scene(theme));
+      await page.waitForTimeout(500);
+      const loops = await page.evaluate(() =>
+        document
+          .getAnimations()
+          .filter((a) => a.effect?.getTiming().iterations === Infinity)
+          .map((a) => ({
+            name: (a as CSSAnimation).animationName,
+            props: [
+              ...new Set(
+                (a.effect as KeyframeEffect)
+                  .getKeyframes()
+                  .flatMap((k) =>
+                    Object.keys(k).filter(
+                      (p) => !["offset", "easing", "composite", "computedOffset"].includes(p),
+                    ),
+                  ),
+              ),
+            ],
+          })),
+      );
+      const costly = loops
+        .filter((l) => !allowed.has(l.name))
+        .filter((l) => l.props.length === 0 || l.props.some((p) => !cheap.has(p)))
+        .map((l) => `${l.name}: ${l.props.join(", ") || "a custom property"}`);
+      expect(costly).toEqual([]);
+    });
+
+  test("animations pause while OBS hides the source, and pick up when it's shown", async ({
+    page,
+  }) => {
+    await page.goto(scene("neon-grid"));
+    await page.waitForTimeout(500);
+    const states = () =>
+      page.evaluate(() => [...new Set(document.getAnimations().map((a) => a.playState))]);
+    const obs = (visible: boolean) =>
+      page.evaluate(
+        (v) =>
+          dispatchEvent(new CustomEvent("obsSourceVisibleChanged", { detail: { visible: v } })),
+        visible,
+      );
+    await obs(false);
+    await expect.poll(states).toEqual(["paused"]);
+    await obs(true);
+    await expect.poll(states).toContain("running");
+  });
 });

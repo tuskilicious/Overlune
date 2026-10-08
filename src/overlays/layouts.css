@@ -92,7 +92,7 @@
 }
 
 /* The light that runs round the countdown card (T6.123) would trace one cell of the shelf. */
-.scene[data-theme="clean-slate"] .countdown::after {
+.scene[data-theme="clean-slate"] .countdown-edge {
   display: none;
 }
 
@@ -166,7 +166,7 @@
 }
 
 /* The light that runs round the countdown card (T6.123) would cut the slab's angle. */
-.scene[data-theme="bold-esports"] .countdown::after {
+.scene[data-theme="bold-esports"] .countdown-edge {
   display: none;
 }
 
@@ -514,7 +514,7 @@
   box-shadow: none;
 }
 
-.scene[data-theme="daylight"] .countdown::after {
+.scene[data-theme="daylight"] .countdown-edge {
   display: none;
 }
 
@@ -629,7 +629,7 @@
   box-shadow: none;
 }
 
-.scene[data-theme="phosphor"] .countdown::after {
+.scene[data-theme="phosphor"] .countdown-edge {
   display: none;
 }
 
@@ -703,7 +703,7 @@
   box-shadow: none;
 }
 
-.scene[data-theme="shonen"] .countdown::after {
+.scene[data-theme="shonen"] .countdown-edge {
   display: none;
 }
 
@@ -856,7 +856,7 @@
   rotate: -5deg;
 }
 
-.scene[data-theme="skate-deck"] .countdown::after {
+.scene[data-theme="skate-deck"] .countdown-edge {
   display: none;
 }
 
@@ -901,7 +901,7 @@
   box-shadow: none;
 }
 
-.scene[data-theme="cozy-cafe"] .countdown::after {
+.scene[data-theme="cozy-cafe"] .countdown-edge {
   display: none;
 }
 
@@ -1000,7 +1000,7 @@
   border-radius: 999px;
 }
 
-.scene[data-theme="pastel-cloud"] .countdown::after {
+.scene[data-theme="pastel-cloud"] .countdown-edge {
   display: none;
 }
 
@@ -1161,7 +1161,7 @@
   box-shadow: none;
 }
 
-.scene[data-theme="abyss"] .countdown::after {
+.scene[data-theme="abyss"] .countdown-edge {
   display: none;
 }
 
@@ -1248,7 +1248,7 @@
   box-shadow: none;
 }
 
-.scene[data-theme="sakura"] .countdown::after {
+.scene[data-theme="sakura"] .countdown-edge {
   display: none;
 }
 
@@ -1364,7 +1364,7 @@
   text-align: left;
 }
 
-.scene[data-theme="quest"] .countdown::after {
+.scene[data-theme="quest"] .countdown-edge {
   display: none;
 }
 
