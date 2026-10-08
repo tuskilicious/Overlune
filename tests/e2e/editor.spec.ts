@@ -1493,6 +1493,25 @@ test("Show badges under More chat options hides them in the chat preview (T6.76)
   await expect(chat.locator(".chat-badge")).toHaveCount(0);
 });
 
+test("a square webcam frame is one click, and its link is square (T6.146)", async ({ page }) => {
+  const part = page.locator("#part-frame");
+  await part
+    .getByRole("group", { name: "Common camera sizes" })
+    .getByRole("button", { name: "480 × 480" })
+    .click();
+  await expect(part.getByLabel("Frame width")).toHaveValue("480");
+  await expect(part.getByLabel("Frame height")).toHaveValue("480");
+  await expect(part.getByRole("button", { name: "480 × 480" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  const row = page.locator(".editor-link").filter({ hasText: "Webcam frame" });
+  await expect(row).toContainText("Width 480 · Height 480");
+  await page.goto((await row.getByRole("textbox").inputValue()).replace(/^https?:\/\/[^/]+/, ""));
+  await expect(page.locator(".frame")).toHaveCSS("width", "480px");
+  await expect(page.locator(".frame")).toHaveCSS("height", "480px");
+});
+
 test("the webcam frame: size, name and preview in the editor, and its link (T6.88)", async ({
   page,
 }) => {

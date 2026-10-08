@@ -4,12 +4,13 @@ import FramePlacer from "../FramePlacer";
 import Preview from "../Preview";
 import { NumberField, same, type SectionProps } from "./fields";
 
-/** Common webcam frame sizes (T6.118): 16:9 at three sizes, and 4:3. */
+/** Common webcam frame sizes (T6.118): 16:9 at three sizes, 4:3, and square (T6.146, for a cropped camera). */
 const frameSizes = [
   [480, 270],
   [640, 360],
   [800, 450],
   [640, 480],
+  [480, 480],
 ] as const;
 
 /** The webcam frame: its size, where it goes (T6.122) and its name tab. */
