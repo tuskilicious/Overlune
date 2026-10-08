@@ -103,7 +103,7 @@ The starting palettes below are suggestions. Verify contrast before shipping eac
 - Colors: bg `#EEF1F6` (cool paper), surface `#FFFFFF`, titles and text ink `#141821`, accent vermilion `#C93A1C`, muted `#5B6272`
 - Fonts: Space Grotesk / Nunito Sans
 - Effects: none; a soft shadow under surfaces, hairline border `#D9DEE7`, radius 14
-- Contrast: text, muted and accent all pass AA on both bg and surface (accent 4.5:1 on bg, 5.1:1 on white). Reuses Clean Slate's alert sound.
+- Contrast: text, muted and accent all pass AA on both bg and surface (accent 4.5:1 on bg, 5.1:1 on white). Its own alert sound: a clean bell (synthesized, T6.142).
 
 ### Motion (T6.117)
 One motion grammar for every look, flavoured by its `enter` and `alertAnim`. All of it plays once per event and stops under reduced motion (`?rm=1`, "Less motion" or the OS setting); hidden pieces show at once.
@@ -131,7 +131,7 @@ Built to the bar of the maintainer's own kits (Tuskilicious, ICARUS): each look 
 - Shape: radius 4; surfaces split by a hairline seam (`#16343A`), never a shadow or glow
 - Light rule: the accent (and any glow) is kept for living things: the headline's last word, the countdown (digits breathe, 4.5s), the newest chat message (a faint accent wash), the alert (accent seam and a soft glow below), glowing motes in the snow
 - Effect (`abyss`): last surface light slanting in from the top left and fading into the water; marine snow sinking in two full-width layers (far 80s, near 54s), three motes glowing. Transform only; still under reduced motion.
-- Sound: reuses Forest Night's alert sound.
+- Sound: a soft sonar ping with one echo over a low hum (synthesized, T6.142).
 
 **11. Session** (T6.110): every scene is a frame of a jazz-session anime: Starting Soon the title card, BRB the eyecatch, the ending the end card.
 - Colors: mustard ground `#E0B23C`, teal `#146B6E` and brick `#B23A2E` bars, cream surface `#F1E6CF`, ink `#0E0E0E` for titles, text and outlines, muted `#4F4334`; the headline's last word in brick
@@ -139,14 +139,14 @@ Built to the bar of the maintainer's own kits (Tuskilicious, ICARUS): each look 
 - Shape: radius 0, 3px ink outlines, no shadows; ink icon tiles; hard wipes (350ms in, 250ms out) like a cut on the beat
 - Effect (`session`): one diagonal teal bar and a thin brick bar across the open top, kept clear of a three-line title, so text only sits on mustard; print grain (`public/images/themes/print-grain.svg`, SVG noise) multiplied over every color. Static.
 - Adaptations: the lines sit tight but never overlap (legible at 720p); the title card's figure silhouettes need commissioned art and are left out.
-- Sound: reuses Cozy Café's alert sound.
+- Sound: a brush snare swish into a muted horn stab (synthesized, T6.142).
 
 **12. Shonen** (T6.111): every scene is a manga page.
 - Colors: paper `#F4F3EE`, white surface, ink `#111111` for titles, text and outlines, muted `#454545`, one spot color, manga red `#D61F26` (the headline's last word, alerts)
 - Fonts: Bangers (headline 196px, ink with a 14px white knockout stroke; countdown 104px) / Comic Neue
 - Shape: radius 0, 4px ink outlines, no shadows; the right column sits in white inked panels (countdown and socials); the chat stack is an inked panel; alerts land with an impact (bounce)
 - Effect (`shonen`): a 6px ink panel border 32px in from the edge (an outline, so it paints above the art); speed lines bursting from a focal point at the top right, clear at the center and gone before the text; a hard-cut screentone sheet over the lower left, with the subtitle in a white knockout so it stays readable. Static.
-- Sound: reuses Bold Esports' alert sound.
+- Sound: a whoosh into one big taiko hit (synthesized, T6.142).
 
 ### Four more looks (T6.125-T6.128)
 From impeccable's second direction round (seed `c833f7e1`, reroll 1), all four picked by the owner. Every loop stops in Lite and Still.
@@ -156,28 +156,28 @@ From impeccable's second direction round (seed `c833f7e1`, reroll 1), all four p
 - Fonts: Shippori Mincho (headline 168px, weight 500; countdown 88px) / Nunito
 - Shape: radius 12; the rule above the title is a tapered brush stroke in the accent
 - Effect (`sakura`): a paper lantern's warm glow in the open top right (light through washi); petals drifting down and across in two layers (40s far, 26s near), each a tile that slides one tile so the loop never jumps.
-- Sound: reuses Pastel Cloud's alert sound.
+- Sound: a single koto-style pluck (synthesized, T6.142).
 
 **14. Skate Deck** (T6.126): a skate-shop deck wall.
 - Colors: maple `#E8B877` with its grain, grip-tape `#151515` surface and titles, cream text `#F7F2E8` on the panels, accent hot pink `#FF4FA3`; the deck adds aqua `#19E3D1` and yellow `#FFE14D`
 - Fonts: Bungee (sticker lettering 128px with a 16px white outline) / Barlow
 - Shape: radius 18, 3px ink borders, no shadows; socials sit on a grip-tape panel; alerts bounce in
 - Effect (`skate`): a deck lying in the open top right, rocking on its trucks (3.2s).
-- Sound: reuses Arcade 8-Bit's alert sound.
+- Sound: a board pop, then a landing click (synthesized, T6.142).
 
 **15. Phosphor** (T6.127): a green-phosphor terminal at midnight.
 - Colors: black glass `#040A05`, surface `#07120A`, one ink in three strengths: titles `#9DFFAE`, text `#B9F5C6`, accent `#4DFF78`; muted `#73B583`
 - Fonts: JetBrains Mono for everything (headline 128px, weight 700)
 - Shape: radius 2, hairline `#1C4A27` borders; text blooms, the title leaves a faint afterimage; stepped entrances
 - Effect (`phosphor`): scanlines and a vignette; a faint boot log in the open top right; a slow refresh band (7s); a cursor that breathes after the title.
-- Sound: reuses Neon Grid's alert sound.
+- Sound: a pair of terminal beeps, the second higher (synthesized, T6.142).
 
 **16. Quest** (T6.128): a fantasy RPG quest log.
 - Colors: dark hall `#1B130C`, gold `#F2D489` titles (the last word forge orange `#FFB547`), parchment `#F2E4C4` panels with ink `#3A2716` text, muted `#6A4D2E`, wax-seal red `#8E2A1E` accent
 - Fonts: Cinzel (carved capitals 148px) / Alegreya (italic subtitle)
 - Shape: radius 6, 2px gilt `#B88F3E` borders with an inner gilt line; countdown and socials on parchment panels
 - Effect (`quest`): embers rising from below (18s) through a forge glow, a vignette over the hall.
-- Sound: reuses Forest Night's alert sound.
+- Sound: a lute strum up a chord, then a short horn call (synthesized, T6.142).
 
 ## The bar for a new or reworked look
 Set on 2026-10-07 from the owner's design handoff, an audit of the looks against paid packs (not in the repo). It applies to every new look and to any rework of a shipped one; shipped looks aren't redesigned only to meet it. These rules, CLAUDE.md and the sections above win over any style skill.
@@ -206,7 +206,7 @@ Set on 2026-10-07 from the owner's design handoff, an audit of the looks against
 **House patterns** are shared by every look, so they aren't tells: the two-tone headline whose last word takes the accent (T6.107), the uppercase event label on alerts, and small tracked caps for the platform names in the socials list. A look doesn't add a second accented word or more caps labels on top of them.
 
 **Known gaps (2026-10-07):**
-- Sounds: eight looks reuse another look's sound: Daylight (Clean Slate's), Abyss and Quest (Forest Night's), Session (Cozy Café's), Shonen (Bold Esports'), Sakura (Pastel Cloud's), Skate Deck (Arcade 8-Bit's), Phosphor (Neon Grid's).
+- Sounds: every look has its own (T6.142). The eight newest (Daylight, Abyss, Session, Shonen, Sakura, Skate Deck, Phosphor, Quest) are synthesized by `tests/make-sounds.py`, normalized to -12 LUFS (-12 to -14.7 measured; the shortest, Skate Deck's pop, measures lowest); `tests/unit/themes/sounds.test.ts` checks each look's file exists and is its own.
 - Fonts: Space Grotesk is Daylight's heading and Vaporwave Sunset's body. Body faces shared by two looks: Nunito Sans (Forest Night, Daylight), Nunito (Cozy Café, Sakura), Barlow (Bold Esports, Skate Deck).
 - Composition: closed in T6.134. Every look now has its own scene layout (see "Scene layout"); layout v2 stays as the starting point for new looks.
 - Shipped looks that match a tell keep it until they are reworked: Bold Esports (near-black with one red), Neon Grid (neon with a grid).
