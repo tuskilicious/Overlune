@@ -2,6 +2,19 @@
 
 What changed in each Overlune release. Overlay links from every release keep working: the link format only ever gains optional settings.
 
+## 1.4.0 (2026-10-08)
+
+A new Offline scene, a square webcam frame, and a refreshed home page. Every earlier link keeps working: Offline is a new link you can add when you want it.
+
+### New
+- **Offline scene:** a full scene in your look for when you're not live, with its own title ("Offline right now" to start) and a line for your schedule. Its link sits with the others in the editor, and the OBS scene file now includes an Offline scene.
+- **Square webcam frame:** 480 × 480 is now one of the quick sizes, and draws cleanly in every look.
+
+### Site
+- **Refreshed home page:** "Seven overlays in every look", with a magnifier that shows each overlay up close under your mouse; the steps to go live joined by a line that draws as you scroll; and Offline in the looks preview.
+- **A ruler for a scrollbar:** on wide screens with a mouse, the home page scrolls with a ruler on the right edge that shows how far you've read and which section you're in. Click or drag it to move. Touch screens keep their usual scrollbar.
+- **New footer** on every page, with its links in groups.
+
 ## 1.3.1 (2026-10-08)
 
 Every look now sounds like itself, and the moving backgrounds are much lighter on your PC. Every earlier link keeps working and picks up the changes on its own.
