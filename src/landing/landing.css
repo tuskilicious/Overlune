@@ -65,13 +65,6 @@
   transition: none !important;
 }
 
-/* Ambient background: brand colors as soft radial light (BRAND.md: the gradient stays behind no body text). */
-.landing-ambient {
-  background:
-    radial-gradient(60% 50% at 85% 20%, rgb(74 42 227 / 0.35), transparent 70%),
-    radial-gradient(40% 40% at 10% 80%, rgb(24 210 245 / 0.12), transparent 70%);
-}
-
 /* Theme-name marquee. Reduced-motion version: index.css stops it and the row stands still. */
 @keyframes landing-marquee {
   to {
