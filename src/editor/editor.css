@@ -1,4 +1,49 @@
 /* Editor chrome uses Overlune brand tokens (src/editor/brand.ts, docs/BRAND.md), set as CSS variables on .editor. */
+
+/* While the editor chrome is mounted, the page itself is dark too, so the window's own scrollbar matches. Not
+   site-wide: overlays need a transparent page, and the landing page sets its own. The thumb is Haze mixed into Night
+   (brand.ts), at least 3:1 against the Night track (contrast.test.ts). */
+:root:has(.editor) {
+  color-scheme: dark;
+  background: #05061a;
+  --scroll-thumb: color-mix(in srgb, #a7a0d6 60%, #05061a);
+  --scroll-thumb-hover: color-mix(in srgb, #a7a0d6 80%, #05061a);
+}
+
+/* Thin themed scrollbars on the page and the editor's scrollers. Chrome draws the ::-webkit-scrollbar rules (which it
+   ignores once scrollbar-color is set, so that is Firefox-only here); Firefox draws scrollbar-color. */
+@supports not selector(::-webkit-scrollbar) {
+  :root:has(.editor),
+  .editor-side {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) transparent;
+  }
+}
+
+:root:has(.editor)::-webkit-scrollbar,
+.editor-side::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+:root:has(.editor)::-webkit-scrollbar-track,
+.editor-side::-webkit-scrollbar-track,
+:root:has(.editor)::-webkit-scrollbar-corner,
+.editor-side::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+:root:has(.editor)::-webkit-scrollbar-thumb,
+.editor-side::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: var(--scroll-thumb) content-box;
+}
+
+:root:has(.editor)::-webkit-scrollbar-thumb:hover,
+.editor-side::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scroll-thumb-hover);
+}
 .editor {
   min-height: 100vh;
   color-scheme: dark;
@@ -721,6 +766,7 @@
     top: 64px;
     max-height: calc(100vh - 80px);
     overflow-y: auto;
+    scrollbar-gutter: stable; /* no shift when the bar appears */
     padding: 4px; /* room for focus rings inside the scroll box */
     margin: -4px;
   }
@@ -1764,12 +1810,71 @@
   font-size: 13px;
 }
 
+/* The strip scrolls sideways with its bar hidden; Previous and Next, a faded edge where more looks are, and arrow keys
+   on the focused strip replace it. */
+.editor-strip-scroller {
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 4px; /* snaps to the track's padding, so the first look sits at the start */
+  scrollbar-width: none;
+  border-radius: var(--radius);
+}
+
+.editor-strip-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.editor-strip-scroller[data-more~="start"] {
+  mask-image: linear-gradient(to right, transparent, #000 48px);
+}
+
+.editor-strip-scroller[data-more~="end"] {
+  mask-image: linear-gradient(to left, transparent, #000 48px);
+}
+
+.editor-strip-scroller[data-more="start end"] {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 48px,
+    #000 calc(100% - 48px),
+    transparent
+  );
+}
+
+.editor-strip-scroller:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .editor-strip-track {
   display: flex;
   gap: 12px;
-  overflow-x: auto;
+  width: max-content;
   padding: 4px 4px 10px;
-  scroll-snap-type: x proximity;
+}
+
+.editor .editor-strip-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.editor .editor-strip-nav button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.editor .editor-strip-nav button[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.editor-strip-nav .icon {
+  width: 16px;
+  height: 16px;
 }
 
 .editor .editor-strip-look {

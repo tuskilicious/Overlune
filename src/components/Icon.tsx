@@ -5,6 +5,7 @@ import "./icon.css";
 const paths = {
   check: "M2 6.5 5 9.5 10 3",
   back: "M10 6H2.5M6 2.5 2.5 6 6 9.5",
+  next: "M2 6h7.5M6 2.5 9.5 6 6 9.5",
   arrow: "M3.5 8.5 8.5 3.5M4.5 3.5h4v4",
   expand: "M7 2.5h2.5V5M5 9.5H2.5V7M9.5 2.5 6.5 5.5M2.5 9.5l3-3",
   // The editor's section list (T6.135).

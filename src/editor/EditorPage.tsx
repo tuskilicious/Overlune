@@ -33,17 +33,28 @@ import Colors from "./sections/Colors";
 
 const browserTz = localZone();
 
+/** Smooth scrolling shows where things go (T6.103); reduced motion jumps straight there. */
+const scrollBehavior = (): ScrollBehavior =>
+  matchMedia("(prefers-reduced-motion: reduce)").matches || "rm" in document.documentElement.dataset
+    ? "auto"
+    : "smooth";
+
 /** Scrolls to a section and moves focus there. No real #fragment jump: the address bar's fragment holds the settings. */
 const jumpTo = (e: MouseEvent, id: string) => {
   e.preventDefault();
   const target = document.getElementById(id);
-  // A smooth scroll shows where the section is (T6.103); reduced motion jumps straight there.
-  const still =
-    matchMedia("(prefers-reduced-motion: reduce)").matches ||
-    "rm" in document.documentElement.dataset;
-  target?.scrollIntoView({ behavior: still ? "auto" : "smooth" });
+  target?.scrollIntoView({ behavior: scrollBehavior() });
   target?.focus({ preventScroll: true });
 };
+
+/** Which ends of the looks filmstrip have more looks past them, for its faded edges and Previous/Next. */
+const moreIn = (el: HTMLElement) =>
+  [el.scrollLeft > 1 && "start", el.scrollLeft + el.clientWidth < el.scrollWidth - 1 && "end"]
+    .filter(Boolean)
+    .join(" ");
+
+/** One card and its gap: 150px + 12px (editor.css). */
+const stripStep = 162;
 
 /** The editor's three steps (T6.18), in the steps bar and as section headings. */
 const steps = [
@@ -412,6 +423,17 @@ export default function EditorPage() {
   const { alert: testAlert, play: playAlert } = useTestAlerts(settings);
   const nextAlert = useRef(0);
   const [picked, setPicked] = useState<Picked | null>(null);
+  const strip = useRef<HTMLDivElement>(null);
+  const [stripMore, setStripMore] = useState("");
+  useEffect(() => {
+    const el = strip.current;
+    if (!el) return;
+    const update = () => setStripMore(moreIn(el));
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [welcome, mood]);
 
   return (
     <div className="editor" style={themeVars(brandChrome)}>
@@ -867,29 +889,65 @@ export default function EditorPage() {
                     ))}
                   </div>
                   <p className="editor-hint">Pick one and every scene restyles.</p>
+                  <div className="editor-strip-nav">
+                    {(
+                      [
+                        ["Previous looks", "back", "start", -1],
+                        ["Next looks", "next", "end", 1],
+                      ] as const
+                    ).map(([label, icon, side, dir]) => (
+                      <button
+                        key={side}
+                        type="button"
+                        aria-label={label}
+                        aria-controls="strip-scroller"
+                        aria-disabled={!stripMore.includes(side) || undefined}
+                        onClick={() =>
+                          strip.current?.scrollBy({
+                            left: dir * stripStep,
+                            behavior: scrollBehavior(),
+                          })
+                        }
+                      >
+                        <Icon name={icon} />
+                      </button>
+                    ))}
+                  </div>
                 </div>
+                {/* Focusable so the arrow keys scroll it, with the bar hidden (axe: scrollable-region-focusable). */}
                 <div
-                  className="editor-strip-track"
-                  role="radiogroup"
-                  aria-labelledby="strip-heading"
+                  id="strip-scroller"
+                  ref={strip}
+                  className="editor-strip-scroller"
+                  role="region"
+                  aria-label="Looks, scrolls sideways"
+                  tabIndex={0}
+                  data-more={stripMore || undefined}
+                  onScroll={(e) => setStripMore(moreIn(e.currentTarget))}
                 >
-                  {themeIds.map((id) => (
-                    <label
-                      key={id}
-                      className="editor-strip-look"
-                      hidden={mood !== "All" && !(moods[mood] as readonly ThemeId[]).includes(id)}
-                    >
-                      <input
-                        type="radio"
-                        name="strip-look"
-                        value={id}
-                        checked={settings.theme === id}
-                        onChange={() => update({ theme: id })}
-                      />
-                      <ThemeShot id={id} />
-                      <span>{themes[id].name}</span>
-                    </label>
-                  ))}
+                  <div
+                    className="editor-strip-track"
+                    role="radiogroup"
+                    aria-labelledby="strip-heading"
+                  >
+                    {themeIds.map((id) => (
+                      <label
+                        key={id}
+                        className="editor-strip-look"
+                        hidden={mood !== "All" && !(moods[mood] as readonly ThemeId[]).includes(id)}
+                      >
+                        <input
+                          type="radio"
+                          name="strip-look"
+                          value={id}
+                          checked={settings.theme === id}
+                          onChange={() => update({ theme: id })}
+                        />
+                        <ThemeShot id={id} />
+                        <span>{themes[id].name}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </section>
               <section

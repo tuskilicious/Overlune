@@ -21,6 +21,18 @@ describe("editor colors meet WCAG AA", () => {
     expect(contrast(t.bg, t.accent)).toBeGreaterThanOrEqual(4.5);
   });
 
+  // The scrollbar thumb is color-mix(in srgb, Haze 60%, Night) (editor.css) on a Night track.
+  it("the scrollbar thumb is at least 3:1 on its track", () => {
+    const hex = (c: string) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+    const mix = (a: string, b: string, p: number) =>
+      "#" +
+      hex(a)
+        .map((v, i) => Math.round(v * p + hex(b)[i]! * (1 - p)))
+        .map((v) => v.toString(16).padStart(2, "0"))
+        .join("");
+    expect(contrast(mix(t.textMuted, t.bg, 0.6), t.bg)).toBeGreaterThanOrEqual(3);
+  });
+
   it("control outlines and focus rings are at least 3:1 (WCAG 1.4.11)", () => {
     for (const edge of [t.textMuted, t.accent]) {
       expect(contrast(edge, t.bg)).toBeGreaterThanOrEqual(3);

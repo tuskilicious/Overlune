@@ -1776,3 +1776,30 @@ test("clicking a part of the scene preview jumps to its settings (T6.135)", asyn
   await page.mouse.move(0, 0);
   await expect(page.locator(".editor-pick-box")).toHaveCount(0);
 });
+
+test("the filmstrip scrolls by Previous, Next and the arrow keys, with its bar hidden (T6.135)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  // The page is dark while the editor is open, so the window's scrollbar matches.
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)).toBe(
+    "dark",
+  );
+  const scroller = page.getByRole("region", { name: "Looks, scrolls sideways" });
+  const left = () => scroller.evaluate((el) => el.scrollLeft);
+  await expect(scroller).toHaveAttribute("data-more", "end");
+  await expect(page.getByRole("button", { name: "Previous looks" })).toHaveAttribute(
+    "aria-disabled",
+    "true",
+  );
+  await page.getByRole("button", { name: "Next looks" }).click();
+  await expect.poll(left).toBeGreaterThan(100);
+  await expect(scroller).toHaveAttribute("data-more", "start end");
+  await page.getByRole("button", { name: "Previous looks" }).click();
+  await expect.poll(left).toBe(0);
+  // Keyboard: the strip itself takes focus, and the arrow keys scroll it.
+  await scroller.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(left).toBeGreaterThan(0);
+});
