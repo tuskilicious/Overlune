@@ -11,6 +11,14 @@ startSentry();
 if (new URLSearchParams(location.search).get("rm") === "1")
   document.documentElement.dataset.rm = "";
 
+// OBS tells a Browser source when it's hidden (another scene, or the eye icon off). Animations pause until it's shown
+// again, so a hidden overlay costs next to nothing (T6.144). Only OBS fires this event; elsewhere nothing changes.
+addEventListener("obsSourceVisibleChanged", (event) => {
+  const visible = (event as CustomEvent<{ visible: boolean }>).detail?.visible;
+  if (visible === false) document.documentElement.dataset.paused = "";
+  else delete document.documentElement.dataset.paused;
+});
+
 // A tab opened before a new deploy asks for page files the deploy replaced. Reload to get the new ones,
 // at most once in 10 seconds so a broken deploy can't loop.
 window.addEventListener("vite:preloadError", (event) => {

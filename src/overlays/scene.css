@@ -790,19 +790,37 @@
   background: color-mix(in srgb, var(--surface) 70%, transparent);
 }
 
-/* The countdown is alive: accent digits that breathe. Reduced motion: index.css holds the glow still. */
+/* The countdown is alive: accent digits with a light behind them that breathes. The light is its own layer whose
+   opacity pulses (T6.144): breathing the digits' text-shadow instead repainted and re-laid out the page every frame,
+   about a quarter of a throttled CPU. Lite and reduced motion: index.css holds it still. */
 .scene[data-theme="abyss"] .countdown-time {
+  position: relative;
+  isolation: isolate;
   font-size: 84px;
   font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--accent);
   text-shadow: 0 0 28px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.scene[data-theme="abyss"] .countdown-time::after {
+  content: "";
+  position: absolute;
+  inset: -40% -6%;
+  z-index: -1;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--accent) 30%, transparent),
+    transparent
+  );
+  opacity: 0.3;
+  pointer-events: none;
   animation: abyss-breathe 4.5s ease-in-out infinite alternate;
 }
 
 @keyframes abyss-breathe {
   to {
-    text-shadow: 0 0 44px color-mix(in srgb, var(--accent) 60%, transparent);
+    opacity: 1;
   }
 }
 
@@ -1478,24 +1496,25 @@
   text-align: left;
 }
 
+/* The refresh band: a 220px glow sweeping down the screen. It moves with `transform` (T6.144); sliding its background
+   instead repainted the whole screen every frame. */
 .scene[data-bg="phosphor"]::after {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: 0 0 auto;
+  height: 220px;
   z-index: 1;
   pointer-events: none;
   background: linear-gradient(transparent, rgb(157 255 174 / 0.05) 50%, transparent);
-  background-size: 100% 220px;
-  background-repeat: no-repeat;
   animation: phosphor-refresh 7s linear infinite;
 }
 
 @keyframes phosphor-refresh {
   from {
-    background-position: 0 -220px;
+    transform: translateY(-220px);
   }
   to {
-    background-position: 0 1300px;
+    transform: translateY(1300px);
   }
 }
 

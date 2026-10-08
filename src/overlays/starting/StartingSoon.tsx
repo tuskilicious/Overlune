@@ -33,6 +33,8 @@ export default function StartingSoon({
     <SceneFrame settings={settings} title={title} subtitle={subtitle} error={error}>
       {endsAt !== null && secs !== null && (
         <div className="countdown">
+          {/* The light running round the card's edge (starting.css); decoration only. */}
+          <span className="countdown-edge" aria-hidden="true" />
           {secs > 0 ? (
             <>
               <div className="countdown-time">
