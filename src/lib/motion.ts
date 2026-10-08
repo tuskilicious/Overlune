@@ -30,7 +30,8 @@ export function animate(
   sequences: Record<string, Sequence>,
   { still = false, plugins = [] }: { still?: boolean; plugins?: PluginLoader[] } = {},
 ): () => void {
-  if (still || rmSet()) return () => {};
+  // Motion off from the start (the OS setting, ?rm=1, Still): GSAP isn't even downloaded.
+  if (still || rmSet() || matchMedia("(prefers-reduced-motion: reduce)").matches) return () => {};
   let mm: ReturnType<Gsap["matchMedia"]> | undefined;
   let done = false;
   const stop = () => {
