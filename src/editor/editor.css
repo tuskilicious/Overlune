@@ -1224,9 +1224,15 @@
 
   /* Folded: icons only. The names leave the screen but stay for screen readers; the filled-in check sits on the
      icon's corner. */
+  /* The icons sit 19px in, open or folded (centered in the 56px folded column), so folding never moves them: no
+     jump to the middle of the still-wide column, and nothing to animate (T6.137). */
+  .editor .editor-rail :is(a, .editor-rail-toggle) {
+    padding-left: 19px;
+    padding-right: 6px; /* keeps "Channel page" and its check inside the 172px column */
+  }
+
   .editor .editor-rail[data-collapsed] :is(a, .editor-rail-toggle) {
-    justify-content: center;
-    padding-inline: 0;
+    padding-right: 0;
   }
 
   .editor-rail[data-collapsed] a {

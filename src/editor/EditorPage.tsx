@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
+import type { Flip as FlipType } from "gsap/Flip";
 import { Link } from "react-router";
 import { localZone } from "../lib/time";
+import { useMotion, type PluginLoader } from "../lib/motion";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
 import { defaultSettings, type Settings } from "../settings/schema";
@@ -220,20 +222,49 @@ const lookRadio = (id: ThemeId) => `${wide() ? "strip" : "theme"}-${id}`;
 /** The look picker (T6.135): the filmstrip under the preview on wide windows, a card grid as step 1 in the form on
  *  narrower ones. Both are always rendered and editor.css hides one with display: none, so screen readers and Tab
  *  only ever meet one. The filter state is shared. */
+const flipPlugin: PluginLoader[] = [() => import("gsap/Flip").then((m) => m.Flip)];
+
 function LookPicker({
   variant,
   theme,
   pick,
   mood,
   setMood,
+  still,
 }: {
   variant: "strip" | "grid";
   theme: ThemeId;
   pick: (id: ThemeId) => void;
   mood: Mood;
   setMood: (m: Mood) => void;
+  still: boolean;
 }) {
   const strip = variant === "strip";
+  // A filter makes the filmstrip's looks glide to their new places, and the ones it brings back fade in (GSAP Flip,
+  // T6.137): First, before the change, then Last and Play after React has drawn it. The grid changes at once.
+  const [section, run] = useMotion({ still, plugins: flipPlugin, query: "(min-width: 1200px)" });
+  const flip = useRef<ReturnType<typeof FlipType.getState> | null>(null);
+  const filter = (m: Mood) => {
+    run((_, [Flip], scope) => {
+      flip.current = (Flip as typeof FlipType).getState(
+        scope.querySelectorAll(".editor-strip-look"),
+      );
+    });
+    setMood(m);
+  };
+  useLayoutEffect(() => {
+    const state = flip.current;
+    flip.current = null;
+    if (state)
+      run((gsap, [Flip]) => {
+        (Flip as typeof FlipType).from(state, {
+          duration: 0.35,
+          ease: "power2.inOut",
+          onEnter: (els) =>
+            gsap.fromTo(els, { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.25 }),
+        });
+      });
+  }, [mood, run]);
   const scroller = useRef<HTMLDivElement>(null);
   const [more, setMore] = useState("");
   useEffect(() => {
@@ -248,7 +279,7 @@ function LookPicker({
   const pills = (
     <div className="editor-pills" role="group" aria-label="Show looks">
       {(["All", "Calm", "Retro", "Bold"] as const).map((m) => (
-        <button key={m} type="button" aria-pressed={mood === m} onClick={() => setMood(m)}>
+        <button key={m} type="button" aria-pressed={mood === m} onClick={() => filter(m)}>
           {m}
         </button>
       ))}
@@ -294,7 +325,7 @@ function LookPicker({
   // The filmstrip (the Studio board): real Starting Soon scenes, held still, as one radio group (one tab stop, arrow
   // keys move).
   return (
-    <section className="editor-strip" aria-labelledby="strip-heading">
+    <section ref={section} className="editor-strip" aria-labelledby="strip-heading">
       <div className="editor-strip-bar">
         <h2 id="strip-heading">Looks</h2>
         {pills}
@@ -563,11 +594,95 @@ export default function EditorPage() {
   const { alert: testAlert, play: playAlert } = useTestAlerts(settings);
   const nextAlert = useRef(0);
   const [picked, setPicked] = useState<Picked | null>(null);
+  // The highlight glides from one part of the preview to the next instead of jumping (T6.137): React draws it at the
+  // new part, then GSAP plays it in from where it was (FLIP). It moves with transforms; its size eases with it.
+  const [pickArea, pickMotion] = useMotion({ still: settings.lessMotion });
+  const lastPick = useRef<Picked | null>(null);
+  useLayoutEffect(() => {
+    const from = lastPick.current;
+    lastPick.current = picked;
+    if (!from || !picked || from.name === picked.name) return;
+    pickMotion((gsap, _, scope) =>
+      gsap.fromTo(
+        scope.querySelector(".editor-pick-box"),
+        {
+          x: from.left - picked.left,
+          y: from.top - picked.top,
+          width: from.width,
+          height: from.height,
+        },
+        {
+          x: 0,
+          y: 0,
+          width: picked.width,
+          height: picked.height,
+          duration: 0.18,
+          ease: "power2.out",
+          overwrite: true,
+          clearProps: "transform",
+        },
+      ),
+    );
+  }, [picked, pickMotion]);
+  // Folding the section list (T6.137): the names fade and slide out before the column narrows, and back in, one after
+  // another, once it has opened. The column and the icons move in CSS. Without motion it just folds.
+  const [rail, railMotion] = useMotion({
+    still: settings.lessMotion,
+    query: "(min-width: 1200px)",
+  });
+  const railNamesIn = useRef(false);
+  const railNames = (scope: Element) => scope.querySelectorAll(".editor-rail-name");
+  const foldRail = (next: boolean) => {
+    const apply = () => {
+      setRailCollapsed(next);
+      try {
+        localStorage.setItem(railKey, next ? "1" : "0");
+      } catch {
+        // Remembering it is a convenience; the menu still folds.
+      }
+    };
+    let ran = false;
+    railMotion((gsap, _, scope) => {
+      ran = true;
+      if (!next) {
+        railNamesIn.current = true; // they fade in once React has shown them
+        apply();
+        return;
+      }
+      gsap.to(railNames(scope), {
+        opacity: 0,
+        x: -8,
+        duration: 0.14,
+        stagger: 0.01,
+        ease: "power1.in",
+        onComplete: apply,
+      });
+    });
+    if (!ran) apply();
+  };
+  useLayoutEffect(() => {
+    railMotion((gsap, _, scope) => {
+      if (railCollapsed) gsap.set(railNames(scope), { clearProps: "opacity,transform" });
+      else if (railNamesIn.current)
+        gsap.from(railNames(scope), {
+          opacity: 0,
+          x: -8,
+          duration: 0.2,
+          delay: 0.06,
+          stagger: 0.015,
+          ease: "power2.out",
+          clearProps: "opacity,transform",
+        });
+      railNamesIn.current = false;
+    });
+  }, [railCollapsed, railMotion]);
   const picker = {
     theme: settings.theme,
     pick: (id: ThemeId) => update({ theme: id }),
     mood,
     setMood,
+    // Still motion holds the editor's own animations too (T6.137).
+    still: settings.lessMotion,
   };
 
   return (
@@ -788,6 +903,7 @@ export default function EditorPage() {
           <div className="editor-body" data-rail={railCollapsed ? "collapsed" : undefined}>
             {/* Wide windows only (editor.css); narrower ones use the steps bar above. */}
             <nav
+              ref={rail}
               className="editor-rail"
               aria-label="Sections"
               data-collapsed={railCollapsed || undefined}
@@ -833,15 +949,7 @@ export default function EditorPage() {
                 aria-controls="editor-rail-list"
                 aria-label={railCollapsed ? "Expand menu" : undefined}
                 title={railCollapsed ? "Expand menu" : undefined}
-                onClick={() => {
-                  const next = !railCollapsed;
-                  setRailCollapsed(next);
-                  try {
-                    localStorage.setItem(railKey, next ? "1" : "0");
-                  } catch {
-                    // Remembering it is a convenience; the menu still folds.
-                  }
-                }}
+                onClick={() => foldRail(!railCollapsed)}
               >
                 <Icon name={railCollapsed ? "open" : "collapse"} />
                 <span className="editor-rail-name">Collapse menu</span>
@@ -951,6 +1059,7 @@ export default function EditorPage() {
                   {/* Click a part to jump to its settings; hover outlines it and names it (T6.135, the Studio board).
                       A mouse shortcut only: the section list and the form already reach every setting by keyboard. */}
                   <div
+                    ref={pickArea}
                     className="editor-pick"
                     data-hover={picked ? "" : undefined}
                     onPointerMove={(e) => setPicked(partAt(e.currentTarget, e.clientX, e.clientY))}
