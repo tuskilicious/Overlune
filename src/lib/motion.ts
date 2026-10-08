@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { gsap as GsapType } from "gsap";
 
 export type Gsap = typeof GsapType;
@@ -56,31 +56,34 @@ export function animate(
   return stop;
 }
 
-/** What run() plays: GSAP and the loaded plugins, inside the reduced-motion context. */
-export type Play = (gsap: Gsap, plugins: object[]) => void;
+/** What run() plays: GSAP, the loaded plugins and the scope element, inside the reduced-motion context. */
+export type Play = (gsap: Gsap, plugins: object[], scope: Element) => void;
 
 /**
- * Animations started by events (T6.137): a click, a filter, a hover. GSAP loads lazily once the component mounts.
- * run(play) plays inside the same context as animate(), so unmount reverts it (GSAP's contextSafe pattern). While
- * motion is off, or GSAP is still loading, or `query` doesn't match, run() does nothing and the change simply shows at
- * once, which is also the reduced-motion version.
+ * Animations started by events (T6.137): a click, a filter, a hover. Put the returned ref on the element the
+ * animations live in; GSAP loads lazily once that element is on the page (a callback ref, so an element that appears
+ * later, like the editor behind the welcome gallery, still gets it). run(play) plays inside the same context as
+ * animate(), so unmount reverts it (GSAP's contextSafe pattern). While motion is off, or GSAP is still loading, or
+ * `query` doesn't match, run() does nothing and the change simply shows at once, which is also the reduced-motion
+ * version.
  */
-export function useMotion(
-  scope: RefObject<Element | null>,
-  {
-    still = false,
-    plugins,
-    query = "",
-  }: { still?: boolean; plugins?: PluginLoader[]; query?: string } = {},
-): (play: Play) => void {
+export function useMotion({
+  still = false,
+  plugins,
+  query = "",
+}: { still?: boolean; plugins?: PluginLoader[]; query?: string } = {}): [
+  ref: (el: Element | null) => void,
+  run: (play: Play) => void,
+] {
+  const [scope, setScope] = useState<Element | null>(null);
   const runner = useRef<((play: Play) => void) | null>(null);
   useEffect(() => {
-    if (!scope.current) return;
+    if (!scope) return;
     return animate(
-      scope.current,
+      scope,
       {
         [query]: (gsap, context, loaded) => {
-          runner.current = context.add("run", (play: Play) => play(gsap, loaded)) as (
+          runner.current = context.add("run", (play: Play) => play(gsap, loaded, scope)) as (
             play: Play,
           ) => void;
           return () => {
@@ -91,5 +94,5 @@ export function useMotion(
       { still, plugins },
     );
   }, [scope, still, plugins, query]);
-  return useCallback((play: Play) => runner.current?.(play), []);
+  return [setScope, useCallback((play: Play) => runner.current?.(play), [])];
 }

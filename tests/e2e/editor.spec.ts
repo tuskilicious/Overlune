@@ -1875,6 +1875,42 @@ test.describe("GSAP in the editor (T6.137)", () => {
     await expect(page.locator(".editor-strip-look:not([hidden])")).toHaveCount(4);
   });
 
+  test("folding the section list fades the names out first, keeps focus on the toggle, and the icons barely move", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const rail = page.getByRole("navigation", { name: "Sections" });
+    const icon = () =>
+      rail
+        .getByRole("link", { name: "Text" })
+        .evaluate((a) => a.querySelector(".icon")!.getBoundingClientRect().left);
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          performance.getEntriesByType("resource").some((e) => /gsap/.test(e.name)),
+        ),
+      )
+      .toBe(true);
+    await page.waitForTimeout(300);
+    const before = await icon();
+    await page.getByRole("button", { name: "Collapse menu" }).click();
+    // Mid-way the names are fading and the list hasn't folded yet.
+    await expect
+      .poll(() =>
+        rail
+          .locator(".editor-rail-name")
+          .first()
+          .evaluate((e) => Number(getComputedStyle(e).opacity)),
+      )
+      .toBeLessThan(1);
+    await expect(rail).toHaveAttribute("data-collapsed");
+    await expect(page.getByRole("button", { name: "Expand menu" })).toBeFocused();
+    expect(Math.abs((await icon()) - before)).toBeLessThanOrEqual(8);
+    await page.getByRole("button", { name: "Expand menu" }).click();
+    await expect(rail).not.toHaveAttribute("data-collapsed");
+    await expect(rail.locator(".editor-rail-name[style*='opacity']")).toHaveCount(0);
+  });
+
   for (const [name, setup] of [
     [
       "the OS setting",

@@ -242,13 +242,12 @@ function LookPicker({
   const strip = variant === "strip";
   // A filter makes the filmstrip's looks glide to their new places, and the ones it brings back fade in (GSAP Flip,
   // T6.137): First, before the change, then Last and Play after React has drawn it. The grid changes at once.
-  const section = useRef<HTMLElement>(null);
-  const run = useMotion(section, { still, plugins: flipPlugin, query: "(min-width: 1200px)" });
+  const [section, run] = useMotion({ still, plugins: flipPlugin, query: "(min-width: 1200px)" });
   const flip = useRef<ReturnType<typeof FlipType.getState> | null>(null);
   const filter = (m: Mood) => {
-    run((_, [Flip]) => {
+    run((_, [Flip], scope) => {
       flip.current = (Flip as typeof FlipType).getState(
-        section.current!.querySelectorAll(".editor-strip-look"),
+        scope.querySelectorAll(".editor-strip-look"),
       );
     });
     setMood(m);
@@ -595,6 +594,58 @@ export default function EditorPage() {
   const { alert: testAlert, play: playAlert } = useTestAlerts(settings);
   const nextAlert = useRef(0);
   const [picked, setPicked] = useState<Picked | null>(null);
+  // Folding the section list (T6.137): the names fade and slide out before the column narrows, and back in, one after
+  // another, once it has opened. The column and the icons move in CSS. Without motion it just folds.
+  const [rail, railMotion] = useMotion({
+    still: settings.lessMotion,
+    query: "(min-width: 1200px)",
+  });
+  const railNamesIn = useRef(false);
+  const railNames = (scope: Element) => scope.querySelectorAll(".editor-rail-name");
+  const foldRail = (next: boolean) => {
+    const apply = () => {
+      setRailCollapsed(next);
+      try {
+        localStorage.setItem(railKey, next ? "1" : "0");
+      } catch {
+        // Remembering it is a convenience; the menu still folds.
+      }
+    };
+    let ran = false;
+    railMotion((gsap, _, scope) => {
+      ran = true;
+      if (!next) {
+        railNamesIn.current = true; // they fade in once React has shown them
+        apply();
+        return;
+      }
+      gsap.to(railNames(scope), {
+        opacity: 0,
+        x: -8,
+        duration: 0.14,
+        stagger: 0.01,
+        ease: "power1.in",
+        onComplete: apply,
+      });
+    });
+    if (!ran) apply();
+  };
+  useLayoutEffect(() => {
+    railMotion((gsap, _, scope) => {
+      if (railCollapsed) gsap.set(railNames(scope), { clearProps: "opacity,transform" });
+      else if (railNamesIn.current)
+        gsap.from(railNames(scope), {
+          opacity: 0,
+          x: -8,
+          duration: 0.2,
+          delay: 0.06,
+          stagger: 0.015,
+          ease: "power2.out",
+          clearProps: "opacity,transform",
+        });
+      railNamesIn.current = false;
+    });
+  }, [railCollapsed, railMotion]);
   const picker = {
     theme: settings.theme,
     pick: (id: ThemeId) => update({ theme: id }),
@@ -822,6 +873,7 @@ export default function EditorPage() {
           <div className="editor-body" data-rail={railCollapsed ? "collapsed" : undefined}>
             {/* Wide windows only (editor.css); narrower ones use the steps bar above. */}
             <nav
+              ref={rail}
               className="editor-rail"
               aria-label="Sections"
               data-collapsed={railCollapsed || undefined}
@@ -867,15 +919,7 @@ export default function EditorPage() {
                 aria-controls="editor-rail-list"
                 aria-label={railCollapsed ? "Expand menu" : undefined}
                 title={railCollapsed ? "Expand menu" : undefined}
-                onClick={() => {
-                  const next = !railCollapsed;
-                  setRailCollapsed(next);
-                  try {
-                    localStorage.setItem(railKey, next ? "1" : "0");
-                  } catch {
-                    // Remembering it is a convenience; the menu still folds.
-                  }
-                }}
+                onClick={() => foldRail(!railCollapsed)}
               >
                 <Icon name={railCollapsed ? "open" : "collapse"} />
                 <span className="editor-rail-name">Collapse menu</span>
