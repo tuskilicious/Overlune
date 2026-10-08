@@ -117,6 +117,8 @@ test("GSAP never reaches the editor's or the overlays' bundles, arrives only by 
 
 test("with reduced motion the page is still and fully visible", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
+  const gsap: string[] = [];
+  page.on("request", (r) => /gsap/.test(r.url()) && gsap.push(r.url()));
   await page.goto("/");
   await page.getByRole("heading", { name: "Live in three steps" }).scrollIntoViewIfNeeded();
   await expect(page.getByRole("heading", { name: "Live in three steps" })).toHaveCSS(
@@ -124,6 +126,8 @@ test("with reduced motion the page is still and fully visible", async ({ page })
     "1",
   );
   await expect(page.locator(".landing-marquee")).toHaveCSS("animation-name", "none");
+  // Motion is off, so GSAP isn't even downloaded (T6.137).
+  expect(gsap).toEqual([]);
 });
 
 test("at phone width the page has no sideways scroll and stays accessible", async ({ page }) => {
