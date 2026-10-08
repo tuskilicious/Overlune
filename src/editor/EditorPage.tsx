@@ -145,6 +145,17 @@ const pickParts = [
   [".alert-box", "Alert", "part-alerts"],
 ] as const;
 
+/** Same part in the same place: nothing to redraw. */
+const samePick = (a: Picked | null, b: Picked | null) =>
+  a === b ||
+  (!!a &&
+    !!b &&
+    a.name === b.name &&
+    a.left === b.left &&
+    a.top === b.top &&
+    a.width === b.width &&
+    a.height === b.height);
+
 type Picked = {
   name: string;
   id: string;
@@ -1062,7 +1073,12 @@ export default function EditorPage() {
                     ref={pickArea}
                     className="editor-pick"
                     data-hover={picked ? "" : undefined}
-                    onPointerMove={(e) => setPicked(partAt(e.currentTarget, e.clientX, e.clientY))}
+                    onPointerMove={(e) => {
+                      const part = partAt(e.currentTarget, e.clientX, e.clientY);
+                      // Only when the part under the pointer changes: every pixel of movement would otherwise
+                      // re-render the whole editor.
+                      setPicked((was) => (samePick(was, part) ? was : part));
+                    }}
                     onPointerLeave={() => setPicked(null)}
                     onClick={(e) => {
                       const part = partAt(e.currentTarget, e.clientX, e.clientY);
