@@ -21,7 +21,7 @@ Note: the PRD gates v2 on "5 real streamers using v1 live" (T5.7, T6.6). This pl
 ## Stack additions (approved 2026-10-09: Cloudflare)
 | Area | Choice | Why |
 |---|---|---|
-| Auth | Twitch OAuth (authorization code + PKCE), our own sessions in D1 | Twitch is the identity provider, so no passwords anywhere; CLAUDE.md §5 sets the session rules |
+| Auth | Twitch OpenID Connect (authorization code, state and nonce; Twitch has no PKCE), our own sessions in D1 | Twitch is the identity provider, so no passwords anywhere; CLAUDE.md §5 sets the session rules |
 | Database | Cloudflare D1 | No row-level security, so every read and write goes through one data layer scoped to the signed-in user, checked by access tests in CI (CLAUDE.md §4) |
 | Uploads | Cloudflare R2 | Same account and deploy as the site |
 | Live updates | Durable Objects with WebSocket hibernation | Idle OBS sources cost nothing; no connection ceiling like Supabase's free 200 |

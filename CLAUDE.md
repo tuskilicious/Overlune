@@ -67,7 +67,7 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 ## 5. Auth and sessions
 > **Status: approved for v2, not active yet.** v1 has no accounts. v2 signs in with Twitch only. When that lands, every rule below applies. Tokens must also never appear in overlay URLs.
 
-- Sign-in is Twitch OAuth only (authorization code with PKCE and a `state` check): Twitch is the identity provider, and Overlune never sees or stores a password. Use a small, well-reviewed OAuth library over hand-rolled protocol code.
+- Sign-in is Twitch OAuth only (authorization code with OpenID Connect: a `state` check, a `nonce`, and the ID token's signature and claims verified. Twitch has no PKCE: its discovery document lists no `code_challenge_methods`, checked 2026-10-09, so the client secret stays on the server and state plus nonce tie the answer to the browser that asked; owner-approved 2026-10-09): Twitch is the identity provider, and Overlune never sees or stores a password. Use a small, well-reviewed OAuth library over hand-rolled protocol code.
 - Enforce auth on the server for every protected route. Client-side checks are UX only.
 - Session tokens are random (256 bits) and stored only as a hash. Never store or log a token or a Twitch access token, and never use fast hashes like MD5 or SHA-1 for anything secret.
 - Session cookies: `HttpOnly`, `Secure`, `SameSite=Lax` or `Strict`, with a sensible expiry.
