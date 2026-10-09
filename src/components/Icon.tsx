@@ -4,6 +4,7 @@ import "./icon.css";
 
 const paths = {
   check: "M2 6.5 5 9.5 10 3",
+  copy: "M4.5 4.5h6v6h-6zM7.5 4.5v-3h-6v6h3",
   back: "M10 6H2.5M6 2.5 2.5 6 6 9.5",
   next: "M2 6h7.5M6 2.5 9.5 6 6 9.5",
   arrow: "M3.5 8.5 8.5 3.5M4.5 3.5h4v4",
