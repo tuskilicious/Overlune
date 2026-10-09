@@ -647,6 +647,11 @@ The owner asked for more looks (2026-10-07), picked all four from impeccable's s
   - Accept: version 1.4.0 (a new overlay link, so a minor version); a dated changelog section in plain words; README and FUTURE-SCOPE.md name 1.4.0; the GitHub release published after the deploy is checked.
   - *Built 2026-10-08 on `chore/release-1.4.0`. `package.json` 1.4.0; CHANGELOG "1.4.0 (2026-10-08)": New (Offline scene, square frame) and Site (home page refresh, ruler scrollbar, footer). The overlay changes were OBS-tested in their own PRs (#187, #188); the landing refresh (#189) was reviewed by the owner on its preview.*
 
+### Smooth scrolling (2026-10-09)
+- [ ] **T6.150 Smooth scrolling on the landing page with Lenis.** The owner approved `lenis` (2026-10-09) for the landing page only.
+  - Accept: the wheel scrolls smoothly on `/`; reduced motion (OS, `?rm=1`, Still) keeps native scrolling and never downloads Lenis; the editor and overlays never load it; ScrollTrigger scenes, the ruler and nested sideways scrollers still work; keyboard scrolling and anchor links unchanged; STACK.md lists it; landing e2e updated.
+  - *Built 2026-10-09 on `feat/lenis-landing`. `lenis` 1.3.26 (MIT, exact pin), created in the landing page's `animate()` sequence by dynamic import, driven by `gsap.ticker` with `ScrollTrigger.update` on each scroll, destroyed on unmount; `allowNestedScroll` keeps the comparison table's sideways scroll; anchors stay native for focus. Lenis's own CSS imported with the landing page. e2e: the bundle check keeps Lenis out of the entry and the editor; reduced motion downloads neither GSAP nor Lenis; the wheel scrolls and leaving for the editor removes it. Landing only, so no OBS test.*
+
 ## Phase 7: v2 foundation, accounts on Cloudflare
 Approved by the owner 2026-10-09 (`docs/PRD.md` "v2 Phase 1", `docs/STACK.md` "Backend"). From the first task that adds server code, CLAUDE.md §4, §5 and §8 are mandatory. Nothing in this phase changes an overlay or an overlay link; the editor keeps working signed out. Each task is its own PR, tested on its preview deploy against staging.
 
