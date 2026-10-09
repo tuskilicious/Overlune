@@ -1953,11 +1953,25 @@ test.describe("GSAP in the editor (T6.137)", () => {
     const box = page.locator(".editor-pick-box");
     await page.mouse.move(...(await center(".scene-title")));
     await expect(box).toHaveText("Title");
+    // Record every transform the box carries from here on: the glide lasts 0.18 s, so polling for it can miss it on
+    // a busy machine (it did in CI on PR #197).
+    await page.evaluate(() => {
+      const seen: string[] = [];
+      (window as unknown as { glide: string[] }).glide = seen;
+      new MutationObserver(() => {
+        const t = document.querySelector<HTMLElement>(".editor-pick-box")?.style.transform;
+        if (t) seen.push(t);
+      }).observe(document.querySelector(".editor-pick")!, {
+        attributes: true,
+        attributeFilter: ["style"],
+        subtree: true,
+      });
+    });
     await page.mouse.move(...(await center(".scene-subtitle")));
     await expect(box).toHaveText("Subtitle");
     // On its way it carries a transform; it ends without one.
     await expect
-      .poll(() => box.evaluate((e) => e.style.transform), { intervals: [20] })
+      .poll(() => page.evaluate(() => (window as unknown as { glide: string[] }).glide.join(" ")))
       .toContain("translate");
     await expect.poll(() => box.evaluate((e) => e.style.transform)).toBe("");
   });
