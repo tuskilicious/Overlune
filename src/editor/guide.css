@@ -1,4 +1,8 @@
 /* Setup guide (/guide): the editor's brand chrome, laid out for reading. */
+.guide {
+  --signal: #18d2f5; /* Signal Cyan (BRAND.md): a done step on the rail */
+}
+
 .guide main {
   max-width: 760px;
   line-height: 1.6;
@@ -6,6 +10,188 @@
 
 .guide section {
   margin-bottom: 32px;
+}
+
+/* The setup steps on a rail (T6.153), after 21st.dev's "Vertical Titled Stepper" (behavior only): a dot per step
+   beside its card, joined by a line. Done: a Signal Cyan tick and the line below it filled. Current (the first not
+   done): a Lune Violet dot. The fills change at once with reduced motion (index.css). */
+.guide-rail {
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-rail-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 16px;
+  padding-bottom: 24px;
+  margin: 0;
+}
+
+/* The line from this dot down to the next one. */
+.guide-rail-item:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 48px;
+  bottom: 8px;
+  left: 19px;
+  width: 2px;
+  border-radius: 1px;
+  background:
+    linear-gradient(var(--signal) 0 0) top / 100% 0% no-repeat,
+    var(--text-muted);
+  opacity: 0.6;
+  transition: background-size 400ms ease;
+}
+
+.guide-rail-item[data-done]:not(:last-child)::before {
+  background-size:
+    100% 100%,
+    auto;
+  opacity: 1;
+}
+
+.guide-rail-dot {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+.guide-rail-item[data-current] .guide-rail-dot {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.guide-rail-item[data-done] .guide-rail-dot {
+  border-color: var(--signal);
+  background: var(--signal);
+  color: var(--bg);
+}
+
+.guide-rail-dot svg,
+.guide-step-done svg {
+  width: 18px;
+  height: 18px;
+}
+
+.guide-step-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.guide .guide-step-done[aria-pressed="true"] {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+/* The fixes (T6.153), after 21st.dev's spring "Accordion" (behavior only): one panel per fix with its heading
+   always showing; it opens with a slight spring (a CSS linear() curve, height only, in browsers that animate
+   details), and at once with reduced motion. */
+.guide-fix {
+  margin-bottom: 12px;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  interpolate-size: allow-keywords;
+}
+
+.guide-fix summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.guide-fix summary::-webkit-details-marker {
+  display: none;
+}
+
+.guide-fix summary h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.guide-fix-chevron {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: -4px;
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  transform: rotate(45deg);
+  transition: transform 300ms ease;
+}
+
+.guide-fix[open] .guide-fix-chevron {
+  margin-top: 4px;
+  transform: rotate(225deg);
+}
+
+.guide-fix::details-content {
+  height: 0;
+  overflow: clip;
+  transition:
+    height 500ms
+      linear(
+        0,
+        0.042,
+        0.143,
+        0.274,
+        0.414,
+        0.549,
+        0.67,
+        0.773,
+        0.856,
+        0.921,
+        0.968,
+        1.001,
+        1.021,
+        1.033,
+        1.038,
+        1.038,
+        1.035,
+        1.031,
+        1.025,
+        1.02,
+        1.015,
+        1.011,
+        1.007,
+        1.004,
+        1
+      ),
+    content-visibility 500ms allow-discrete;
+}
+
+/* Closed is hidden for real, not just clipped: no focus, nothing for screen readers until it opens. */
+.guide-fix:not([open])::details-content {
+  content-visibility: hidden;
+}
+
+.guide-fix[open]::details-content {
+  height: auto;
+}
+
+.guide-fix-body {
+  padding: 0 20px 16px;
+  border-top: var(--border);
 }
 
 /* The three setup steps as cards, so they stand apart from the fixes below them (T6.25). */
