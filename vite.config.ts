@@ -74,7 +74,7 @@ export default defineConfig(({ mode }) => {
     },
     test: {
       environment: "node",
-      include: ["tests/unit/**/*.test.ts"],
+      include: ["tests/unit/**/*.test.ts", "tests/functions/**/*.test.ts"],
     },
   };
 });

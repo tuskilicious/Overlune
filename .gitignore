@@ -54,3 +54,6 @@ skills-lock.json
 .impeccable/config.local.json
 .impeccable/*.cache.json
 graphify-out/
+
+# Wrangler local secrets (Functions)
+.dev.vars*

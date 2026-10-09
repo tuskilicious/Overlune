@@ -65,6 +65,13 @@ All are optional for local development. Without `VITE_SENTRY_DSN`, Sentry stays 
 
 Deploys use the Cloudflare Pages Git integration, so no Cloudflare token is needed.
 
+The API (v2, `functions/`) also reads these, server only:
+
+| Name | Where | Purpose |
+|---|---|---|
+| `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET` | Cloudflare Pages, as encrypted secrets (production: the Overlune Twitch app; preview: Overlune Staging) | Sign in with Twitch (T7.3). Locally, in `.dev.vars`, which git ignores |
+| `DB` | `wrangler.jsonc` (a binding, not a secret) | The D1 database: `overlune-staging` for local and previews, `overlune-production` for `main` |
+
 ## Optional tooling
 - **21st.dev plugin for Claude Code.** A design reference for the editor and landing page only, never overlays (`docs/DESIGN.md`, "Outside components"). It reads `API_KEY_21ST`: set it in the plugin's own settings or in `.env.local`, which git ignores. It isn't an app variable (no `VITE_` prefix), so the build never puts it in client code. Never add it to CI, Cloudflare Pages or a URL, and don't use install commands that put the key in a URL. Hosted AI generation stays off: v1 has no AI (`CLAUDE.md`).
 
@@ -75,11 +82,17 @@ npm run build        # production build into dist/
 npm run preview      # serve the production build locally
 ```
 
+The API (`/api/*`, Pages Functions) runs under Wrangler, against a local D1:
+```bash
+npx wrangler d1 migrations apply overlune-staging --local   # once, and after each new migration
+npm run build && npx wrangler pages dev                     # the site and /api at http://localhost:8788
+```
+
 ## Test
 ```bash
 npm run lint         # ESLint + Prettier check (npm run format to fix)
 npm run typecheck
-npm test             # unit tests (Vitest)
+npm test             # unit tests and the API against a local D1 (Vitest)
 npm run test:e2e     # editor and overlay tests (Playwright)
 ```
 Also test every overlay inside OBS. See `docs/OBS-TESTING.md`.
@@ -91,12 +104,14 @@ Screenshot tests (`*.visual.spec.ts`) only run on Linux, because fonts render di
 Cloudflare Pages:
 - Every PR gets a preview deploy (staging).
 - Merging to `main` deploys production.
-- Security headers live in `public/_headers`.
+- Security headers live in `public/_headers`; the API sets its own (`functions/api/_middleware.ts`).
+- `wrangler.jsonc` holds the project's bindings and plain variables, for preview and production. Secrets stay in the dashboard.
+- Database migrations don't run on deploy. Apply each new one with `npx wrangler d1 migrations apply overlune-staging --remote`, then `overlune-production` once its PR is approved.
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on every PR and push to `main`: lint, typecheck, unit tests, build, `npm audit`, Playwright tests and a gitleaks scan.
 
 ### Cloudflare Pages settings
-Pages settings: build command `npm run build`, output `dist`, Node from `.nvmrc`. Environment variables (Settings → Variables):
+Pages settings: build command `npm run build`, output `dist`, Node from `.nvmrc`. Since T7.2 the plain variables below are set in `wrangler.jsonc`, which the dashboard then only shows:
 
 | Variable | Production | Preview |
 |---|---|---|

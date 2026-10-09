@@ -9,6 +9,25 @@ export function stripFragment(url: string): string {
   return i === -1 ? url : url.slice(0, i);
 }
 
+const DENIED = ["forwarded", "-ip", "remote-", "via", "-user", "authorization", "cookie"];
+
+/**
+ * Sentry 11 replaced sendDefaultPii with dataCollection, and leaving it unset collects MORE (user info, cookies,
+ * bodies). This is the documented v10 baseline, written out, so nothing new is collected (T6.98), plus sign-in headers
+ * and cookies denied by name for the API (T7.2). The site and the API both use it.
+ */
+export const dataCollection = {
+  userInfo: false,
+  cookies: false,
+  httpHeaders: { request: { deny: DENIED }, response: { deny: DENIED } },
+  httpBodies: [],
+  urlQueryParams: { deny: DENIED },
+  genAI: { inputs: false, outputs: false },
+  databaseQueryData: false,
+  queues: false,
+  graphQL: { document: false, variables: false },
+};
+
 const URL_KEYS = ["url", "from", "to"] as const;
 
 export function scrubBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb | null {
