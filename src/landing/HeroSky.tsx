@@ -129,8 +129,11 @@ const START = 72;
 const SCALE = 0.75;
 const FRAME_MS = 1000 / 30;
 
-/** Draws the aurora into a new canvas in `host` until the returned stop is called. Without WebGL 2 it does nothing,
- *  and the still stays. */
+/** WebGL drawn on the CPU (no GPU, or a blocked one): far too slow for a background. Headless test browsers too. */
+const SOFTWARE = /swiftshader|llvmpipe|softpipe|software|basic render/i;
+
+/** Draws the aurora into a new canvas in `host` until the returned stop is called. Without WebGL 2 on a GPU it does
+ *  nothing, and the still stays. */
 function run(host: HTMLElement): () => void {
   const canvas = document.createElement("canvas");
   const gl = canvas.getContext("webgl2", {
@@ -139,6 +142,11 @@ function run(host: HTMLElement): () => void {
     powerPreference: "low-power",
   });
   if (!gl) return () => {};
+  const info = gl.getExtension("WEBGL_debug_renderer_info");
+  if (info && SOFTWARE.test(String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)))) {
+    gl.getExtension("WEBGL_lose_context")?.loseContext();
+    return () => {};
+  }
   const program = gl.createProgram();
   for (const [type, source] of [
     [gl.VERTEX_SHADER, vertex],

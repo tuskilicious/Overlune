@@ -137,9 +137,16 @@ test("the hero's aurora draws live over its still, and leaves only the still wit
   const sky = page.locator(".landing-aurora");
   await page.goto("/");
   await expect(sky).toHaveCSS("background-image", /aurora\.webp/);
-  const webgl = await page.evaluate(() => !!document.createElement("canvas").getContext("webgl2"));
-  // Without WebGL 2 (some CI machines) the still simply stays.
-  await expect(sky.locator("canvas")).toHaveCount(webgl ? 1 : 0);
+  // Only WebGL 2 on a GPU draws it live. Headless browsers render WebGL in software, like a PC without a usable
+  // GPU, and the still simply stays: drawing it on the CPU would slow the whole page.
+  const gpu = await page.evaluate(() => {
+    const gl = document.createElement("canvas").getContext("webgl2");
+    const info = gl?.getExtension("WEBGL_debug_renderer_info");
+    const renderer = info ? String(gl!.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
+    return !!gl && !/swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer);
+  });
+  await page.waitForTimeout(500);
+  await expect(sky.locator("canvas")).toHaveCount(gpu ? 1 : 0);
   // Leaving the page takes the canvas and its loop with it.
   await page.getByRole("link", { name: "Make your overlays" }).first().click();
   await expect(page).toHaveURL(/\/editor/);
