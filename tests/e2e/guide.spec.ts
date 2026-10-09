@@ -65,6 +65,8 @@ test("the guide has no axe accessibility violations", async ({ page }) => {
 
 test("every guide screenshot loads", async ({ page }) => {
   await page.goto("/guide");
+  // One sits in a fix, which opens in place (T6.153).
+  await page.getByRole("heading", { name: "Fix: a black or white box" }).click();
   const shots = page.locator(".guide-shot img");
   await expect(shots).toHaveCount(4);
   for (const img of await shots.all()) {
@@ -82,5 +84,33 @@ test("the guide covers silent alerts and wrong sizes (T6.72)", async ({ page }) 
   await expect(
     page.getByRole("heading", { name: "Fix: the overlay is the wrong size or cut off" }),
   ).toBeVisible();
+  // The fixes open in place (T6.153): the heading shows, the steps once it's opened.
+  await expect(page.getByText("Transform → Fit to screen")).toBeHidden();
+  await page
+    .getByRole("heading", { name: "Fix: the overlay is the wrong size or cut off" })
+    .click();
   await expect(page.getByText("Transform → Fit to screen")).toBeVisible();
+});
+
+// T6.153, after 21st.dev's "Vertical Titled Stepper": the steps sit on a rail you tick off as you go.
+test("the setup steps can be ticked off, and the next one becomes current (T6.153)", async ({
+  page,
+}) => {
+  await page.goto("/guide");
+  const steps = page.locator(".guide-rail-item");
+  const done = page.getByRole("button", { name: "Done with this step" });
+  await expect(steps).toHaveCount(3);
+  await expect(steps.first()).toHaveAttribute("data-current", "true");
+  await done.first().click();
+  await expect(done.first()).toHaveAttribute("aria-pressed", "true");
+  await expect(steps.first()).toHaveAttribute("data-done", "true");
+  await expect(steps.nth(1)).toHaveAttribute("data-current", "true");
+  await done.first().click(); // and untick
+  await expect(steps.first()).toHaveAttribute("data-current", "true");
+  // Keyboard: a fix opens with Enter on its heading's row.
+  await page.getByRole("heading", { name: "Fix: chat is empty" }).click();
+  await expect(page.getByText("Nothing has been said yet.")).toBeVisible();
+  expect(
+    (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze()).violations,
+  ).toEqual([]);
 });
