@@ -70,6 +70,7 @@ The API (v2, `functions/`) also reads these, server only:
 | Name | Where | Purpose |
 |---|---|---|
 | `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET` | Cloudflare Pages, as encrypted secrets (production: the Overlune Twitch app; preview: Overlune Staging) | Sign in with Twitch (T7.3). Locally, in `.dev.vars`, which git ignores |
+| `AUTH_ORIGIN` | `wrangler.jsonc` | Where Sign in with Twitch comes back to: `https://overlune.in`, `https://staging.overlune.pages.dev` (the `staging` branch) or `http://localhost:8788`. Each Twitch app lists `<AUTH_ORIGIN>/api/auth/twitch/callback` |
 | `DB` | `wrangler.jsonc` (a binding, not a secret) | The D1 database: `overlune-staging` for local and previews, `overlune-production` for `main` |
 
 ## Optional tooling

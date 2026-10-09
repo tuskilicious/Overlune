@@ -2,7 +2,7 @@ import type { PagesFunction } from "@cloudflare/workers-types";
 import { sentryPagesPlugin } from "@sentry/cloudflare";
 import { version } from "../../package.json";
 import { dataCollection, scrubBreadcrumb, scrubEvent } from "../../src/lib/sentry-scrub";
-import type { Env } from "../lib/env";
+import { json, type Env } from "../lib/env";
 
 /** Security headers for every API answer (T7.2). public/_headers only covers static files, never Functions. JSON
  *  never needs to load anything or sit in a frame, so the policy denies it all; nothing is cached. */
@@ -21,8 +21,16 @@ export const securityHeaders: PagesFunction<Env> = async ({ next }) => {
   return secured;
 };
 
+/** Accounts stay closed where ACCOUNTS_OPEN isn't "true" (production, until T7.9): their routes answer like any
+ *  unknown path, and the editor then shows no account controls. */
+export const accountsGate: PagesFunction<Env> = ({ request, env, next }) => {
+  const path = new URL(request.url).pathname;
+  const account = path === "/api/me" || path.startsWith("/api/auth/");
+  return account && env.ACCOUNTS_OPEN !== "true" ? json({ error: "not found" }, 404) : next();
+};
+
 /** Every /api request: Sentry first, with the site's privacy rules and scrubber (no PII, no settings fragments), so
- *  it sees errors from everything after it; then the headers. Without a DSN (local development) Sentry stays off. */
+ *  it sees errors from everything after it; then the headers; then the accounts switch. Without a DSN (local development) Sentry stays off. */
 export const onRequest = [
   sentryPagesPlugin<Env>(({ env }) => ({
     dsn: env.VITE_SENTRY_DSN,
@@ -37,4 +45,5 @@ export const onRequest = [
     beforeBreadcrumb: (breadcrumb) => scrubBreadcrumb(breadcrumb),
   })),
   securityHeaders,
+  accountsGate,
 ];

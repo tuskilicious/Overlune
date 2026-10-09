@@ -25,6 +25,7 @@ import { sampleScene } from "./scene-samples";
 import SiteFooter from "../components/SiteFooter";
 import "./editor.css";
 import Icon from "../components/Icon";
+import Account from "./Account";
 import { focusSoon, type SectionProps } from "./sections/fields";
 import SceneText from "./sections/SceneText";
 import Socials from "./sections/Socials";
@@ -709,12 +710,15 @@ export default function EditorPage() {
         Skip to your OBS links
       </a>
       <header className="editor-header">
-        {/* The logo leads home, as on the guide and legal pages (T6.67). */}
-        <h1>
-          <Link to="/">
-            <img src="/images/brand/logo.png" alt="Overlune home" width="159" height="48" />
-          </Link>
-        </h1>
+        {/* The logo leads home, as on the guide and legal pages (T6.67); the account sits on its right (T7.4). */}
+        <div className="editor-header-top">
+          <h1>
+            <Link to="/">
+              <img src="/images/brand/logo.png" alt="Overlune home" width="159" height="48" />
+            </Link>
+          </h1>
+          <Account />
+        </div>
         {/* The primary tagline from docs/BRAND.md, then what to do (T6.33). */}
         <p>
           <strong className="editor-tagline">Free stream overlays that look pro.</strong> Pick a

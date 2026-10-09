@@ -10,6 +10,8 @@ export function stripFragment(url: string): string {
 }
 
 const DENIED = ["forwarded", "-ip", "remote-", "via", "-user", "authorization", "cookie"];
+/** Also never the sign-in callback's one-time code and state (T7.3). */
+const DENIED_QUERY = [...DENIED, "code", "state"];
 
 /**
  * Sentry 11 replaced sendDefaultPii with dataCollection, and leaving it unset collects MORE (user info, cookies,
@@ -21,7 +23,7 @@ export const dataCollection = {
   cookies: false,
   httpHeaders: { request: { deny: DENIED }, response: { deny: DENIED } },
   httpBodies: [],
-  urlQueryParams: { deny: DENIED },
+  urlQueryParams: { deny: DENIED_QUERY },
   genAI: { inputs: false, outputs: false },
   databaseQueryData: false,
   queues: false,
