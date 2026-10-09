@@ -647,6 +647,13 @@ The owner asked for more looks (2026-10-07), picked all four from impeccable's s
   - Accept: version 1.4.0 (a new overlay link, so a minor version); a dated changelog section in plain words; README and FUTURE-SCOPE.md name 1.4.0; the GitHub release published after the deploy is checked.
   - *Built 2026-10-08 on `chore/release-1.4.0`. `package.json` 1.4.0; CHANGELOG "1.4.0 (2026-10-08)": New (Offline scene, square frame) and Site (home page refresh, ruler scrollbar, footer). The overlay changes were OBS-tested in their own PRs (#187, #188); the landing refresh (#189) was reviewed by the owner on its preview.*
 
+### 21st.dev components (2026-10-09)
+The owner asked for 21st.dev components on the landing page, the editor and the setup guide, and for Claude to suggest the spots. Six spots, four registry candidates each; the owner picked one per spot. Ported as behavior only (`docs/DESIGN.md` "Outside components"): previews studied, no code read or copied, no new dependency. One PR per page.
+
+- [ ] **T6.152 Landing: CTA banner and comparison table.** Picks: thegridcn's "CTA Banner" for the closing call to action, olewandowski1's "Feature Comparison Table" for "What works where".
+  - Accept: both in the brand colors; the scan stops with reduced motion; no sideways scroll at phone width; axe clean; landing e2e updated.
+  - *Built 2026-10-09 on `feat/21st-landing`. CTA: a thin Signal Cyan edge, corner brackets (one pseudo-element of eight bars), faint scanlines and a slow scan sweeping down (transform and opacity only; hidden at rest, so reduced motion shows the plain panel), and a second button to the setup guide. Its edge glow was left out, since the hero frame keeps the page's one glow. Table: rows grouped "On screen" and "From your chat", ticks and crosses in small squares (the words stay for screen readers and tests), Twitch's column lit under a "Best supported" badge. Its sticky header was skipped: the table is five rows, and it scrolls sideways on phones, which makes sticky meaningless. The scroll box is now focusable and labelled (axe), and positioned, so the screen-reader labels can't stretch the page. Landing only, so no OBS test.*
+
 ## Phase 7: v2 foundation, accounts on Cloudflare
 Approved by the owner 2026-10-09 (`docs/PRD.md` "v2 Phase 1", `docs/STACK.md` "Backend"). From the first task that adds server code, CLAUDE.md §4, §5 and §8 are mandatory. Nothing in this phase changes an overlay or an overlay link; the editor keeps working signed out. Each task is its own PR, tested on its preview deploy against staging.
 
