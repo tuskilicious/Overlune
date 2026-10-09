@@ -674,6 +674,11 @@ The owner asked for 21st.dev components on the landing page, the editor and the 
   - Accept: version 1.5.0 (new site, guide and editor features; no overlay or link changes); a dated changelog section in plain words; README and FUTURE-SCOPE.md name 1.5.0; the GitHub release published after the deploy is checked.
   - *Built 2026-10-09 on `chore/release-1.5.0`. `package.json` 1.5.0; CHANGELOG "1.5.0 (2026-10-09)": Site (aurora, smooth scrolling, the support table, the closing panel), Setup guide (steps to tick off, fixes that open in place) and Editor (Copy link states, a line about each look). Each change was reviewed by the owner on its PR preview (#192 to #196); no overlay changed, so no OBS test.*
 
+### Flaky test (2026-10-09)
+- [x] **T6.156 Make the highlight glide test reliable.** CI failed once on the docs-only release PR (#197): the editor test "the preview's highlight glides from one part to the next" polled every 20 ms for the 0.18 s glide's transform, and on a busy runner the glide finished between two polls.
+  - Accept: the test checks the same thing (a translate on the way, no transform at the end) without depending on timing; it fails when the glide is removed; it passes repeatedly under load.
+  - *Built 2026-10-09 on `fix/flaky-glide-test`. A MutationObserver on the preview's pick area records every transform the box carries from the moment before the move, and the test asserts one was a translate, then that the box ends with none. Under load (40 runs, 8 at once) the old test failed 10 times and the new one 0; with the glide switched off the new test fails, as it should. Test only, no app change.*
+
 ## Phase 7: v2 foundation, accounts on Cloudflare
 Approved by the owner 2026-10-09 (`docs/PRD.md` "v2 Phase 1", `docs/STACK.md` "Backend"). From the first task that adds server code, CLAUDE.md §4, §5 and §8 are mandatory. Nothing in this phase changes an overlay or an overlay link; the editor keeps working signed out. Each task is its own PR, tested on its preview deploy against staging.
 
