@@ -55,7 +55,10 @@ All on Cloudflare, next to the site: one provider, one deploy, one domain, so th
 
 - **Staging and production:** one D1 database each, with separate secrets and Twitch redirect URLs. Preview deploys (each PR) use staging; `main` uses production. Sentry environments match.
 - **Secrets** (`TWITCH_CLIENT_SECRET`, the session key, `CLOUDFLARE_API_TOKEN` for the backup job) live in Cloudflare's encrypted variables or GitHub Actions secrets, never in the repo or the client. `.env.example` lists the names.
-- **New dependencies this needs**, approved with this plan and each pinned and reviewed in the PR that adds it: `wrangler` and `@cloudflare/workers-types` (dev), `@cloudflare/vitest-pool-workers` (dev, to test Functions against a real local D1), a small OAuth library such as `arctic` (MIT; chosen in T7.3 after a review), and `@sentry/cloudflare` for errors in Functions.
+- **New dependencies this needs**, approved with this plan and each pinned and reviewed in the PR that adds it: `wrangler` and `@cloudflare/workers-types` (dev), a small OAuth library such as `arctic` (MIT; chosen in T7.3 after a review), and `@sentry/cloudflare` for errors in Functions. `@cloudflare/vitest-pool-workers` was planned for tests but dropped in T7.2: its latest (0.23.0) needs Vitest 4 and Overlune is on 5. Function tests use wrangler's `getPlatformProxy` instead, which runs the same local D1 (Miniflare) inside the usual Vitest run (`tests/functions/`).
+- **Config (T7.2):** `wrangler.jsonc` is the Pages project's source of truth: the D1 binding (`DB`) and the plain variables for local, preview (staging) and production. Its `vars` replace the dashboard's, at build time too, so `NODE_VERSION`, `VITE_SENTRY_DSN` and `VITE_SENTRY_ENVIRONMENT` live there now. Secrets stay in the dashboard. Pages environments don't inherit, so preview and production each list everything.
+- **Functions (T7.2):** only `/api/*` runs code (the generated `_routes.json` includes nothing else), so the site stays static and free. `functions/api/_middleware.ts` runs Sentry (`@sentry/cloudflare`, the site's `dataCollection` and scrubber from `src/lib/sentry-scrub.ts`, `traceLifecycle: "static"`) and adds the API's own security headers, since `public/_headers` never covers Functions: `default-src 'none'`, `frame-ancestors 'none'`, HSTS, `nosniff`, `no-referrer`, `no-store`. `functions/api/[[path]].ts` answers any other `/api` path, or the wrong method, with a JSON 404 instead of the site's HTML. `functions/lib/db.ts` is the one data layer (CLAUDE.md §4).
+- **Migrations (T7.2):** numbered SQL files in `migrations/`. They don't run on deploy: apply each new one to staging, then to production after its PR is approved, with `npx wrangler d1 migrations apply overlune-staging --remote` (and `overlune-production`). `/api/health` reports the schema version, so a missed migration shows.
 - **Overlays keep working without it:** a saved overlay's link also carries a snapshot, so it still renders if the API is down (v2 Phase 2).
 
 ## Twitch data without login
@@ -80,11 +83,14 @@ All on Cloudflare, next to the site: one provider, one deploy, one domain, so th
 ## Folder structure
 ```
 overlune/
-├─ CLAUDE.md  README.md  CHANGELOG.md  LICENSE  .gitignore  .env.example
+├─ CLAUDE.md  README.md  CHANGELOG.md  LICENSE  .gitignore  .env.example  wrangler.jsonc
 ├─ docs/
 │  ├─ PRD.md  TASKS.md  STACK.md  DESIGN.md  LAYOUTS.md  BRAND.md  ASSETS.md  OBS-TESTING.md  FUTURE-SCOPE.md
 │  ├─ brand/            logo, icon and social exports (BRAND.md)
 │  └─ legal/            privacy.md, terms.md
+├─ functions/          Pages Functions (v2), only under /api: api/ (routes, _middleware.ts), lib/ (db.ts: the one data
+│                       layer; env.ts), its own tsconfig.json
+├─ migrations/         D1 schema changes, numbered SQL (0001_init.sql, …)
 ├─ public/
 │  ├─ _headers
 │  └─ sounds/           licensed alert sounds (recorded in ASSETS.md)
@@ -102,6 +108,7 @@ overlune/
 ├─ tests/
 │  ├─ unit/             mirrors src/
 │  ├─ e2e/              Playwright overlay smoke tests
+│  ├─ functions/        the API against a local D1 (wrangler's getPlatformProxy)
 │  └─ fixtures/links/   saved links from every schema version
 └─ .github/
    ├─ workflows/ci.yml

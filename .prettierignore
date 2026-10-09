@@ -3,6 +3,7 @@ package-lock.json
 *.md
 playwright-report
 test-results
+.wrangler
 # Local AI tool skill packs, also in .gitignore
 .agents
 .codex

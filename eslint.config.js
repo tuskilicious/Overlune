@@ -12,6 +12,7 @@ export default tseslint.config(
       "dist",
       "playwright-report",
       "test-results",
+      ".wrangler", // Wrangler's local state and bundles, also in .gitignore
       // Local AI tool skill packs, also in .gitignore
       ".agents",
       ".codex",
