@@ -107,7 +107,7 @@
 }
 
 /* The hero (T6.59). The night sky: a few stars and a soft arc behind the content, and a crescent moon. CSS only,
-   static, so there is no reduced-motion version. */
+   static, so there is no reduced-motion version. The aurora (T6.151, .landing-aurora) now covers these stars. */
 .landing-sky::before,
 .landing-sky::after {
   content: "";
@@ -136,6 +136,24 @@
   border-radius: 50%;
   transform: rotate(-10deg);
   mask-image: linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent);
+}
+
+/* The hero's aurora (T6.151): a still of the scene, which HeroSky draws live over it with WebGL. It covers the
+   card's own gradient and the CSS stars (the scene has its own); the moon, the ridges and the arc stay on top. The
+   still is also the reduced-motion and no-WebGL version. */
+.landing-aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: url("/images/landing/aurora.webp") center / cover var(--color-deep);
+  pointer-events: none;
+}
+
+.landing-aurora canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 /* A crescent: the shadow of a circle, minus the circle itself. */

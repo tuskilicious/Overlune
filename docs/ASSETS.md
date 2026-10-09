@@ -41,6 +41,7 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 | Manrope (`@fontsource/manrope` 5.3.0, weights 400/600/700) | font | Advanced font picker; Abyss body text (T6.109) | https://fontsource.org/fonts/manrope | SIL OFL 1.1 | No | 2026-10-07 |
 | Archivo Black (`@fontsource/archivo-black` 5.3.0, weight 400) | font | Advanced font picker; Session headings (T6.110) | https://fontsource.org/fonts/archivo-black | SIL OFL 1.1 | No | 2026-10-07 |
 | Archivo (`@fontsource/archivo` 5.3.0, weights 400/600/700) | font | Advanced font picker; Session body text (T6.110) | https://fontsource.org/fonts/archivo | SIL OFL 1.1 | No | 2026-10-07 |
+| `public/images/landing/aurora.webp` (a frame of the landing page's aurora shader, `src/landing/HeroSky.tsx`, captured in Unicorn Studio's editor) | image | Landing hero sky: the reduced-motion and no-WebGL version (T6.151) | Rendered for Overlune from its own shader | Own work (MIT, same as the code) | No | 2026-10-09 |
 | `public/images/themes/print-grain.svg` (SVG fractal noise filter) | image | Session print grain | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-07 |
 | Bangers (`@fontsource/bangers` 5.3.0, weight 400) | font | Advanced font picker; Shonen headings (T6.111) | https://fontsource.org/fonts/bangers | SIL OFL 1.1 | No | 2026-10-07 |
 | Comic Neue (`@fontsource/comic-neue` 5.3.0, weights 400/700) | font | Advanced font picker; Shonen body text (T6.111) | https://fontsource.org/fonts/comic-neue | SIL OFL 1.1 | No | 2026-10-07 |

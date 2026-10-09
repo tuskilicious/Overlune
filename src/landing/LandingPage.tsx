@@ -11,6 +11,7 @@ import {
 } from "react";
 import { Link } from "react-router";
 import { animate } from "../lib/motion";
+import HeroSky from "./HeroSky";
 import { testAlerts } from "../alerts/events";
 import Icon from "../components/Icon";
 import SiteFooter, { repoUrl, supportUrl } from "../components/SiteFooter";
@@ -1044,6 +1045,7 @@ export default function LandingPage() {
               data-hero-card
               className="landing-hero-card landing-sky relative z-10 mx-auto w-full max-w-[90rem] px-6 py-16 md:px-12 md:py-20"
             >
+              <HeroSky />
               <span aria-hidden className="landing-moon" />
               <HeroNight />
               <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
