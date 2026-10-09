@@ -385,7 +385,10 @@ test("copied links are marked, and the last copy says what's next (T6.24)", asyn
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   const links = page.getByRole("region", { name: "Links to paste into OBS" });
   await links.getByRole("button", { name: "Copy Starting Soon link" }).click();
-  await expect(links.locator(".editor-link").first()).toContainText("Copied");
+  // The mark beside the link (the button's own "Copied" face comes and goes, T6.154).
+  await expect(links.locator(".editor-link").first().locator(".editor-link-done")).toContainText(
+    "Copied",
+  );
   await expect(links.getByText("1 of 5 links copied.")).toBeVisible();
 
   // Editing changes every link, so the copy in OBS is out of date.

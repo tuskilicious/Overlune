@@ -99,6 +99,11 @@ test("GSAP never reaches the editor's or the overlays' bundles, arrives only by 
   const editor = chunks.find((c) => c.facadeModuleId?.endsWith("src/editor/EditorPage.tsx"))!;
   expect(gsapIn(entry)).toEqual([]);
   expect(gsapIn(editor)).toEqual([]);
+  // Lenis (T6.150) is the landing page's alone too.
+  const hasLenis = (c: Chunk) =>
+    c.moduleIds.some((m) => m.includes("/node_modules/lenis/dist/lenis.mjs"));
+  for (const c of [entry, editor])
+    expect([...loadsWith(c)].filter((f) => hasLenis(byFile.get(f)!))).toEqual([]);
 
   // (b) No page loads GSAP with it: it only arrives through a dynamic import (src/lib/motion.ts).
   const gsapChunks = chunks.filter(hasGsap);
@@ -118,7 +123,11 @@ test("GSAP never reaches the editor's or the overlays' bundles, arrives only by 
 test("with reduced motion the page is still and fully visible", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   const gsap: string[] = [];
-  page.on("request", (r) => /gsap/.test(r.url()) && gsap.push(r.url()));
+  // Code only: Lenis's CSS comes with the page, inert without the `.lenis` class its script adds.
+  page.on(
+    "request",
+    (r) => /gsap|lenis/.test(r.url()) && !r.url().includes(".css") && gsap.push(r.url()),
+  );
   await page.goto("/");
   await page.getByRole("heading", { name: "Live in three steps" }).scrollIntoViewIfNeeded();
   await expect(page.getByRole("heading", { name: "Live in three steps" })).toHaveCSS(
@@ -126,8 +135,22 @@ test("with reduced motion the page is still and fully visible", async ({ page })
     "1",
   );
   await expect(page.locator(".landing-marquee")).toHaveCSS("animation-name", "none");
-  // Motion is off, so GSAP isn't even downloaded (T6.137).
+  // Motion is off, so neither GSAP (T6.137) nor Lenis (T6.150) is even downloaded, and scrolling stays native.
   expect(gsap).toEqual([]);
+  await expect(page.locator("html")).not.toHaveClass(/lenis/);
+});
+
+test("the mouse wheel scrolls smoothly, and leaving the page gives scrolling back (T6.150)", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveClass(/lenis/);
+  await page.mouse.move(400, 400);
+  await page.mouse.wheel(0, 600);
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
+  await page.getByRole("link", { name: "Make your overlays" }).first().click();
+  await expect(page).toHaveURL(/\/editor/);
+  await expect(page.locator("html")).not.toHaveClass(/lenis/);
 });
 
 // T6.151: the hero's aurora is drawn live with WebGL over a still of itself; the still is all reduced motion gets.
@@ -391,6 +414,16 @@ test("the landing page says what works where (T6.69, T6.79)", async ({ page }) =
   await expect(row("Raids, subs")).toHaveText(["Yes", "Not yet", "No"]);
   await expect(row("Follow alerts")).toHaveText(["Not yet", "No", "No"]);
   await expect(page.getByText("“Not yet” means it’s planned for a later version")).toBeVisible();
+  // T6.152, after 21st.dev's "Feature Comparison Table": grouped rows and the best-supported column marked.
+  await expect(table.getByRole("columnheader", { name: "On screen" })).toBeVisible();
+  await expect(table.getByRole("columnheader", { name: "From your chat" })).toBeVisible();
+  await expect(table.getByRole("columnheader", { name: /Twitch/ })).toContainText("Best supported");
+  // T6.152, after 21st.dev's "CTA Banner": the closing panel also points to the setup guide.
+  await expect(
+    page.getByRole("region", { name: "Make your stream look pro." }).getByRole("link", {
+      name: "Read the setup guide",
+    }),
+  ).toHaveAttribute("href", "/guide");
 });
 
 test("previews off screen are built after load, without scrolling (T6.78)", async ({ page }) => {

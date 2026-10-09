@@ -9,6 +9,7 @@ import { defaultSettings, type Settings } from "../settings/schema";
 import { loadSaved, save } from "../settings/storage";
 import { decodeLink, encode } from "../settings/url";
 import { themes } from "../themes";
+import { blurbs } from "../themes/blurbs";
 import { brandChrome } from "./brand";
 import { themeIds, type ThemeId } from "../themes/types";
 import { themeVars } from "../themes/vars";
@@ -873,9 +874,14 @@ export default function EditorPage() {
           <ul className="editor-welcome-looks">
             {themeIds.map((id) => (
               <li key={id}>
+                {/* After 21st.dev's "Gallery Hover Carousel" (behavior only, T6.154): under the pointer or keyboard
+                    focus the picture rises to make room for a line about the look. The name stays the button's name;
+                    the line is its description. */}
                 <button
                   type="button"
-                  className="editor-card"
+                  className="editor-card editor-look-card"
+                  aria-labelledby={`look-name-${id}`}
+                  aria-describedby={`look-blurb-${id}`}
                   onClick={() => {
                     update({ theme: id });
                     pickedThisVisit = true;
@@ -887,8 +893,16 @@ export default function EditorPage() {
                     });
                   }}
                 >
-                  <ThemeShot id={id} />
-                  {themes[id].name}
+                  <span className="editor-look-pic">
+                    <ThemeShot id={id} />
+                    <span className="editor-look-reveal">
+                      <span id={`look-blurb-${id}`}>{blurbs[id]}</span>
+                      <span aria-hidden className="editor-look-go">
+                        Start with it <Icon name="next" />
+                      </span>
+                    </span>
+                  </span>
+                  <span id={`look-name-${id}`}>{themes[id].name}</span>
                 </button>
               </li>
             ))}
