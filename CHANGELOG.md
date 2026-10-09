@@ -2,6 +2,24 @@
 
 What changed in each Overlune release. Overlay links from every release keep working: the link format only ever gains optional settings.
 
+## 1.5.0 (2026-10-09)
+
+A livelier home page, a setup guide you can tick off as you go, and a clearer editor. Overlays and their links are unchanged: there is nothing to re-paste.
+
+### Site
+- **An aurora over the home page:** slow cyan and violet curtains drift across the night sky behind the headline. With reduced motion, or on a PC without graphics acceleration, you see a still picture of it instead.
+- **Smooth scrolling:** the mouse wheel glides on the home page. Touch, the keyboard and links scroll as before, and reduced motion turns it off.
+- **"What works where", clearer:** ticks and crosses, the overlays grouped by what shows on screen and what reads your chat, and Twitch marked as the best-supported platform.
+- **A new closing panel** at the bottom of the home page, with a link to the setup guide next to "Make your overlays".
+
+### Setup guide
+- **Tick off the steps:** each of the three setup steps has a "Done with this step" button, and the line beside them shows how far you've got.
+- **Fixes open in place:** the four "Fix: …" sections are folded, so the page is shorter. Open the one you need.
+
+### Editor
+- **Copy link shows what happened:** it changes to "Copied" with a tick, or to "Press Ctrl+C" if your browser blocked copying.
+- **A line about each look:** in the first-visit gallery, pointing at a look (or moving to it with Tab) shows what it is.
+
 ## 1.4.0 (2026-10-08)
 
 A new Offline scene, a square webcam frame, and a refreshed home page. Every earlier link keeps working: Offline is a new link you can add when you want it.
