@@ -74,3 +74,29 @@ export async function deleteSession(db: D1Database, tokenHash: string): Promise<
 export async function deleteUserSessions(db: D1Database, userId: string): Promise<void> {
   await db.prepare("DELETE FROM sessions WHERE user_id = ?").bind(userId).run();
 }
+
+/** What the editor shows of an account (T7.4): nothing it doesn't need, so no Twitch or internal ids. */
+export interface Profile {
+  login: string;
+  displayName: string;
+  avatarUrl: string | null;
+}
+
+export async function profile(db: D1Database, userId: string): Promise<Profile | null> {
+  const row = await db
+    .prepare("SELECT login, display_name, avatar_url FROM users WHERE id = ?")
+    .bind(userId)
+    .first<{ login: string; display_name: string; avatar_url: string | null }>();
+  return row
+    ? { login: row.login, displayName: row.display_name, avatarUrl: row.avatar_url }
+    : null;
+}
+
+/** Deletes the account and every row that belongs to it, in one transaction (T7.4). Later tables that hold a user's
+ *  data join this list. */
+export async function deleteUser(db: D1Database, userId: string): Promise<void> {
+  await db.batch([
+    db.prepare("DELETE FROM sessions WHERE user_id = ?").bind(userId),
+    db.prepare("DELETE FROM users WHERE id = ?").bind(userId),
+  ]);
+}

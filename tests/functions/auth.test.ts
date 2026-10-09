@@ -4,6 +4,8 @@ import { onRequestGet as start } from "../../functions/api/auth/twitch/index";
 import { onRequestGet as callback } from "../../functions/api/auth/twitch/callback";
 import { onRequestPost as signout } from "../../functions/api/auth/signout";
 import { onRequestPost as signoutEverywhere } from "../../functions/api/auth/signout-everywhere";
+import { onRequestDelete as deleteMe, onRequestGet as getMe } from "../../functions/api/me";
+import { accountsGate } from "../../functions/api/_middleware";
 import { hashToken, SESSION_COOKIE, SIGNIN_COOKIE } from "../../functions/lib/session";
 import { call, localD1, migrate } from "./d1";
 
@@ -315,5 +317,78 @@ describe("signing out", () => {
     expect((await post(signoutEverywhere, second)).status).toBe(204);
     expect(await rows("sessions")).toHaveLength(0);
     expect((await post(signoutEverywhere, first)).status).toBe(401);
+  });
+});
+
+describe("the account (T7.4)", () => {
+  const me = (token: string | null) =>
+    call(getMe, {
+      env,
+      request: new Request(`${ORIGIN}/api/me`, {
+        headers: token ? { Cookie: `${SESSION_COOKIE}=${token}` } : {},
+      }),
+    });
+  const del = (token: string | null, origin: string | null = ORIGIN) =>
+    call(deleteMe, {
+      env,
+      request: new Request(`${ORIGIN}/api/me`, {
+        method: "DELETE",
+        headers: {
+          ...(origin ? { Origin: origin } : {}),
+          ...(token ? { Cookie: `${SESSION_COOKIE}=${token}` } : {}),
+        },
+      }),
+    });
+
+  it("shows the editor only what it needs: no Twitch or internal ids", async () => {
+    const res = await me(await signIn());
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({
+      login: "moonstreamer",
+      displayName: "MoonStreamer",
+      avatarUrl: "https://static-cdn.jtvnw.net/user-default-pictures/a.png",
+    });
+  });
+
+  it("answers 401 when signed out, or with a forged or malformed cookie", async () => {
+    for (const token of [null, "A".repeat(43), "not a token"])
+      expect((await me(token)).status).toBe(401);
+  });
+
+  it("deletes every row of that account, and nobody else's, only from Overlune's own pages", async () => {
+    const mine = await signIn();
+    await signIn(); // a second session of the same account
+    twitch.sub = twitch.helixId = "777";
+    const theirs = await signIn(); // someone else
+    expect((await del(mine, "https://evil.example")).status).toBe(403);
+    expect((await del(null)).status).toBe(401);
+    const res = await del(mine);
+    expect(res.status).toBe(204);
+    expect(res.headers.get("Set-Cookie")).toContain("Max-Age=0");
+    expect(await rows("users")).toEqual([expect.objectContaining({ twitch_id: "777" })]);
+    const sessions = await rows("sessions");
+    expect(sessions.map((s) => s.token_hash)).toEqual([await hashToken(theirs)]);
+    expect((await me(mine)).status).toBe(401);
+    expect((await me(theirs)).status).toBe(200);
+  });
+
+  it("stays closed where accounts aren't open (production until T7.9): every account route is a 404", async () => {
+    const gate = (path: string, open?: string) =>
+      call(accountsGate, {
+        env: { ...env, ACCOUNTS_OPEN: open },
+        request: new Request(`${ORIGIN}${path}`),
+        next: async () => new Response("passed"),
+      });
+    for (const path of [
+      "/api/me",
+      "/api/auth/twitch",
+      "/api/auth/twitch/callback",
+      "/api/auth/signout",
+    ]) {
+      expect((await gate(path, "false")).status).toBe(404);
+      expect((await gate(path)).status).toBe(404);
+      expect(await (await gate(path, "true")).text()).toBe("passed");
+    }
+    expect(await (await gate("/api/health", "false")).text()).toBe("passed");
   });
 });
