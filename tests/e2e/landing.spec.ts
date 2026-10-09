@@ -153,6 +153,35 @@ test("the mouse wheel scrolls smoothly, and leaving the page gives scrolling bac
   await expect(page.locator("html")).not.toHaveClass(/lenis/);
 });
 
+// T6.151: the hero's aurora is drawn live with WebGL over a still of itself; the still is all reduced motion gets.
+test("the hero's aurora draws live over its still, and leaves only the still with reduced motion (T6.151)", async ({
+  page,
+}) => {
+  const sky = page.locator(".landing-aurora");
+  await page.goto("/");
+  await expect(sky).toHaveCSS("background-image", /aurora\.webp/);
+  // Only WebGL 2 on a GPU draws it live. Headless browsers render WebGL in software, like a PC without a usable
+  // GPU, and the still simply stays: drawing it on the CPU would slow the whole page.
+  const gpu = await page.evaluate(() => {
+    const gl = document.createElement("canvas").getContext("webgl2");
+    const info = gl?.getExtension("WEBGL_debug_renderer_info");
+    const renderer = info ? String(gl!.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
+    return !!gl && !/swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer);
+  });
+  await page.waitForTimeout(500);
+  await expect(sky.locator("canvas")).toHaveCount(gpu ? 1 : 0);
+  // Leaving the page takes the canvas and its loop with it.
+  await page.getByRole("link", { name: "Make your overlays" }).first().click();
+  await expect(page).toHaveURL(/\/editor/);
+  await expect(page.locator(".landing-aurora canvas")).toHaveCount(0);
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await expect(sky).toHaveCSS("background-image", /aurora\.webp/);
+  await page.waitForTimeout(500);
+  await expect(sky.locator("canvas")).toHaveCount(0);
+});
+
 test("at phone width the page has no sideways scroll and stays accessible", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
