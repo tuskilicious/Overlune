@@ -1,3 +1,6 @@
+import { sessionUserId } from "./db";
+import type { Env } from "./env";
+
 /**
  * Sessions and the sign-in cookie (T7.3, CLAUDE.md §5). A session token is 256 random bits, sent only in a __Host-
  * cookie (HttpOnly, Secure, SameSite=Lax, whole site, no domain), and stored only as its SHA-256 hash. A fast hash
@@ -49,3 +52,10 @@ export function sessionToken(request: Request): string | null {
  *  a POST, and a site can't fake it, so a missing or foreign one is refused. */
 export const sameOrigin = (request: Request) =>
   request.headers.get("Origin") === new URL(request.url).origin;
+
+/** The signed-in user's id, or null: no cookie, a malformed one, an unknown or expired session. Every route that needs
+ *  an account starts here (CLAUDE.md §5: auth is enforced on the server). */
+export async function currentUserId(request: Request, env: Env): Promise<string | null> {
+  const token = sessionToken(request);
+  return token ? sessionUserId(env.DB, await hashToken(token), now()) : null;
+}

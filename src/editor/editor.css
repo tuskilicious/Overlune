@@ -66,6 +66,96 @@
   font-family: var(--font-heading);
 }
 
+/* The logo and the account on one row (T7.4); the account wraps under the logo on narrow windows. */
+.editor-header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+/* Sign in with Twitch (T7.4): an outline button, as the brand keeps the filled one for Copy link. Signed in: the
+   Twitch picture and name open a small panel with sign out, sign out everywhere and delete. */
+.editor-account {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.editor-account-signin {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.editor-account-signin:hover {
+  background: var(--surface);
+}
+
+.editor-account-signin svg {
+  width: 18px;
+  height: 18px;
+  fill: currentcolor;
+}
+
+.editor-account-menu summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px 4px 4px;
+  border: var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.editor-account-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.editor-account-menu img {
+  border-radius: 50%;
+}
+
+.editor-account-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  display: grid;
+  gap: 8px;
+  width: min(300px, calc(100vw - 32px));
+  padding: 16px;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 0.4);
+}
+
+.editor-account-panel p {
+  margin: 0;
+}
+
+.editor-account-confirm {
+  display: grid;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: var(--border);
+}
+
+.editor-account-status:empty {
+  display: none;
+}
+
 /* Block, so the logo has no gap under it; the guide's h1 is text and keeps its line height. */
 .editor-header h1 img {
   display: block;
