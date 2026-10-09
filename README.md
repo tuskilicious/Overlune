@@ -106,7 +106,7 @@ Cloudflare Pages:
 - Merging to `main` deploys production.
 - Security headers live in `public/_headers`; the API sets its own (`functions/api/_middleware.ts`).
 - `wrangler.jsonc` holds the project's bindings and plain variables, for preview and production. Secrets stay in the dashboard.
-- Database migrations don't run on deploy. Apply each new one with `npx wrangler d1 migrations apply overlune-staging --remote`, then `overlune-production` once its PR is approved.
+- Database migrations don't run on deploy. Apply each new one with `npx wrangler d1 migrations apply overlune-staging --remote`, then `npx wrangler d1 migrations apply overlune-production --remote --env production` once its PR is approved.
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on every PR and push to `main`: lint, typecheck, unit tests, build, `npm audit`, Playwright tests and a gitleaks scan.
 
