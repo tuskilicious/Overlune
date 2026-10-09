@@ -521,25 +521,58 @@ type Support = "Yes" | "Not yet" | "No";
 /** What works on which platform (T6.79), said as plainly as a table can. "Not yet" is only for what's planned
  *  (PRD v2: follow alerts, YouTube and Kick chat; YouTube alerts were saved for later with them). */
 const platforms = ["Twitch", "YouTube", "Kick and others"] as const;
-const support: { overlay: string; detail: string; on: [Support, Support, Support] }[] = [
+/** Grouped like 21st.dev's "Feature Comparison Table" (T6.152): what shows on screen, and what reads your chat. */
+const support: {
+  group: string;
+  rows: { overlay: string; detail: string; on: [Support, Support, Support] }[];
+}[] = [
   {
-    overlay: "Scenes",
-    detail: "Starting Soon, Be Right Back, Stream Ending, Offline",
-    on: ["Yes", "Yes", "Yes"],
+    group: "On screen",
+    rows: [
+      {
+        overlay: "Scenes",
+        detail: "Starting Soon, Be Right Back, Stream Ending, Offline",
+        on: ["Yes", "Yes", "Yes"],
+      },
+      { overlay: "Webcam frame", detail: "A border for your camera", on: ["Yes", "Yes", "Yes"] },
+    ],
   },
-  { overlay: "Chat", detail: "Your chat, in your look", on: ["Yes", "Not yet", "Not yet"] },
-  { overlay: "Webcam frame", detail: "A border for your camera", on: ["Yes", "Yes", "Yes"] },
   {
-    overlay: "Alerts",
-    detail: "Raids, subs, gift subs and bits",
-    on: ["Yes", "Not yet", "No"],
-  },
-  {
-    overlay: "Follow alerts",
-    detail: "Need a Twitch login",
-    on: ["Not yet", "No", "No"],
+    group: "From your chat",
+    rows: [
+      { overlay: "Chat", detail: "Your chat, in your look", on: ["Yes", "Not yet", "Not yet"] },
+      {
+        overlay: "Alerts",
+        detail: "Raids, subs, gift subs and bits",
+        on: ["Yes", "Not yet", "No"],
+      },
+      {
+        overlay: "Follow alerts",
+        detail: "Need a Twitch login",
+        on: ["Not yet", "No", "No"],
+      },
+    ],
   },
 ];
+
+/** A cell: a tick, a cross, or the words. Screen readers get the words every time. */
+function SupportCell({ value }: { value: Support }) {
+  if (value === "Not yet") return <>Not yet</>;
+  return (
+    <>
+      <span aria-hidden data-mark={value} className="landing-mark">
+        {value === "Yes" ? (
+          <Icon name="check" />
+        ) : (
+          <svg viewBox="0 0 12 12">
+            <path d="M3.5 3.5l5 5M8.5 3.5l-5 5" />
+          </svg>
+        )}
+      </span>
+      <span className="sr-only">{value}</span>
+    </>
+  );
+}
 
 const facts = [
   `${themeIds.length} looks`,
@@ -1222,53 +1255,69 @@ export default function LandingPage() {
               Every overlay runs as a Browser source in OBS Studio or Streamlabs Desktop. The scenes
               work wherever you stream; chat and alerts read your Twitch channel.
             </p>
-            <div className="mt-10 overflow-x-auto rounded-3xl border border-white/10 bg-deep">
-              <table className="w-full min-w-[22rem] border-collapse text-left">
+            {/* After 21st.dev's "Feature Comparison Table" (behavior only, T6.152): rows grouped under a heading,
+                ticks and crosses, and the best-supported platform's column lit. */}
+            <div
+              tabIndex={0}
+              role="region"
+              aria-label="What works where, by platform"
+              className="relative mt-10 overflow-x-auto rounded-3xl border border-white/10 bg-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet"
+            >
+              <table className="landing-support w-full min-w-[34rem] border-collapse text-left">
                 <caption className="sr-only">Which overlays work on which platform</caption>
                 <thead>
                   <tr className="border-b border-white/10">
                     <th
                       scope="col"
-                      className="p-3 font-heading text-sm text-haze md:p-4 md:px-6 md:text-base"
+                      className="p-3 align-bottom font-heading text-sm text-haze md:p-4 md:px-6 md:text-base"
                     >
                       Overlay
                     </th>
-                    {platforms.map((name) => (
+                    {platforms.map((name, i) => (
                       <th
                         key={name}
                         scope="col"
-                        className="p-3 font-heading text-sm md:p-4 md:px-6 md:text-base"
+                        data-lit={i === 0 || undefined}
+                        className="p-3 text-center align-bottom font-heading text-sm md:p-4 md:px-6 md:text-base"
                       >
+                        {i === 0 && <span className="landing-support-badge">Best supported</span>}
                         {name}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody>
-                  {support.map((row) => (
-                    <tr key={row.overlay} className="border-b border-white/10 last:border-b-0">
-                      <th scope="row" className="p-3 align-top font-normal md:p-4 md:px-6">
-                        <span className="block font-heading text-lg font-bold">{row.overlay}</span>
-                        <span className="text-sm text-haze">{row.detail}</span>
+                {support.map(({ group, rows }) => (
+                  <tbody key={group}>
+                    <tr className="border-b border-white/10 bg-night/50">
+                      <th
+                        scope="colgroup"
+                        colSpan={4}
+                        className="px-3 py-2 text-sm font-bold text-moon md:px-6"
+                      >
+                        {group}
                       </th>
-                      {row.on.map((s, i) => (
-                        <td
-                          key={platforms[i]}
-                          data-support={s}
-                          className="p-3 align-top data-[support=No]:text-haze/80 data-[support=Not_yet]:text-haze md:p-4 md:px-6"
-                        >
-                          {s === "Yes" && (
-                            <span
-                              aria-hidden
-                              className="mr-2 inline-block size-2 rounded-full bg-cyan align-middle"
-                            />
-                          )}
-                          {s}
-                        </td>
-                      ))}
                     </tr>
-                  ))}
-                </tbody>
+                    {rows.map((row) => (
+                      <tr key={row.overlay} className="border-b border-white/10">
+                        <th scope="row" className="p-3 align-top font-normal md:p-4 md:px-6">
+                          <span className="block font-heading text-lg font-bold">
+                            {row.overlay}
+                          </span>
+                          <span className="text-sm text-haze">{row.detail}</span>
+                        </th>
+                        {row.on.map((value, i) => (
+                          <td
+                            key={platforms[i]}
+                            data-lit={i === 0 || undefined}
+                            className="p-3 text-center align-middle text-haze md:p-4 md:px-6"
+                          >
+                            <SupportCell value={value} />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                ))}
               </table>
             </div>
             <p className="mt-4 max-w-2xl text-sm text-haze">
@@ -1318,6 +1367,7 @@ export default function LandingPage() {
 
         {/* Action. */}
         <section id="start" className="px-3 pb-6 md:px-6" aria-labelledby="cta-heading">
+          {/* After 21st.dev's "CTA Banner" (behavior only, T6.152): corner brackets, scanlines and a slow scan. */}
           <div className="landing-cta mx-auto max-w-[90rem] px-6 pt-20 pb-24 text-center md:px-12 md:pt-28 md:pb-32">
             <h2
               id="cta-heading"
@@ -1326,12 +1376,20 @@ export default function LandingPage() {
             >
               Make your stream look pro.
             </h2>
-            <Link
-              to="/editor"
-              className={`${button} mt-12 bg-violet px-10 py-5 text-xl text-night hover:bg-moon`}
-            >
-              Make your overlays
-            </Link>
+            <div className="mt-12 flex flex-wrap justify-center gap-4">
+              <Link
+                to="/editor"
+                className={`${button} bg-violet px-10 py-5 text-xl text-night hover:bg-moon`}
+              >
+                Make your overlays
+              </Link>
+              <Link
+                to="/guide"
+                className={`${button} border border-moon/40 px-10 py-5 text-xl text-moon hover:border-moon`}
+              >
+                Read the setup guide
+              </Link>
+            </div>
             <p className="mt-6 text-haze">Free. No account. Works with OBS and Streamlabs.</p>
             {/* Optional, quiet, and after the call to action: nothing is locked (T6.80). */}
             <p className="mx-auto mt-3 max-w-xl text-sm text-haze">

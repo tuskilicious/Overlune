@@ -572,12 +572,122 @@
   display: none;
 }
 
-/* The call to action in one gradient panel. */
+/* The call to action (T6.152), after 21st.dev's "CTA Banner" by thegridcn (behavior only, no code): a panel with a
+   thin Signal Cyan edge, corner brackets, faint scanlines, and a scan sweeping slowly down it. Its edge glow is left
+   out: the hero frame keeps the page's one glow. Reduced motion stops the scan (index.css), and it rests hidden. */
 .landing-cta {
-  border-radius: 2.5rem;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgb(24 210 245 / 0.3);
+  border-radius: 1.25rem;
   background:
-    radial-gradient(70% 90% at 50% 120%, var(--color-violet), transparent 70%),
-    radial-gradient(60% 80% at 0% 0%, rgb(74 42 227 / 0.6), transparent 60%), var(--color-deep);
+    repeating-linear-gradient(0deg, rgb(244 241 255 / 0.03) 0 1px, transparent 1px 4px),
+    radial-gradient(70% 90% at 50% 120%, rgb(164 94 252 / 0.5), transparent 70%), var(--color-deep);
+}
+
+.landing-cta > * {
+  position: relative;
+}
+
+.landing-cta::before,
+.landing-cta::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Four L-shaped brackets, one per corner, from eight thin bars. */
+.landing-cta::before {
+  --bar: linear-gradient(var(--color-cyan) 0 0);
+  inset: 14px;
+  background:
+    var(--bar) top left / 32px 2px,
+    var(--bar) top left / 2px 32px,
+    var(--bar) top right / 32px 2px,
+    var(--bar) top right / 2px 32px,
+    var(--bar) bottom left / 32px 2px,
+    var(--bar) bottom left / 2px 32px,
+    var(--bar) bottom right / 32px 2px,
+    var(--bar) bottom right / 2px 32px;
+  background-repeat: no-repeat;
+  opacity: 0.8;
+}
+
+/* The scan: a band that brightens to a thin line at its lower edge. Transform and opacity only. */
+.landing-cta::after {
+  inset-inline: 0;
+  top: 0;
+  height: 35%;
+  background: linear-gradient(transparent, rgb(24 210 245 / 0.06) 85%, rgb(24 210 245 / 0.22));
+  opacity: 0;
+  transform: translateY(-100%);
+  animation: cta-scan 8s linear infinite;
+}
+
+@keyframes cta-scan {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  10% {
+    opacity: 1;
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(290%);
+  }
+  75%,
+  100% {
+    opacity: 0;
+    transform: translateY(290%);
+  }
+}
+
+/* The support table (T6.152), after 21st.dev's "Feature Comparison Table" (behavior only): the best-supported
+   column lit, and ticks and crosses in small squares. */
+.landing-support [data-lit] {
+  background: rgb(164 94 252 / 0.08);
+}
+
+.landing-support-badge {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 0.5rem;
+  border-radius: 999px;
+  background: var(--color-cyan);
+  padding: 0.125rem 0.625rem;
+  color: var(--color-night);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.landing-mark {
+  display: inline-grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  border-radius: 0.375rem;
+  vertical-align: middle;
+}
+
+.landing-mark svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.landing-mark[data-mark="Yes"] {
+  background: var(--color-cyan);
+  color: var(--color-night);
+}
+
+.landing-mark[data-mark="No"] {
+  background: rgb(244 241 255 / 0.06);
+  color: var(--color-haze);
 }
 
 /* The stream stage (T6.124): the kit over a game in one look. */

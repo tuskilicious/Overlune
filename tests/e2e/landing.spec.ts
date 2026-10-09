@@ -362,6 +362,16 @@ test("the landing page says what works where (T6.69, T6.79)", async ({ page }) =
   await expect(row("Raids, subs")).toHaveText(["Yes", "Not yet", "No"]);
   await expect(row("Follow alerts")).toHaveText(["Not yet", "No", "No"]);
   await expect(page.getByText("“Not yet” means it’s planned for a later version")).toBeVisible();
+  // T6.152, after 21st.dev's "Feature Comparison Table": grouped rows and the best-supported column marked.
+  await expect(table.getByRole("columnheader", { name: "On screen" })).toBeVisible();
+  await expect(table.getByRole("columnheader", { name: "From your chat" })).toBeVisible();
+  await expect(table.getByRole("columnheader", { name: /Twitch/ })).toContainText("Best supported");
+  // T6.152, after 21st.dev's "CTA Banner": the closing panel also points to the setup guide.
+  await expect(
+    page.getByRole("region", { name: "Make your stream look pro." }).getByRole("link", {
+      name: "Read the setup guide",
+    }),
+  ).toHaveAttribute("href", "/guide");
 });
 
 test("previews off screen are built after load, without scrolling (T6.78)", async ({ page }) => {
