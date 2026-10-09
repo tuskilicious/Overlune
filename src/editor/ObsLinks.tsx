@@ -85,8 +85,27 @@ export function LinkRow({
           <span className="editor-link-stale">Changed since you copied it. Copy it again.</span>
         )
       )}
-      <button type="button" onClick={copy} aria-label={`Copy ${name} link`}>
-        Copy link
+      {/* After 21st.dev's "Copy Button" (behavior only, T6.154): its label crossfades between states, and a tick
+          draws itself once copied. All three faces share one spot, so the button never changes size. */}
+      <button
+        type="button"
+        className="editor-copy"
+        data-state={status === "Copied." ? "copied" : status ? "error" : "idle"}
+        onClick={copy}
+        aria-label={`Copy ${name} link`}
+      >
+        <span className="editor-copy-face" data-face="idle">
+          <Icon name="copy" /> Copy link
+        </span>
+        <span className="editor-copy-face" data-face="copied">
+          <svg className="icon editor-copy-tick" viewBox="0 0 12 12">
+            <path d="M2 6.5 5 9.5 10 3" pathLength={1} />
+          </svg>{" "}
+          Copied
+        </span>
+        <span className="editor-copy-face" data-face="error">
+          Press Ctrl+C
+        </span>
       </button>
       {/* See it full size before OBS (T6.114). Alerts wait for events, so their preview plays the samples. */}
       <a
