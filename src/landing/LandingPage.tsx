@@ -10,6 +10,8 @@ import {
   type ReactNode,
 } from "react";
 import { Link } from "react-router";
+import type Lenis from "lenis";
+import type { ScrollTrigger as ScrollTriggerType } from "gsap/ScrollTrigger";
 import { animate } from "../lib/motion";
 import { testAlerts } from "../alerts/events";
 import Icon from "../components/Icon";
@@ -27,6 +29,7 @@ import { themes } from "../themes";
 import { blurbs } from "../themes/blurbs";
 import { themeIds, type ThemeId } from "../themes/types";
 import "../editor/brand"; // brand fonts (Quicksand, Nunito)
+import "lenis/dist/lenis.css";
 import "./landing.css";
 
 /** Previews still waiting, built one per idle moment after the page has loaded, so they're ready before anyone
@@ -964,7 +967,19 @@ export default function LandingPage() {
               },
             });
           },
-          "": (gsap) => {
+          "": (gsap, _context, [plugin]) => {
+            // Smooth wheel scrolling (T6.150), driven by GSAP's ticker so ScrollTrigger reads the same position.
+            // Touch, keys and anchor links stay native; reduced motion never gets here, so Lenis isn't downloaded.
+            const ScrollTrigger = plugin as typeof ScrollTriggerType;
+            let lenis: Lenis | undefined;
+            let stopped = false;
+            const tick = (time: number) => lenis?.raf(time * 1000);
+            void import("lenis").then(({ default: Lenis }) => {
+              if (stopped) return;
+              lenis = new Lenis({ autoRaf: false, allowNestedScroll: true });
+              lenis.on("scroll", ScrollTrigger.update);
+              gsap.ticker.add(tick);
+            });
             gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) =>
               gsap.from(el, {
                 y: 48,
@@ -989,6 +1004,11 @@ export default function LandingPage() {
                 },
               },
             );
+            return () => {
+              stopped = true;
+              gsap.ticker.remove(tick);
+              lenis?.destroy();
+            };
           },
         },
         { plugins: [() => import("gsap/ScrollTrigger").then((m) => m.ScrollTrigger)] },
