@@ -512,3 +512,11 @@
     padding: 16px;
   }
 }
+
+/* The legal pages' index (T8.3) only on wide windows: with fourteen headings, a row of chips would push the text off a
+   phone's first screen, and the headings are short to scroll past. */
+@media (max-width: 1023px) {
+  .legal-layout > .guide-index {
+    display: none;
+  }
+}

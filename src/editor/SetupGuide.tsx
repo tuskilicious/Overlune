@@ -1,4 +1,5 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { useHeadingAbove } from "../lib/useHeadingAbove";
 import SiteFooter from "../components/SiteFooter";
 import SiteNav from "../components/SiteNav";
 import { defaultSettings } from "../settings/schema";
@@ -94,27 +95,6 @@ const guideIndex = [
   ["streamlabs-heading", "Streamlabs"],
 ] as const;
 const guideIds = guideIndex.map(([id]) => id);
-
-/** The part you're reading (T8.2): the last of the index's headings above 40% of the window. */
-function useHeadingAbove(ids: readonly string[]) {
-  const [current, setCurrent] = useState<string>(ids[0]!);
-  useEffect(() => {
-    const update = () => {
-      let found = ids[0]!;
-      for (const id of ids)
-        if (
-          (document.getElementById(id)?.getBoundingClientRect().top ?? Infinity) <
-          innerHeight * 0.4
-        )
-          found = id;
-      setCurrent(found);
-    };
-    update();
-    addEventListener("scroll", update, { passive: true });
-    return () => removeEventListener("scroll", update);
-  }, [ids]);
-  return current;
-}
 
 export default function SetupGuide() {
   const reading = useHeadingAbove(guideIds);
