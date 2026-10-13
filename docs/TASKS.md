@@ -767,6 +767,7 @@ Asked for by the owner 2026-10-13 ("the editor should give the users freedom", a
   - Built 2026-10-14, ticked after the owner's OBS check at 1280×720: "Canvas size" in the preview bar (four common sizes, or another up to 3:1); scenes and Live draw on a box of the canvas's shape scaled to fill it (STACK.md "Canvas sizes"); a size change moves layouts proportionally and back again exactly. `tests/unit/overlays/canvas-size.test.ts`, `tests/e2e/canvas-size.spec.ts`.
 - [ ] **T9.9 Beginners and access.** The pick-a-look path stays first; the canvas works by keyboard and screen reader; the guide covers customizing.
   - Accept: axe clean; a keyboard-only run-through; the owner tries it.
+  - Built 2026-10-14, ticked after the owner tries it: Customize, Done and Reset to the look keep focus (into the canvas, back to Customize); a "Keyboard keys" list under the canvas panels; the guide's "Make it yours: move things around" with the same keys; a global `.sr-only` (only the landing page had Tailwind's, so the canvas status line and the guide's step numbers showed on screen). `tests/e2e/canvas-access.spec.ts`; the canvas axe scan was already clean.
 - [ ] **T9.10 OBS test and release 2.0.0.** A new kind of link (layouts) and a new editor make it a major release, though every old link still works.
   - Accept: every overlay passes `docs/OBS-TESTING.md`, old links included; 2.0.0 published.
 

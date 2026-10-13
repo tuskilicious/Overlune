@@ -21,7 +21,7 @@ import {
 import { canvasOf, naturalBox, rescale, sceneParts } from "../../overlays/measure";
 import { defaultLive } from "../../overlays/LiveScene";
 import { encode } from "../../settings/url";
-import { Inspector, Layers, elementName, type Adding, type Change } from "./Panels";
+import { CanvasKeys, Inspector, Layers, elementName, type Adding, type Change } from "./Panels";
 import "./canvas.css";
 
 type Gesture =
@@ -417,6 +417,11 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
           remove={(id) => remove([id])}
           duplicate={(id) => duplicate([id])}
         />
+        {/* Turning is in the inspector's Turn box, for the keyboard. */}
+        <details className="canvas-keys-box">
+          <summary>Keyboard keys</summary>
+          <CanvasKeys />
+        </details>
       </div>
     </div>
   );

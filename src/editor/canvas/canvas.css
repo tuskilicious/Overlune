@@ -278,3 +278,35 @@
   font-size: 13px;
   padding: 8px 4px 8px 8px;
 }
+
+/* The keys (T9.9): folded under the panels, across their full width. */
+.canvas-keys-box {
+  grid-column: 1 / -1;
+}
+
+.canvas-keys-box summary {
+  cursor: pointer;
+  width: fit-content;
+}
+
+.canvas-keys {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 6px 16px;
+  margin: 8px 0 0;
+}
+
+.canvas-keys div {
+  display: flex;
+  gap: 8px;
+}
+
+.canvas-keys dt {
+  flex: none;
+  font-weight: 600;
+}
+
+.canvas-keys dd {
+  margin: 0;
+  color: var(--text-muted);
+}

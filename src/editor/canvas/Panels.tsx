@@ -568,3 +568,28 @@ export function CanvasSize({ size, onChange }: { size: Size; onChange: (size: Si
     </div>
   );
 }
+
+/** The canvas's keys (T9.9), shown under the panels and in the setup guide. */
+export const canvasKeys: [keys: string, does: string][] = [
+  ["Tab, Shift+Tab", "Pick the next or the last element"],
+  ["Arrow keys", "Move it 1 pixel (with Shift, 10)"],
+  ["Alt + arrow keys", "Make it wider, narrower, taller or shorter"],
+  ["[ and ]", "Send it down or bring it up a layer"],
+  ["Ctrl+D", "Make a copy (text, shapes and pictures)"],
+  ["Delete", "Remove it (Put back brings a part of the look back)"],
+  ["Escape", "Pick nothing"],
+  ["Ctrl+Z, Ctrl+Y", "Undo, redo"],
+];
+
+export function CanvasKeys() {
+  return (
+    <dl className="canvas-keys">
+      {canvasKeys.map(([keys, does]) => (
+        <div key={keys}>
+          <dt>{keys}</dt>
+          <dd>{does}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}

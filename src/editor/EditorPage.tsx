@@ -566,6 +566,10 @@ export default function EditorPage() {
   };
   const canvas = canvasOf(settings);
   const sceneLayout = settings.layouts.landscape?.scenes[target] ?? null;
+  /** Customize, Done and Reset each replace the button just pressed, so focus follows (T9.9): into the canvas, or
+   *  back to Customize, never lost to the top of the page. */
+  const canvasFocus = useRef(false);
+  const customizeButton = useRef<HTMLButtonElement>(null);
   /** Customize: starts from the look's own layout, measured from the preview (T9.3), the first time. */
   const customize = () => {
     if (!sceneLayout) {
@@ -575,7 +579,18 @@ export default function EditorPage() {
         if (shown) commitLayout(measureLayout(shown));
       }
     }
+    canvasFocus.current = true;
     setCanvasOn(true);
+  };
+  useEffect(() => {
+    if (!canvasFocus.current) return;
+    canvasFocus.current = false;
+    if (canvasOn) document.querySelector<HTMLElement>(".canvas")?.focus();
+    else customizeButton.current?.focus();
+  }, [canvasOn]);
+  const closeCanvas = () => {
+    canvasFocus.current = true;
+    setCanvasOn(false);
   };
 
   /** Anything changed from a fresh editor, including work restored from a link or autosave. */
@@ -1132,18 +1147,18 @@ export default function EditorPage() {
                             type="button"
                             onClick={() => {
                               commitLayout(null);
-                              setCanvasOn(false);
+                              closeCanvas();
                             }}
                           >
                             Reset to the look
                           </button>
                         )}
-                        <button type="button" onClick={() => setCanvasOn(false)}>
+                        <button type="button" onClick={closeCanvas}>
                           Done
                         </button>
                       </>
                     ) : (
-                      <button type="button" onClick={customize}>
+                      <button type="button" ref={customizeButton} onClick={customize}>
                         Customize
                       </button>
                     )}

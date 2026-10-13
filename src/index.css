@@ -6,6 +6,20 @@ body {
   font-synthesis-weight: none; /* pixel fonts have one weight; never smear a fake bold */
 }
 
+/* Read by screen readers, not shown. Tailwind has its own, but only the landing page loads Tailwind, so the editor's
+   canvas status and the guide's step numbers showed on screen (T9.9). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Reduced motion: the OS setting, or ?rm=1 in the link (sets html[data-rm], see main.tsx).
    This is the reduced-motion version of every CSS animation in the app. */
 @media (prefers-reduced-motion: reduce) {
