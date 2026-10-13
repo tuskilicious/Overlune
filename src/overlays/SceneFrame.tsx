@@ -31,6 +31,9 @@ interface Props {
   /** Shown above the content (e.g. <OverlayError />), which moves down to make room. */
   error?: ReactNode;
   children?: ReactNode;
+  /** A customized scene's elements (T9.3): drawn over the composed scene, whose parts are then hidden but keep their
+   *  places, so the look's cards and bands (its art) stay exactly as composed. */
+  layer?: ReactNode;
 }
 
 /** A two-tone headline (T6.107): the last word takes the accent color. Each word is its own span so the entrance
@@ -51,7 +54,7 @@ export function TwoTone({ text }: { text: string }) {
 }
 
 /** Shared 1920×1080 scene layout for Starting Soon, BRB, Stream Ending and Offline. */
-export default function SceneFrame({ settings, title, subtitle, error, children }: Props) {
+export default function SceneFrame({ settings, title, subtitle, error, children, layer }: Props) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
   // A row added in the editor but not filled in yet would show as a bare "Twitch" box on stream (T6.27).
   const socials = settings.socials.filter((s) => s.handle.trim());
@@ -106,6 +109,7 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
       ref={scene}
       className="scene"
       data-ticker={ticker ? "" : undefined}
+      data-layout={layer ? "" : undefined}
       data-enter={theme.enter.id}
       data-bg={theme.bgEffect}
       data-theme={theme.id}
@@ -128,6 +132,7 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
         )}
       </div>
       {ticker && <SceneTicker settings={settings} socials={socials} />}
+      {layer && <div className="layout-layer">{layer}</div>}
     </div>
   );
 }
