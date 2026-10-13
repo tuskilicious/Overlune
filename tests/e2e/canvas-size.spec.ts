@@ -100,3 +100,32 @@ test.describe("in the editor", () => {
     expect((await linkSettings(page))!.size).toEqual({ width: 1280, height: 720 });
   });
 });
+
+test.describe("in a short window", () => {
+  // The preview's height cap (T6.49) applies here; the canvas's handles must still sit on the parts.
+  test.use({ viewport: { width: 1920, height: 760 } });
+
+  test("the handles line up with the scene, wide or tall", async ({ page }) => {
+    await page.goto("/editor");
+    await page.getByRole("button", { name: "Clean Slate" }).click();
+    await page.getByRole("button", { name: "Live source" }).click();
+    await page.getByRole("button", { name: "Customize" }).click();
+    const lined = async () => {
+      const hit = (await page.locator(".canvas-hit").first().boundingBox())!;
+      const id = await page.locator(".canvas-hit").first().getAttribute("data-id");
+      const part = (await page.locator(`.canvas .layout-el[data-id="${id}"]`).boundingBox())!;
+      for (const k of ["x", "y", "width", "height"] as const)
+        expect(Math.abs(hit[k] - part[k])).toBeLessThanOrEqual(2);
+      const canvas = (await page.locator(".canvas").boundingBox())!;
+      const scene = (await page.locator(".canvas .live").boundingBox())!;
+      expect(Math.abs(canvas.width - scene.width)).toBeLessThanOrEqual(2);
+    };
+    await lined();
+    const size = page.getByRole("combobox", { name: "Canvas size" });
+    await size.selectOption({ label: "Another size…" });
+    await page.getByRole("spinbutton", { name: "Canvas width" }).fill("1080");
+    await page.getByRole("spinbutton", { name: "Canvas height" }).fill("1920");
+    await page.getByRole("button", { name: "Use this size" }).click();
+    await lined();
+  });
+});

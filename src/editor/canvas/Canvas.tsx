@@ -343,7 +343,9 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         onPointerDown={() => setSelected([])}
-        style={{ aspectRatio: `${size.w} / ${size.h}` }}
+        style={
+          { aspectRatio: `${size.w} / ${size.h}`, "--aspect": size.w / size.h } as CSSProperties
+        }
       >
         <Preview width={size.w} height={size.h}>
           {scene(withElements(shown))}
