@@ -213,7 +213,7 @@ Set on 2026-10-07 from the owner's design handoff, an audit of the looks against
 - Composition: closed in T6.134. Every look now has its own scene layout (see "Scene layout"); layout v2 stays as the starting point for new looks.
 - Shipped looks that match a tell keep it until they are reworked: Bold Esports (near-black with one red), Neon Grid (neon with a grid).
 
-## Vertical layout (Phase 9)
+## Vertical layout (Phase 10)
 Overlays for a portrait canvas, from `?canvas=vertical` (STACK.md). The canvas is 1080×1920; the look's background and art fill all of it.
 
 **Safe zone.** TikTok Live and YouTube Shorts draw their own header, a column of buttons on the right, and captions at the bottom over the stream. Neither publishes the sizes, and third-party guides disagree (TikTok: top 130–200px, bottom 367–484px, right 120–140px; Shorts up to 288px top, 672px bottom and 192px right in Google's ad template). Overlune keeps **every word and number inside x 60–940, y 200–1440** (an 880×1240 box: 60px left, 140px right, 200px top, 480px bottom); art, motifs and backgrounds may run to the edges. These are planning numbers, checked on a real phone in T9.10, not platform specs.
@@ -228,7 +228,7 @@ Overlays for a portrait canvas, from `?canvas=vertical` (STACK.md). The canvas i
 - Chat: sizes that suit a tall canvas (880 wide, 400–900 tall), placed by the streamer in the safe zone.
 - Webcam frame: presets for portrait: 880×495 (a 16:9 camera), 880×880 (square), and 1080×608 (full width, its label inside the safe zone).
 
-**Editor.** A Horizontal / Vertical switch over the preview; the 9:16 preview can show the safe zone as a faint overlay (never in OBS). Vertical is offered only for looks that have it (TASKS.md Phase 9 batches).
+**Editor.** A Horizontal / Vertical switch over the preview; the 9:16 preview can show the safe zone as a faint overlay (never in OBS). Vertical is offered only for looks that have it (TASKS.md Phase 10 batches).
 
 ## Overlay layout rules
 - Canvas is always 1920×1080. Keep a 64px safe margin on scenes.
@@ -272,6 +272,18 @@ Each look has its own scene composition (T6.134, plan and sketches in `docs/LAYO
 - **Alerts:** still centered at the top. A wider card (760-1100px) with a 6px accent band, an uppercase event label ("Raid", "New subscriber", "Resub", "Gift subs", "Cheer"), then the streamer's message at 56px; resub and cheer text below in the muted color.
 - **Chat:** one panel instead of a card per message: no borders between cards, hairline separators, only the top and bottom of the stack rounded. Badges are small square-cornered tags tinted with the accent.
 
+## Canvas editor (Phase 9)
+The canvas follows the editor's chrome (tokens, focus rings, one filled button) and the kits' docks: everything visible, nothing hidden behind a mode.
+- **Where:** "Customize" on the scene preview opens the canvas in its place; "Done" returns. The section list, the form and the links stay; the form still edits words (title, countdown, socials), the canvas edits places and styles.
+- **Canvas:** the scene at its real size, scaled to fit, on a checkerboard so see-through areas read. Zoom to fit, 50%, 100% and 200%, and space-drag to pan.
+- **Selection:** a 1px Lune Violet outline with eight square handles and a rotation handle above; the element's name in a small tag, as the preview's click-to-select (T6.135). Shift adds to the selection; Escape clears it.
+- **Guides:** snapping to the canvas's edges and centre, other elements' edges and centres, and the safe zone (Phase 10), shown as 1px Signal Cyan lines while dragging, with the distance between neighbours. Alt drags without snapping.
+- **Keyboard:** Tab and Shift+Tab move through elements in layer order; arrows nudge 1px (Shift: 10px); Alt+arrows resize; Delete removes; Ctrl/Cmd+D duplicates; Ctrl/Cmd+Z and Shift+Z undo and redo (the editor's existing history); [ and ] move down and up a layer.
+- **Layers panel:** the element list, top layer first, each with its icon, name (renamable), and hide and lock toggles; drag or the keyboard to reorder. It is a listbox, so screen readers hear the element, its position and its state.
+- **Inspector:** X, Y, W, H and rotation as number fields with nudges (the editor's quick rows), opacity as a slider, then the type's own style: font, size, colour (the look's swatches first, then your own), alignment, fit, fill, stroke, corner radius.
+- **Add:** a menu of element types with their line icons; a new element lands in the centre of the view, selected.
+- **Accessibility:** every canvas action is also possible from the layers panel and the inspector, so the canvas itself is a pointer convenience (like click-to-select), and the editor still passes axe and a keyboard-only run-through. Reduced motion turns off the canvas's own transitions.
+
 ## Editor and site UI
 The editor, setup guide, privacy and terms pages share one quiet, high-contrast chrome in Overlune's brand (`docs/BRAND.md`), so the colorful theme previews stay the loudest thing on the page. Tokens live in `src/editor/brand.ts` and reach CSS as variables on `.editor` (`themeVars`). "Must" rules are hard requirements; "should" rules are defaults.
 
@@ -302,6 +314,13 @@ The editor, setup guide, privacy and terms pages share one quiet, high-contrast 
 - **Guide:** a row of index chips that jump to each part, and a "Before your first stream" run-through with check boxes drawn in the accent. Since T8.2 the guide is centred under the site nav and as wide as it: from 1024px the index is a sticky column on the left that marks the part you're reading (Moonlight text and a Lune Violet dot, `aria-current="location"`, the last of its headings above 40% of the window); narrower, it stays the row of chips; on phones the steps run full width with their number above them. The privacy and terms pages (T8.3) share that layout, with an index built from their own headings in `docs/legal/*.md` (ids from the heading text); it shows only from 1024px, since fourteen chips would push the text off a phone's first screen.
 - Copy: success messages end with a full stop, not an exclamation mark.
 - **First-visit gallery (T8.4):** a hero-style opening, the "Pick a look to start" heading large and centred over a soft violet glow (behind the heading, not the text under it), the intro centred under it. Its look cards are cards: Deep Space with a faint edge, and under the pointer or keyboard focus a Lune Violet edge with the home page's soft violet glow, the only glow in the editor. The save box takes the site nav's faint edge and 16px corners.
+
+### Site shell (T8.1, every page)
+Every page but the overlays shares one shell: the nav at the top, the night-sky ground under it, and the footer at the end. One component each, never a copy per page; the home page uses the same nav and footer.
+- **Nav:** `components/SiteNav.tsx`, the floating pill: logo, Overlays, Looks, How it works, Setup guide, and "Open the editor" (the editor puts the account there instead). Fixed on the home page, sticky on the guide, legal pages and 404, and full-width and in the flow in the editor (its preview column is sticky itself). From other pages the section links go to `/#kit`, `/#looks` and `/#how`; the page you're on is underlined (`aria-current`). The section links show from 960px; narrower, only the logo and button (T8.6), so they never break onto two lines (the nav e2e checks 960px on every page). On the home page it also marks the section in view (below).
+- **Night sky (`.site-sky`):** every page but the home page, whose hero has its own sky: a few static stars and a soft violet glow at the top, never behind body text.
+- **Footer (T6.148):** link groups (Make, Project, Legal, Contact) over a large outlined "Overlune" wordmark, after 21st.dev's "Footer with Minimal Outline" (layout only). The wordmark is `aria-hidden`, filled with the page background over a 2px stroke so only its outer edge shows. Layout in `src/components/site-footer.css`; each page sets `--footer-mark-stroke` and `--footer-mark-fill`.
+- **Checked together (T8.6):** every page at 1440, 1024, 768 and 390px, and one axe pass over all of them at 390 and 1440px (`tests/e2e/footer.spec.ts`).
 
 ### Components
 | Component | Anatomy and variants | States | Notes |
@@ -367,11 +386,9 @@ Write for a streamer opening OBS for the first time: concise, confident, helpful
 - **Looks (T6.124):** the looks rise on a violet curve as a list (name and one line each) beside one big live preview that follows hover, focus and the row in the middle of the window, with scene buttons, full screen and "Use this look". Narrow windows get a picture per look.
 - **Overlay cards (T6.59, T6.102, T6.124, T6.148):** "Seven overlays in every look": Starting Soon, Be Right Back, Stream Ending, Offline, Chat, Webcam frame and Alerts, tall cards that fill with violet from the pointer. On wide windows they sit in two tiers on one 12-column grid, after 21st.dev's bento galleries: the four scenes in a row (two a row below 1280px), then the three overlays that sit over the game in wider cards. Between 640 and 1023px it's two columns, and Alerts takes the last row as a letterbox. Under the mouse each thumbnail shows a round magnifier with a 2x copy of the overlay (after 21st.dev's "Magnified Bento", ported without its Framer Motion): the copy is built only while the pointer is over that card, and touch screens skip it. Each is a live thumbnail that opens its part of the editor (`/editor?part=starting|brb|ending|offline|chat|frame|alerts`; a first visit picks a look first).
 - **How it works (T6.148):** three numbered stops on one line, after 21st.dev's "How It Works Steps" (behavior only). On wide windows a 2px line runs from the first stop's center to the last's and draws Lune Violet to Signal Cyan as the steps scroll in, each stop filling violet as the line reaches it (a CSS scroll timeline on the list; the line is transform only). Without scroll timelines, or with reduced motion, it shows the finished state. Phones stack the steps with no line.
-- **Footer (T6.148, every page):** link groups (Make, Project, Legal, Contact) over a large outlined "Overlune" wordmark, after 21st.dev's "Footer with Minimal Outline" (layout only). The wordmark is `aria-hidden`, filled with the page background over a 2px stroke so only its outer edge shows. Layout in `src/components/site-footer.css`; each page sets `--footer-mark-stroke` and `--footer-mark-fill`.
 - **Home page fixes (T8.5):** the hero's two alerts sit side by side just above the frame's top-left (in the card's empty sky), never over the scene's title; the fact row is four facts in two columns at every width ("One link per overlay" was dropped: the paragraph above says it); the Chat, Webcam frame and Alerts cards show their overlay over the stage's "your game" dusk backdrop; the stage section ends tighter, so no empty band sits above the looks' curve. The ruler is quieter: 2.75rem wide, its numbers and section name dim until the pointer is on it.
 - **Ruler (T6.148):** on wide windows with a mouse the page's scrollbar is a ruler, after getartcraft.com's (no code from it): a frosted strip on the right edge whose ticks are fixed to the page (one per 56px, a number every fifth) so it scrolls past like a measuring tape, and a Signal Cyan marker that rides down it with the share read and the current section's name. Click or drag on it to move; the keyboard and wheel scroll as always. It's `role="scrollbar"` with `aria-valuenow`, and the browser's scrollbar is hidden only while it's there (`html[data-ruler]`). Touch screens and narrow windows keep the browser's own. It follows the scroll directly and never animates on its own.
 - **Nav (T6.59):** the link for the section in the middle of the window is underlined in Lune Violet (`aria-current="location"`).
-- **One nav on every page (T8.1):** `components/SiteNav.tsx`, the floating pill: logo, Overlays, Looks, How it works, Setup guide, and "Open the editor" (the editor puts the account there instead). Fixed on the home page, sticky on the guide, legal pages and 404, and full-width and in the flow in the editor (its preview column is sticky itself). From other pages the section links go to `/#kit`, `/#looks` and `/#how`; the page you're on is underlined (`aria-current`). The pages under it share `.site-sky`: a few static stars and a soft violet glow at the top, never behind body text.
 - Motion: scroll reveals, the pinned hero zoom (wide windows), a word-by-word reveal that starts at 40% opacity so large text keeps 3:1 contrast, and CSS hover zooms. All GSAP runs inside `gsap.matchMedia("(prefers-reduced-motion: no-preference)")`; with reduced motion the page is static and fully visible.
 - One filled button style (Lune Violet, Night text). No meta-labels ("SECTION 01"), no invented reviews or stats.
 - Responsive down to 390px with no sideways scroll (e2e check).
@@ -384,5 +401,5 @@ After the Kage reference the owner shared, rebuilt in Overlune's own palette wit
 - [ ] Every new control has a label and a visible focus ring, and works by keyboard.
 - [ ] Hover, focus-visible, selected, disabled, invalid and empty states are handled where they apply.
 - [ ] Copy follows the tone rules; labels name what the streamer sees.
-- [ ] Checked at 1366×768 and at 600px wide; long text wraps or truncates as described.
+- [ ] Checked at 1366×768 and at 600px wide; long text wraps or truncates as described. Site-wide changes (the shell, a new page): at 1440, 1024, 768 and 390px, with the browser painting live (a background preview pane freezes GSAP mid-reveal).
 - [ ] axe stays clean in e2e, and `tests/unit/editor/contrast.test.ts` covers any new color pair.

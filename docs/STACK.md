@@ -72,7 +72,7 @@ All on Cloudflare, next to the site: one provider, one deploy, one domain, so th
 - Route per overlay: `/o/starting`, `/o/brb`, `/o/ending`, `/o/offline` (T6.147), `/o/chat`, `/o/alerts`, `/o/frame` (T6.88).
 - Settings are in the **hash fragment**: `#<version>.<lz-string payload>`. The fragment is never sent to servers, and it is stripped from Sentry events.
 - Optional query flag `?rm=1` (before the `#`) forces reduced motion: every animation is turned off, same as the OS "reduce motion" setting. Never remove or repurpose it.
-- Optional query flag `?canvas=vertical` (before the `#`, added in Phase 9) renders the overlay for a 1080×1920 portrait canvas (DESIGN.md "Vertical layout"). The settings after the `#` are the same as the landscape link's, so one save gives both. Any other value, or none, is the 1920×1080 landscape overlay every earlier link shows. It combines with `?rm=1` and `?test=1`. Never remove or repurpose it.
+- Optional query flag `?canvas=vertical` (before the `#`, added in Phase 10) renders the overlay for a 1080×1920 portrait canvas (DESIGN.md "Vertical layout"). The settings after the `#` are the same as the landscape link's, so one save gives both. Any other value, or none, is the 1920×1080 landscape overlay every earlier link shows. It combines with `?rm=1` and `?test=1`. Never remove or repurpose it.
 - Optional payload field `frame` (added T6.88): the webcam frame's `width` (160 to 1920, default 640), `height` (120 to 1080, default 360) and `label` (up to 40 characters, default none). Overlay route `/o/frame`. Links without it get the defaults.
 - Optional payload field `chat.showBadges` (added T6.76, default `true`): role badges before chat names. Links without it keep badges.
 - Optional payload field `alerts.seconds` (added T6.75, 3 to 15, default 5): how long each alert stays on screen. Links without it keep 5 seconds; a value out of range falls back to 5.
@@ -81,6 +81,17 @@ All on Cloudflare, next to the site: one provider, one deploy, one domain, so th
 - Optional `&until=<unix seconds>` next to `?test=1` (added T6.9): the editor stamps it 15 minutes ahead, and after that time the link plays no samples (the label stays). A value that isn't a number counts as expired. Links without `until` play their samples on every load, as they always have.
 - `src/settings/schema.ts` holds zod schemas per version. `src/settings/migrations.ts` upgrades any old version to the current one.
 - `tests/fixtures/links/` keeps real links from every version. CI loads all of them.
+
+## Layout model (Phase 9, the canvas editor)
+A customized scene is a list of positioned elements in the link's settings, as a new optional field. The v1 contract allows it without a new schema version: links without the field render exactly as before, so there is nothing to migrate. A version bump comes only if a later change renames, removes or tightens something.
+- **Field:** `layouts`, optional, default none. `layouts.landscape` (Phase 9) and `layouts.portrait` (Phase 10, picked by `?canvas=vertical`), each `{ size, scenes }`: `size` is the canvas in px (default 1920×1080; 1080×1920 for portrait; custom sizes from T9.8, 320–3840 by 320–3840), `scenes` maps `starting`, `brb`, `ending`, `offline` and `live` to an element list. A scene without a list renders the look's composed scene.
+- **Element:** `id` (8 characters), `type`, `x`, `y`, `w`, `h` (integers, canvas px, may run partly off the canvas), `r` (rotation, -180 to 180 degrees), `o` (opacity 0–1), `hidden`, `locked`; list order is stacking order. Types: `title`, `subtitle`, `countdown`, `socials`, `logo` and `ticker` (they render today's components and read today's settings, so editing the title text still happens in one place); `text` (its own words, up to 200 characters), `image` (an https link, CLAUDE.md §6, `fit` cover or contain), `shape` (rectangle, ellipse or line); and for `live`: `chat`, `alerts`, `frame`, `label` (Phase 13 fills labels). Styles are the look's tokens or `#rrggbb` (the existing `hexColor`), fonts are `fontIds`, sizes are bounded numbers: never free CSS, never `url()`.
+- **Limits:** 40 elements per scene. A link's whole encoded fragment stays under 24 KB; the editor warns at 16 KB and suggests saving to the account (Phase 12).
+- **Validation:** zod, like every setting: an invalid element is dropped and the rest render, with the overlay's error card (as for any damaged link).
+- **Rendering:** the overlay route renders `layouts[canvas].scenes[scene]` when present, absolutely positioned on the canvas, with the look's background and motif layer underneath (the look's art is not an element, so it keeps its craft); otherwise the composed scene, unchanged.
+- **Default layouts (T9.3):** "Customize" measures where each part sits in the look's composed scene at the canvas size and writes that list; the result must render the same as the composed scene.
+- **No new dependency:** selection, dragging, resizing, rotating and snapping use pointer events and plain math in `src/editor/canvas/`. A library like react-moveable would add weight to every editor visit for what a few hundred lines do.
+- **Stays out:** custom code, HTML or CSS strings, fonts not in `fontIds`, video, uploaded files, and any link other than https images.
 
 ## Folder structure
 ```

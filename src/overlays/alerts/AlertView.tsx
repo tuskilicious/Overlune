@@ -9,6 +9,7 @@ import "./alerts.css";
 
 /** What happened, above the message. The message itself is the streamer's template. */
 const kindLabel = {
+  follow: "New follower",
   raid: "Raid",
   sub: "New subscriber",
   resub: "Resub",

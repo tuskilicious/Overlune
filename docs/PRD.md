@@ -82,7 +82,17 @@ The owner moved these into scope for v1.x (T6.86). They keep v1's rules: a stati
 
 The realistic plan beyond this list (v1.x goals, v2 phases on Cloudflare, open decisions): `docs/FUTURE-SCOPE.md`.
 
-## Vertical overlays (approved 2026-10-13, `docs/TASKS.md` Phase 9)
+## Canvas editor (approved 2026-10-13, `docs/TASKS.md` Phase 9)
+Streamers asked for freedom, as in StreamElements' overlay editor, without losing what makes Overlune easy.
+- **Looks stay the start.** A beginner picks a look and is done, as today.
+- **Customize is the freedom.** It opens a canvas where every part of a scene (title, subtitle, countdown, socials, logo, ticker) and anything added (text, images, shapes) can be moved, resized, rotated, layered, hidden, locked or removed, with snapping guides, a layers panel, an inspector and undo.
+- **One source if you want it.** An optional Live overlay places chat, alerts, the webcam frame and labels freely in one browser source.
+- **Still no account.** A layout lives in the link like every other setting; saved overlays (Phase 12) add a short link and live edits later.
+- **Every old link looks the same.** Only links that were customized carry a layout.
+- **Out of scope:** custom code (a streamer's own HTML, CSS or JavaScript), video, uploaded files (images are https links until Phase 12+ uploads), and per-element animation editors.
+- **Done when:** a streamer can rebuild any scene by hand, by mouse or keyboard, every old link renders as before, and 2.0.0 is released.
+
+## Vertical overlays (approved 2026-10-13, `docs/TASKS.md` Phase 10, built on the canvas editor)
 Streamers increasingly go live in portrait: TikTok Live, YouTube Shorts and OBS's vertical canvases (OBS 32.1+, or the Aitum Vertical plugin). Every look gets portrait versions of its four scenes, and alerts, chat and the webcam frame work on a tall canvas.
 - **One save, two canvases.** A vertical link is the same save after the `#` plus `?canvas=vertical` before it. No existing link changes, and no account is needed.
 - **Made for the phone screen.** Text stays out of the places where TikTok and Shorts draw their own buttons and captions (DESIGN.md "Vertical layout").

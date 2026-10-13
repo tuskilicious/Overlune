@@ -5,6 +5,7 @@ import { defaultTemplates, type Settings } from "../../settings/schema";
 import { CharsLeft, same, type SectionProps } from "./fields";
 
 const alertFields: [AlertKind, string][] = [
+  ["follow", "New follower message"],
   ["raid", "Raid message"],
   ["sub", "New sub message"],
   ["resub", "Resub message"],
@@ -59,6 +60,12 @@ export default function Alerts({
       <p className="editor-hint">
         Alerts use your channel name from Chat. Chat and alerts work with Twitch only; YouTube isn’t
         supported yet.
+      </p>
+      {/* Follows never reach chat, so they need the streamer's Twitch sign-in and the backend (Phase 13). The look's
+          follow alert is ready, and the test alert shows it; the note says plainly what turns it on. */}
+      <p className="editor-hint" id="follow-hint">
+        <strong>Follow alerts</strong> need you to sign in with Twitch (top right). They start
+        showing on stream in a coming update; the test alert already shows how yours will look.
       </p>
       <label className="editor-slider">
         Alert volume
@@ -125,7 +132,7 @@ export default function Alerts({
                   >
                     + Their name
                   </button>
-                  {kind !== "sub" && (
+                  {kind !== "sub" && kind !== "follow" && (
                     <button
                       type="button"
                       aria-label={`Add the amount to ${label}`}

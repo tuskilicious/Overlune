@@ -50,13 +50,12 @@ The moment Phase 1 code lands, CLAUDE.md sections 4 (data), 5 (auth) and 8 (abus
 Follow alerts could skip the backend by connecting to Streamer.bot running on the streamer's PC. That works without an account, but it means installing and setting up another app, which is too much for the beginners Overlune is for. So the backend route is the plan (confirmed with the Cloudflare choice, 2026-10-09).
 
 ## Planned after v2 Phase 1 (owner, 2026-10-13)
-In order, each in `docs/TASKS.md`: website polish (Phase 8, done 2026-10-13), vertical overlays (Phase 9, approved: `?canvas=vertical`, looks in batches of four), four new looks with the lune signature (Phase 10), saved overlays (Phase 11, v2 Phase 2 above), then the Overlune Dock and an Android app (Phase 12), an OBS remote built on obs-websocket with Overlune's own controls.
+In order, each in `docs/TASKS.md`: website polish (Phase 8, done 2026-10-13), a canvas editor (Phase 9: looks as templates, then full freedom to move, resize, layer, add and remove), vertical overlays (Phase 10, as a canvas size: `?canvas=vertical`, looks in batches of four), four new looks with the lune signature (Phase 11), saved overlays (Phase 12, v2 Phase 2 above), connections (Phase 13: Twitch events, goals and labels, tips from StreamElements or Streamlabs, then YouTube and Kick), then the Overlune Dock and an Android app (Phase 14), an OBS remote built on obs-websocket with Overlune's own controls.
 
 ## Later, maybe
 Bigger ideas, to decide on after v2 Phase 2 and real use:
 - **YouTube chat and alerts.** YouTube only shares live chat through its API, which needs a server and has a small free daily allowance that a popular overlay would use up fast. Revisit once the backend exists and the costs are clear.
 - **Kick chat.** Kick's chat connection is widely used but not an official API, so it could break without warning. Check for an official option first.
-- **Drag-and-drop layout editor:** move, resize and layer every element. Needs a new link schema with a migration, and every v1 link must still look the same.
 - **More uploads:** backgrounds, sounds and fonts, each with its own checks.
 - **Community gallery:** publish a look, remix with credit. Needs reporting, moderation and someone to moderate before it opens.
 - **Help forum:** a Discord forum channel first. Build one only if Discord isn't enough.

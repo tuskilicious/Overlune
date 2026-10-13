@@ -38,6 +38,7 @@ const sample: Settings = {
   },
   alerts: {
     templates: {
+      follow: "{user} followed",
       raid: "RAID {user} {amount}",
       sub: "{user} subbed",
       resub: "{user} x{amount}",
@@ -51,6 +52,7 @@ const sample: Settings = {
   ticker: { show: true, label: "Ronni", extra: "Tue / Thu at 7 PM" },
   lessMotion: true,
   liteMotion: true,
+  layouts: {},
   advanced: {
     colors: { accent: "#ff2bd6", surface: "#101010" },
     fontHeading: "Orbitron",
