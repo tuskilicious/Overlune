@@ -116,3 +116,27 @@ test("every page has the site's one nav, and none scrolls sideways on a phone (T
   await expect(page).toHaveURL(/\/#how$/);
   await expect(page.locator("#how")).toBeInViewport();
 });
+
+test("the legal pages index their own headings and mark the part you're reading (T8.3)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/terms");
+  const index = page.getByRole("navigation", { name: "On this page" });
+  // Built from docs/legal/terms.md, so it lists exactly its sections.
+  await expect(index.getByRole("link")).toHaveCount(await page.locator("main.legal h2").count());
+  await expect(index.getByRole("link", { name: "1. What Overlune is" })).toHaveAttribute(
+    "aria-current",
+    "location",
+  );
+  await index.getByRole("link", { name: "3. Accounts" }).click();
+  await expect(page).toHaveURL(/\/terms#3-accounts$/);
+  await expect(index.getByRole("link", { name: "3. Accounts" })).toHaveAttribute(
+    "aria-current",
+    "location",
+  );
+  await expect(index).toBeInViewport();
+  // Phones skip it: fourteen chips would push the text off the first screen.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(index).toBeHidden();
+});
