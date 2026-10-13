@@ -735,8 +735,9 @@ The order after this phase, agreed the same day: vertical overlays (Phase 9), fo
 - [x] **T8.5 Home page fixes.** The empty gap under "Your whole stream, in one look"; the fact row (no orphan "Open source"); where the hero's alert cards sit; the Webcam frame and Chat card thumbnails; a quieter scroll ruler; the top bar on phones.
   - Accept: each item fixed and seen in the preview; landing e2e passes.
   - *Done 2026-10-13 (#214). The hero's alerts above the frame instead of over the scene's title; four facts in two columns ("One link per overlay" dropped); Chat, Webcam frame and Alerts cards over the "your game" backdrop; the gap above the looks' curve closed; a narrower, dimmer ruler; the meta descriptions say an account is optional.*
-- [ ] **T8.6 Review pass.** Screenshots of every page at 1440, 1024, 768 and 390px with the browser painting live (a background preview pane freezes GSAP mid-reveal, which looked like overlapping text in the audit), axe and e2e clean, DESIGN.md updated for the shell.
+- [x] **T8.6 Review pass.** Screenshots of every page at 1440, 1024, 768 and 390px with the browser painting live (a background preview pane freezes GSAP mid-reveal, which looked like overlapping text in the audit), axe and e2e clean, DESIGN.md updated for the shell.
   - Accept: the owner signs off the screenshots.
+  - *Done 2026-10-13 (#215); the owner signed off the screenshot sheets (every page at 1440, 1024, 768 and 390px, no sideways scroll). Fixed in the pass: the nav's section links broke onto two lines at 768px (now from 960px), and the guide's sizes table split "Width" mid-word (only the notes break now).*
 
 ## Phase 9: Vertical overlays (planned)
 Overlays for a 1080×1920 canvas (TikTok, Shorts, OBS 32.1+ vertical canvases, Aitum Vertical): every look's four scenes recomposed for a tall frame, chat and alerts placed for vertical, and vertical webcam frame sizes. A new optional link option, so no existing link changes (a migration plus fixtures if the payload grows). Size L: it touches all 16 looks. Broken into tasks when it starts.
