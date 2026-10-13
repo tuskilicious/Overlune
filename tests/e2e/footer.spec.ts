@@ -97,6 +97,15 @@ test("every page has the site's one nav, and none scrolls sideways on a phone (T
         "href",
         "/editor",
       );
+    // The narrowest window that shows the links: each stays on one line (T8.6 found two wrapping off the home page).
+    await page.setViewportSize({ width: 768, height: 1024 });
+    const wrapped = await nav
+      .getByRole("listitem")
+      .getByRole("link")
+      .evaluateAll((links) =>
+        links.filter((a) => a.getClientRects().length > 1).map((a) => a.textContent),
+      );
+    expect(wrapped, path).toEqual([]);
     await page.setViewportSize({ width: 390, height: 844 });
     // On failure, name what sticks out, since it can depend on the machine's fonts.
     const wide = await page.evaluate(() => ({

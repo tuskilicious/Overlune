@@ -54,8 +54,10 @@
 .site-nav-links {
   display: none;
   align-items: center;
-  gap: 28px;
+  /* Tighter on narrow windows: inside a page's gutters at 768px, 28px gaps wrapped "How it works" (T8.6). */
+  gap: clamp(14px, 2vw, 28px);
   margin: 0;
+  white-space: nowrap;
   padding: 0;
   list-style: none;
 }
