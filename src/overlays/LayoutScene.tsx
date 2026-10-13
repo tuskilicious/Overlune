@@ -102,9 +102,9 @@ const added = new Set<LayoutElement["type"]>(["text", "image", "shape"]);
  * there. A part missing from the layout, or hidden, isn't shown. Re-applied when fonts load or the parts resize, since
  * the moves are measured from where the parts naturally sit.
  */
-function useMoveParts(root: RefObject<HTMLDivElement | null>, elements: LayoutElement[]) {
+function useMoveParts(marker: RefObject<HTMLSpanElement | null>, elements: LayoutElement[]) {
   useLayoutEffect(() => {
-    const scene = root.current?.querySelector<HTMLElement>(".scene");
+    const scene = marker.current?.closest<HTMLElement>(".scene");
     if (!scene) return;
     const placed = sceneParts.flatMap(([selector, type]) => {
       const el = scene.querySelector<HTMLElement>(selector);
@@ -162,37 +162,39 @@ export default function LayoutScene({
   elements: LayoutElement[];
   error?: ReactNode;
 }) {
-  const root = useRef<HTMLDivElement>(null);
-  useMoveParts(root, elements);
+  // A marker in the layer finds the scene: a wrapper around it would stop rules like `.editor-preview > .scene`.
+  const marker = useRef<HTMLSpanElement>(null);
+  useMoveParts(marker, elements);
   const { title, subtitle } = settings[scene];
   const { endsAt, repeat } = settings.starting;
-  const layer = elements
-    .filter((el) => added.has(el.type) && !el.hidden)
-    .map((el) => (
-      <div
-        key={el.id}
-        className={`layout-el layout-el-${el.type}`}
-        data-id={el.id}
-        style={{
-          left: el.x,
-          top: el.y,
-          width: el.w,
-          height: el.h,
-          rotate: el.r ? `${el.r}deg` : undefined,
-          opacity: el.o < 1 ? el.o : undefined,
-        }}
-      >
-        <Added el={el} />
-      </div>
-    ));
+  const layer = [
+    <span key="marker" ref={marker} hidden />,
+    ...elements
+      .filter((el) => added.has(el.type) && !el.hidden)
+      .map((el) => (
+        <div
+          key={el.id}
+          className={`layout-el layout-el-${el.type}`}
+          data-id={el.id}
+          style={{
+            left: el.x,
+            top: el.y,
+            width: el.w,
+            height: el.h,
+            rotate: el.r ? `${el.r}deg` : undefined,
+            opacity: el.o < 1 ? el.o : undefined,
+          }}
+        >
+          <Added el={el} />
+        </div>
+      )),
+  ];
   return (
-    <div ref={root} style={{ display: "contents" }}>
-      <SceneFrame settings={settings} title={title} subtitle={subtitle} error={error} layer={layer}>
-        {scene === "starting" && (endsAt !== null || repeat.mode !== "off") && (
-          <Countdown starting={settings.starting} />
-        )}
-      </SceneFrame>
-    </div>
+    <SceneFrame settings={settings} title={title} subtitle={subtitle} error={error} layer={layer}>
+      {scene === "starting" && (endsAt !== null || repeat.mode !== "off") && (
+        <Countdown starting={settings.starting} />
+      )}
+    </SceneFrame>
   );
 }
 

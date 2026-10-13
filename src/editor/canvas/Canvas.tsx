@@ -47,8 +47,9 @@ interface Props {
   elements: LayoutElement[];
   /** Draws the scene for some settings: the editor's StartingSoon or TextScene. */
   scene: (settings: Settings) => ReactNode;
-  /** Keeps an edit: called once per drag, nudge burst or other change, so each is one undo step. */
-  onCommit: (elements: LayoutElement[]) => void;
+  /** Keeps an edit. A drag, resize or turn is its own undo step; `merge` (arrow-key nudges) joins a burst of them
+   *  into one, as typing does. */
+  onCommit: (elements: LayoutElement[], merge?: boolean) => void;
 }
 
 /**
@@ -199,6 +200,7 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
           ? { ...el, w: Math.max(8, el.w + dx), h: Math.max(8, el.h + dy) }
           : { ...el, x: el.x + dx, y: el.y + dy },
       ),
+      true,
     );
   };
 

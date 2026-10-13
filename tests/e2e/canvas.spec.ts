@@ -53,6 +53,10 @@ test.beforeEach(async ({ page }) => {
 test("Customize turns the preview into a canvas with the look's own layout, then Done returns", async ({
   page,
 }) => {
+  // The scene is scaled into the canvas, not drawn at full size behind it.
+  const canvas = (await page.locator(".canvas").boundingBox())!;
+  const shown = (await page.locator(".canvas .scene").boundingBox())!;
+  expect(Math.abs(shown.width - canvas.width)).toBeLessThan(4);
   const layout = (await layoutInLink(page))!;
   expect(layout.map((e) => e.type)).toEqual(expect.arrayContaining(["title", "subtitle"]));
   await page.getByRole("button", { name: "Done" }).click();
@@ -64,10 +68,12 @@ test("Customize turns the preview into a canvas with the look's own layout, then
 test("dragging an element moves it, as one undo step", async ({ page }) => {
   const title = (await layoutInLink(page))!.find((e) => e.type === "title")!;
   const from = await canvasPoint(page, title.x + 40, title.y + title.h / 2);
+  await page.keyboard.down("Alt"); // no snapping, so the move is exact
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
   await page.mouse.move(from.x + 50, from.y - 60, { steps: 6 });
   await page.mouse.up();
+  await page.keyboard.up("Alt");
   const moved = (await layoutInLink(page))!.find((e) => e.type === "title")!;
   expect(Math.abs(moved.x - title.x - 50 / from.scale)).toBeLessThan(10);
   expect(moved.y).toBeLessThan(title.y);
@@ -75,21 +81,25 @@ test("dragging an element moves it, as one undo step", async ({ page }) => {
   expect((await layoutInLink(page))!.find((e) => e.type === "title")).toEqual(title);
 });
 
-test("dragging near the canvas's centre snaps to it, with a guide; Alt doesn't snap", async ({
+test("dragging near another line snaps to it, with a guide, and lines the box up with it", async ({
   page,
 }) => {
   const title = (await layoutInLink(page))!.find((e) => e.type === "title")!;
   const from = await canvasPoint(page, title.x + 20, title.y + 20);
-  const centreX = 960 - title.w / 2 + 3; // 3px off centre
-  const to = await canvasPoint(page, centreX + 20, title.y + 20);
+  const nearCentre = 960 - title.w / 2 + 3; // 3px off the canvas's centre
+  const to = await canvasPoint(page, nearCentre + 20, title.y + 20);
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
   await page.mouse.move(to.x, to.y, { steps: 8 });
-  await expect(page.locator('.canvas-guide[data-axis="x"]')).toBeVisible();
+  const guide = page.locator('.canvas-guide[data-axis="x"]');
+  await expect(guide).toBeVisible();
+  // The line it snapped to, in canvas px: the closest one, the canvas's centre or another element's.
+  const at = parseFloat(await guide.evaluate((g) => (g as HTMLElement).style.left)) / to.scale;
   await page.mouse.up();
-  const snapped = (await layoutInLink(page))!.find((e) => e.type === "title")!;
-  expect(snapped.x + snapped.w / 2).toBeCloseTo(960, 0);
   await expect(page.locator(".canvas-guide")).toHaveCount(0);
+  const snapped = (await layoutInLink(page))!.find((e) => e.type === "title")!;
+  const lines = [snapped.x, snapped.x + snapped.w / 2, snapped.x + snapped.w];
+  expect(Math.min(...lines.map((l) => Math.abs(l - at)))).toBeLessThanOrEqual(1);
 });
 
 test("a corner handle resizes, and the turning handle turns", async ({ page }) => {
