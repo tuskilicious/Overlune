@@ -48,6 +48,7 @@ export function measureLayout(scene: HTMLElement): LayoutElement[] {
         o: 1,
         hidden: false,
         locked: false,
+        name: "",
       } as LayoutElement,
     ];
   });

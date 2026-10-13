@@ -22,7 +22,7 @@ describe("layouts", () => {
     const s = settingsV1.parse(withStarting([{ id: "t1", type: "title", ...box }]));
     expect(s.layouts.landscape?.size).toEqual({ width: 1920, height: 1080 });
     expect(customized(s, "starting")).toEqual([
-      { id: "t1", type: "title", ...box, r: 0, o: 1, hidden: false, locked: false },
+      { id: "t1", type: "title", ...box, r: 0, o: 1, hidden: false, locked: false, name: "" },
     ]);
     expect(customized(s, "brb")).toBeNull();
   });

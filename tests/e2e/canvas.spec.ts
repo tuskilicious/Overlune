@@ -21,6 +21,7 @@ const layoutInLink = (page: Page) =>
               landscape?: {
                 scenes: {
                   starting?: {
+                    id: string;
                     type: string;
                     x: number;
                     y: number;
@@ -45,7 +46,13 @@ const canvasPoint = async (page: Page, x: number, y: number) => {
 
 test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto(editorWith({ theme: "clean-slate", starting: { subtitle: "Chill games" } }));
+  await page.goto(
+    editorWith({
+      theme: "clean-slate",
+      starting: { subtitle: "Chill games", endsAt: Date.now() + 9e7, tz: "UTC" },
+      socials: [{ platform: "twitch", handle: "yourname" }],
+    }),
+  );
   await page.getByRole("button", { name: "Customize" }).click();
   await expect(page.locator(".canvas")).toBeVisible();
 });
@@ -142,4 +149,79 @@ test("by keyboard: Tab picks an element, arrows nudge it, Shift moves 10, Alt re
   );
   await page.keyboard.press("Escape");
   await expect(page.locator(".canvas-selection")).toHaveCount(0);
+});
+
+test.describe("layers and inspector (T9.5)", () => {
+  const layers = (page: Page) => page.getByRole("region", { name: "Layers" });
+  const inspector = (page: Page) => page.locator(".canvas-inspector");
+
+  test("Layers lists every element top first, and picks one for the inspector", async ({
+    page,
+  }) => {
+    const layout = (await layoutInLink(page))!;
+    await expect(layers(page).locator("li")).toHaveCount(layout.length);
+    await layers(page).getByRole("button", { name: "Title", exact: true }).click();
+    await expect(page.locator(".canvas-selection")).toHaveCount(1);
+    await expect(inspector(page).getByRole("heading")).toHaveText("Inspector: Title");
+  });
+
+  test("the inspector moves, sizes, turns, renames and restyles; each shows in the link", async ({
+    page,
+  }) => {
+    await layers(page).getByRole("button", { name: "Title", exact: true }).click();
+    const panel = inspector(page);
+    await panel.getByLabel("X", { exact: true }).fill("300");
+    await panel.getByLabel("Turn (°)").fill("15");
+    await panel.getByLabel("Name in Layers").fill("Big headline");
+    await panel.getByRole("combobox", { name: /^Color/ }).selectOption("accent");
+    const title = (await layoutInLink(page))!.find((e) => e.type === "title") as unknown as Record<
+      string,
+      unknown
+    >;
+    expect(title).toMatchObject({ x: 300, r: 15, name: "Big headline", color: "accent" });
+    await expect(
+      layers(page).getByRole("button", { name: "Big headline", exact: true }),
+    ).toBeVisible();
+    await expect(page.locator(".canvas .scene-title")).toHaveCSS("rotate", "15deg");
+  });
+
+  test("hide, lock and layer order from the panel", async ({ page }) => {
+    await layers(page).getByRole("button", { name: "Hide Subtitle" }).click();
+    await expect(page.locator(".canvas .scene-subtitle")).toBeHidden();
+    await layers(page).getByRole("button", { name: "Lock Title" }).click();
+    expect((await layoutInLink(page))!.find((e) => e.type === "title")!).toMatchObject({
+      locked: true,
+    });
+    // A locked element has no handles, and dragging it doesn't move it.
+    await layers(page).getByRole("button", { name: "Title", exact: true }).click();
+    await expect(page.locator(".canvas-handle")).toHaveCount(0);
+
+    const order = async () => (await layoutInLink(page))!.map((e) => e.type);
+    const before = await order();
+    const lowest = before[0]!;
+    const name = lowest[0]!.toUpperCase() + lowest.slice(1);
+    await layers(page)
+      .getByRole("button", { name: `Move ${name} up a layer` })
+      .click();
+    expect((await order())[1]).toBe(lowest);
+  });
+
+  test("[ and ] move the selection down and up a layer", async ({ page }) => {
+    const before = (await layoutInLink(page))!.map((e) => e.id);
+    await page.locator(".canvas").focus();
+    await page.keyboard.press("Tab"); // the bottom layer
+    await page.keyboard.press("]");
+    expect((await layoutInLink(page))!.map((e) => e.id)[1]).toBe(before[0]);
+    await page.keyboard.press("[");
+    expect((await layoutInLink(page))!.map((e) => e.id)).toEqual(before);
+  });
+
+  test("the editor stays accessible with the canvas and panels open", async ({ page }) => {
+    await layers(page).getByRole("button", { name: "Title", exact: true }).click();
+    const { default: AxeBuilder } = await import("@axe-core/playwright");
+    const scan = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(scan.violations).toEqual([]);
+  });
 });
