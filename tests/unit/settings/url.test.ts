@@ -38,6 +38,7 @@ const sample: Settings = {
   },
   alerts: {
     templates: {
+      follow: "{user} followed",
       raid: "RAID {user} {amount}",
       sub: "{user} subbed",
       resub: "{user} x{amount}",
