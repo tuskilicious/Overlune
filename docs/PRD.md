@@ -96,7 +96,7 @@ Streamers asked for freedom, as in StreamElements' overlay editor, without losin
 Streamers increasingly go live in portrait: TikTok Live, YouTube Shorts and OBS's vertical canvases (OBS 32.1+, or the Aitum Vertical plugin). Every look gets portrait versions of its four scenes, and alerts, chat and the webcam frame work on a tall canvas.
 - **One save, two canvases.** A vertical link is the same save after the `#` plus `?canvas=vertical` before it. No existing link changes, and no account is needed.
 - **Made for the phone screen.** Text stays out of the places where TikTok and Shorts draw their own buttons and captions (DESIGN.md "Vertical layout").
-- **Rolled out in batches** of four looks, each checked in OBS on a vertical canvas; the editor offers Vertical only for looks that have it until all sixteen do.
+- **Rolled out in batches** of four, each batch checked in OBS on a vertical canvas; the editor offers Vertical only for looks that have it until all sixteen do.
 - **Done when:** every look's scenes, alerts, chat and frame pass the OBS test on a vertical canvas, every old link renders as before, and 1.7.0 is released.
 
 ## v2 Phase 1: accounts on Cloudflare (approved 2026-10-09)
