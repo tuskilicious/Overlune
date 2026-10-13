@@ -12,7 +12,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  width: min(64rem, calc(100% - 2rem));
+  /* The page's own padding is the gutter; only the fixed nav (below) sets its own. */
+  width: min(64rem, 100%);
   margin: 16px auto 0;
   padding: 8px 8px 8px 20px;
   border: 1px solid rgb(255 255 255 / 0.1);
@@ -28,6 +29,7 @@
   position: fixed;
   inset: 0 0 auto;
   top: 16px;
+  width: min(64rem, calc(100% - 2rem));
   margin-top: 0;
 }
 
