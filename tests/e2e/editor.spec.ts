@@ -204,7 +204,7 @@ test("keyboard focus is always visible", async ({ page }) => {
     if (focused.ring === "none 3px" && focused.label.startsWith('<input type="datetime-local"'))
       continue;
     expect(focused.ring, focused.label).toBe("solid 2px");
-    expect(++visited).toBeLessThan(120); // a guard against a focus loop, not a budget
+    expect(++visited).toBeLessThan(160); // a guard against a focus loop, not a budget
   }
   expect(visited).toBeGreaterThan(30);
 });
@@ -462,7 +462,9 @@ test("the look picker shows each theme as a picture you can click", async ({ pag
 });
 
 test("the editor shows Starting Soon in the preview by default", async ({ page }) => {
-  await expect(page.getByRole("heading", { name: "Overlune" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Free stream overlays that look pro." }),
+  ).toBeVisible();
   await expect(page.getByRole("radio", { name: "Clean Slate" })).toBeChecked();
   await expect(previewTitle(page, "Starting soon")).toBeVisible();
 });

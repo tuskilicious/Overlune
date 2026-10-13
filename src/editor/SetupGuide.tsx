@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { Link } from "react-router";
 import SiteFooter from "../components/SiteFooter";
+import SiteNav from "../components/SiteNav";
 import { defaultSettings } from "../settings/schema";
 import { brandChrome } from "./brand";
 import "../themes/fonts";
@@ -115,16 +115,9 @@ export default function SetupGuide() {
     },
   ];
   return (
-    <div className="editor guide" style={themeVars(brandChrome)}>
+    <div className="editor guide site-sky" style={themeVars(brandChrome)}>
+      <SiteNav />
       <header className="editor-header">
-        <Link to="/" className="guide-logo">
-          <img src="/images/brand/logo.png" alt="Overlune home" width="159" height="48" />
-        </Link>
-        <p>
-          <Link to="/editor">
-            <Icon name="back" /> Back to the editor
-          </Link>
-        </p>
         <h1>Set up your overlays in OBS</h1>
         <p>You only do this once. After that, your overlays update themselves.</p>
         {/* Every part one tap away, like the kits' guides (T6.118). */}

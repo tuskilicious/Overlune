@@ -17,6 +17,7 @@ import HeroSky from "./HeroSky";
 import { testAlerts } from "../alerts/events";
 import Icon from "../components/Icon";
 import SiteFooter, { repoUrl, supportUrl } from "../components/SiteFooter";
+import SiteNav from "../components/SiteNav";
 import { chatSamples } from "../editor/chat-samples";
 import Preview from "../editor/Preview";
 import { sampleScene } from "../editor/scene-samples";
@@ -916,6 +917,10 @@ export default function LandingPage() {
   /** Work saved in this browser: the hero button picks it up in the editor (T6.67). */
   const [returning] = useState(() => loadSaved() !== null);
   const current = useSectionInView(sections);
+  // Other pages' nav links lead to a section here (/#kit, T8.1): go to it once the page is drawn.
+  useEffect(() => {
+    if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
+  }, []);
   const navLink = (id: string) => ({
     href: `#${id}`,
     "aria-current": current === id ? ("location" as const) : undefined,
@@ -1026,36 +1031,25 @@ export default function LandingPage() {
         Skip to the page
       </a>
 
-      <nav
-        aria-label="Main"
-        className="fixed inset-x-0 top-4 z-40 mx-auto flex w-[min(64rem,calc(100%-2rem))] items-center justify-between gap-4 rounded-full border border-white/10 bg-night/70 py-2 pr-2 pl-5 backdrop-blur-md"
-      >
-        <Link to="/">
-          <img src="/images/brand/logo.png" alt="Overlune home" width="120" height="36" />
-        </Link>
-        <ul className="hidden items-center gap-7 text-haze md:flex">
-          <li>
-            <a {...navLink("kit")}>Overlays</a>
-          </li>
-          <li>
-            <a {...navLink("looks")}>Looks</a>
-          </li>
-          <li>
-            <a {...navLink("how")}>How it works</a>
-          </li>
-          <li>
-            <Link className="hover:text-moon" to="/guide">
-              Setup guide
-            </Link>
-          </li>
-        </ul>
-        <Link
-          to="/editor"
-          className={`${button} bg-violet px-5 py-2.5 text-base text-night hover:bg-moon`}
-        >
-          Open the editor
-        </Link>
-      </nav>
+      <SiteNav
+        position="fixed"
+        links={
+          <>
+            <li>
+              <a {...navLink("kit")}>Overlays</a>
+            </li>
+            <li>
+              <a {...navLink("looks")}>Looks</a>
+            </li>
+            <li>
+              <a {...navLink("how")}>How it works</a>
+            </li>
+            <li>
+              <Link to="/guide">Setup guide</Link>
+            </li>
+          </>
+        }
+      />
 
       <main id="main" tabIndex={-1} className="w-full max-w-full overflow-x-clip outline-none">
         {/* Attention: text left, a live overlay beside it. The whole scene stays in view: its title sits at the
