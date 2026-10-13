@@ -4,7 +4,9 @@ import { localZone } from "../lib/time";
 import { useMotion, type PluginLoader } from "../lib/motion";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
-import { defaultSettings, type Settings } from "../settings/schema";
+import { defaultSettings, type LayoutElement, type Settings } from "../settings/schema";
+import { measureLayout } from "../overlays/measure";
+import Canvas from "./canvas/Canvas";
 import { loadSaved, save } from "../settings/storage";
 import { decodeLink, encode } from "../settings/url";
 import { themes } from "../themes";
@@ -528,6 +530,30 @@ export default function EditorPage() {
   };
 
   const update = (patch: Partial<Settings>) => setSettings((s) => ({ ...s, ...patch }));
+
+  /** The canvas (T9.4): on for the scene in the preview, which then holds a layout. */
+  const [canvasOn, setCanvasOn] = useState(false);
+  /** Keeps the scene's layout (or, with null, drops it, back to the look's composed scene). Each call is its own undo
+   *  step unless `merge` (a burst of nudges). */
+  const commitLayout = (elements: LayoutElement[] | null, merge = false) => {
+    if (!merge) lastEdit.current = 0;
+    setSettings((s) => {
+      const landscape = s.layouts.landscape ?? { size: { width: 1920, height: 1080 }, scenes: {} };
+      const scenes = { ...landscape.scenes };
+      if (elements) scenes[scene] = elements;
+      else delete scenes[scene];
+      return { ...s, layouts: { ...s.layouts, landscape: { ...landscape, scenes } } };
+    });
+  };
+  const sceneLayout = settings.layouts.landscape?.scenes[scene] ?? null;
+  /** Customize: starts from the look's own layout, measured from the preview (T9.3), the first time. */
+  const customize = () => {
+    if (!sceneLayout) {
+      const shown = document.querySelector<HTMLElement>(".editor-pick .scene");
+      if (shown) commitLayout(measureLayout(shown));
+    }
+    setCanvasOn(true);
+  };
 
   /** Anything changed from a fresh editor, including work restored from a link or autosave. */
   const madeSomething = JSON.stringify(settings) !== freshJson;
@@ -1064,6 +1090,29 @@ export default function EditorPage() {
                   <div className="editor-preview-bar">
                     <h2>Preview: {overlays[scene].name}</h2>
                     <span className="editor-chip-static">1920 × 1080</span>
+                    {/* The canvas (T9.4): move, resize and turn every part of the scene. */}
+                    {canvasOn ? (
+                      <>
+                        {sceneLayout && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              commitLayout(null);
+                              setCanvasOn(false);
+                            }}
+                          >
+                            Reset to the look
+                          </button>
+                        )}
+                        <button type="button" onClick={() => setCanvasOn(false)}>
+                          Done
+                        </button>
+                      </>
+                    ) : (
+                      <button type="button" onClick={customize}>
+                        Customize
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="editor-test-alert"
@@ -1078,46 +1127,62 @@ export default function EditorPage() {
                   </div>
                   {/* Click a part to jump to its settings; hover outlines it and names it (T6.135, the Studio board).
                       A mouse shortcut only: the section list and the form already reach every setting by keyboard. */}
-                  <div
-                    ref={pickArea}
-                    className="editor-pick"
-                    data-hover={picked ? "" : undefined}
-                    onPointerMove={(e) => {
-                      const part = partAt(e.currentTarget, e.clientX, e.clientY);
-                      // Only when the part under the pointer changes: every pixel of movement would otherwise
-                      // re-render the whole editor.
-                      setPicked((was) => (samePick(was, part) ? was : part));
-                    }}
-                    onPointerLeave={() => setPicked(null)}
-                    onClick={(e) => {
-                      const part = partAt(e.currentTarget, e.clientX, e.clientY);
-                      if (part) jumpTo(e, part.id);
-                    }}
-                  >
-                    <Preview>
-                      {scene === "starting" ? (
-                        <StartingSoon settings={settings} />
-                      ) : (
-                        <TextScene scene={scene} settings={settings} />
+                  {canvasOn && sceneLayout ? (
+                    <Canvas
+                      settings={settings}
+                      sceneId={scene}
+                      elements={sceneLayout}
+                      onCommit={commitLayout}
+                      scene={(s) =>
+                        scene === "starting" ? (
+                          <StartingSoon settings={s} />
+                        ) : (
+                          <TextScene scene={scene} settings={s} />
+                        )
+                      }
+                    />
+                  ) : (
+                    <div
+                      ref={pickArea}
+                      className="editor-pick"
+                      data-hover={picked ? "" : undefined}
+                      onPointerMove={(e) => {
+                        const part = partAt(e.currentTarget, e.clientX, e.clientY);
+                        // Only when the part under the pointer changes: every pixel of movement would otherwise
+                        // re-render the whole editor.
+                        setPicked((was) => (samePick(was, part) ? was : part));
+                      }}
+                      onPointerLeave={() => setPicked(null)}
+                      onClick={(e) => {
+                        const part = partAt(e.currentTarget, e.clientX, e.clientY);
+                        if (part) jumpTo(e, part.id);
+                      }}
+                    >
+                      <Preview>
+                        {scene === "starting" ? (
+                          <StartingSoon settings={settings} />
+                        ) : (
+                          <TextScene scene={scene} settings={settings} />
+                        )}
+                        <AlertView settings={settings} alert={testAlert} />
+                      </Preview>
+                      {picked && (
+                        <div
+                          className="editor-pick-box"
+                          data-below={picked.top < 28 || undefined}
+                          style={{
+                            left: picked.left,
+                            top: picked.top,
+                            width: picked.width,
+                            height: picked.height,
+                          }}
+                          aria-hidden
+                        >
+                          <span>{picked.name}</span>
+                        </div>
                       )}
-                      <AlertView settings={settings} alert={testAlert} />
-                    </Preview>
-                    {picked && (
-                      <div
-                        className="editor-pick-box"
-                        data-below={picked.top < 28 || undefined}
-                        style={{
-                          left: picked.left,
-                          top: picked.top,
-                          width: picked.width,
-                          height: picked.height,
-                        }}
-                        aria-hidden
-                      >
-                        <span>{picked.name}</span>
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </section>
               {/* Wide windows: the look picker is the filmstrip under the preview (T6.135). */}
