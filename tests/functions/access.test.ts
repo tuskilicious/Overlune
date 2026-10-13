@@ -9,7 +9,7 @@ import { onRequestPost as signoutEverywhere } from "../../functions/api/auth/sig
 import { onRequestGet as start } from "../../functions/api/auth/twitch/index";
 import { onRequestGet as callback } from "../../functions/api/auth/twitch/callback";
 import type { Env } from "../../functions/lib/env";
-import { createSession, deleteUser } from "../../functions/lib/db";
+import { deleteUser } from "../../functions/lib/db";
 import { hashToken, newSessionToken, SESSION_COOKIE } from "../../functions/lib/session";
 import { env, ORIGIN, rows, signIn, twitch, withFakeTwitch } from "./twitch-fake";
 
@@ -141,13 +141,16 @@ describe("the route registry", () => {
 describe("cookies that aren't a live session", () => {
   /** Cookies that must all count as signed out, and look identical doing it. */
   async function badTokens() {
-    const expired = newSessionToken();
-    const aId = (await rows("users")).find((u) => u.twitch_id === "111")!.id as string;
-    await createSession(env.DB, aId, await hashToken(expired), 1, 2);
     twitch.sub = twitch.helixId = "333";
     const gone = await signIn();
     const goneId = (await rows("users")).find((u) => u.twitch_id === "333")!.id as string;
     await deleteUser(env.DB, goneId);
+    // After the sign-in above, which clears expired sessions.
+    const expired = newSessionToken();
+    const aId = (await rows("users")).find((u) => u.twitch_id === "111")!.id as string;
+    await env.DB.prepare("INSERT INTO sessions VALUES (?, ?, 1, 2)")
+      .bind(await hashToken(expired), aId)
+      .run();
     return {
       none: null,
       forged: newSessionToken(),

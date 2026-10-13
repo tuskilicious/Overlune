@@ -35,7 +35,7 @@ test("overlays have no footer, since they are shown on stream", async ({ page })
 });
 
 for (const [path, title, line] of [
-  ["/privacy", "Overlune Privacy Policy", "Overlune sets no cookies and uses no trackers"],
+  ["/privacy", "Overlune Privacy Policy", "Overlune uses no tracking cookies and no trackers"],
   ["/terms", "Overlune Terms of Use", "These terms are governed by the laws of"],
 ] as const) {
   test(`${path} shows the legal doc as a page in the site's style (T6.13)`, async ({ page }) => {

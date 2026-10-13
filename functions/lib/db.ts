@@ -37,6 +37,8 @@ export async function upsertUser(db: D1Database, p: TwitchProfile, now: number):
   return row!.id;
 }
 
+/** Starts a session, and clears every expired one (anyone's): a sign-in is the only regular write, so expired rows
+ *  last only until the next sign-in (the privacy policy says sessions are removed after 30 days). */
 export async function createSession(
   db: D1Database,
   userId: string,
@@ -44,12 +46,14 @@ export async function createSession(
   now: number,
   expiresAt: number,
 ): Promise<void> {
-  await db
-    .prepare(
-      "INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)",
-    )
-    .bind(tokenHash, userId, now, expiresAt)
-    .run();
+  await db.batch([
+    db.prepare("DELETE FROM sessions WHERE expires_at <= ?").bind(now),
+    db
+      .prepare(
+        "INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)",
+      )
+      .bind(tokenHash, userId, now, expiresAt),
+  ]);
 }
 
 /** The user a session belongs to, if it exists and hasn't expired. */
