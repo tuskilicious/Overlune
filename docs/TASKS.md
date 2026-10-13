@@ -718,35 +718,83 @@ Approved by the owner 2026-10-09 (`docs/PRD.md` "v2 Phase 1", `docs/STACK.md` "B
 ## Phase 8: Website polish
 Planned with the owner 2026-10-13, after an audit of every page at 1440×900 and 390×844 against DESIGN.md. The home page is rich (night sky, glow, motion, bento, the ruler); the editor, guide, legal pages and 404 are plain utility pages, so the site feels like two products. This phase carries the home page's world into every page. No overlay or overlay link changes. Each task is its own PR with a preview the owner checks; the audit's one real bug (home page copy saying there are no accounts) was fixed first (#207).
 
-The order after this phase, agreed the same day: vertical overlays (Phase 9), four new looks (Phase 10), saved overlays (Phase 11), then the Overlune Dock and the Android app (Phase 12). Vertical comes before the new looks so they're built vertical-ready.
+The order after this phase, agreed the same day and revised for the canvas editor: the canvas (Phase 9), vertical overlays (Phase 10, now a canvas size), four new looks (Phase 11), saved overlays (Phase 12), connections (Phase 13), then the Overlune Dock and the Android app (Phase 14).
 
 - [x] **T8.1 Shared site shell.** The home page's floating nav, night-sky ground and outlined-wordmark footer on every page: guide, privacy, terms, 404 and the editor's header. One component set, not copies; the nav marks the current page.
   - Accept: every page has the same nav and footer; axe clean; no sideways scroll at 390px; e2e for the nav on each page.
-  - *Merged 2026-10-13 in #209. `src/components/SiteNav.tsx` and `site-nav.css`: fixed on the home page, sticky on the guide, privacy, terms and 404, full width in the editor, where the account takes the place of "Open the editor". Off the home page the section links go to `/#kit`, `/#looks`, `/#how`; the current page is underlined. `.site-sky` (static CSS stars and a violet glow) tops every page but the home page. The editor's heading is now its tagline. Found on the way: Start over's confirmation showed in the page corner (a shared `editor-reset` class); fixed. New e2e: the nav on all six pages, no sideways scroll at 390px, a section link from the guide.*
+  - *Done 2026-10-13 (#209). `components/SiteNav.tsx` on every page: fixed on the home page, sticky on the guide, legal pages and 404, in the flow in the editor with the account in the button's place; `.site-sky` behind every other page. Found on the way: Start over's confirmation shared the section Reset's `position: absolute` and sat in the page's top corner (fixed). CI (Linux fonts) caught the guide's sizes table 2px over a phone's width, and the editor's focus-loop guard at exactly 120 stops (raised to 160).*
 - [x] **T8.2 Setup guide.** A centred layout with a sticky table of contents on wide windows (the index chips become it), steps at full width on phones, and the site nav in place of "Back to the editor" alone.
   - Accept: the table of contents follows the section in view (`aria-current`); phones get the steps full width; axe clean; checked at 1440, 1024, 768 and 390px.
-  - *Merged 2026-10-13 in #210. Centred under the nav; from 1024px the index is a sticky column marking the part you're reading (`aria-current="location"`), below that the chips stay; phones run each step full width. Jumps land below the sticky nav. Two new e2e (the index follows a jump; phone steps wider than 340px, no sideways scroll).*
+  - *Done 2026-10-13 (#210). Centred under the nav; from 1024px a sticky index marks the part you're reading (`useHeadingAbove`, the last heading above 40% of the window); phones get full-width steps.*
 - [x] **T8.3 Legal pages.** Privacy and terms in the same centred layout, a table of contents built from their headings, and a readable measure and spacing.
   - Accept: the table of contents comes from `docs/legal/*.md` (no second copy); the footer e2e still passes; axe clean.
-  - *Merged 2026-10-13 in #211. The guide's layout; the index is built from each document's own headings, with ids from their text (`/terms#3-accounts`); a sticky column from 1024px, hidden below (privacy has fourteen sections). `useHeadingAbove` moved to `src/lib/`, shared with the guide. New e2e for the index, a jump, and phones.*
+  - *Done 2026-10-13 (#211). The guide's layout with an index built from each document's headings (ids from their text, e.g. `/terms#3-accounts`), only from 1024px. Also fixed: a section link from another page (`/#how`) landed off screen once the pinned hero laid out.*
 - [x] **T8.4 Editor polish.** The first-visit gallery gets a hero-style header and the home page's glow on look cards; the header, save box and account menu join the same family.
   - Accept: the editor's rules in DESIGN.md still hold (one filled button, tokens, focus rings); axe clean narrow and wide; the owner approves the preview.
-  - *Merged 2026-10-13 in #212. The first-visit gallery's heading is large and centred over a soft violet glow (behind the heading only); look cards are Deep Space cards with a Lune Violet edge and glow on hover and focus (the editor's only glow; the focus ring stays); the save box takes the nav's edge and corners. DESIGN.md records the gallery.*
+  - *Done 2026-10-13 (#212). A hero-style gallery opening, look cards on Deep Space that glow violet on hover and focus (the editor's only glow), the save box with the nav's edge.*
 - [x] **T8.5 Home page fixes.** The empty gap under "Your whole stream, in one look"; the fact row (no orphan "Open source"); where the hero's alert cards sit; the Webcam frame and Chat card thumbnails; a quieter scroll ruler; the top bar on phones.
   - Accept: each item fixed and seen in the preview; landing e2e passes.
-  - *Merged 2026-10-13 in #214. The hero's alerts sit side by side above the frame's top-left, never over the scene title; the fact row is four facts in two columns ("One link per overlay" dropped); Chat, Webcam frame and Alerts cards show their overlay over the "your game" dusk backdrop; the gap above the looks is gone; the ruler is narrower (2.75rem) with dim numbers until hovered; meta descriptions say an account is optional. The phone top bar already fit after T8.1. Landing e2e passed except the hero tour test, which failed only on Windows (fixed in #213).*
+  - *Done 2026-10-13 (#214). The hero's alerts above the frame instead of over the scene's title; four facts in two columns ("One link per overlay" dropped); Chat, Webcam frame and Alerts cards over the "your game" backdrop; the gap above the looks' curve closed; a narrower, dimmer ruler; the meta descriptions say an account is optional.*
 - [x] **T8.6 Review pass.** Screenshots of every page at 1440, 1024, 768 and 390px with the browser painting live (a background preview pane freezes GSAP mid-reveal, which looked like overlapping text in the audit), axe and e2e clean, DESIGN.md updated for the shell.
   - Accept: the owner signs off the screenshots.
-  - *Signed off by the owner 2026-10-13 (#222). Every page at the four widths, taken in headless Chromium with the reveals scrolled through and the home page's looks paused, shared as a private review sheet. Found and fixed: the nav's links wrapped at 768px on the guide, legal pages and 404 (the gap now scales, 14 to 28px; the nav e2e checks 768px on every page). New e2e: one axe pass over every page at 390 and 1440px, all clean. DESIGN.md: a "Site shell" section (nav, `.site-sky`, footer) and the review widths in the checklist. The owner's call: the editor's save box now says "An account is optional." instead of "No accounts needed." Checked, not bugs: a hero alert caught mid-entrance, and the editor's account menu hidden on the dev server (no `/api`).*
+  - *Done 2026-10-13 (#215); the owner signed off the screenshot sheets (every page at 1440, 1024, 768 and 390px, no sideways scroll). Fixed in the pass: the nav's section links broke onto two lines at 768px (now from 960px), and the guide's sizes table split "Width" mid-word (only the notes break now). Then #222: one axe pass over every page at 390 and 1440px (all clean), a check that the nav's links never wrap at 768px, a "Site shell" section in DESIGN.md, and, the owner's call, the editor's save box says "An account is optional." instead of "No accounts needed."*
 
-## Phase 9: Vertical overlays (planned)
-Overlays for a 1080×1920 canvas (TikTok, Shorts, OBS 32.1+ vertical canvases, Aitum Vertical): every look's four scenes recomposed for a tall frame, chat and alerts placed for vertical, and vertical webcam frame sizes. A new optional link option, so no existing link changes (a migration plus fixtures if the payload grows). Size L: it touches all 16 looks. Broken into tasks when it starts.
+## Phase 9: Canvas editor
+Asked for by the owner 2026-10-13 ("the editor should give the users freedom", after StreamElements' overlay editor). Looks stay the beginner's one-click start; **Customize** opens a canvas where every part of a scene (title, countdown, socials, logo, text, images, shapes, chat, alerts, the webcam frame) can be moved, resized, rotated, layered, hidden, added or removed. **Old links never change:** a link without a layout renders exactly as today; customizing writes an explicit layout into the link as a new optional field (STACK.md "Layout model": the v1 contract allows it, so no version bump or migration). **Link first, account optional:** layouts live in the link; saved overlays (Phase 12) later add a short link and live edits. An optional **Live** overlay gathers chat, alerts, the frame and labels into one browser source. **No custom-code widgets:** a streamer's own HTML or JavaScript would run on overlune.in, next to other people's sign-in cookies. This phase comes before vertical (Phase 10), which then becomes a canvas size.
 
-## Phase 10: Four new looks (planned)
+- [ ] **T9.1 Plan and rules.** The canvas in the PRD; the layout model in STACK.md (elements, units, schema version, migration, the link size budget, what stays out); the canvas UI in DESIGN.md (selection, handles, guides, layers, inspector, keyboard); any new dependency named for the owner's approval.
+  - Accept: the owner approves the PR; no code changes.
+- [ ] **T9.2 Layout model and renderer.** Positioned elements checked by zod, rendered with today's components (title, countdown, socials, logo, chat, alerts, frame); a link with a layout renders it, one without renders as today.
+  - Accept: every old-link fixture renders as before; fixtures for layout links; unit tests for the schema (bad elements dropped, limits held).
+- [ ] **T9.3 Looks as default layouts.** Each look's four scenes expressed as default layouts that render the same as today's composed scenes.
+  - Accept: screenshot comparison per look and scene within a small tolerance; contrast tests unchanged.
+- [ ] **T9.4 Canvas core.** Select, drag, resize, rotate, snapping guides and spacing hints, arrow-key nudges, undo and redo.
+  - Accept: works by mouse and keyboard; e2e for each action.
+- [ ] **T9.5 Layers and inspector.** A layers panel (order, hide, lock, rename) and an inspector (position, size, rotation, opacity, the element's style).
+  - Accept: axe clean; every canvas action is also possible from these panels.
+- [ ] **T9.6 Add and remove.** Text, image (https only, CLAUDE.md §6), shape, logo, countdown and socials; duplicate and delete.
+  - Accept: validated input; e2e; the link stays within the size budget.
+- [ ] **T9.7 The Live overlay.** One browser source with chat, alerts, the frame and labels placed freely.
+  - Accept: passes the OBS test with a test alert and real chat.
+- [ ] **T9.8 Canvas sizes.** 1920×1080 by default, other common sizes and custom ones, so Phase 10's portrait canvas is a size.
+  - Accept: layouts keep their places proportionally when the size changes; e2e.
+- [ ] **T9.9 Beginners and access.** The pick-a-look path stays first; the canvas works by keyboard and screen reader; the guide covers customizing.
+  - Accept: axe clean; a keyboard-only run-through; the owner tries it.
+- [ ] **T9.10 OBS test and release 2.0.0.** A new kind of link (layouts) and a new editor make it a major release, though every old link still works.
+  - Accept: every overlay passes `docs/OBS-TESTING.md`, old links included; 2.0.0 published.
+
+## Phase 10: Vertical overlays
+Planned with the owner 2026-10-13. Overlune for vertical streams (TikTok Live, YouTube Shorts, OBS 32.1+ vertical canvases, the Aitum Vertical plugin): every look's four scenes in portrait (1080×1920), and alerts, chat and the webcam frame placed for a tall canvas. **The link:** the same save after the `#`, plus an optional `?canvas=vertical` flag before it (like `?rm=1`), so one save gives both sets of links and no existing link changes; the flag joins the link contract in STACK.md and is never removed or repurposed. **Rollout:** looks in batches of four, each merged after the owner's OBS check; until all sixteen are done, the editor offers Vertical only for looks that have it. Phase 11's new looks are built vertical-ready. **Re-planned on the canvas (owner, 2026-10-13):** Phase 9's canvas comes first, so a vertical layout becomes a 1080×1920 canvas with portrait starting layouts per look instead of per-look portrait CSS; the batches, the safe zone and the link flag stay, and the tasks below are revised when Phase 10 starts (one save holds both layouts; `?canvas=vertical` picks the portrait one).
+
+- [ ] **T10.1 Plan and rules.** The vertical plan in the PRD; `?canvas=vertical` in STACK.md's URL format; the portrait layout and the safe zones in DESIGN.md (where TikTok's and Shorts' own buttons and captions sit over the stream, checked against their current apps); FUTURE-SCOPE.md updated.
+  - Accept: the owner approves the PR; no code changes.
+- [ ] **T10.2 The portrait scene layout.** `?canvas=vertical` read once (like `?rm=1`); scenes at 1080×1920 with one shared portrait layout for every look (logo at the top, the title block in the middle third, the countdown under it, socials stacked), text that shrinks to fit, the entrance choreography and its reduced-motion version; overlay fixtures for vertical links.
+  - Accept: every old-link fixture renders exactly as before; a vertical link renders at 1080×1920 with nothing in the safe zones; unit and e2e tests.
+- [ ] **T10.3 Vertical looks, batch 1:** Clean Slate, Neon Grid, Vaporwave Sunset, Bold Esports. Each look's art and motif checked and adjusted for portrait (grid floors, the sun and palms, the angled slabs).
+  - Accept: contrast tests cover the portrait scenes; e2e renders all four scenes of each look; the owner OBS-checks them on a vertical canvas.
+- [ ] **T10.4 Vertical looks, batch 2:** Cozy Café, Arcade 8-Bit, Pastel Cloud, Forest Night.
+  - Accept: as T10.3.
+- [ ] **T10.5 Vertical looks, batch 3:** Daylight, Abyss, Session, Shonen.
+  - Accept: as T10.3.
+- [ ] **T10.6 Vertical looks, batch 4:** Sakura, Skate Deck, Phosphor, Quest.
+  - Accept: as T10.3; every look now has vertical.
+- [ ] **T10.7 Alerts, chat and webcam frame for vertical.** Alerts placed for a tall canvas, chat sizes that suit one, and vertical webcam frame presets, all clear of the safe zones.
+  - Accept: e2e for each; the owner OBS-checks them with a test alert.
+- [ ] **T10.8 Editor: Horizontal / Vertical.** A switch over the preview, a 9:16 preview with the safe zones as an optional overlay, and the links section giving the chosen canvas's links and sizes; Vertical only for looks that have it.
+  - Accept: axe clean narrow and wide; e2e for the switch and the vertical links; old editor bookmarks open as before.
+- [ ] **T10.9 Setup guide: vertical.** How to add the links to a vertical canvas in OBS 32.1+, with Aitum Vertical, and in Streamlabs, with the sizes.
+  - Accept: the guide's tests pass; the owner checks the steps in OBS.
+- [ ] **T10.10 OBS test and release 1.7.0.** Every vertical overlay through `docs/OBS-TESTING.md` on a real vertical canvas, then a release.
+  - Accept: the OBS test is logged; 1.7.0 published.
+
+## Phase 11: Four new looks (planned)
 Eclipse, Rain City, Paper Cut and Aurora Tundra (picked by the owner 2026-10-13), each with its own world and **the lune**, Overlune's signature: a crescent moon made from that look's own material (a corona, a neon sign, cut paper, frost). The bar in DESIGN.md applies, plus vertical versions from the start. Broken into tasks when it starts.
 
-## Phase 11: Saved overlays (planned, v2 Phase 2)
+## Phase 12: Saved overlays (planned, v2 Phase 2)
 Save an overlay to your account and paste its links once; edits reach OBS live through a Durable Object, and each link keeps a snapshot so it renders if the API is down. Open questions from 2026-10-13: where the Durable Object runs (a small separate Worker, recommended, or moving the site to Workers), edits going live on an "Update OBS" button or by autosave, and 10 saved overlays per account.
 
-## Phase 12: Overlune Dock and the Android app (planned)
+## Phase 13: Connections (planned)
+Picked by the owner 2026-10-13, in this order: Twitch events (follows, subs, bits, raids, channel points, hype trains through EventSub, with Twitch sign-in and only the permissions each needs), goals and labels (goal bars, latest and top supporters, a recent-events list), tips from the streamer's own StreamElements or Streamlabs (their APIs; Overlune never handles money), then YouTube and Kick (YouTube's API quota and Kick's lack of a stable official API decide how). Builds on saved overlays (Phase 12): events reach the overlay live through its Durable Object, and no token ever appears in a link or an overlay. Broken into tasks when it starts.
+
+## Phase 14: Overlune Dock and the Android app (planned)
 Approved in principle by the owner 2026-10-13. One dock UI in this repo, used in three places: `overlune.in/dock` as an OBS Custom Browser Dock (controls OBS through obs-websocket on `ws://localhost:4455`, which browsers allow from an https page, and Overlune overlays through `BroadcastChannel`, as the owner's kits do); an Android app that wraps the same UI with Capacitor (an installed app may reach OBS on the local network; the phone reaches overlays through obs-websocket's `BroadcastCustomEvent` and the dock); and, after Phase 11, settings that follow the account. Goal: everything OBS Blade's free version does (scenes, sources, Studio Mode, transitions, stream, record, replay buffer, virtual camera, audio with meters, preview, profiles, collections, hotkeys, stats), plus Overlune's own controls and chat. Built from scratch on the public obs-websocket protocol: no OBS Blade code (it's GPL-3.0). The OBS password stays in the dock or on the phone, never in a link or on Overlune's servers. Android first (Google Play, one-time $25, plus an APK on GitHub); iPhone later. Capacitor is a new dependency, approved for this phase. Broken into tasks when it starts.

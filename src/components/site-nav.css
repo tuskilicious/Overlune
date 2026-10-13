@@ -54,15 +54,14 @@
 .site-nav-links {
   display: none;
   align-items: center;
-  /* Tighter on narrow windows: inside a page's gutters at 768px, 28px gaps wrapped "How it works" (T8.6). */
-  gap: clamp(14px, 2vw, 28px);
+  gap: 28px;
   margin: 0;
-  white-space: nowrap;
   padding: 0;
   list-style: none;
 }
 
-@media (min-width: 768px) {
+/* The section links need about 960px beside the logo and button; narrower, they'd break onto two lines (T8.6). */
+@media (min-width: 960px) {
   .site-nav-links {
     display: flex;
   }

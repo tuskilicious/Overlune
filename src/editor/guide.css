@@ -245,7 +245,11 @@
   padding: 8px 16px;
   border-bottom: var(--border);
   text-align: left;
-  /* Lets the table shrink to a phone's width: with wider fonts (Linux CI) the Webcam frame note left it 2px over. */
+}
+
+/* The long notes may break anywhere, so the table fits a phone with wider fonts (Linux CI); the headings and sizes keep
+   their words whole (T8.6: "Width" had split). */
+.guide-sizes .guide-note {
   overflow-wrap: anywhere;
 }
 

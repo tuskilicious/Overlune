@@ -255,6 +255,18 @@ Each look has its own scene composition (T6.134, plan and sketches in `docs/LAYO
 - **Alerts:** still centered at the top. A wider card (760-1100px) with a 6px accent band, an uppercase event label ("Raid", "New subscriber", "Resub", "Gift subs", "Cheer"), then the streamer's message at 56px; resub and cheer text below in the muted color.
 - **Chat:** one panel instead of a card per message: no borders between cards, hairline separators, only the top and bottom of the stack rounded. Badges are small square-cornered tags tinted with the accent.
 
+## Canvas editor (Phase 9)
+The canvas follows the editor's chrome (tokens, focus rings, one filled button) and the kits' docks: everything visible, nothing hidden behind a mode.
+- **Where:** "Customize" on the scene preview opens the canvas in its place; "Done" returns. The section list, the form and the links stay; the form still edits words (title, countdown, socials), the canvas edits places and styles.
+- **Canvas:** the scene at its real size, scaled to fit, on a checkerboard so see-through areas read. Zoom to fit, 50%, 100% and 200%, and space-drag to pan.
+- **Selection:** a 1px Lune Violet outline with eight square handles and a rotation handle above; the element's name in a small tag, as the preview's click-to-select (T6.135). Shift adds to the selection; Escape clears it.
+- **Guides:** snapping to the canvas's edges and centre, other elements' edges and centres, and the safe zone (Phase 10), shown as 1px Signal Cyan lines while dragging, with the distance between neighbours. Alt drags without snapping.
+- **Keyboard:** Tab and Shift+Tab move through elements in layer order; arrows nudge 1px (Shift: 10px); Alt+arrows resize; Delete removes; Ctrl/Cmd+D duplicates; Ctrl/Cmd+Z and Shift+Z undo and redo (the editor's existing history); [ and ] move down and up a layer.
+- **Layers panel:** the element list, top layer first, each with its icon, name (renamable), and hide and lock toggles; drag or the keyboard to reorder. It is a listbox, so screen readers hear the element, its position and its state.
+- **Inspector:** X, Y, W, H and rotation as number fields with nudges (the editor's quick rows), opacity as a slider, then the type's own style: font, size, colour (the look's swatches first, then your own), alignment, fit, fill, stroke, corner radius.
+- **Add:** a menu of element types with their line icons; a new element lands in the centre of the view, selected.
+- **Accessibility:** every canvas action is also possible from the layers panel and the inspector, so the canvas itself is a pointer convenience (like click-to-select), and the editor still passes axe and a keyboard-only run-through. Reduced motion turns off the canvas's own transitions.
+
 ## Editor and site UI
 The editor, setup guide, privacy and terms pages share one quiet, high-contrast chrome in Overlune's brand (`docs/BRAND.md`), so the colorful theme previews stay the loudest thing on the page. Tokens live in `src/editor/brand.ts` and reach CSS as variables on `.editor` (`themeVars`). "Must" rules are hard requirements; "should" rules are defaults.
 
@@ -288,7 +300,7 @@ The editor, setup guide, privacy and terms pages share one quiet, high-contrast 
 
 ### Site shell (T8.1, every page)
 Every page but the overlays shares one shell: the nav at the top, the night-sky ground under it, and the footer at the end. One component each, never a copy per page; the home page uses the same nav and footer.
-- **Nav:** `components/SiteNav.tsx`, the floating pill: logo, Overlays, Looks, How it works, Setup guide, and "Open the editor" (the editor puts the account there instead). Fixed on the home page, sticky on the guide, legal pages and 404, and full-width and in the flow in the editor (its preview column is sticky itself). From other pages the section links go to `/#kit`, `/#looks` and `/#how`; the page you're on is underlined (`aria-current`). Its links never wrap: the gap between them narrows with the window (14 to 28px), checked at 768px on every page (T8.6). On the home page it also marks the section in view (below).
+- **Nav:** `components/SiteNav.tsx`, the floating pill: logo, Overlays, Looks, How it works, Setup guide, and "Open the editor" (the editor puts the account there instead). Fixed on the home page, sticky on the guide, legal pages and 404, and full-width and in the flow in the editor (its preview column is sticky itself). From other pages the section links go to `/#kit`, `/#looks` and `/#how`; the page you're on is underlined (`aria-current`). The section links show from 960px; narrower, only the logo and button (T8.6), so they never break onto two lines (the nav e2e checks 960px on every page). On the home page it also marks the section in view (below).
 - **Night sky (`.site-sky`):** every page but the home page, whose hero has its own sky: a few static stars and a soft violet glow at the top, never behind body text.
 - **Footer (T6.148):** link groups (Make, Project, Legal, Contact) over a large outlined "Overlune" wordmark, after 21st.dev's "Footer with Minimal Outline" (layout only). The wordmark is `aria-hidden`, filled with the page background over a 2px stroke so only its outer edge shows. Layout in `src/components/site-footer.css`; each page sets `--footer-mark-stroke` and `--footer-mark-fill`.
 - **Checked together (T8.6):** every page at 1440, 1024, 768 and 390px, and one axe pass over all of them at 390 and 1440px (`tests/e2e/footer.spec.ts`).
