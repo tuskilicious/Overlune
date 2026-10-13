@@ -10,6 +10,8 @@ import Chat from "./chat/Chat";
 import ChatView, { type ChatMessage } from "./chat/ChatView";
 import Frame from "./frame/Frame";
 import { Added } from "./LayoutScene";
+import { canvasOf, rescale } from "./measure";
+import { canvasStyle } from "./SceneFrame";
 import "./scene.css";
 
 /** Where Live puts things before it's customized: chat down the right, alerts at the top, the frame bottom left. */
@@ -22,9 +24,10 @@ export const defaultLive: LayoutElement[] = [
     ({ id: `live${i}`, r: 0, o: 1, hidden: false, locked: false, name: "", ...b }) as LayoutElement,
 );
 
-/** The Live overlay's elements: its layout, or the default. */
+/** The Live overlay's elements: its layout, or the default moved onto its canvas (T9.8). */
 export const liveElements = (settings: Settings) =>
-  settings.layouts.landscape?.scenes.live ?? defaultLive;
+  settings.layouts.landscape?.scenes.live ??
+  rescale(defaultLive, { w: 1920, h: 1080 }, canvasOf(settings));
 
 /**
  * /o/live (T9.7): one browser source with chat, alerts and the webcam frame, each in its box on a see-through
@@ -73,7 +76,11 @@ export default function LiveScene({
     }
   };
   return (
-    <div className="live" data-theme={theme.id} style={themeVars(theme)}>
+    <div
+      className="live"
+      data-theme={theme.id}
+      style={{ ...themeVars(theme), ...canvasStyle(settings) }}
+    >
       {error}
       {liveElements(settings)
         .filter((el) => !el.hidden)

@@ -485,3 +485,86 @@ export function Inspector({
     </section>
   );
 }
+
+type Size = { width: number; height: number };
+const sizes: [width: number, height: number, label: string][] = [
+  [1920, 1080, "1920 × 1080"],
+  [1280, 720, "1280 × 720"],
+  [2560, 1440, "2560 × 1440"],
+  [3840, 2160, "3840 × 2160 (4K)"],
+];
+
+/** A size the scenes can be drawn at: 320 to 3840 each way, and at most three times as wide as tall or the other way
+ *  round, so a layout stays inside the link's limits. */
+export const goodSize = ({ width, height }: Size) =>
+  [width, height].every((n) => Number.isInteger(n) && n >= 320 && n <= 3840) &&
+  Math.max(width / height, height / width) <= 3;
+
+/**
+ * The canvas size (T9.8): the scenes and Live are drawn at the size of the streamer's OBS canvas. A common size, or
+ * their own; the layouts keep their places when it changes.
+ */
+export function CanvasSize({ size, onChange }: { size: Size; onChange: (size: Size) => void }) {
+  const common = sizes.some(([w, h]) => w === size.width && h === size.height);
+  const [custom, setCustom] = useState<{ width: string; height: string } | null>(null);
+  const typed = custom && { width: Number(custom.width), height: Number(custom.height) };
+  return (
+    <div className="canvas-size">
+      <label>
+        {/* Named for screen readers only: the size itself reads as the old "1920 × 1080" chip did. */}
+        <span className="editor-sep">Canvas size</span>
+        <select
+          value={custom || !common ? "custom" : `${size.width}x${size.height}`}
+          onChange={(e) => {
+            if (e.target.value === "custom")
+              return setCustom({ width: String(size.width), height: String(size.height) });
+            const [width, height] = sizes[e.target.selectedIndex]!;
+            setCustom(null);
+            onChange({ width, height });
+          }}
+        >
+          {sizes.map(([w, h, label]) => (
+            <option key={label} value={`${w}x${h}`}>
+              {label}
+            </option>
+          ))}
+          <option value="custom">
+            {common ? "Another size…" : `${size.width} × ${size.height}`}
+          </option>
+        </select>
+      </label>
+      {custom && typed && (
+        <form
+          className="canvas-size-custom"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!goodSize(typed)) return;
+            onChange(typed);
+            setCustom(null);
+          }}
+        >
+          {(["width", "height"] as const).map((side) => (
+            <label key={side}>
+              {side === "width" ? "Canvas width" : "Canvas height"}
+              <input
+                type="number"
+                min={320}
+                max={3840}
+                value={custom[side]}
+                aria-invalid={!goodSize(typed)}
+                aria-describedby="canvas-size-hint"
+                onChange={(e) => setCustom({ ...custom, [side]: e.target.value })}
+              />
+            </label>
+          ))}
+          <button type="submit">Use this size</button>
+          <p id="canvas-size-hint" className="editor-hint">
+            {goodSize(typed)
+              ? "Use the Base (Canvas) Resolution from OBS’s Settings → Video."
+              : "Sizes go from 320 to 3840, and at most three times as wide as tall (or as tall as wide)."}
+          </p>
+        </form>
+      )}
+    </div>
+  );
+}

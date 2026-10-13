@@ -1000,6 +1000,7 @@
 .editor-preview > .scene {
   transform: scale(var(--scale));
   transform-origin: 0 0;
+  scale: none; /* another canvas size (T9.8): the preview does the scaling */
 }
 
 .editor-links h2 {
@@ -2172,4 +2173,5 @@
 .editor-preview > .live {
   transform: scale(var(--scale));
   transform-origin: 0 0;
+  scale: none;
 }

@@ -1700,7 +1700,7 @@ test("Test alert by the scene preview plays the samples over the scene, in turn 
 }) => {
   await page.clock.install();
   const bar = page.locator(".editor-scene-preview .editor-preview-bar");
-  await expect(bar.getByText("1920 × 1080")).toBeVisible();
+  await expect(bar.getByRole("combobox", { name: "Canvas size" })).toHaveValue("1920x1080");
   const box = page.locator(".editor-scene-preview .alert-box");
   await expect(box).toHaveCount(0);
   await bar.getByRole("button", { name: "Test alert" }).press("Enter");

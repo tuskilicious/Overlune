@@ -249,3 +249,32 @@
 .canvas-picture button {
   justify-self: start;
 }
+
+/* The canvas size (T9.8), in the preview's bar. */
+.canvas-size {
+  display: contents;
+}
+
+.canvas-size-custom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px 12px;
+  flex-basis: 100%;
+}
+
+.canvas-size-custom input {
+  width: 7em;
+}
+
+.canvas-size-custom .editor-hint {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+/* In the preview's bar it takes the old size chip's place, so it stays about as narrow (a 1366px laptop keeps the
+   bar on one line). */
+.editor .canvas-size select {
+  font-size: 13px;
+  padding: 8px 4px 8px 8px;
+}

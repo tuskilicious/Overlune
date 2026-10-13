@@ -1,4 +1,43 @@
-import type { LayoutElement } from "../settings/schema";
+import type { LayoutElement, Settings } from "../settings/schema";
+
+/**
+ * The canvas a scene is drawn on (T9.8). The looks are designed at 1920×1080, so a scene is drawn on a box of the
+ * canvas's shape whose short side matches that design, then scaled (`k`) to the canvas: 1280×720 and 4K are the same
+ * scene at another scale, and a wider or taller canvas gets a wider or taller scene. Layouts are in the box's units.
+ */
+export function canvasOf(settings: Settings) {
+  const { width, height } = settings.layouts.landscape?.size ?? { width: 1920, height: 1080 };
+  const k = Math.min(width / 1920, height / 1080);
+  return { width, height, k, w: Math.round(width / k), h: Math.round(height / k) };
+}
+
+/** Moves elements from one box to another of a new shape: centers keep their place proportionally, and sizes stay
+ *  (the box never gets smaller than 1920×1080), so switching sizes and back gives the layout back. Only an element
+ *  wider or taller than the new box shrinks, evenly, text too. */
+export function rescale(
+  els: LayoutElement[],
+  from: { w: number; h: number },
+  to: { w: number; h: number },
+): LayoutElement[] {
+  if (from.w === to.w && from.h === to.h) return els;
+  const sx = to.w / from.w;
+  const sy = to.h / from.h;
+  return els.map((el) => {
+    const s = Math.min(1, to.w / el.w, to.h / el.h);
+    const w = Math.max(8, Math.round(el.w * s));
+    const h = Math.max(8, Math.round(el.h * s));
+    const moved = {
+      ...el,
+      w,
+      h,
+      x: Math.round((el.x + el.w / 2) * sx - w / 2),
+      y: Math.round((el.y + el.h / 2) * sy - h / 2),
+    };
+    if ("size" in moved && moved.size)
+      moved.size = Math.min(400, Math.max(8, Math.round(moved.size * s)));
+    return moved;
+  });
+}
 
 /** The composed scene's parts, in stacking order, and the element type each is. */
 export const sceneParts: [selector: string, type: LayoutElement["type"]][] = [

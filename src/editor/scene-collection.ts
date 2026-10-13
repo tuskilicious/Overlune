@@ -23,11 +23,13 @@ export function sceneCollection(
 ) {
   const hash = encode(settings);
   const { chat, frame } = settings;
+  // The scenes take the canvas size picked in the editor (T9.8).
+  const { width, height } = settings.layouts.landscape?.size ?? { width: 1920, height: 1080 };
   const browsers = [
-    { name: "Starting Soon", route: "starting", width: 1920, height: 1080 },
-    { name: "Be Right Back", route: "brb", width: 1920, height: 1080 },
-    { name: "Stream Ending", route: "ending", width: 1920, height: 1080 },
-    { name: "Offline", route: "offline", width: 1920, height: 1080 },
+    { name: "Starting Soon", route: "starting", width, height },
+    { name: "Be Right Back", route: "brb", width, height },
+    { name: "Stream Ending", route: "ending", width, height },
+    { name: "Offline", route: "offline", width, height },
     { name: "Chat", route: "chat", width: chat.width, height: chat.height },
     framePosition(frame)
       ? { name: "Webcam frame", route: "frame", width: 1920, height: 1080 }

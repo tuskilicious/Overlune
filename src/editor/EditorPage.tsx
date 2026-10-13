@@ -5,9 +5,10 @@ import { useMotion, type PluginLoader } from "../lib/motion";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
 import { defaultSettings, type LayoutElement, type Settings } from "../settings/schema";
-import { measureLayout } from "../overlays/measure";
+import { canvasOf, measureLayout, rescale } from "../overlays/measure";
 import Canvas from "./canvas/Canvas";
-import LiveScene, { defaultLive } from "../overlays/LiveScene";
+import { CanvasSize } from "./canvas/Panels";
+import LiveScene, { liveElements } from "../overlays/LiveScene";
 import { loadSaved, save } from "../settings/storage";
 import { decodeLink, encode } from "../settings/url";
 import { themes } from "../themes";
@@ -549,11 +550,26 @@ export default function EditorPage() {
       return { ...s, layouts: { ...s.layouts, landscape: { ...landscape, scenes } } };
     });
   };
+  /** The canvas size (T9.8): every layout moves onto the new size, in one undo step. */
+  const setCanvasSize = (size: { width: number; height: number }) => {
+    lastEdit.current = 0;
+    setSettings((s) => {
+      const landscape = { ...(s.layouts.landscape ?? { scenes: {} }), size };
+      const next = { ...s, layouts: { ...s.layouts, landscape } };
+      const from = canvasOf(s);
+      const to = canvasOf(next);
+      landscape.scenes = Object.fromEntries(
+        Object.entries(landscape.scenes).map(([id, els]) => [id, rescale(els, from, to)]),
+      );
+      return next;
+    });
+  };
+  const canvas = canvasOf(settings);
   const sceneLayout = settings.layouts.landscape?.scenes[target] ?? null;
   /** Customize: starts from the look's own layout, measured from the preview (T9.3), the first time. */
   const customize = () => {
     if (!sceneLayout) {
-      if (onLive) commitLayout(defaultLive);
+      if (onLive) commitLayout(liveElements(settings));
       else {
         const shown = document.querySelector<HTMLElement>(".editor-pick .scene");
         if (shown) commitLayout(measureLayout(shown));
@@ -1096,7 +1112,7 @@ export default function EditorPage() {
                       plays the next sample alert over the scene, as on stream. */}
                   <div className="editor-preview-bar">
                     <h2>Preview: {onLive ? "Live" : overlays[scene].name}</h2>
-                    <span className="editor-chip-static">1920 × 1080</span>
+                    <CanvasSize size={canvas} onChange={setCanvasSize} />
                     {/* Live (T9.7): chat, alerts and the webcam frame together, in one source. */}
                     <button
                       type="button"
@@ -1181,7 +1197,7 @@ export default function EditorPage() {
                         if (part) jumpTo(e, part.id);
                       }}
                     >
-                      <Preview>
+                      <Preview width={canvas.w} height={canvas.h}>
                         {onLive ? (
                           <LiveScene
                             settings={settings}
