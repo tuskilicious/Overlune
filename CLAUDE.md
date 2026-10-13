@@ -61,7 +61,7 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 - Collect only the data the product needs. (v1 collects none: settings live in the user's link and browser.)
 - Least privilege: each Function gets only the bindings it needs, and CI tokens get only the permissions their job needs. No account-wide tokens in app code.
 - Trim API responses to the fields the client needs. Never return password hashes, tokens or internal fields.
-- **Access-control tests (required):** user A tries to read, edit and delete user B's records through every endpoint and by guessing IDs. Every attempt must return 403/404. Run them in CI. A new route does not ship without its test.
+- **Access-control tests (required):** user A tries to read, edit and delete user B's records through every endpoint and by guessing IDs. Every attempt must return 403/404. Run them in CI. A new route does not ship without its test: add it to the registry in `tests/functions/access.test.ts`, which fails for any file in `functions/api/` that isn't listed.
 - **Backups (required):** point-in-time recovery (D1 Time Travel) plus a nightly encrypted copy stored outside the Cloudflare account. Do a real test restore before launch and after major schema changes.
 
 ## 5. Auth and sessions
