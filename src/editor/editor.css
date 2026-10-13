@@ -2167,3 +2167,9 @@
     margin-left: auto;
   }
 }
+
+/* The Live overlay in a preview (T9.7) scales like a scene. */
+.editor-preview > .live {
+  transform: scale(var(--scale));
+  transform-origin: 0 0;
+}

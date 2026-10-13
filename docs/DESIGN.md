@@ -284,6 +284,8 @@ The canvas follows the editor's chrome (tokens, focus rings, one filled button) 
 - **Add:** a menu of element types with their line icons; a new element lands in the centre of the view, selected.
 - **Accessibility:** every canvas action is also possible from the layers panel and the inspector, so the canvas itself is a pointer convenience (like click-to-select), and the editor still passes axe and a keyboard-only run-through. Reduced motion turns off the canvas's own transitions.
 
+**Live (T9.7):** "Live source" in the preview bar switches the preview to the Live overlay (`/o/live`): chat, alerts and the webcam frame on one see-through 1920×1080 canvas, each today's overlay sized to its box, plus any added text, pictures and shapes. Before it's customized: the frame bottom left, chat down the right, alerts across the top. In the editor its chat shows the sample messages and Test alert plays in its alerts box; Customize edits Live's own layout, and "Put back the Chat" (or Alerts, Webcam frame) returns a removed one to its default place. Labels (latest follower and the like) come with Phase 13's data.
+
 ## Editor and site UI
 The editor, setup guide, privacy and terms pages share one quiet, high-contrast chrome in Overlune's brand (`docs/BRAND.md`), so the colorful theme previews stay the loudest thing on the page. Tokens live in `src/editor/brand.ts` and reach CSS as variables on `.editor` (`themeVars`). "Must" rules are hard requirements; "should" rules are defaults.
 

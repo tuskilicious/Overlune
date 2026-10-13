@@ -1,5 +1,8 @@
 import { useLayoutEffect, useRef, type CSSProperties, type ReactNode, type RefObject } from "react";
-import type { LayoutElement, LayoutScene as SceneId, Settings } from "../settings/schema";
+import type { LayoutElement, LayoutScene, Settings } from "../settings/schema";
+
+/** The composed scenes; Live has its own renderer (LiveScene). */
+type SceneId = Exclude<LayoutScene, "live">;
 import type { ColorToken } from "../themes/types";
 import { naturalBox, sceneParts } from "./measure";
 import SceneFrame from "./SceneFrame";
@@ -57,7 +60,7 @@ function Fitted({
 }
 
 /** An added element (text, image, shape), drawn in the layer over the scene. */
-function Added({ el }: { el: LayoutElement }) {
+export function Added({ el }: { el: LayoutElement }) {
   switch (el.type) {
     case "text":
       return (

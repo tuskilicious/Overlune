@@ -69,7 +69,7 @@ All on Cloudflare, next to the site: one provider, one deploy, one domain, so th
 - Badge **images** need the authenticated Helix API. Instead, we render **theme-styled badges** from the `badges` tag (broadcaster, moderator, vip, subscriber). This also matches the theme better.
 
 ## URL settings format
-- Route per overlay: `/o/starting`, `/o/brb`, `/o/ending`, `/o/offline` (T6.147), `/o/chat`, `/o/alerts`, `/o/frame` (T6.88).
+- Route per overlay: `/o/starting`, `/o/brb`, `/o/ending`, `/o/offline` (T6.147), `/o/chat`, `/o/alerts`, `/o/frame` (T6.88), `/o/live` (T9.7: chat, alerts and the frame in one 1920×1080 source, placed by `layouts.landscape.scenes.live` or a default).
 - Settings are in the **hash fragment**: `#<version>.<lz-string payload>`. The fragment is never sent to servers, and it is stripped from Sentry events.
 - Optional query flag `?rm=1` (before the `#`) forces reduced motion: every animation is turned off, same as the OS "reduce motion" setting. Never remove or repurpose it.
 - Optional query flag `?canvas=vertical` (before the `#`, added in Phase 10) renders the overlay for a 1080×1920 portrait canvas (DESIGN.md "Vertical layout"). The settings after the `#` are the same as the landscape link's, so one save gives both. Any other value, or none, is the 1920×1080 landscape overlay every earlier link shows. It combines with `?rm=1` and `?test=1`. Never remove or repurpose it.

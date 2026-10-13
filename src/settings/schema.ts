@@ -86,6 +86,10 @@ export const layoutElement = z.discriminatedUnion("type", [
   z.object({ ...elementBase, type: z.literal("socials") }),
   z.object({ ...elementBase, type: z.literal("logo") }),
   z.object({ ...elementBase, type: z.literal("ticker") }),
+  /** The Live overlay's own (T9.7): chat, alerts and the webcam frame, each from today's settings, in its box. */
+  z.object({ ...elementBase, type: z.literal("chat") }),
+  z.object({ ...elementBase, type: z.literal("alerts") }),
+  z.object({ ...elementBase, type: z.literal("frame") }),
   z.object({
     ...elementBase,
     type: z.literal("text"),
@@ -111,7 +115,7 @@ export const layoutElement = z.discriminatedUnion("type", [
 ]);
 export type LayoutElement = z.output<typeof layoutElement>;
 
-export const layoutScenes = ["starting", "brb", "ending", "offline"] as const;
+export const layoutScenes = ["starting", "brb", "ending", "offline", "live"] as const;
 export type LayoutScene = (typeof layoutScenes)[number];
 
 /** A canvas and its customized scenes. A scene with no list renders the look's composed scene. */

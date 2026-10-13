@@ -19,6 +19,7 @@ import {
   type Handle,
 } from "./geometry";
 import { naturalBox, sceneParts } from "../../overlays/measure";
+import { defaultLive } from "../../overlays/LiveScene";
 import { encode } from "../../settings/url";
 import { Inspector, Layers, elementName, type Adding, type Change } from "./Panels";
 import "./canvas.css";
@@ -189,11 +190,16 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
       : linkBytes(elements) > 24_000
         ? "Your link is full (24 KB). Delete something to add more."
         : null;
-  const parts = sceneParts.filter(
-    ([selector, type]) =>
-      !elements.some((el) => el.type === type) &&
-      area.current?.querySelector(`.scene ${selector}`) !== null,
-  );
+  const parts: LayoutElement["type"][] =
+    sceneId === "live"
+      ? (["chat", "alerts", "frame"] as const).filter((t) => !elements.some((el) => el.type === t))
+      : sceneParts
+          .filter(
+            ([selector, type]) =>
+              !elements.some((el) => el.type === type) &&
+              area.current?.querySelector(`.scene ${selector}`) !== null,
+          )
+          .map(([, type]) => type);
   /** Adds an element and selects it: added ones in the middle of the canvas, the scene's own parts back where the
    *  look puts them (still laid out, hidden, in the composed scene). */
   const add: Adding = (kind, src) => {
@@ -221,7 +227,10 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
         strokeWidth: 0,
         radius: 16,
       };
-    else {
+    else if (kind === "chat" || kind === "alerts" || kind === "frame") {
+      const { x, y, w, h } = defaultLive.find((d) => d.type === kind)!;
+      el = { ...base, type: kind, x, y, w, h };
+    } else {
       const scene = area.current?.querySelector<HTMLElement>(".scene");
       const part = scene?.querySelector<HTMLElement>(sceneParts.find(([, t]) => t === kind)![0]);
       const box = scene && part ? naturalBox(part, scene) : centred(600, 160);
@@ -391,7 +400,7 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
           onSelect={select}
           change={change}
           move={move}
-          parts={parts.map(([, type]) => type)}
+          parts={parts}
           add={add}
           room={room}
           longLink={linkBytes(elements) > 16_000}

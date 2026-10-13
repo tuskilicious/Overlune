@@ -9,6 +9,7 @@ import Frame from "./overlays/frame/Frame";
 import OverlayPlaceholder from "./overlays/OverlayPlaceholder";
 import StartingSoon from "./overlays/starting/StartingSoon";
 import TextScene from "./overlays/TextScene";
+import LiveScene from "./overlays/LiveScene";
 import SentryTestPage from "./components/SentryTestPage";
 
 // GSAP and Tailwind live in this chunk only, so the editor and overlays never load them.
@@ -102,6 +103,11 @@ export default function App() {
           <Route
             path="/o/frame"
             element={<FromLink>{(s, error) => <Frame settings={s} error={error} />}</FromLink>}
+          />
+          {/* One source with chat, alerts and the frame (T9.7). */}
+          <Route
+            path="/o/live"
+            element={<FromLink>{(s, error) => <LiveScene settings={s} error={error} />}</FromLink>}
           />
           <Route path="/o/:overlay" element={<OverlayPlaceholder />} />
           {showSentryTest && <Route path="/_sentry-test" element={<SentryTestPage />} />}
