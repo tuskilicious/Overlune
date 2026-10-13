@@ -284,6 +284,7 @@ The editor, setup guide, privacy and terms pages share one quiet, high-contrast 
 - **Line icons** (`components/Icon.tsx`, one 2px stroke) instead of text glyphs: the check in "Copied" and the section list, the back arrow on the guide and legal pages.
 - **Guide:** a row of index chips that jump to each part, and a "Before your first stream" run-through with check boxes drawn in the accent.
 - Copy: success messages end with a full stop, not an exclamation mark.
+- **First-visit gallery (T8.4):** a hero-style opening, the "Pick a look to start" heading large and centred over a soft violet glow (behind the heading, not the text under it), the intro centred under it. Its look cards are cards: Deep Space with a faint edge, and under the pointer or keyboard focus a Lune Violet edge with the home page's soft violet glow, the only glow in the editor. The save box takes the site nav's faint edge and 16px corners.
 
 ### Components
 | Component | Anatomy and variants | States | Notes |
