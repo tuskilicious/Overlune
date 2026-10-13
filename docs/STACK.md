@@ -51,7 +51,7 @@ All on Cloudflare, next to the site: one provider, one deploy, one domain, so th
 | Uploads (v2 Phase 4) | R2 | Free allowance |
 | Sign-in | Twitch OpenID Connect (authorization code, state and nonce, ID token verified; Twitch has no PKCE) through `oauth4webapi`; sessions in D1 (CLAUDE.md §5) | Free |
 | Rate limits | A Cloudflare WAF rate-limiting rule at the edge, plus in-memory limits in the Functions (T7.6, below) | One rate-limiting rule; 10-second windows only |
-| Backups | Time Travel plus a nightly encrypted `wrangler d1 export`, stored outside the Cloudflare account (CLAUDE.md §4) | Free |
+| Backups | Time Travel plus a nightly age-encrypted dump with read-only `SELECT`s, in the private repo `tuskilicious/overlune-backups` (CLAUDE.md §4, `docs/BACKUPS.md`) | Free |
 
 - **Staging and production:** one D1 database each, with separate secrets and Twitch redirect URLs. Preview deploys (each PR) use staging; `main` uses production. Sentry environments match.
 - **Secrets** (`TWITCH_CLIENT_SECRET`, the session key, `CLOUDFLARE_API_TOKEN` for the backup job) live in Cloudflare's encrypted variables or GitHub Actions secrets, never in the repo or the client. `.env.example` lists the names.
