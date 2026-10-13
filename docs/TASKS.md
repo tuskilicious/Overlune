@@ -739,8 +739,29 @@ The order after this phase, agreed the same day: vertical overlays (Phase 9), fo
   - Accept: the owner signs off the screenshots.
   - *Done 2026-10-13 (#215); the owner signed off the screenshot sheets (every page at 1440, 1024, 768 and 390px, no sideways scroll). Fixed in the pass: the nav's section links broke onto two lines at 768px (now from 960px), and the guide's sizes table split "Width" mid-word (only the notes break now).*
 
-## Phase 9: Vertical overlays (planned)
-Overlays for a 1080×1920 canvas (TikTok, Shorts, OBS 32.1+ vertical canvases, Aitum Vertical): every look's four scenes recomposed for a tall frame, chat and alerts placed for vertical, and vertical webcam frame sizes. A new optional link option, so no existing link changes (a migration plus fixtures if the payload grows). Size L: it touches all 16 looks. Broken into tasks when it starts.
+## Phase 9: Vertical overlays
+Planned with the owner 2026-10-13. Overlune for vertical streams (TikTok Live, YouTube Shorts, OBS 32.1+ vertical canvases, the Aitum Vertical plugin): every look's four scenes in portrait (1080×1920), and alerts, chat and the webcam frame placed for a tall canvas. **The link:** the same save after the `#`, plus an optional `?canvas=vertical` flag before it (like `?rm=1`), so one save gives both sets of links and no existing link changes; the flag joins the link contract in STACK.md and is never removed or repurposed. **Rollout:** looks in batches of four, each merged after the owner's OBS check; until all sixteen are done, the editor offers Vertical only for looks that have it. Phase 10's new looks are built vertical-ready.
+
+- [ ] **T9.1 Plan and rules.** The vertical plan in the PRD; `?canvas=vertical` in STACK.md's URL format; the portrait layout and the safe zones in DESIGN.md (where TikTok's and Shorts' own buttons and captions sit over the stream, checked against their current apps); FUTURE-SCOPE.md updated.
+  - Accept: the owner approves the PR; no code changes.
+- [ ] **T9.2 The portrait scene layout.** `?canvas=vertical` read once (like `?rm=1`); scenes at 1080×1920 with one shared portrait layout for every look (logo at the top, the title block in the middle third, the countdown under it, socials stacked), text that shrinks to fit, the entrance choreography and its reduced-motion version; overlay fixtures for vertical links.
+  - Accept: every old-link fixture renders exactly as before; a vertical link renders at 1080×1920 with nothing in the safe zones; unit and e2e tests.
+- [ ] **T9.3 Vertical looks, batch 1:** Clean Slate, Neon Grid, Vaporwave Sunset, Bold Esports. Each look's art and motif checked and adjusted for portrait (grid floors, the sun and palms, the angled slabs).
+  - Accept: contrast tests cover the portrait scenes; e2e renders all four scenes of each look; the owner OBS-checks them on a vertical canvas.
+- [ ] **T9.4 Vertical looks, batch 2:** Cozy Café, Arcade 8-Bit, Pastel Cloud, Forest Night.
+  - Accept: as T9.3.
+- [ ] **T9.5 Vertical looks, batch 3:** Daylight, Abyss, Session, Shonen.
+  - Accept: as T9.3.
+- [ ] **T9.6 Vertical looks, batch 4:** Sakura, Skate Deck, Phosphor, Quest.
+  - Accept: as T9.3; every look now has vertical.
+- [ ] **T9.7 Alerts, chat and webcam frame for vertical.** Alerts placed for a tall canvas, chat sizes that suit one, and vertical webcam frame presets, all clear of the safe zones.
+  - Accept: e2e for each; the owner OBS-checks them with a test alert.
+- [ ] **T9.8 Editor: Horizontal / Vertical.** A switch over the preview, a 9:16 preview with the safe zones as an optional overlay, and the links section giving the chosen canvas's links and sizes; Vertical only for looks that have it.
+  - Accept: axe clean narrow and wide; e2e for the switch and the vertical links; old editor bookmarks open as before.
+- [ ] **T9.9 Setup guide: vertical.** How to add the links to a vertical canvas in OBS 32.1+, with Aitum Vertical, and in Streamlabs, with the sizes.
+  - Accept: the guide's tests pass; the owner checks the steps in OBS.
+- [ ] **T9.10 OBS test and release 1.7.0.** Every vertical overlay through `docs/OBS-TESTING.md` on a real vertical canvas, then a release.
+  - Accept: the OBS test is logged; 1.7.0 published.
 
 ## Phase 10: Four new looks (planned)
 Eclipse, Rain City, Paper Cut and Aurora Tundra (picked by the owner 2026-10-13), each with its own world and **the lune**, Overlune's signature: a crescent moon made from that look's own material (a corona, a neon sign, cut paper, frost). The bar in DESIGN.md applies, plus vertical versions from the start. Broken into tasks when it starts.
