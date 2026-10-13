@@ -83,6 +83,19 @@ describe("Twitch's callback", () => {
     expect(await rows("users")).toHaveLength(1);
   });
 
+  it("a sign-in clears every expired session, anyone's, and keeps the live ones", async () => {
+    const live = await signIn();
+    const [user] = await rows("users");
+    const insert = env.DB.prepare("INSERT INTO sessions VALUES (?, ?, 1, ?)");
+    await insert.bind("expired", user!.id, 2).run();
+    await insert.bind("just-expired", user!.id, Math.floor(Date.now() / 1000)).run();
+    const next = await signIn();
+    const left = (await rows("sessions")).map((s) => s.token_hash);
+    expect(left).not.toContain("expired");
+    expect(left).not.toContain("just-expired");
+    expect(left).toEqual(expect.arrayContaining([await hashToken(live), await hashToken(next)]));
+  });
+
   const fails = async (res: Response) => {
     const before = (await rows("sessions")).length;
     expect(res.status).toBe(302);
