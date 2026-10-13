@@ -225,3 +225,81 @@ test.describe("layers and inspector (T9.5)", () => {
     expect(scan.violations).toEqual([]);
   });
 });
+
+test.describe("adding and removing (T9.6)", () => {
+  const layers = (page: Page) => page.getByRole("region", { name: "Layers" });
+  const types = async (page: Page) => (await layoutInLink(page))!.map((e) => e.type);
+  /** An Add button, not a layer of the same name. */
+  const adder = (page: Page, name: string) =>
+    layers(page).getByRole("group", { name: "Add" }).getByRole("button", { name, exact: true });
+
+  test("adds text and a shape in the middle, selected, and edits the new text", async ({
+    page,
+  }) => {
+    await adder(page, "Text").click();
+    const text = (await layoutInLink(page))!.at(-1)!;
+    expect(text.type).toBe("text");
+    expect(text.x + text.w / 2).toBe(960);
+    await expect(page.locator(".canvas .layout-text")).toHaveText("Your text");
+    await page.locator(".canvas-inspector").getByLabel("Words").fill("Raffle at 9 PM");
+    await expect(page.locator(".canvas .layout-text")).toHaveText("Raffle at 9 PM");
+    await adder(page, "Shape").click();
+    expect((await types(page)).slice(-2)).toEqual(["text", "shape"]);
+  });
+
+  test("a picture needs an https link first", async ({ page }) => {
+    await layers(page).getByRole("button", { name: "Picture" }).click();
+    const field = page.getByLabel("Picture link (https)");
+    await field.fill("http://example.com/logo.png");
+    await page.getByRole("button", { name: "Add picture" }).click();
+    await expect(page.getByText("Pictures need a link that starts with https://")).toBeVisible();
+    expect(await types(page)).not.toContain("image");
+    await page.route("https://example.com/**", (r) =>
+      r.fulfill({ status: 200, contentType: "image/png", body: "" }),
+    );
+    await field.fill("https://example.com/logo.png");
+    await page.getByRole("button", { name: "Add picture" }).click();
+    expect(await types(page)).toContain("image");
+  });
+
+  test("Delete removes; a scene part can be put back where the look puts it", async ({ page }) => {
+    const subtitle = (await layoutInLink(page))!.find((e) => e.type === "subtitle")!;
+    await layers(page).getByRole("button", { name: "Subtitle", exact: true }).click();
+    await page.locator(".canvas").focus();
+    await page.keyboard.press("Delete");
+    expect(await types(page)).not.toContain("subtitle");
+    await expect(page.locator(".canvas .scene-subtitle")).toBeHidden();
+    await layers(page).getByRole("button", { name: "Put back the Subtitle" }).click();
+    const back = (await layoutInLink(page))!.find((e) => e.type === "subtitle")!;
+    expect([back.x, back.y, back.w, back.h]).toEqual([
+      subtitle.x,
+      subtitle.y,
+      subtitle.w,
+      subtitle.h,
+    ]);
+  });
+
+  test("Duplicate copies added elements 24px over; Ctrl+D does too", async ({ page }) => {
+    await adder(page, "Shape").click();
+    const shape = (await layoutInLink(page))!.at(-1)!;
+    await page.locator(".canvas-inspector").getByRole("button", { name: "Duplicate" }).click();
+    const copy = (await layoutInLink(page))!.at(-1)!;
+    expect([copy.type, copy.x, copy.y]).toEqual(["shape", shape.x + 24, shape.y + 24]);
+    await page.locator(".canvas").focus();
+    await page.keyboard.press("Control+d");
+    expect((await types(page)).filter((t) => t === "shape")).toHaveLength(3);
+    // The scene's own parts appear once: no Duplicate for them.
+    await layers(page).getByRole("button", { name: "Title", exact: true }).click();
+    await expect(
+      page.locator(".canvas-inspector").getByRole("button", { name: "Duplicate" }),
+    ).toHaveCount(0);
+  });
+
+  test("at 40 elements adding stops, and says why", async ({ page }) => {
+    const add = adder(page, "Shape");
+    for (let n = (await types(page)).length; n < 40; n++) await add.click();
+    expect(await types(page)).toHaveLength(40);
+    await expect(layers(page).getByText("A scene holds 40 elements at most.")).toBeVisible();
+    await expect(add).toHaveCount(0);
+  });
+});

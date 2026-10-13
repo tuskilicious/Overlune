@@ -18,7 +18,9 @@ import {
   type Guide,
   type Handle,
 } from "./geometry";
-import { Inspector, Layers, elementName, type Change } from "./Panels";
+import { naturalBox, sceneParts } from "../../overlays/measure";
+import { encode } from "../../settings/url";
+import { Inspector, Layers, elementName, type Adding, type Change } from "./Panels";
 import "./canvas.css";
 
 type Gesture =
@@ -172,12 +174,102 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
     [next[at], next[to]] = [next[to]!, next[at]!];
     onCommit(next);
   };
+  /** A short random id no element in the scene has. */
+  const newId = () => {
+    for (;;) {
+      const id = Math.random().toString(36).slice(2, 8);
+      if (!elements.some((el) => el.id === id)) return id;
+    }
+  };
+  /** The link's length with these elements, against the size budget (STACK.md: warn at 16 KB, stop at 24 KB). */
+  const linkBytes = (els: LayoutElement[]) => encode(withElements(els)).length;
+  const room =
+    elements.length >= 40
+      ? "A scene holds 40 elements at most. Delete one to add another."
+      : linkBytes(elements) > 24_000
+        ? "Your link is full (24 KB). Delete something to add more."
+        : null;
+  const parts = sceneParts.filter(
+    ([selector, type]) =>
+      !elements.some((el) => el.type === type) &&
+      area.current?.querySelector(`.scene ${selector}`) !== null,
+  );
+  /** Adds an element and selects it: added ones in the middle of the canvas, the scene's own parts back where the
+   *  look puts them (still laid out, hidden, in the composed scene). */
+  const add: Adding = (kind, src) => {
+    if (room) return;
+    const id = newId();
+    const base = { id, r: 0, o: 1, hidden: false, locked: false, name: "" };
+    const centred = (w: number, h: number) => ({
+      x: Math.round((size.width - w) / 2),
+      y: Math.round((size.height - h) / 2),
+      w,
+      h,
+    });
+    let el: LayoutElement;
+    if (kind === "text")
+      el = { ...base, type: "text", ...centred(800, 120), text: "Your text", font: "heading" };
+    else if (kind === "image")
+      el = { ...base, type: "image", ...centred(400, 400), src: src!, fit: "contain" };
+    else if (kind === "shape")
+      el = {
+        ...base,
+        type: "shape",
+        ...centred(400, 200),
+        kind: "rect",
+        fill: "surface",
+        strokeWidth: 0,
+        radius: 16,
+      };
+    else {
+      const scene = area.current?.querySelector<HTMLElement>(".scene");
+      const part = scene?.querySelector<HTMLElement>(sceneParts.find(([, t]) => t === kind)![0]);
+      const box = scene && part ? naturalBox(part, scene) : centred(600, 160);
+      el = { ...base, type: kind, ...box } as LayoutElement;
+    }
+    onCommit([...elements, el]);
+    setSelected([id]);
+  };
+  const remove = (ids: string[]) => {
+    onCommit(elements.filter((el) => !ids.includes(el.id)));
+    setSelected([]);
+  };
+  /** Copies of the selected added elements, 24px down and right. The scene's own parts appear once, so they don't copy. */
+  const duplicate = (ids: string[]) => {
+    if (room) return;
+    const copies = elements
+      .filter(
+        (el) =>
+          ids.includes(el.id) && (el.type === "text" || el.type === "image" || el.type === "shape"),
+      )
+      .map((el) => ({
+        ...el,
+        id: newId(),
+        x: el.x + 24,
+        y: el.y + 24,
+        name: el.name && `${el.name} copy`,
+      }));
+    if (!copies.length) return;
+    onCommit([...elements, ...copies]);
+    setSelected(copies.map((c) => c.id));
+  };
+
   const select = (id: string, add: boolean) =>
     setSelected((s) => (add ? (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]) : [id]));
 
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Escape") {
       setSelected([]);
+      return;
+    }
+    if ((e.key === "Delete" || e.key === "Backspace") && selected.length) {
+      e.preventDefault();
+      remove(selected);
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "d" && selected.length) {
+      e.preventDefault(); // the browser's bookmark shortcut
+      duplicate(selected);
       return;
     }
     if (e.key === "Tab" && shown.length) {
@@ -299,8 +391,17 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
           onSelect={select}
           change={change}
           move={move}
+          parts={parts.map(([, type]) => type)}
+          add={add}
+          room={room}
+          longLink={linkBytes(elements) > 16_000}
         />
-        <Inspector el={one && elements.find((el) => el.id === one.id)} change={change} />
+        <Inspector
+          el={one && elements.find((el) => el.id === one.id)}
+          change={change}
+          remove={(id) => remove([id])}
+          duplicate={(id) => duplicate([id])}
+        />
       </div>
     </div>
   );
