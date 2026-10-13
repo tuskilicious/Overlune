@@ -740,12 +740,12 @@ The order after this phase, agreed the same day and revised for the canvas edito
   - *Done 2026-10-13 (#215); the owner signed off the screenshot sheets (every page at 1440, 1024, 768 and 390px, no sideways scroll). Fixed in the pass: the nav's section links broke onto two lines at 768px (now from 960px), and the guide's sizes table split "Width" mid-word (only the notes break now).*
 
 ## Phase 9: Canvas editor
-Asked for by the owner 2026-10-13 ("the editor should give the users freedom", after StreamElements' overlay editor). Looks stay the beginner's one-click start; **Customize** opens a canvas where every part of a scene (title, countdown, socials, logo, text, images, shapes, chat, alerts, the webcam frame) can be moved, resized, rotated, layered, hidden, added or removed. **Old links never change:** a link without a layout renders exactly as today; customizing writes an explicit layout into the link under a new schema version with a migration. **Link first, account optional:** layouts live in the link; saved overlays (Phase 12) later add a short link and live edits. An optional **Live** overlay gathers chat, alerts, the frame and labels into one browser source. **No custom-code widgets:** a streamer's own HTML or JavaScript would run on overlune.in, next to other people's sign-in cookies. This phase comes before vertical (Phase 10), which then becomes a canvas size.
+Asked for by the owner 2026-10-13 ("the editor should give the users freedom", after StreamElements' overlay editor). Looks stay the beginner's one-click start; **Customize** opens a canvas where every part of a scene (title, countdown, socials, logo, text, images, shapes, chat, alerts, the webcam frame) can be moved, resized, rotated, layered, hidden, added or removed. **Old links never change:** a link without a layout renders exactly as today; customizing writes an explicit layout into the link as a new optional field (STACK.md "Layout model": the v1 contract allows it, so no version bump or migration). **Link first, account optional:** layouts live in the link; saved overlays (Phase 12) later add a short link and live edits. An optional **Live** overlay gathers chat, alerts, the frame and labels into one browser source. **No custom-code widgets:** a streamer's own HTML or JavaScript would run on overlune.in, next to other people's sign-in cookies. This phase comes before vertical (Phase 10), which then becomes a canvas size.
 
 - [ ] **T9.1 Plan and rules.** The canvas in the PRD; the layout model in STACK.md (elements, units, schema version, migration, the link size budget, what stays out); the canvas UI in DESIGN.md (selection, handles, guides, layers, inspector, keyboard); any new dependency named for the owner's approval.
   - Accept: the owner approves the PR; no code changes.
 - [ ] **T9.2 Layout model and renderer.** Positioned elements checked by zod, rendered with today's components (title, countdown, socials, logo, chat, alerts, frame); a link with a layout renders it, one without renders as today.
-  - Accept: every old-link fixture renders as before; fixtures for layout links; unit tests for the schema and migration.
+  - Accept: every old-link fixture renders as before; fixtures for layout links; unit tests for the schema (bad elements dropped, limits held).
 - [ ] **T9.3 Looks as default layouts.** Each look's four scenes expressed as default layouts that render the same as today's composed scenes.
   - Accept: screenshot comparison per look and scene within a small tolerance; contrast tests unchanged.
 - [ ] **T9.4 Canvas core.** Select, drag, resize, rotate, snapping guides and spacing hints, arrow-key nudges, undo and redo.
@@ -760,7 +760,7 @@ Asked for by the owner 2026-10-13 ("the editor should give the users freedom", a
   - Accept: layouts keep their places proportionally when the size changes; e2e.
 - [ ] **T9.9 Beginners and access.** The pick-a-look path stays first; the canvas works by keyboard and screen reader; the guide covers customizing.
   - Accept: axe clean; a keyboard-only run-through; the owner tries it.
-- [ ] **T9.10 OBS test and release 2.0.0.** A new link schema and a new editor make it a major release.
+- [ ] **T9.10 OBS test and release 2.0.0.** A new kind of link (layouts) and a new editor make it a major release, though every old link still works.
   - Accept: every overlay passes `docs/OBS-TESTING.md`, old links included; 2.0.0 published.
 
 ## Phase 10: Vertical overlays
