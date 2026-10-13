@@ -52,7 +52,7 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 - Add secret scanning: a gitleaks pre-commit hook and GitHub secret scanning with push protection. Run gitleaks in CI too.
 
 ## 4. Data and database
-> **Status: approved for v2, not active yet.** v1 has no database or server. These rules become mandatory with the first change that adds one (v2 Phase 1, on Cloudflare D1).
+> **Status: active since 2026-10-13** (v2 Phase 1: accounts in Cloudflare D1, launched in T7.9).
 
 - D1 has no row-level security, so access control lives in one server-side data layer: every read and write goes through it, scoped to the signed-in user, default deny. Route handlers never query D1 directly.
 - Check record ownership on the server for every read, update and delete. Never trust client-supplied IDs or roles.
@@ -65,7 +65,7 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 - **Backups (required):** point-in-time recovery (D1 Time Travel) plus a nightly encrypted copy stored outside the Cloudflare account. Do a real test restore before launch and after major schema changes.
 
 ## 5. Auth and sessions
-> **Status: approved for v2, not active yet.** v1 has no accounts. v2 signs in with Twitch only. When that lands, every rule below applies. Tokens must also never appear in overlay URLs.
+> **Status: active since 2026-10-13.** Sign in with Twitch is live on overlune.in (T7.9). Tokens must never appear in overlay URLs.
 
 - Sign-in is Twitch OAuth only (authorization code with OpenID Connect: a `state` check, a `nonce`, and the ID token's signature and claims verified. Twitch has no PKCE: its discovery document lists no `code_challenge_methods`, checked 2026-10-09, so the client secret stays on the server and state plus nonce tie the answer to the browser that asked; owner-approved 2026-10-09): Twitch is the identity provider, and Overlune never sees or stores a password. Use a small, well-reviewed OAuth library over hand-rolled protocol code.
 - Enforce auth on the server for every protected route. Client-side checks are UX only.
@@ -113,14 +113,14 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 - **Accessibility:** editor meets WCAG AA contrast, has full keyboard navigation with visible focus, and has meaningful alt text. Overlays support reduced motion.
 
 ## Pre-launch checklist
-Signed off 2026-10-01 for v1 (T5.6). Re-checked 2026-10-03 for the 1.0.0 release (T6.83). Re-check every item before any later launch or when a change touches it.
-- [x] 1. Rotate any exposed keys. Secret scanning is on locally and in CI. *(Owner confirmed no key was exposed. gitleaks pre-commit and CI; GitHub secret scanning and push protection on.)*
-- [x] 2. RLS and access-control tests: **N/A for v1** (no database). Confirm this is still true. *(Still true: no server, Pages Functions, database, cookies or fetch calls.)*
-- [x] 3. Backups: **N/A for v1** (no data). The repo is the source of truth.
-- [x] 4. MFA: **N/A for v1** (no accounts). Turn on 2FA for the GitHub, Cloudflare and Sentry accounts. *(Owner confirmed.)*
-- [x] 5. Sentry events contain no settings fragments, tokens or PII. *(Owner checked production events. Fragments stripped, no chat text, IP storage off. Performance samples can include the logo link, as the privacy policy states.)*
-- [x] 6. Security headers, HTTPS and HSTS verified on production. *(HSTS, CSP with frame-ancestors, nosniff, Referrer-Policy, Permissions-Policy; HTTP 301 to HTTPS.)*
-- [x] 7. Dependency scan is clean. *(`npm audit`: 0 vulnerabilities.)*
-- [x] 8. Privacy policy and terms are drafted and self-reviewed by the maintainer, and say they are not legal advice.
-- [x] 9. Every overlay passed `docs/OBS-TESTING.md` in OBS and Streamlabs.
+Signed off 2026-10-01 for v1 (T5.6). Re-checked 2026-10-03 for the 1.0.0 release (T6.83). Re-checked 2026-10-13 for accounts (T7.9), with items 2 to 4 active. Re-check every item before any later launch or when a change touches it.
+- [x] 1. Rotate any exposed keys. Secret scanning is on locally and in CI. *(Owner confirmed no key was exposed. gitleaks pre-commit and CI; GitHub secret scanning and push protection on, rechecked 2026-10-13.)*
+- [x] 2. Access-control tests (D1 has no RLS). *(2026-10-13: `tests/functions/access.test.ts` attacks every API route and runs in CI; its registry fails for any route without an entry.)*
+- [x] 3. Backups and a real restore. *(2026-10-13: D1 Time Travel on; nightly age-encrypted copies kept 90 days outside Cloudflare; restore drill with real account rows passed, logged in `docs/BACKUPS.md`.)*
+- [x] 4. MFA: 2FA on GitHub, Cloudflare, Sentry and the Twitch developer console; users get Twitch's own. *(Owner confirmed all four, 2026-10-13.)*
+- [x] 5. Sentry events contain no settings fragments, tokens or PII. *(Owner checked production events. Fragments stripped, no chat text, IP storage off. Performance samples can include the logo link, as the privacy policy states. 2026-10-13: no Sentry span has ever had a cookie or authorization header, an IP or a user id; sign-in callbacks show `code` and `state` as `[Filtered]`; no production errors.)*
+- [x] 6. Security headers, HTTPS and HSTS verified on production. *(HSTS, CSP with frame-ancestors, nosniff, Referrer-Policy, Permissions-Policy; HTTP 301 to HTTPS. 2026-10-13: the API's own headers too (`default-src 'none'`, `no-store`).)*
+- [x] 7. Dependency scan is clean. *(`npm audit`: 0 vulnerabilities, rechecked 2026-10-13.)*
+- [x] 8. Privacy policy and terms are drafted and self-reviewed by the maintainer, and say they are not legal advice. *(Rewritten for accounts in T7.8, owner-approved 2026-10-13.)*
+- [x] 9. Every overlay passed `docs/OBS-TESTING.md` in OBS and Streamlabs. *(2026-10-13: no overlay changed in Phase 7; the owner loaded one in OBS after the launch.)*
 - [x] 10. Old-link test: URLs from every earlier schema version still load. *(Fixture test in CI.)*
