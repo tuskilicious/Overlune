@@ -288,6 +288,8 @@ The canvas follows the editor's chrome (tokens, focus rings, one filled button) 
 
 **Canvas size (T9.8):** a select in the preview bar, where the fixed "1920 × 1080" chip was, named "Canvas size" for screen readers (the bar has no room for a visible label): 1920 × 1080, 1280 × 720, 2560 × 1440, 3840 × 2160 (4K), or "Another size…", which opens Canvas width and Canvas height with "Use this size". The hint points to OBS's Settings → Video → Base (Canvas) Resolution, and a size outside 320–3840 or past 3:1 says why instead. It applies to the four scenes and Live, their link rows and the scene collection; the layouts move onto the new size in one undo step. Portrait gets its own layout in Phase 10, so no portrait preset here.
 
+**Keyboard and screen readers (T9.9):** Customize moves focus into the canvas; Done and Reset to the look move it back to Customize, so focus never drops to the top of the page. The canvas's status line (what's picked, where, how big) is read by screen readers, not shown. "Keyboard keys", folded under the panels, lists every key for people who don't use a screen reader; the setup guide's "Make it yours" part repeats them from the same list (`canvasKeys`). Turning by keyboard is the Inspector's Turn box.
+
 ## Editor and site UI
 The editor, setup guide, privacy and terms pages share one quiet, high-contrast chrome in Overlune's brand (`docs/BRAND.md`), so the colorful theme previews stay the loudest thing on the page. Tokens live in `src/editor/brand.ts` and reach CSS as variables on `.editor` (`themeVars`). "Must" rules are hard requirements; "should" rules are defaults.
 

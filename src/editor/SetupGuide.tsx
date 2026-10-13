@@ -7,6 +7,7 @@ import { brandChrome } from "./brand";
 import "../themes/fonts";
 import { themeVars } from "../themes/vars";
 import { overlays } from "./ObsLinks";
+import { canvasKeys } from "./canvas/Panels";
 import "./editor.css";
 import "./guide.css";
 import Icon from "../components/Icon";
@@ -91,6 +92,7 @@ const guideIndex = [
   ["audio-heading", "3. Alert sound"],
   ["import-heading", "Import every scene"],
   ["rehearse-heading", "Before your first stream"],
+  ["customize-heading", "Move things around"],
   ["black-heading", "Fixes"],
   ["streamlabs-heading", "Streamlabs"],
 ] as const;
@@ -102,7 +104,7 @@ export default function SetupGuide() {
   const current = done.indexOf(false);
   const toggle = (i: number) => () => setDone((d) => d.map((v, j) => (j === i ? !v : v)));
   const sizes = [
-    ...Object.values(overlays).map((o) => ({ ...o, note: "" })),
+    ...Object.values(overlays).map((o) => ({ ...o, note: "or the canvas size you picked" })),
     {
       name: "Chat",
       width: defaultSettings.chat.width,
@@ -120,7 +122,7 @@ export default function SetupGuide() {
       name: "Live",
       width: 1920,
       height: 1080,
-      note: "optional: chat, alerts and the webcam frame in one source, instead of those three",
+      note: "optional: chat, alerts and the webcam frame in one source, instead of those three; or your canvas size",
     },
   ];
   return (
@@ -291,6 +293,62 @@ export default function SetupGuide() {
             </ul>
           </section>
 
+          {/* Customizing (T9.9): optional, after the setup, for streamers who want their own layout. */}
+          <section aria-labelledby="customize-heading">
+            <h2 id="customize-heading">Make it yours: move things around</h2>
+            <p>
+              Every look is ready as it is, so this part is optional. To change where things sit,
+              press <strong>Customize</strong> above the preview in the editor.
+            </p>
+            <ul>
+              <li>
+                <strong>Move, resize and turn.</strong> Drag a part to move it, drag a corner to
+                resize it, and drag the round handle above it to turn it. Parts line up with the
+                edges, the middle and each other.
+              </li>
+              <li>
+                <strong>Layers</strong> lists every part. Hide, lock or reorder them, and add your
+                own text, shapes and pictures (picture links start with https://).
+              </li>
+              <li>
+                <strong>Inspector</strong> sets the picked part’s exact place, size, turn,
+                see-through and colors.
+              </li>
+              <li>
+                Each scene keeps its own layout. Press <strong>Live source</strong> to lay out chat,
+                alerts and the webcam frame in one source.
+              </li>
+              <li>
+                Is your OBS canvas not 1920×1080? Pick its size next to the preview’s name, and
+                everything moves over with it.
+              </li>
+              <li>
+                <strong>Reset to the look</strong> puts the scene back the way the look has it.
+              </li>
+              <li>
+                <strong>Then copy that scene’s link again</strong> and paste it into OBS: the link
+                holds your layout.
+              </li>
+            </ul>
+            <table className="guide-sizes">
+              <caption>Keyboard keys on the canvas</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Keys</th>
+                  <th scope="col">What they do</th>
+                </tr>
+              </thead>
+              <tbody>
+                {canvasKeys.map(([keys, does]) => (
+                  <tr key={keys}>
+                    <th scope="row">{keys}</th>
+                    <td>{does}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+
           <Fix id="black-heading" title="Fix: a black or white box">
             <ul>
               <li>
@@ -370,7 +428,8 @@ export default function SetupGuide() {
               <li>
                 <strong>Check the size.</strong> In the source’s <strong>Properties</strong>, Width
                 and Height must match the sizes in the table above: 1920 and 1080 for the scenes and
-                Alerts, and the size you picked for Chat and the Webcam frame.
+                Alerts (or the canvas size you picked for the scenes), and the size you picked for
+                Chat and the Webcam frame.
               </li>
               <li>
                 <strong>Fit it to the screen.</strong> For a scene or Alerts, right-click the source
