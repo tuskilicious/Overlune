@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import lz from "lz-string";
 import alertsLink from "../fixtures/links/v1/alerts.json" with { type: "json" };
 import { fakeTwitch, priv } from "./fake-twitch";
+import { themeIds } from "../../src/themes/types";
 
 // The alerts overlay against the fake Twitch IRC server.
 
@@ -85,12 +86,12 @@ test("?test=1 plays one sample of each alert, then goes quiet", async ({ page })
   await fakeTwitch(page);
   await page.goto(link({ chat: { channel: "dallas" } }, "?test=1"));
   const seen: string[] = [];
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 6; i++) {
     await expect(box(page)).toHaveCount(1);
     seen.push((await box(page).getAttribute("data-kind"))!);
     await page.clock.runFor(5_500);
   }
-  expect(seen).toEqual(["raid", "sub", "resub", "subgift", "bits"]);
+  expect(seen).toEqual(["raid", "sub", "resub", "subgift", "bits", "follow"]);
   await expect(box(page)).toHaveCount(0);
 });
 
@@ -186,6 +187,29 @@ test("volume 0 plays no sound", async ({ page }) => {
   await twitch.send(raid("Raider", 3));
   await expect(box(page)).toBeVisible();
   expect(requests.filter((u) => u.includes("/sounds/"))).toEqual([]);
+});
+
+test("every look has a follow alert, labelled and in its own style", async ({ page }) => {
+  await page.clock.install();
+  for (const theme of themeIds) {
+    await page.goto(
+      link({ theme, chat: { channel: "dallas" }, alerts: { seconds: 3 } }, "?test=1"),
+    );
+    // Step through the five samples before it; each look times its entrance and exit its own way.
+    for (
+      let t = 0;
+      t < 40 &&
+      (await box(page)
+        .getAttribute("data-kind")
+        .catch(() => null)) !== "follow";
+      t++
+    )
+      await page.clock.runFor(500);
+    await expect(box(page), theme).toHaveAttribute("data-kind", "follow");
+    await expect(box(page).locator(".alert-kind"), theme).toHaveText("New follower");
+    await expect(box(page).locator(".alert-title"), theme).toHaveText("NewFollower just followed!");
+    await expect(page.locator(".alerts"), theme).toHaveAttribute("data-theme", theme);
+  }
 });
 
 test("alerts label the event above the message (T6.35)", async ({ page }) => {

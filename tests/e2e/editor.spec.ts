@@ -2020,3 +2020,17 @@ test("Offline is edited like the other scenes, with its own link (T6.147)", asyn
   await page.getByRole("radio", { name: "Be Right Back", exact: true }).check();
   await expect(page.getByLabel("Title", { exact: true })).toHaveValue("Snack break");
 });
+
+test("follow alerts: a message of their own, and a plain note that they need Twitch sign-in", async ({
+  page,
+}) => {
+  await expect(page.getByText(/Follow alerts\s+need you to sign in with Twitch/)).toBeVisible();
+  await page.getByText("Change alert messages").click();
+  const field = page.getByRole("textbox", { name: "New follower message" });
+  await expect(field).toHaveAttribute("placeholder", "{user} just followed!");
+  await expect(
+    page.getByRole("button", { name: "Add the amount to New follower message" }),
+  ).toHaveCount(0);
+  await field.fill("Welcome {user}!");
+  await expect(page.getByText("Example: Welcome NewFollower!")).toBeVisible();
+});

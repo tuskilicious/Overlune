@@ -27,6 +27,7 @@ export const socialPlatforms = [
 
 /** Default alert messages. `{s}` is "s" unless the amount is 1. */
 export const defaultTemplates = {
+  follow: "{user} just followed!",
   raid: "{user} is raiding with {amount} viewer{s}!",
   sub: "{user} just subscribed!",
   resub: "{user} subscribed for {amount} month{s}!",
@@ -190,6 +191,8 @@ export const settingsV1 = z.object({
     .object({
       templates: z
         .object({
+          /** Follow alerts (owner, 2026-10-13): old links have no field and get the default. */
+          follow: text(100, defaultTemplates.follow),
           raid: text(100, defaultTemplates.raid),
           sub: text(100, defaultTemplates.sub),
           resub: text(100, defaultTemplates.resub),

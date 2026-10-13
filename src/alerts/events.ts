@@ -1,14 +1,16 @@
 import type { TwitchEvent } from "../twitch/parse";
 
-// Parsed Twitch events → the alerts v1 supports. Follows and donations need a login (v2, out of scope).
+// Parsed Twitch events → alerts. Follows never appear in chat, so they need the streamer's Twitch sign-in and the
+// backend (TASKS.md Phase 13); every look already has a follow alert for when they arrive. Donations stay with the
+// streamer's own tip service.
 
-export type AlertKind = "raid" | "sub" | "resub" | "subgift" | "bits";
+export type AlertKind = "follow" | "raid" | "sub" | "resub" | "subgift" | "bits";
 
 export interface AlertEvent {
   kind: AlertKind;
-  /** Display name of whoever caused the alert (raider, subscriber, gifter, cheerer). */
+  /** Display name of whoever caused the alert (follower, raider, subscriber, gifter, cheerer). */
   user: string;
-  /** Raid viewers, sub months, number of gifted subs, or bits. */
+  /** Raid viewers, sub months, number of gifted subs, or bits; 1 for a follow. */
   amount: number;
   /** Resub message or cheer text; "" when there is none. */
   message: string;
@@ -66,4 +68,6 @@ export const testAlerts: AlertEvent[] = [
   { kind: "resub", user: "LoyalViewer", amount: 12, message: "A whole year already!" },
   { kind: "subgift", user: "GenerousGifter", amount: 5, message: "" },
   { kind: "bits", user: "CheerLeader", amount: 500, message: "cheer500 Love the stream!" },
+  // Last, so the samples streamers know keep their order.
+  { kind: "follow", user: "NewFollower", amount: 1, message: "" },
 ];
