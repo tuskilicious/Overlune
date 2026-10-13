@@ -2,7 +2,7 @@
 
 > **Self-written, not legal advice.** Overlune is a free, non-commercial hobby project. This document was written by the maintainer, has not been reviewed by a lawyer, and does not guarantee compliance with any law.
 
-_Last updated: 2026-10-13_
+_Last updated: 2026-10-14_
 
 These terms cover your use of the Overlune website and overlays at overlune.in ("Overlune"). By using Overlune, you agree to them.
 
@@ -10,7 +10,7 @@ These terms cover your use of the Overlune website and overlays at overlune.in (
 Overlune is a free tool for making stream overlays. Accounts are optional, and Overlune takes no payments. You can choose to support the project on GitHub Sponsors; that is optional, handled by GitHub, and unlocks nothing. The source code is open source under the MIT License: https://github.com/tuskilicious/Overlune/blob/main/LICENSE
 
 ## 2. Your content and your stream
-- You are responsible for what you put in your overlays (titles, social handles, logo links, alert messages) and for what appears on your stream, including your viewers' chat messages shown by the Chat overlay.
+- You are responsible for what you put in your overlays (titles, social handles, logo and picture links, text you add, alert messages) and for what appears on your stream, including your viewers' chat messages shown by the Chat overlay.
 - Only use logos and images you have the right to use.
 - Follow the rules of the platforms you stream on, including Twitch's Terms of Service and Community Guidelines.
 
@@ -28,7 +28,7 @@ Don't use Overlune to break the law, to harass others, or to disrupt the site or
 The themes use fonts, sounds and images under free licenses that allow use on live streams. Each one is listed with its license in the project's asset register: https://github.com/tuskilicious/Overlune/blob/main/docs/ASSETS.md
 
 ## 6. Third-party services
-Sign-in, chat and alerts use Twitch, and logos load from the sites you link to. Those services have their own terms, and Overlune does not control them. Features that depend on them may stop working if they change.
+Sign-in, chat and alerts use Twitch, and logos and pictures load from the sites you link to. Those services have their own terms, and Overlune does not control them. Features that depend on them may stop working if they change.
 
 ## 7. No warranty
 Overlune is provided **"as is" and "as available"**, without warranties of any kind. We don't promise it will always be available, error-free, or work with every version of OBS, Streamlabs or Twitch. Test your overlays before you go live.
