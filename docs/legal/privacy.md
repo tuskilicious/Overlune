@@ -2,7 +2,7 @@
 
 > **Self-written, not legal advice.** Overlune is a free, non-commercial hobby project. This document was written by the maintainer, has not been reviewed by a lawyer, and does not guarantee compliance with any law.
 
-_Last updated: 2026-10-13_
+_Last updated: 2026-10-14_
 
 Overlune is a free, open-source stream overlay maker at overlune.in. This page describes, in plain language, what the app actually does with data.
 
@@ -13,7 +13,7 @@ Overlune is a free, open-source stream overlay maker at overlune.in. This page d
 - **Error reporting is on.** Error reports and a small sample of performance data go to Sentry, with your settings and console output removed (details below).
 
 ## Your settings
-Everything you set in the editor (theme, titles, socials, logo link, chat channel name, alert messages) is saved in two places, both on your side:
+Everything you set in the editor (theme, titles, socials, logo link, chat channel name, alert messages, and where you placed things on the canvas, including any text and picture links you added) is saved in two places, both on your side:
 
 1. **Your overlay links.** Settings are stored in the part of the link after the `#`. Browsers never send that part to the website, so our host does not receive your settings when an overlay loads.
 2. **Your browser's local storage**, so the editor remembers your work. It stays on your device. "Start over" in the editor resets it to the defaults, and clearing your browser's site data for Overlune deletes it.
@@ -46,15 +46,15 @@ The Chat and Alerts overlays read your channel's public chat **anonymously**, wi
 
 Overlune does not store chat messages, and it is built not to include them in error reports.
 
-## Your logo
-If you add a logo link, your overlay loads that image straight from the website you linked. That website receives the usual request data (such as your IP address) under its own policy.
+## Your logo and pictures
+If you add a logo link, or a picture on the canvas, your overlay loads that image straight from the website you linked. That website receives the usual request data (such as your IP address) under its own policy.
 
 ## Error reports (Sentry)
 Error reporting is **on** in the live site. It uses Sentry (Functional Software, Inc.), with data stored in Sentry's EU region (Germany). We use it only to find and fix bugs. The app sends Sentry:
 
 - **Error reports** when something breaks: the error message, where in the code it happened, your browser and operating system type, the page address **without** the part after `#` (so your settings are not included), and a short trail of recent app events before the error (page changes, clicks on buttons, and network requests the page made).
 - **A session ping** each time a page loads, so we can count how often pages crash. It contains the page's status (ok or crashed), the time, and your browser type.
-- **Performance samples** for about 5% of page loads: how long the page and its parts took to load, and the addresses of the files it loaded, such as fonts, sounds, Twitch emote images and, if you set one, your logo image link.
+- **Performance samples** for about 5% of page loads: how long the page and its parts took to load, and the addresses of the files it loaded, such as fonts, sounds, Twitch emote images and, if you set them, your logo and picture links.
 
 Errors in Overlune's server code (the sign-in and account pages) go to Sentry too, under the same rules: never your sign-in key, Twitch's tokens or cookies.
 
