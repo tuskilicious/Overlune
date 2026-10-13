@@ -1,4 +1,6 @@
+import { useState } from "react";
 import type { LayoutElement } from "../../settings/schema";
+import { isHttpsUrl } from "../../lib/url-safety";
 import { colorTokens, type ColorToken } from "../../themes/types";
 
 /** What each element is called: the streamer's name for it, or its type's. */
@@ -24,6 +26,9 @@ const tokenName: Record<ColorToken, string> = {
   textMuted: "Muted text",
 };
 
+/** Adds an element: new text, a shape, a picture (with its https link), or one of the scene's own parts put back. */
+export type Adding = (kind: LayoutElement["type"], src?: string) => void;
+
 /** One element changed; `merge` joins a burst of typing or nudging into one undo step. */
 export type Change = (id: string, patch: Partial<LayoutElement>, merge?: boolean) => void;
 
@@ -37,17 +42,98 @@ export function Layers({
   onSelect,
   change,
   move,
+  parts,
+  add,
+  room,
+  longLink,
 }: {
   elements: LayoutElement[];
   selected: string[];
   onSelect: (id: string, add: boolean) => void;
   change: Change;
   move: (id: string, by: 1 | -1) => void;
+  /** The scene's own parts not in the layout, which can be put back. */
+  parts: LayoutElement["type"][];
+  add: Adding;
+  /** Why nothing more can be added, or null. */
+  room: string | null;
+  longLink: boolean;
 }) {
   const top = [...elements].reverse();
+  const [picture, setPicture] = useState<string | null>(null);
+  const goodPicture = picture !== null && isHttpsUrl(picture);
   return (
     <section className="canvas-panel canvas-layers" aria-labelledby="layers-heading">
       <h3 id="layers-heading">Layers</h3>
+      {/* Adding (T9.6): new elements land in the middle of the canvas, selected; the scene's own parts go back where
+          the look puts them. Limits are said in words, not with disabled buttons (DESIGN.md). */}
+      {room ? (
+        <p className="editor-hint" role="status">
+          {room}
+        </p>
+      ) : (
+        <div className="canvas-add" role="group" aria-label="Add">
+          <span className="editor-hint">Add</span>
+          <button type="button" onClick={() => add("text")}>
+            Text
+          </button>
+          <button type="button" onClick={() => add("shape")}>
+            Shape
+          </button>
+          <button
+            type="button"
+            aria-expanded={picture !== null}
+            onClick={() => setPicture((p) => (p === null ? "" : null))}
+          >
+            Picture
+          </button>
+          {parts.map((t) => (
+            <button
+              key={t}
+              type="button"
+              aria-label={`Put back the ${typeName[t]}`}
+              onClick={() => add(t)}
+            >
+              {typeName[t]}
+            </button>
+          ))}
+        </div>
+      )}
+      {picture !== null && !room && (
+        <form
+          className="canvas-picture"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!goodPicture) return;
+            add("image", picture);
+            setPicture(null);
+          }}
+        >
+          <label>
+            Picture link (https)
+            <input
+              type="url"
+              value={picture}
+              maxLength={2048}
+              placeholder="https://"
+              aria-invalid={picture !== "" && !goodPicture}
+              aria-describedby="picture-hint"
+              onChange={(e) => setPicture(e.target.value)}
+            />
+          </label>
+          <p id="picture-hint" className="editor-hint">
+            {picture !== "" && !goodPicture
+              ? "Pictures need a link that starts with https://, to an image, not a web page."
+              : "Paste a link to a PNG, JPEG, GIF or WebP picture."}
+          </p>
+          <button type="submit">Add picture</button>
+        </form>
+      )}
+      {longLink && (
+        <p className="editor-hint" role="status">
+          Your link is getting long. It still works; past 24 KB nothing more can be added.
+        </p>
+      )}
       <ol>
         {top.map((el, i) => {
           const name = elementName(el);
@@ -191,7 +277,17 @@ function ColorField({
  * The inspector (T9.5): the selected element's name, place, size, turn and opacity, then its own style. Every canvas
  * action has its field here, so the canvas is a pointer convenience and everything works by keyboard.
  */
-export function Inspector({ el, change }: { el: LayoutElement | undefined; change: Change }) {
+export function Inspector({
+  el,
+  change,
+  remove,
+  duplicate,
+}: {
+  el: LayoutElement | undefined;
+  change: Change;
+  remove: (id: string) => void;
+  duplicate: (id: string) => void;
+}) {
   if (!el)
     return (
       <section className="canvas-panel canvas-inspector" aria-labelledby="inspector-heading">
@@ -205,6 +301,16 @@ export function Inspector({ el, change }: { el: LayoutElement | undefined; chang
   return (
     <section className="canvas-panel canvas-inspector" aria-labelledby="inspector-heading">
       <h3 id="inspector-heading">Inspector: {elementName(el)}</h3>
+      <div className="canvas-actions">
+        {(el.type === "text" || el.type === "image" || el.type === "shape") && (
+          <button type="button" onClick={() => duplicate(el.id)}>
+            Duplicate
+          </button>
+        )}
+        <button type="button" onClick={() => remove(el.id)}>
+          Delete
+        </button>
+      </div>
       <label>
         Name in Layers
         <input

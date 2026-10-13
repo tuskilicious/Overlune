@@ -225,3 +225,27 @@
   height: 36px;
   padding: 2px;
 }
+
+/* Adding and removing (T9.6): a row of add buttons, the picture link form, and the inspector's actions. */
+.canvas-add,
+.canvas-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.canvas-add button,
+.canvas-actions button {
+  padding: 4px 10px;
+  font-size: 13px;
+}
+
+.canvas-picture {
+  display: grid;
+  gap: 6px;
+}
+
+.canvas-picture button {
+  justify-self: start;
+}
