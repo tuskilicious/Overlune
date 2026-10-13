@@ -282,7 +282,7 @@ The editor, setup guide, privacy and terms pages share one quiet, high-contrast 
 - **Quick rows** of chips under a field: countdown picks and -1 / +1 min nudges, common webcam frame sizes (a picked size shows `aria-pressed` and fills Lune Violet, T6.135).
 - **Status in the section list:** a small accent check after a part that's filled in (Socials, Chat, Logo, Colors), with "(filled in)" for screen readers.
 - **Line icons** (`components/Icon.tsx`, one 2px stroke) instead of text glyphs: the check in "Copied" and the section list, the back arrow on the guide and legal pages.
-- **Guide:** a row of index chips that jump to each part, and a "Before your first stream" run-through with check boxes drawn in the accent.
+- **Guide:** a row of index chips that jump to each part, and a "Before your first stream" run-through with check boxes drawn in the accent. Since T8.2 the guide is centred under the site nav and as wide as it: from 1024px the index is a sticky column on the left that marks the part you're reading (Moonlight text and a Lune Violet dot, `aria-current="location"`, the last of its headings above 40% of the window); narrower, it stays the row of chips; on phones the steps run full width with their number above them.
 - Copy: success messages end with a full stop, not an exclamation mark.
 
 ### Components

@@ -391,3 +391,122 @@
   border: 2px solid var(--accent);
   border-radius: 4px;
 }
+
+/* The guide's layout (T8.2): centred under the site nav, and as wide as it, with the content lined up with the logo.
+   Narrow windows: the heading, the index as a row of chips, then the steps. From 1024px the index is a sticky column
+   on the left that marks the part you're reading. */
+.guide-layout {
+  box-sizing: border-box;
+  width: min(64rem, 100%);
+  margin: 0 auto;
+  padding-inline: 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "head" "index" "main";
+}
+
+.guide-layout > .editor-header {
+  grid-area: head;
+}
+
+.guide-layout > .guide-index {
+  grid-area: index;
+}
+
+.guide-layout > main {
+  grid-area: main;
+}
+
+/* A jump lands below the sticky nav, not under it. */
+.guide [id] {
+  scroll-margin-top: 96px;
+}
+
+@media (min-width: 1024px) {
+  .guide-layout {
+    grid-template-columns: 13rem minmax(0, 1fr);
+    grid-template-areas: "index head" "index main";
+    column-gap: 48px;
+  }
+
+  .guide-layout > .guide-index {
+    position: sticky;
+    top: 96px;
+    align-self: start;
+    margin-top: 24px;
+  }
+
+  .guide-layout .guide-index ol {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 2px;
+    margin: 0;
+  }
+
+  .guide-layout .guide-index a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    border: 0;
+    background: none;
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  .guide-layout .guide-index a::before {
+    content: "";
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.4;
+  }
+
+  .guide-layout .guide-index a:hover {
+    color: var(--text);
+  }
+
+  /* The part you're reading: Moonlight text and a Lune Violet dot (state in text color and shape, not color alone). */
+  .guide-layout .guide-index a[aria-current] {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .guide-layout .guide-index a[aria-current]::before {
+    background: var(--accent);
+    opacity: 1;
+    transform: scale(1.5);
+  }
+}
+
+/* Phones (T8.2): less page padding, and each step at full width with its number above it, so the steps don't lose a
+   third of the screen to the rail. */
+@media (max-width: 600px) {
+  .editor.guide {
+    padding-inline: 12px;
+  }
+
+  .guide-layout {
+    padding-inline: 4px;
+  }
+
+  .guide-rail-item {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .guide-rail-item:not(:last-child)::before {
+    display: none;
+  }
+
+  .guide-rail-dot {
+    width: 32px;
+    height: 32px;
+  }
+
+  .guide .guide-step {
+    padding: 16px;
+  }
+}
