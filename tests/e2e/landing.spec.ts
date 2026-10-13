@@ -338,7 +338,6 @@ test("the hero lists four facts, all true for v1", async ({ page }) => {
   await expect(page.getByRole("list", { name: "At a glance" }).getByRole("listitem")).toHaveText([
     `${themeIds.length} looks`,
     "Scenes, chat and alerts",
-    "One link per overlay",
     "Free, no account needed",
     "Open source",
   ]);
