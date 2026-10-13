@@ -831,7 +831,9 @@
    can collapse; visibility hides it once collapsed, so it never takes focus or reaches screen readers while closed.
    Browsers without ::details-content open and close at once, as before. Reduced motion: index.css drops the
    transition. */
-.editor details::details-content {
+/* Only disclosures with the wrapper: any other <details> (the account menu) keeps the browser's own hiding, or its
+   closed content would show (it did, fixed 2026-10-13). */
+.editor details:has(> .editor-disclosure)::details-content {
   content-visibility: visible;
 }
 

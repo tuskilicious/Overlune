@@ -64,6 +64,9 @@ test("signed in: the Twitch picture and name, then sign out", async ({ page }) =
   const menu = header(page).locator(".editor-account-menu summary");
   await expect(menu).toHaveText("MoonStreamer");
   await expect(menu.locator("img")).toHaveAttribute("src", ME.avatarUrl);
+  // Hidden until the profile is clicked: a closed details showed its panel until 2026-10-13.
+  await expect(header(page).getByText("Signed in with Twitch as moonstreamer.")).toBeHidden();
+  await expect(header(page).getByRole("button", { name: "Sign out", exact: true })).toBeHidden();
   await menu.click();
   await expect(header(page).getByText("Signed in with Twitch as moonstreamer.")).toBeVisible();
   expect(
