@@ -1,0 +1,128 @@
+/* The canvas (T9.4, DESIGN.md "Canvas editor"): the scene scaled to fit, with an interaction layer over it. Colors from
+   the editor's tokens; the guides are Signal Cyan, the brand's second accent (BRAND.md). */
+.canvas {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius);
+  outline: none;
+  touch-action: none;
+  user-select: none;
+}
+
+.canvas:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.canvas-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.canvas-hit {
+  position: absolute;
+  cursor: move;
+}
+
+.canvas-hit:hover {
+  outline: 1px dashed color-mix(in srgb, var(--text-muted) 70%, transparent);
+}
+
+.canvas-hit[data-locked] {
+  cursor: default;
+}
+
+.canvas-selection {
+  position: absolute;
+  outline: 1px solid var(--accent);
+  pointer-events: none;
+}
+
+.canvas-tag {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: -1px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.canvas-handle,
+.canvas-rotate {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border: 1px solid var(--accent);
+  background: var(--bg);
+  pointer-events: auto;
+}
+
+.canvas-handle[data-handle*="n"] {
+  top: 0;
+}
+.canvas-handle[data-handle*="s"] {
+  top: 100%;
+}
+.canvas-handle[data-handle="n"],
+.canvas-handle[data-handle="s"] {
+  left: 50%;
+}
+.canvas-handle[data-handle*="w"] {
+  left: 0;
+}
+.canvas-handle[data-handle*="e"] {
+  left: 100%;
+}
+.canvas-handle[data-handle="e"],
+.canvas-handle[data-handle="w"] {
+  top: 50%;
+}
+
+.canvas-handle[data-handle="n"],
+.canvas-handle[data-handle="s"] {
+  cursor: ns-resize;
+}
+.canvas-handle[data-handle="e"],
+.canvas-handle[data-handle="w"] {
+  cursor: ew-resize;
+}
+.canvas-handle[data-handle="nw"],
+.canvas-handle[data-handle="se"] {
+  cursor: nwse-resize;
+}
+.canvas-handle[data-handle="ne"],
+.canvas-handle[data-handle="sw"] {
+  cursor: nesw-resize;
+}
+
+/* The turning handle: a round knob above the box. */
+.canvas-rotate {
+  top: -28px;
+  left: 50%;
+  border-radius: 50%;
+  cursor: grab;
+}
+
+.canvas-guide {
+  position: absolute;
+  background: #18d2f5; /* Signal Cyan (BRAND.md), the snapping guides only */
+  pointer-events: none;
+}
+
+.canvas-guide[data-axis="x"] {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.canvas-guide[data-axis="y"] {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
