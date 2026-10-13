@@ -339,7 +339,7 @@ test("the hero lists four facts, all true for v1", async ({ page }) => {
     `${themeIds.length} looks`,
     "Scenes, chat and alerts",
     "One link per overlay",
-    "Free, no account",
+    "Free, no account needed",
     "Open source",
   ]);
 });

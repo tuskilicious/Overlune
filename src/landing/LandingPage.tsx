@@ -583,7 +583,7 @@ const facts = [
   `${themeIds.length} looks`,
   "Scenes, chat and alerts",
   "One link per overlay",
-  "Free, no account",
+  "Free, no account needed",
 ];
 
 const steps = [
@@ -596,7 +596,7 @@ const steps = [
 ] as const;
 
 const promise =
-  "No account and no payment. Your settings live in your link and your browser, your chat is read anonymously, and the code is open source.";
+  "No payment, and no account needed. Your settings live in your link and your browser, your chat is read anonymously, and the code is open source.";
 
 const button =
   "inline-flex items-center justify-center rounded-full px-7 py-3.5 font-heading text-lg font-bold transition-colors duration-300";
@@ -1393,7 +1393,9 @@ export default function LandingPage() {
                 Read the setup guide
               </Link>
             </div>
-            <p className="mt-6 text-haze">Free. No account. Works with OBS and Streamlabs.</p>
+            <p className="mt-6 text-haze">
+              Free. No account needed. Works with OBS and Streamlabs.
+            </p>
             {/* Optional, quiet, and after the call to action: nothing is locked (T6.80). */}
             <p className="mx-auto mt-3 max-w-xl text-sm text-haze">
               Overlune is free and stays free. If it helped your stream, you can{" "}
