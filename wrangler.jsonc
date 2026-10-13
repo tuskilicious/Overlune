@@ -50,8 +50,8 @@
         "VITE_SENTRY_DSN": "https://26398e09d381b7786ca7ea853b4a063f@o4512174345224192.ingest.de.sentry.io/4512174371766352",
         "VITE_SENTRY_ENVIRONMENT": "production",
         "AUTH_ORIGIN": "https://overlune.in",
-        // Closed until the privacy policy and terms cover accounts (T7.8) and the launch check passes (T7.9).
-        "ACCOUNTS_OPEN": "false",
+        // Opened at the launch check (T7.9). "false" closes sign-in again: account routes 404, no data is lost.
+        "ACCOUNTS_OPEN": "true",
       },
       "d1_databases": [
         {
