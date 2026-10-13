@@ -50,6 +50,78 @@ export const defaultBots = [
   "pokemoncommunitygame",
 ] as const;
 
+/** A color in a layout (T9.2): one of the look's tokens, or a plain #rrggbb. */
+const layoutColor = z.union([z.enum(colorTokens), hexColor]);
+
+/** What every element has (docs/STACK.md "Layout model"): a box in canvas px, rotation, opacity, and its state. The
+ *  box may run partly off the canvas; ids are short and random, set by the editor. */
+const elementBase = {
+  id: z.string().regex(/^[A-Za-z0-9_-]{1,8}$/),
+  x: z.number().int().min(-3840).max(7680),
+  y: z.number().int().min(-3840).max(7680),
+  w: z.number().int().min(1).max(7680),
+  h: z.number().int().min(1).max(7680),
+  r: z.number().min(-180).max(180).default(0),
+  o: z.number().min(0).max(1).default(1),
+  hidden: z.boolean().default(false),
+  locked: z.boolean().default(false),
+};
+
+/** Style a scene's own text can take on the canvas; unset keeps the look's. */
+const textStyle = {
+  size: z.number().int().min(8).max(400).optional(),
+  color: layoutColor.optional(),
+  align: z.enum(["left", "center", "right"]).optional(),
+};
+
+/** One element of a customized scene (T9.2). The scene's parts render today's components from today's settings, so
+ *  their words are still edited in one place; added elements carry their own content. Never free CSS. */
+export const layoutElement = z.discriminatedUnion("type", [
+  z.object({ ...elementBase, type: z.literal("title"), ...textStyle }),
+  z.object({ ...elementBase, type: z.literal("subtitle"), ...textStyle }),
+  z.object({ ...elementBase, type: z.literal("countdown") }),
+  z.object({ ...elementBase, type: z.literal("socials") }),
+  z.object({ ...elementBase, type: z.literal("logo") }),
+  z.object({ ...elementBase, type: z.literal("ticker") }),
+  z.object({
+    ...elementBase,
+    type: z.literal("text"),
+    text: text(200),
+    font: z.enum(["heading", "body"]).default("body"),
+    ...textStyle,
+  }),
+  z.object({
+    ...elementBase,
+    type: z.literal("image"),
+    src: z.string().max(2048).refine(isHttpsUrl, "Images must be https: links"),
+    fit: z.enum(["cover", "contain"]).default("contain"),
+  }),
+  z.object({
+    ...elementBase,
+    type: z.literal("shape"),
+    kind: z.enum(["rect", "ellipse", "line"]).default("rect"),
+    fill: layoutColor.default("surface"),
+    stroke: layoutColor.optional(),
+    strokeWidth: z.number().int().min(0).max(40).default(0),
+    radius: z.number().int().min(0).max(400).default(0),
+  }),
+]);
+export type LayoutElement = z.output<typeof layoutElement>;
+
+export const layoutScenes = ["starting", "brb", "ending", "offline"] as const;
+export type LayoutScene = (typeof layoutScenes)[number];
+
+/** A canvas and its customized scenes. A scene with no list renders the look's composed scene. */
+const layout = z.object({
+  size: z
+    .object({
+      width: z.number().int().min(320).max(3840).default(1920),
+      height: z.number().int().min(320).max(3840).default(1080),
+    })
+    .prefault({}),
+  scenes: z.partialRecord(z.enum(layoutScenes), z.array(layoutElement).max(40)).default({}),
+});
+
 export const settingsV1 = z.object({
   theme: z.enum(themeIds).default("clean-slate"),
   logo: z
@@ -160,6 +232,9 @@ export const settingsV1 = z.object({
   /** Lite motion (T6.119): entrances, countdown flips and alerts keep moving, the looping backgrounds stop. For
    *  slower PCs. Old links have no field and keep full motion; lessMotion wins when both are set. */
   liteMotion: z.boolean().default(false),
+  /** The canvas editor's layouts (T9.2, docs/STACK.md "Layout model"). Old links have no field: every scene renders as
+   *  the look composes it, exactly as before. Portrait joins in Phase 10. */
+  layouts: z.object({ landscape: layout.optional() }).default({}),
   /** "Advanced" overrides on top of the theme (T2.7). Empty means the theme as designed. */
   advanced: z
     .object({

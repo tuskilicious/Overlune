@@ -35,7 +35,7 @@ interface Props {
 
 /** A two-tone headline (T6.107): the last word takes the accent color. Each word is its own span so the entrance
  *  can land them one after another (T6.117). Plain text, rendered as React elements. */
-function TwoTone({ text }: { text: string }) {
+export function TwoTone({ text }: { text: string }) {
   const words = text.trim().split(/\s+/);
   return words.map((w, i) => (
     <Fragment key={i}>
@@ -123,47 +123,62 @@ export default function SceneFrame({ settings, title, subtitle, error, children 
         {(children || socials.length > 0) && (
           <div className="scene-side">
             {children}
-            {socials.length > 0 && (
-              <ul className="scene-socials">
-                {socials.map((s, i) => (
-                  <li key={i} style={{ "--i": i } as CSSProperties}>
-                    <SocialIcon platform={s.platform} />
-                    <span className="scene-platform">{platformLabel[s.platform]}</span>{" "}
-                    <span className="scene-handle">{s.handle}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+            {socials.length > 0 && <SceneSocials socials={socials} />}
           </div>
         )}
       </div>
-      {ticker && (
-        <div className="scene-ticker">
-          {label.trim() && <span className="scene-ticker-tab">{label}</span>}
-          {/* Two copies, each at least as wide as the band, slide left by one copy: a seamless loop. The second copy
+      {ticker && <SceneTicker settings={settings} socials={socials} />}
+    </div>
+  );
+}
+
+/** The socials as an icon list (T6.35). Shared with customized scenes (T9.2). */
+export function SceneSocials({ socials }: { socials: Settings["socials"] }) {
+  return (
+    <ul className="scene-socials">
+      {socials.map((s, i) => (
+        <li key={i} style={{ "--i": i } as CSSProperties}>
+          <SocialIcon platform={s.platform} />
+          <span className="scene-platform">{platformLabel[s.platform]}</span>{" "}
+          <span className="scene-handle">{s.handle}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** The ticker band (T6.121). Shared with customized scenes (T9.2). */
+export function SceneTicker({
+  settings,
+  socials,
+}: {
+  settings: Settings;
+  socials: Settings["socials"];
+}) {
+  const { label, extra } = settings.ticker;
+  return (
+    <div className="scene-ticker">
+      {label.trim() && <span className="scene-ticker-tab">{label}</span>}
+      {/* Two copies, each at least as wide as the band, slide left by one copy: a seamless loop. The second copy
               is only there for the loop, so screen readers skip it. */}
-          <div className="scene-ticker-rail">
-            <div
-              className="scene-ticker-track"
-              style={
-                { "--ticker-s": `${Math.max(24, (socials.length + 1) * 9)}s` } as CSSProperties
-              }
-            >
-              {[0, 1].map((copy) => (
-                <ul key={copy} aria-hidden={copy === 1 || undefined}>
-                  {socials.map((s, i) => (
-                    <li key={i}>
-                      <SocialIcon platform={s.platform} />
-                      {s.handle}
-                    </li>
-                  ))}
-                  {extra.trim() && <li>{extra}</li>}
-                </ul>
+      <div className="scene-ticker-rail">
+        <div
+          className="scene-ticker-track"
+          style={{ "--ticker-s": `${Math.max(24, (socials.length + 1) * 9)}s` } as CSSProperties}
+        >
+          {[0, 1].map((copy) => (
+            <ul key={copy} aria-hidden={copy === 1 || undefined}>
+              {socials.map((s, i) => (
+                <li key={i}>
+                  <SocialIcon platform={s.platform} />
+                  {s.handle}
+                </li>
               ))}
-            </div>
-          </div>
+              {extra.trim() && <li>{extra}</li>}
+            </ul>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 }
