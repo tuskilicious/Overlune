@@ -720,16 +720,21 @@ Planned with the owner 2026-10-13, after an audit of every page at 1440×900 and
 
 The order after this phase, agreed the same day: vertical overlays (Phase 9), four new looks (Phase 10), saved overlays (Phase 11), then the Overlune Dock and the Android app (Phase 12). Vertical comes before the new looks so they're built vertical-ready.
 
-- [ ] **T8.1 Shared site shell.** The home page's floating nav, night-sky ground and outlined-wordmark footer on every page: guide, privacy, terms, 404 and the editor's header. One component set, not copies; the nav marks the current page.
+- [x] **T8.1 Shared site shell.** The home page's floating nav, night-sky ground and outlined-wordmark footer on every page: guide, privacy, terms, 404 and the editor's header. One component set, not copies; the nav marks the current page.
   - Accept: every page has the same nav and footer; axe clean; no sideways scroll at 390px; e2e for the nav on each page.
-- [ ] **T8.2 Setup guide.** A centred layout with a sticky table of contents on wide windows (the index chips become it), steps at full width on phones, and the site nav in place of "Back to the editor" alone.
+  - *Done 2026-10-13 (#209). `components/SiteNav.tsx` on every page: fixed on the home page, sticky on the guide, legal pages and 404, in the flow in the editor with the account in the button's place; `.site-sky` behind every other page. Found on the way: Start over's confirmation shared the section Reset's `position: absolute` and sat in the page's top corner (fixed). CI (Linux fonts) caught the guide's sizes table 2px over a phone's width, and the editor's focus-loop guard at exactly 120 stops (raised to 160).*
+- [x] **T8.2 Setup guide.** A centred layout with a sticky table of contents on wide windows (the index chips become it), steps at full width on phones, and the site nav in place of "Back to the editor" alone.
   - Accept: the table of contents follows the section in view (`aria-current`); phones get the steps full width; axe clean; checked at 1440, 1024, 768 and 390px.
-- [ ] **T8.3 Legal pages.** Privacy and terms in the same centred layout, a table of contents built from their headings, and a readable measure and spacing.
+  - *Done 2026-10-13 (#210). Centred under the nav; from 1024px a sticky index marks the part you're reading (`useHeadingAbove`, the last heading above 40% of the window); phones get full-width steps.*
+- [x] **T8.3 Legal pages.** Privacy and terms in the same centred layout, a table of contents built from their headings, and a readable measure and spacing.
   - Accept: the table of contents comes from `docs/legal/*.md` (no second copy); the footer e2e still passes; axe clean.
-- [ ] **T8.4 Editor polish.** The first-visit gallery gets a hero-style header and the home page's glow on look cards; the header, save box and account menu join the same family.
+  - *Done 2026-10-13 (#211). The guide's layout with an index built from each document's headings (ids from their text, e.g. `/terms#3-accounts`), only from 1024px. Also fixed: a section link from another page (`/#how`) landed off screen once the pinned hero laid out.*
+- [x] **T8.4 Editor polish.** The first-visit gallery gets a hero-style header and the home page's glow on look cards; the header, save box and account menu join the same family.
   - Accept: the editor's rules in DESIGN.md still hold (one filled button, tokens, focus rings); axe clean narrow and wide; the owner approves the preview.
-- [ ] **T8.5 Home page fixes.** The empty gap under "Your whole stream, in one look"; the fact row (no orphan "Open source"); where the hero's alert cards sit; the Webcam frame and Chat card thumbnails; a quieter scroll ruler; the top bar on phones.
+  - *Done 2026-10-13 (#212). A hero-style gallery opening, look cards on Deep Space that glow violet on hover and focus (the editor's only glow), the save box with the nav's edge.*
+- [x] **T8.5 Home page fixes.** The empty gap under "Your whole stream, in one look"; the fact row (no orphan "Open source"); where the hero's alert cards sit; the Webcam frame and Chat card thumbnails; a quieter scroll ruler; the top bar on phones.
   - Accept: each item fixed and seen in the preview; landing e2e passes.
+  - *Done 2026-10-13 (#214). The hero's alerts above the frame instead of over the scene's title; four facts in two columns ("One link per overlay" dropped); Chat, Webcam frame and Alerts cards over the "your game" backdrop; the gap above the looks' curve closed; a narrower, dimmer ruler; the meta descriptions say an account is optional.*
 - [ ] **T8.6 Review pass.** Screenshots of every page at 1440, 1024, 768 and 390px with the browser painting live (a background preview pane freezes GSAP mid-reveal, which looked like overlapping text in the audit), axe and e2e clean, DESIGN.md updated for the shell.
   - Accept: the owner signs off the screenshots.
 
