@@ -218,8 +218,9 @@
 }
 
 /* A plain stand-in for a camera behind the webcam frame picture. */
+/* The camera behind the webcam frame: a dim cut-out of the game behind it (T8.5), so its clear middle reads as clear. */
 .landing-camera .editor-preview {
-  background: linear-gradient(135deg, #6b7486, #3a414f);
+  background: rgb(5 6 26 / 0.35);
 }
 
 .landing .editor-preview > .frame,
@@ -732,13 +733,20 @@
 }
 
 /* A stand-in for the game: dusk over hills, drawn in CSS and labeled, so it never passes for a real one. */
-.landing-stage-game {
-  inset: 0;
+/* "Your game": a dusk sky over dark hills, behind the overlays that sit over a game (the stage, and since T8.5 the
+   Chat, Webcam frame and Alerts cards, and their magnifier). */
+.landing-stage-game,
+[data-over-game],
+[data-over-game] .landing-lens-zoom {
   background:
     radial-gradient(60% 50% at 70% 38%, rgb(255 190 140 / 0.35), transparent 70%),
     linear-gradient(170deg, transparent 58%, #1d2a3f 58.2%, #141d2e 75%, transparent 75.2%),
     linear-gradient(190deg, transparent 64%, #10182a 64.2%),
     linear-gradient(#3b4a78, #8a6f9e 45%, #d79a83 62%, #2a2f4a 63%);
+}
+
+.landing-stage-game {
+  inset: 0;
 }
 
 .landing-stage-game span {
@@ -1044,7 +1052,7 @@ html[data-ruler]::-webkit-scrollbar {
   inset-block: 0;
   right: 0;
   z-index: 30;
-  width: 3.5rem;
+  width: 2.75rem;
   overflow: hidden;
   cursor: crosshair;
   touch-action: none;
@@ -1073,11 +1081,14 @@ html[data-ruler]::-webkit-scrollbar {
   will-change: transform;
 }
 
+/* Quieter since T8.5: the numbers and the section's name stay dim beside the page and brighten when the pointer is on
+   the strip; the cyan marker is the one bright thing on it. */
 .landing-ruler-tape span {
   position: absolute;
   right: 1.5rem;
   translate: 0 -50%;
-  color: rgb(237 235 255 / 0.5);
+  color: rgb(237 235 255 / 0.25);
+  transition: color 200ms ease;
   font: 600 10px/1 var(--font-body);
   font-variant-numeric: tabular-nums;
 }
@@ -1106,8 +1117,10 @@ html[data-ruler]::-webkit-scrollbar {
   position: absolute;
   right: 0.25rem;
   bottom: 1.5rem;
-  color: var(--color-moon);
-  font: 700 12px/1 var(--font-heading);
+  color: var(--color-haze);
+  opacity: 0.6;
+  font: 700 10px/1 var(--font-heading);
+  transition: opacity 200ms ease;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -1118,4 +1131,12 @@ html[data-ruler]::-webkit-scrollbar {
 .landing-ruler-mark[data-low] .landing-ruler-section {
   top: 0.75rem;
   bottom: auto;
+}
+
+.landing-ruler:hover .landing-ruler-tape span {
+  color: rgb(237 235 255 / 0.6);
+}
+
+.landing-ruler:hover .landing-ruler-section {
+  opacity: 1;
 }

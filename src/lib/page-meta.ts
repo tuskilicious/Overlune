@@ -5,12 +5,12 @@ import { themeIds } from "../themes/types.ts";
 export const pages: Record<string, { title: string; description: string }> = {
   "/": {
     title: "Overlune: free stream overlays for OBS",
-    description: `Free stream overlays that look pro: ${themeIds.length} matching looks for four scenes, chat and alerts. One link per overlay in OBS. No account, no payment.`,
+    description: `Free stream overlays that look pro: ${themeIds.length} matching looks for four scenes, chat and alerts. One link per overlay in OBS. No payment, and no account needed.`,
   },
   "/editor": {
     title: "Make your overlays · Overlune",
     description:
-      "Pick a look, add your text and copy one link per overlay into OBS. Free, with no account.",
+      "Pick a look, add your text and copy one link per overlay into OBS. Free, and no account needed.",
   },
   "/guide": {
     title: "Set up your overlays in OBS · Overlune",
@@ -20,7 +20,7 @@ export const pages: Record<string, { title: string; description: string }> = {
   "/privacy": {
     title: "Privacy · Overlune",
     description:
-      "No accounts and no trackers: your settings live in your link and your browser. What Overlune collects and why.",
+      "No trackers, and accounts are optional: your settings live in your link and your browser. What Overlune collects and why.",
   },
   "/terms": {
     title: "Terms · Overlune",

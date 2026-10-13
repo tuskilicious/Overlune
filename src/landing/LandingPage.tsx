@@ -216,9 +216,10 @@ function HeroKit() {
           LIVE
         </span>
       </div>
-      {/* The alerts float over the frame's empty top-left sky on wide screens, and sit under it on phones. */}
+      {/* On wide screens the alerts arrive side by side just above the frame's top-left, in the hero card's empty sky,
+          so they never cover the scene's own title (T8.5); on phones they sit under it. */}
       <div
-        className={`landing-kit-alerts mt-4 grid grid-cols-2 items-start gap-3 lg:absolute lg:items-stretch lg:top-[-2.5rem] lg:left-[-3.5rem] lg:mt-0 lg:flex lg:w-[50%] lg:flex-col ${still}`}
+        className={`landing-kit-alerts mt-4 grid grid-cols-2 items-start gap-3 lg:absolute lg:top-0 lg:left-[-2rem] lg:mt-0 lg:w-[82%] lg:-translate-y-[calc(100%+0.75rem)] ${still}`}
       >
         {[1, 3].map((i) => (
           <AlertCard key={`${step}-${i}`} theme={theme} alert={i} />
@@ -342,6 +343,8 @@ function Magnified({ part, theme }: { part: string; theme: ThemeId }) {
   return (
     <div
       className="landing-still relative aspect-video overflow-hidden rounded-xl bg-night"
+      // Chat, the webcam frame and alerts sit over a game, so their thumbnails show one behind them (T8.5).
+      data-over-game={["chat", "frame", "alerts"].includes(part) || undefined}
       onPointerEnter={(ev) => {
         if (ev.pointerType === "touch") return;
         aim(ev);
@@ -580,12 +583,7 @@ function SupportCell({ value }: { value: Support }) {
   );
 }
 
-const facts = [
-  `${themeIds.length} looks`,
-  "Scenes, chat and alerts",
-  "One link per overlay",
-  "Free, no account needed",
-];
+const facts = [`${themeIds.length} looks`, "Scenes, chat and alerts", "Free, no account needed"];
 
 const steps = [
   ["Pick a look", `${themeIds.length} looks, each with matching scenes, chat and alerts.`],
@@ -1116,8 +1114,9 @@ export default function LandingPage() {
                       See the looks
                     </a>
                   </div>
+                  {/* Two by two at every width, so no fact is left alone on a line (T8.5). */}
                   <ul
-                    className="mt-10 flex flex-wrap gap-x-6 gap-y-2 text-haze"
+                    className="mt-10 grid w-fit grid-cols-2 gap-x-8 gap-y-2 text-haze"
                     aria-label="At a glance"
                   >
                     {facts.map((f) => (
@@ -1201,7 +1200,7 @@ export default function LandingPage() {
         {/* Interest (T6.124): the whole kit over a game in one look, with the look switchable. */}
         <section
           id="stage"
-          className="px-6 py-32 md:px-12 md:py-48"
+          className="px-6 pt-32 pb-16 md:px-12 md:pt-48 md:pb-24"
           aria-labelledby="stage-heading"
         >
           <StreamStage />
