@@ -245,6 +245,8 @@
   padding: 8px 16px;
   border-bottom: var(--border);
   text-align: left;
+  /* Lets the table shrink to a phone's width: with wider fonts (Linux CI) the Webcam frame note left it 2px over. */
+  overflow-wrap: anywhere;
 }
 
 /* /privacy and /terms (T6.13), and the not-found page (T6.51). */
