@@ -328,8 +328,9 @@
   }
 
   /* Short enough to leave room for the form above it. */
-  .editor-scene-preview-body .editor-preview {
-    max-width: calc(45vh * 16 / 9);
+  .editor-scene-preview-body .editor-preview,
+  .editor-scene-preview-body .canvas {
+    max-width: calc(45vh * var(--aspect, 16 / 9));
     margin: 0 auto;
   }
 }
@@ -979,8 +980,15 @@
   /* Scene titles sit at the bottom of the frame, so the whole preview must fit under the header on a 768px-tall
      laptop, or a first visit looks like an empty box (T6.49). 390px covers the header, save box, steps bar and
      preview heading above it at the top of the page (about 320-350px, depending on how the save box wraps). */
-  .editor-scene-preview .editor-preview {
-    max-width: max(320px, calc((100vh - 390px) * 16 / 9));
+  .editor-scene-preview .editor-preview,
+  .editor-scene-preview .canvas {
+    max-width: max(320px, calc((100vh - 390px) * var(--aspect, 16 / 9)));
+  }
+
+  /* On the canvas the cap is the canvas's own (it holds the layer of handles too), so the scene inside never draws
+     narrower than its handles. */
+  .editor-scene-preview .canvas > .editor-preview {
+    max-width: none;
   }
 }
 
