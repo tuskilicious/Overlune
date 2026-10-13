@@ -82,6 +82,16 @@ The owner moved these into scope for v1.x (T6.86). They keep v1's rules: a stati
 
 The realistic plan beyond this list (v1.x goals, v2 phases on Cloudflare, open decisions): `docs/FUTURE-SCOPE.md`.
 
+## Canvas editor (approved 2026-10-13, `docs/TASKS.md` Phase 9)
+Streamers asked for freedom, as in StreamElements' overlay editor, without losing what makes Overlune easy.
+- **Looks stay the start.** A beginner picks a look and is done, as today.
+- **Customize is the freedom.** It opens a canvas where every part of a scene (title, subtitle, countdown, socials, logo, ticker) and anything added (text, images, shapes) can be moved, resized, rotated, layered, hidden, locked or removed, with snapping guides, a layers panel, an inspector and undo.
+- **One source if you want it.** An optional Live overlay places chat, alerts, the webcam frame and labels freely in one browser source.
+- **Still no account.** A layout lives in the link like every other setting; saved overlays (Phase 12) add a short link and live edits later.
+- **Every old link looks the same.** Only links that were customized carry a layout.
+- **Out of scope:** custom code (a streamer's own HTML, CSS or JavaScript), video, uploaded files (images are https links until Phase 12+ uploads), and per-element animation editors.
+- **Done when:** a streamer can rebuild any scene by hand, by mouse or keyboard, every old link renders as before, and 2.0.0 is released.
+
 ## v2 Phase 1: accounts on Cloudflare (approved 2026-10-09)
 The v2 gate (5 real streamers, T6.6) is met, and the owner approved starting v2 on Cloudflare (`docs/STACK.md` "Backend"). Phase 1 is the foundation the later phases build on; it adds no overlay features yet.
 - **Optional "Sign in with Twitch".** The editor, every overlay and every old link keep working signed out.

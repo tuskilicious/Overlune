@@ -81,6 +81,17 @@ All on Cloudflare, next to the site: one provider, one deploy, one domain, so th
 - `src/settings/schema.ts` holds zod schemas per version. `src/settings/migrations.ts` upgrades any old version to the current one.
 - `tests/fixtures/links/` keeps real links from every version. CI loads all of them.
 
+## Layout model (Phase 9, the canvas editor)
+A customized scene is a list of positioned elements in the link's settings, as a new optional field. The v1 contract allows it without a new schema version: links without the field render exactly as before, so there is nothing to migrate. A version bump comes only if a later change renames, removes or tightens something.
+- **Field:** `layouts`, optional, default none. `layouts.landscape` (Phase 9) and `layouts.portrait` (Phase 10, picked by `?canvas=vertical`), each `{ size, scenes }`: `size` is the canvas in px (default 1920×1080; 1080×1920 for portrait; custom sizes from T9.8, 320–3840 by 320–3840), `scenes` maps `starting`, `brb`, `ending`, `offline` and `live` to an element list. A scene without a list renders the look's composed scene.
+- **Element:** `id` (8 characters), `type`, `x`, `y`, `w`, `h` (integers, canvas px, may run partly off the canvas), `r` (rotation, -180 to 180 degrees), `o` (opacity 0–1), `hidden`, `locked`; list order is stacking order. Types: `title`, `subtitle`, `countdown`, `socials`, `logo` and `ticker` (they render today's components and read today's settings, so editing the title text still happens in one place); `text` (its own words, up to 200 characters), `image` (an https link, CLAUDE.md §6, `fit` cover or contain), `shape` (rectangle, ellipse or line); and for `live`: `chat`, `alerts`, `frame`, `label` (Phase 13 fills labels). Styles are the look's tokens or `#rrggbb` (the existing `hexColor`), fonts are `fontIds`, sizes are bounded numbers: never free CSS, never `url()`.
+- **Limits:** 40 elements per scene. A link's whole encoded fragment stays under 24 KB; the editor warns at 16 KB and suggests saving to the account (Phase 12).
+- **Validation:** zod, like every setting: an invalid element is dropped and the rest render, with the overlay's error card (as for any damaged link).
+- **Rendering:** the overlay route renders `layouts[canvas].scenes[scene]` when present, absolutely positioned on the canvas, with the look's background and motif layer underneath (the look's art is not an element, so it keeps its craft); otherwise the composed scene, unchanged.
+- **Default layouts (T9.3):** "Customize" measures where each part sits in the look's composed scene at the canvas size and writes that list; the result must render the same as the composed scene.
+- **No new dependency:** selection, dragging, resizing, rotating and snapping use pointer events and plain math in `src/editor/canvas/`. A library like react-moveable would add weight to every editor visit for what a few hundred lines do.
+- **Stays out:** custom code, HTML or CSS strings, fonts not in `fontIds`, video, uploaded files, and any link other than https images.
+
 ## Folder structure
 ```
 overlune/
