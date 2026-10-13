@@ -1652,50 +1652,41 @@
   color: var(--accent);
 }
 
-/* A customized scene (T9.2, docs/STACK.md "Layout model"): the look's background and motif stay on .scene; each
-   element is a box placed on the canvas, its part filling the box. The parts keep their class names, so each look's
-   type, colors and entrance carry over; only the composed scene's grid places are undone. */
-.scene.scene-layout {
+/* A customized scene (T9.2, T9.3, docs/STACK.md "Layout model"): the composed scene, its own parts moved to their
+   layout boxes from where they sit (LayoutScene), and the added elements (text, images, shapes) in a layer over it. */
+.scene[data-layout] {
   position: relative;
-  display: block;
-  padding: 0;
+}
+
+.layout-layer {
+  position: absolute;
+  inset: 0;
 }
 
 .layout-el {
   position: absolute;
   box-sizing: border-box;
-  display: flex;
-  align-items: flex-start;
 }
 
 .layout-el > * {
   box-sizing: border-box;
-  max-width: 100%;
+  width: 100%;
   margin: 0;
 }
 
-.layout-el :is(.scene-title, .scene-subtitle, .layout-text) {
-  width: 100%;
-  overflow-wrap: anywhere;
-}
-
-.layout-el-logo .scene-logo,
-.layout-image {
-  width: 100%;
+.layout-image,
+.layout-shape {
   height: 100%;
-  max-width: none;
-  max-height: none;
-  object-fit: contain;
 }
 
-.layout-el-ticker .scene-ticker {
-  position: static;
-  width: 100%;
+.layout-image {
+  display: block;
 }
 
 .layout-text {
   color: var(--text);
   line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .layout-text-heading {
@@ -1710,8 +1701,6 @@
 }
 
 .layout-shape {
-  width: 100%;
-  height: 100%;
   border-style: solid;
 }
 
@@ -1720,8 +1709,9 @@
 }
 
 .layout-shape-line {
+  position: relative;
+  top: 50%;
   height: 0;
-  align-self: center;
   border-width: 0;
   border-top-style: solid;
 }
