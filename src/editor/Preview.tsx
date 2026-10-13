@@ -23,7 +23,13 @@ export default function Preview({
     <div
       className="editor-preview"
       ref={ref}
-      style={{ "--scale": scale, aspectRatio: `${width} / ${height}` } as CSSProperties}
+      style={
+        {
+          "--scale": scale,
+          "--aspect": width / height,
+          aspectRatio: `${width} / ${height}`,
+        } as CSSProperties
+      }
       aria-hidden
       inert
     >
