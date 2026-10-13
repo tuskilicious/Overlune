@@ -2,6 +2,20 @@
 
 What changed in each Overlune release. Overlay links from every release keep working: the link format only ever gains optional settings.
 
+## 1.6.0 (2026-10-13)
+
+Sign in with Twitch, if you want to. Everything still works without an account, and overlays and their links are unchanged: there is nothing to re-paste.
+
+### Accounts
+- **Sign in with Twitch:** a button in the editor's header. You sign in on Twitch's own page, and Overlune asks for no Twitch permissions, only who you are. Your Twitch name and picture then show in the editor.
+- **Your account, your call:** from the account menu, sign out, sign out on every device, or delete your account, which removes it at once. Your overlay links keep working either way.
+- This is the groundwork: saving overlays to your account comes later.
+
+### Privacy and safety
+- **A rewritten privacy policy and terms** say what an account stores (your Twitch ID, name and picture link, and your sign-ins), what it never stores (your password, email or chat), how long it's kept, and how to delete it.
+- **Two cookies, only if you sign in,** both needed to keep you signed in. Still no tracking cookies, and no cookie banner.
+- **Limits against abuse,** and **nightly encrypted backups**, kept for 90 days.
+
 ## 1.5.0 (2026-10-09)
 
 A livelier home page, a setup guide you can tick off as you go, and a clearer editor. Overlays and their links are unchanged: there is nothing to re-paste.
