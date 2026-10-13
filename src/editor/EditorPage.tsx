@@ -737,7 +737,7 @@ export default function EditorPage() {
           )}
           <div>
             <h2 id="save-heading">Your link is your save file.</h2>{" "}
-            {madeSomething ? "Changes also save in this browser." : "No accounts needed."}
+            {madeSomething ? "Changes also save in this browser." : "An account is optional."}
           </div>
         </div>
         {/* The buttons stay put; each opens its own panel underneath, one at a time, and Escape closes it (T6.58). */}
