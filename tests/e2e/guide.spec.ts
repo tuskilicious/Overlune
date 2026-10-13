@@ -117,3 +117,38 @@ test("the setup steps can be ticked off, and the next one becomes current (T6.15
     (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze()).violations,
   ).toEqual([]);
 });
+
+test("on wide windows the index stays beside the steps and marks the part you're reading (T8.2)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/guide");
+  const index = page.getByRole("navigation", { name: "On this page" });
+  await expect(index.getByRole("link", { name: "1. Add an overlay" })).toHaveAttribute(
+    "aria-current",
+    "location",
+  );
+  await index.getByRole("link", { name: "Before your first stream" }).click();
+  await expect(index.getByRole("link", { name: "Before your first stream" })).toHaveAttribute(
+    "aria-current",
+    "location",
+  );
+  await expect(index.getByRole("link", { name: "1. Add an overlay" })).not.toHaveAttribute(
+    "aria-current",
+  );
+  // Sticky: still in view after the jump, and the heading it jumped to isn't under the nav.
+  await expect(index).toBeInViewport();
+  const nav = (await page.getByRole("navigation", { name: "Main" }).boundingBox())!;
+  const heading = (await page
+    .getByRole("heading", { name: "Before your first stream" })
+    .boundingBox())!;
+  expect(heading.y).toBeGreaterThanOrEqual(nav.y + nav.height);
+});
+
+test("on phones each step uses the full width (T8.2)", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/guide");
+  const step = (await page.locator(".guide-step").first().boundingBox())!;
+  expect(step.width).toBeGreaterThan(340);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+});

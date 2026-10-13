@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { useHeadingAbove } from "../lib/useHeadingAbove";
 import SiteFooter from "../components/SiteFooter";
 import SiteNav from "../components/SiteNav";
 import { defaultSettings } from "../settings/schema";
@@ -93,8 +94,10 @@ const guideIndex = [
   ["black-heading", "Fixes"],
   ["streamlabs-heading", "Streamlabs"],
 ] as const;
+const guideIds = guideIndex.map(([id]) => id);
 
 export default function SetupGuide() {
+  const reading = useHeadingAbove(guideIds);
   const [done, setDone] = useState([false, false, false]);
   const current = done.indexOf(false);
   const toggle = (i: number) => () => setDone((d) => d.map((v, j) => (j === i ? !v : v)));
@@ -117,280 +120,288 @@ export default function SetupGuide() {
   return (
     <div className="editor guide site-sky" style={themeVars(brandChrome)}>
       <SiteNav />
-      <header className="editor-header">
-        <h1>Set up your overlays in OBS</h1>
-        <p>You only do this once. After that, your overlays update themselves.</p>
+      {/* Centred under the nav (T8.2): on wide windows the index is a sticky column beside the steps and marks the
+          part you're reading; narrower, it's the row of chips under the heading. */}
+      <div className="guide-layout">
+        <header className="editor-header">
+          <h1>Set up your overlays in OBS</h1>
+          <p>You only do this once. After that, your overlays update themselves.</p>
+        </header>
         {/* Every part one tap away, like the kits' guides (T6.118). */}
         <nav className="guide-index" aria-label="On this page">
           <ol>
             {guideIndex.map(([id, name]) => (
               <li key={id}>
-                <a href={`#${id}`}>{name}</a>
+                <a href={`#${id}`} aria-current={reading === id ? "location" : undefined}>
+                  {name}
+                </a>
               </li>
             ))}
           </ol>
         </nav>
-      </header>
 
-      <main>
-        {/* The three setup steps on a rail (T6.153). */}
-        <ol className="guide-rail">
-          <Step
-            n={1}
-            id="add-heading"
-            title="Add an overlay"
-            done={done[0]!}
-            current={current === 0}
-            onDone={toggle(0)}
-          >
-            <ol>
-              <li>
-                In the editor, press <strong>Copy link</strong> next to the overlay you want.
-              </li>
-              <li>
-                In OBS, find the <strong>Sources</strong> box at the bottom. Press{" "}
-                <strong>+</strong>. In the list on the left, choose <strong>Browser</strong>, then
-                press <strong>Add a new Browser</strong> at the top. Give it a name, like “Starting
-                Soon”, and press <strong>OK</strong>.
-              </li>
-              <li>
-                Delete what is in the <strong>URL</strong> box and paste your link.
-              </li>
-              <li>
-                Type the <strong>Width</strong> and <strong>Height</strong> from the table below,
-                then press <strong>OK</strong>.
-              </li>
-            </ol>
-            <Shot
-              file="obs-add-browser.png"
-              alt="The OBS Add Source window, with Browser chosen in the list on the left and Add a new Browser at the top."
-            />
-            <table className="guide-sizes">
-              <caption>Sizes to type in</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Overlay</th>
-                  <th scope="col">Width</th>
-                  <th scope="col">Height</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sizes.map((s) => (
-                  <tr key={s.name}>
-                    <th scope="row">{s.name}</th>
-                    <td>{s.width}</td>
-                    <td>
-                      {s.height}
-                      {s.note && <span className="guide-note"> ({s.note})</span>}
-                    </td>
+        <main>
+          {/* The three setup steps on a rail (T6.153). */}
+          <ol className="guide-rail">
+            <Step
+              n={1}
+              id="add-heading"
+              title="Add an overlay"
+              done={done[0]!}
+              current={current === 0}
+              onDone={toggle(0)}
+            >
+              <ol>
+                <li>
+                  In the editor, press <strong>Copy link</strong> next to the overlay you want.
+                </li>
+                <li>
+                  In OBS, find the <strong>Sources</strong> box at the bottom. Press{" "}
+                  <strong>+</strong>. In the list on the left, choose <strong>Browser</strong>, then
+                  press <strong>Add a new Browser</strong> at the top. Give it a name, like
+                  “Starting Soon”, and press <strong>OK</strong>.
+                </li>
+                <li>
+                  Delete what is in the <strong>URL</strong> box and paste your link.
+                </li>
+                <li>
+                  Type the <strong>Width</strong> and <strong>Height</strong> from the table below,
+                  then press <strong>OK</strong>.
+                </li>
+              </ol>
+              <Shot
+                file="obs-add-browser.png"
+                alt="The OBS Add Source window, with Browser chosen in the list on the left and Add a new Browser at the top."
+              />
+              <table className="guide-sizes">
+                <caption>Sizes to type in</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Overlay</th>
+                    <th scope="col">Width</th>
+                    <th scope="col">Height</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <p>Every link carries your settings, so you only paste it once.</p>
-          </Step>
+                </thead>
+                <tbody>
+                  {sizes.map((s) => (
+                    <tr key={s.name}>
+                      <th scope="row">{s.name}</th>
+                      <td>{s.width}</td>
+                      <td>
+                        {s.height}
+                        {s.note && <span className="guide-note"> ({s.note})</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p>Every link carries your settings, so you only paste it once.</p>
+            </Step>
 
-          <Step
-            n={2}
-            id="settings-heading"
-            title="Tick the right boxes"
-            done={done[1]!}
-            current={current === 1}
-            onDone={toggle(1)}
-          >
-            <p>In the same window, below the size:</p>
+            <Step
+              n={2}
+              id="settings-heading"
+              title="Tick the right boxes"
+              done={done[1]!}
+              current={current === 1}
+              onDone={toggle(1)}
+            >
+              <p>In the same window, below the size:</p>
+              <ul>
+                <li>
+                  <strong>Control audio via OBS:</strong> turn it <strong>on</strong> for Alerts, so
+                  your viewers hear the alert sound.
+                </li>
+                <li>
+                  <strong>Shutdown source when not visible:</strong> leave it <strong>off</strong>{" "}
+                  for Chat and Alerts, so they stay connected when you switch scenes.
+                </li>
+                <li>Leave the “Custom CSS” box as it is. It keeps the background see-through.</li>
+              </ul>
+              <Shot
+                file="obs-properties.png"
+                alt="OBS Browser source properties with the link, width 1920, height 1080 and Control audio via OBS ticked."
+              />
+            </Step>
+
+            <Step
+              n={3}
+              id="audio-heading"
+              title="Make sure alerts can be heard"
+              done={done[2]!}
+              current={current === 2}
+              onDone={toggle(2)}
+            >
+              <ol>
+                <li>
+                  With “Control audio via OBS” on, your Alerts source shows up in the{" "}
+                  <strong>Audio Mixer</strong>. Check that it is not muted and its slider is up.
+                </li>
+                <li>
+                  Want to hear alerts in your own headphones too? In the Audio Mixer, press the{" "}
+                  <strong>⋮</strong> or gear button, choose{" "}
+                  <strong>Advanced Audio Properties</strong>, and set Alerts to{" "}
+                  <strong>Monitor and Output</strong>.
+                </li>
+                <li>
+                  Test it: in the editor, copy the <strong>Link to test your alerts in OBS</strong>,
+                  paste it into your Alerts source, then switch back to the normal link when you are
+                  done.
+                </li>
+              </ol>
+              <Shot
+                file="obs-audio-mixer.png"
+                alt="The OBS Audio Mixer showing the Alerts source with its volume slider."
+              />
+            </Step>
+          </ol>
+
+          <section aria-labelledby="import-heading">
+            <h2 id="import-heading">Faster: import every scene at once (OBS Studio)</h2>
+            <p>
+              Instead of adding each link by hand, press{" "}
+              <strong>Download OBS scene collection</strong> in the editor’s links section. Then in
+              OBS, open the <strong>Scene Collection</strong> menu, choose <strong>Import</strong>,
+              pick the file and press <strong>Import</strong>, and switch to the{" "}
+              <strong>Overlune</strong> collection. Every scene arrives with your links and sizes,
+              and Alerts already has Control audio via OBS ticked. Add your game and camera to{" "}
+              <strong>Overlune: Live</strong>. Streamlabs can’t import it: use the steps above.
+            </p>
+          </section>
+
+          <section aria-labelledby="rehearse-heading">
+            <h2 id="rehearse-heading">Before your first stream</h2>
+            <p>A five-minute run-through, so nothing surprises you live:</p>
+            <ul className="guide-checklist">
+              <li>Switch to each scene in OBS once and check it fills the screen.</li>
+              <li>Check the countdown shows the right time and time zone.</li>
+              <li>Ask a friend to type in your chat, and check it shows in the Chat overlay.</li>
+              <li>
+                Paste the <strong>Link to test your alerts</strong> into your Alerts source, and
+                check you see and hear every alert.
+              </li>
+              <li>Switch the Alerts source back to your normal Alerts link.</li>
+              <li>Bookmark the editor page: your link is your save file.</li>
+            </ul>
+          </section>
+
+          <Fix id="black-heading" title="Fix: a black or white box">
             <ul>
               <li>
-                <strong>Control audio via OBS:</strong> turn it <strong>on</strong> for Alerts, so
-                your viewers hear the alert sound.
+                <strong>Check the link.</strong> Copy it again from the editor and paste it. If a
+                link was cut short, the overlay shows a message saying what is wrong.
               </li>
               <li>
-                <strong>Shutdown source when not visible:</strong> leave it <strong>off</strong> for
-                Chat and Alerts, so they stay connected when you switch scenes.
+                <strong>Refresh it.</strong> Right-click the source, choose{" "}
+                <strong>Properties</strong>, and press{" "}
+                <strong>Refresh cache of current page</strong>.
               </li>
-              <li>Leave the “Custom CSS” box as it is. It keeps the background see-through.</li>
+              <li>
+                <strong>Custom CSS.</strong> If you changed the “Custom CSS” box, press{" "}
+                <strong>Defaults</strong> at the bottom of the window to bring it back.
+              </li>
+              <li>
+                <strong>Still black?</strong> In OBS, go to <strong>Settings → Advanced</strong> and
+                switch <strong>Browser Source Hardware Acceleration</strong> off (or on, if it was
+                off), then restart OBS.
+              </li>
             </ul>
             <Shot
-              file="obs-properties.png"
-              alt="OBS Browser source properties with the link, width 1920, height 1080 and Control audio via OBS ticked."
+              file="obs-refresh.png"
+              alt="OBS Browser source properties with the Refresh cache of current page button."
+              caption="This example is a Be Right Back scene. For Chat and Alerts, leave “Shutdown source when not visible” unticked."
             />
-          </Step>
+          </Fix>
 
-          <Step
-            n={3}
-            id="audio-heading"
-            title="Make sure alerts can be heard"
-            done={done[2]!}
-            current={current === 2}
-            onDone={toggle(2)}
-          >
+          <Fix id="chat-heading" title="Fix: chat is empty">
+            <ul>
+              <li>
+                <strong>Nothing has been said yet.</strong> The chat box only shows new messages,
+                and it is see-through when empty. Type something in your own Twitch chat to test it.
+              </li>
+              <li>
+                <strong>Check your channel name.</strong> If it is missing or wrong, the chat box
+                shows a message saying so. Fix the name under Chat in the editor, then copy a fresh
+                Chat link into OBS.
+              </li>
+              <li>
+                <strong>Refresh it.</strong> Open the source’s <strong>Properties</strong> and press{" "}
+                <strong>Refresh cache of current page</strong>.
+              </li>
+            </ul>
+          </Fix>
+
+          {/* Two more fixes streamers asked for (T6.72). */}
+          <Fix id="silent-heading" title="Fix: alerts are silent or don’t show">
+            <ul>
+              <li>
+                <strong>Control audio via OBS.</strong> Open the Alerts source’s{" "}
+                <strong>Properties</strong> and tick it. Without it, OBS doesn’t pick up the sound.
+              </li>
+              <li>
+                <strong>Check the Audio Mixer.</strong> The Alerts source must not be muted, and its
+                slider should be up (step 3 above).
+              </li>
+              <li>
+                <strong>Check the volume.</strong> In the editor, under Alerts, 0% turns the sound
+                off. After changing it, copy a fresh Alerts link into OBS.
+              </li>
+              <li>
+                <strong>Test it.</strong> Paste the editor’s{" "}
+                <strong>Link to test your alerts in OBS</strong> into your Alerts source, then
+                switch back to the normal link.
+              </li>
+              <li>
+                <strong>No alert at all?</strong> Alerts use your channel name from Chat in the
+                editor, and they are for raids, subs, gift subs and bits. Follow alerts need a
+                Twitch login, so they come in a later version.
+              </li>
+            </ul>
+          </Fix>
+
+          <Fix id="size-heading" title="Fix: the overlay is the wrong size or cut off">
+            <ul>
+              <li>
+                <strong>Check the size.</strong> In the source’s <strong>Properties</strong>, Width
+                and Height must match the sizes in the table above: 1920 and 1080 for the scenes and
+                Alerts, and the size you picked for Chat and the Webcam frame.
+              </li>
+              <li>
+                <strong>Fit it to the screen.</strong> For a scene or Alerts, right-click the source
+                and choose <strong>Transform → Fit to screen</strong>.
+              </li>
+              <li>
+                <strong>Check your canvas.</strong> In OBS, go to <strong>Settings → Video</strong>.
+                If <strong>Base (Canvas) Resolution</strong> isn’t 1920x1080, Fit to screen still
+                makes the scenes fill it.
+              </li>
+              <li>
+                <strong>Chat cut off?</strong> Change the chat box size under Chat in the editor,
+                copy a fresh Chat link, and type the same width and height in OBS.
+              </li>
+            </ul>
+          </Fix>
+
+          <section aria-labelledby="streamlabs-heading">
+            <h2 id="streamlabs-heading">Using Streamlabs Desktop?</h2>
+            <p>It works the same way, with slightly different names:</p>
             <ol>
               <li>
-                With “Control audio via OBS” on, your Alerts source shows up in the{" "}
-                <strong>Audio Mixer</strong>. Check that it is not muted and its slider is up.
+                In the <strong>Sources</strong> box, press <strong>+</strong>, choose{" "}
+                <strong>Browser Source</strong>, and press <strong>Add Source</strong>.
               </li>
               <li>
-                Want to hear alerts in your own headphones too? In the Audio Mixer, press the{" "}
-                <strong>⋮</strong> or gear button, choose <strong>Advanced Audio Properties</strong>
-                , and set Alerts to <strong>Monitor and Output</strong>.
+                Paste your link into <strong>URL</strong>, and type the width and height from the
+                table above.
               </li>
               <li>
-                Test it: in the editor, copy the <strong>Link to test your alerts in OBS</strong>,
-                paste it into your Alerts source, then switch back to the normal link when you are
-                done.
+                For Alerts, turn on <strong>Control audio via OBS</strong> in the same window, just
+                like in OBS.
               </li>
             </ol>
-            <Shot
-              file="obs-audio-mixer.png"
-              alt="The OBS Audio Mixer showing the Alerts source with its volume slider."
-            />
-          </Step>
-        </ol>
-
-        <section aria-labelledby="import-heading">
-          <h2 id="import-heading">Faster: import every scene at once (OBS Studio)</h2>
-          <p>
-            Instead of adding each link by hand, press{" "}
-            <strong>Download OBS scene collection</strong> in the editor’s links section. Then in
-            OBS, open the <strong>Scene Collection</strong> menu, choose <strong>Import</strong>,
-            pick the file and press <strong>Import</strong>, and switch to the{" "}
-            <strong>Overlune</strong> collection. Every scene arrives with your links and sizes, and
-            Alerts already has Control audio via OBS ticked. Add your game and camera to{" "}
-            <strong>Overlune: Live</strong>. Streamlabs can’t import it: use the steps above.
-          </p>
-        </section>
-
-        <section aria-labelledby="rehearse-heading">
-          <h2 id="rehearse-heading">Before your first stream</h2>
-          <p>A five-minute run-through, so nothing surprises you live:</p>
-          <ul className="guide-checklist">
-            <li>Switch to each scene in OBS once and check it fills the screen.</li>
-            <li>Check the countdown shows the right time and time zone.</li>
-            <li>Ask a friend to type in your chat, and check it shows in the Chat overlay.</li>
-            <li>
-              Paste the <strong>Link to test your alerts</strong> into your Alerts source, and check
-              you see and hear every alert.
-            </li>
-            <li>Switch the Alerts source back to your normal Alerts link.</li>
-            <li>Bookmark the editor page: your link is your save file.</li>
-          </ul>
-        </section>
-
-        <Fix id="black-heading" title="Fix: a black or white box">
-          <ul>
-            <li>
-              <strong>Check the link.</strong> Copy it again from the editor and paste it. If a link
-              was cut short, the overlay shows a message saying what is wrong.
-            </li>
-            <li>
-              <strong>Refresh it.</strong> Right-click the source, choose{" "}
-              <strong>Properties</strong>, and press <strong>Refresh cache of current page</strong>.
-            </li>
-            <li>
-              <strong>Custom CSS.</strong> If you changed the “Custom CSS” box, press{" "}
-              <strong>Defaults</strong> at the bottom of the window to bring it back.
-            </li>
-            <li>
-              <strong>Still black?</strong> In OBS, go to <strong>Settings → Advanced</strong> and
-              switch <strong>Browser Source Hardware Acceleration</strong> off (or on, if it was
-              off), then restart OBS.
-            </li>
-          </ul>
-          <Shot
-            file="obs-refresh.png"
-            alt="OBS Browser source properties with the Refresh cache of current page button."
-            caption="This example is a Be Right Back scene. For Chat and Alerts, leave “Shutdown source when not visible” unticked."
-          />
-        </Fix>
-
-        <Fix id="chat-heading" title="Fix: chat is empty">
-          <ul>
-            <li>
-              <strong>Nothing has been said yet.</strong> The chat box only shows new messages, and
-              it is see-through when empty. Type something in your own Twitch chat to test it.
-            </li>
-            <li>
-              <strong>Check your channel name.</strong> If it is missing or wrong, the chat box
-              shows a message saying so. Fix the name under Chat in the editor, then copy a fresh
-              Chat link into OBS.
-            </li>
-            <li>
-              <strong>Refresh it.</strong> Open the source’s <strong>Properties</strong> and press{" "}
-              <strong>Refresh cache of current page</strong>.
-            </li>
-          </ul>
-        </Fix>
-
-        {/* Two more fixes streamers asked for (T6.72). */}
-        <Fix id="silent-heading" title="Fix: alerts are silent or don’t show">
-          <ul>
-            <li>
-              <strong>Control audio via OBS.</strong> Open the Alerts source’s{" "}
-              <strong>Properties</strong> and tick it. Without it, OBS doesn’t pick up the sound.
-            </li>
-            <li>
-              <strong>Check the Audio Mixer.</strong> The Alerts source must not be muted, and its
-              slider should be up (step 3 above).
-            </li>
-            <li>
-              <strong>Check the volume.</strong> In the editor, under Alerts, 0% turns the sound
-              off. After changing it, copy a fresh Alerts link into OBS.
-            </li>
-            <li>
-              <strong>Test it.</strong> Paste the editor’s{" "}
-              <strong>Link to test your alerts in OBS</strong> into your Alerts source, then switch
-              back to the normal link.
-            </li>
-            <li>
-              <strong>No alert at all?</strong> Alerts use your channel name from Chat in the
-              editor, and they are for raids, subs, gift subs and bits. Follow alerts need a Twitch
-              login, so they come in a later version.
-            </li>
-          </ul>
-        </Fix>
-
-        <Fix id="size-heading" title="Fix: the overlay is the wrong size or cut off">
-          <ul>
-            <li>
-              <strong>Check the size.</strong> In the source’s <strong>Properties</strong>, Width
-              and Height must match the sizes in the table above: 1920 and 1080 for the scenes and
-              Alerts, and the size you picked for Chat and the Webcam frame.
-            </li>
-            <li>
-              <strong>Fit it to the screen.</strong> For a scene or Alerts, right-click the source
-              and choose <strong>Transform → Fit to screen</strong>.
-            </li>
-            <li>
-              <strong>Check your canvas.</strong> In OBS, go to <strong>Settings → Video</strong>.
-              If <strong>Base (Canvas) Resolution</strong> isn’t 1920x1080, Fit to screen still
-              makes the scenes fill it.
-            </li>
-            <li>
-              <strong>Chat cut off?</strong> Change the chat box size under Chat in the editor, copy
-              a fresh Chat link, and type the same width and height in OBS.
-            </li>
-          </ul>
-        </Fix>
-
-        <section aria-labelledby="streamlabs-heading">
-          <h2 id="streamlabs-heading">Using Streamlabs Desktop?</h2>
-          <p>It works the same way, with slightly different names:</p>
-          <ol>
-            <li>
-              In the <strong>Sources</strong> box, press <strong>+</strong>, choose{" "}
-              <strong>Browser Source</strong>, and press <strong>Add Source</strong>.
-            </li>
-            <li>
-              Paste your link into <strong>URL</strong>, and type the width and height from the
-              table above.
-            </li>
-            <li>
-              For Alerts, turn on <strong>Control audio via OBS</strong> in the same window, just
-              like in OBS.
-            </li>
-          </ol>
-        </section>
-      </main>
+          </section>
+        </main>
+      </div>
       <SiteFooter />
     </div>
   );

@@ -986,6 +986,14 @@ export default function LandingPage() {
               lenis.on("scroll", ScrollTrigger.update);
               gsap.ticker.add(tick);
             });
+            // A section link from another page (/#how, T8.1) scrolled before this ran; on wide windows the pinned hero
+            // then adds height above it. Lay everything out now and go there again.
+            const linked = location.hash && document.getElementById(location.hash.slice(1));
+            if (linked)
+              requestAnimationFrame(() => {
+                ScrollTrigger.refresh();
+                linked.scrollIntoView();
+              });
             gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) =>
               gsap.from(el, {
                 y: 48,
