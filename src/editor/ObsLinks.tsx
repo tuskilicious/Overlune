@@ -157,6 +157,14 @@ export default function ObsLinks({
         : { width: settings.frame.width, height: settings.frame.height }),
       optional: true,
     },
+    // Live (T9.7): chat, alerts and the frame in one source, instead of the three above. An extra, like Offline.
+    {
+      id: "live",
+      name: "Live",
+      width: 1920,
+      height: 1080,
+      optional: true,
+    },
   ];
   /** Each link as last copied this visit; kept in memory only (no tracking, no storage). */
   const [copied, setCopied] = useState<Record<string, string>>({});

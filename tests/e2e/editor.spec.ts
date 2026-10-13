@@ -779,7 +779,7 @@ test("each overlay link shows the size to enter in OBS", async ({ page }) => {
   const rows = page
     .getByRole("region", { name: "Links to paste into OBS" })
     .locator(".editor-link");
-  await expect(rows).toHaveCount(7);
+  await expect(rows).toHaveCount(8);
   for (const row of (await rows.all()).slice(0, 4))
     await expect(row).toContainText("Width 1920 · Height 1080");
   // Offline is an extra (T6.147).
@@ -787,6 +787,8 @@ test("each overlay link shows the size to enter in OBS", async ({ page }) => {
   await expect(rows.nth(4)).toContainText("Chat · Width 400 · Height 600");
   await expect(rows.nth(5)).toContainText("Alerts · Width 1920 · Height 1080");
   await expect(rows.nth(6)).toContainText("Webcam frame (optional) · Width 640 · Height 360");
+  // Live (T9.7): chat, alerts and the frame in one, an extra.
+  await expect(rows.nth(7)).toContainText("Live (optional) · Width 1920 · Height 1080");
 });
 
 test("a pasted Twitch link becomes the channel name in the chat link", async ({ page }) => {
@@ -1414,14 +1416,16 @@ test("Copy all links copies every link with its size, and marks them copied (T6.
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.getByRole("button", { name: "Copy all links" }).click();
   await expect(page.locator(".editor-copy-all [role=status]")).toHaveText(
-    "Copied all 7 links with their sizes.",
+    "Copied all 8 links with their sizes.",
   );
   const text = await page.evaluate(() => navigator.clipboard.readText());
   // Windows' clipboard turns line breaks into \r\n.
   expect(text).toMatch(/Starting Soon \(width 1920, height 1080\)\r?\n/);
   expect(text).toMatch(/Chat \(width 400, height 600\)\r?\n/);
   expect(text).toMatch(/Webcam frame \(width 640, height 360\)\r?\n/);
-  expect(text.match(/\/o\/(starting|brb|ending|offline|chat|alerts|frame)#1\./g)).toHaveLength(7);
+  expect(text.match(/\/o\/(starting|brb|ending|offline|chat|alerts|frame|live)#1\./g)).toHaveLength(
+    8,
+  );
   await expect(page.locator(".editor-links-progress")).toContainText("You’re set");
 });
 

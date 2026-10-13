@@ -116,6 +116,12 @@ export default function SetupGuide() {
       height: defaultSettings.frame.height,
       note: "optional; or the size you picked. Put it above your camera and line them up",
     },
+    {
+      name: "Live",
+      width: 1920,
+      height: 1080,
+      note: "optional: chat, alerts and the webcam frame in one source, instead of those three",
+    },
   ];
   return (
     <div className="editor guide site-sky" style={themeVars(brandChrome)}>
