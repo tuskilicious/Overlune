@@ -27,7 +27,8 @@ const textStyle = (el: { size?: number; color?: string; align?: string }): CSSPr
   textAlign: el.align as CSSProperties["textAlign"],
 });
 
-/** Shrinks a text element's font until it fits its box, like the composed scene's long titles (T6.26). */
+/** Shrinks a text element's font until it fits its box, like the composed scene's long titles (T6.26). On the canvas the
+ *  streamer picks the box, so it may go down to 12px instead of stopping at a share of the look's size. */
 function Fitted({
   className,
   style,
@@ -45,7 +46,7 @@ function Fitted({
     const fit = () => {
       el.style.fontSize = "";
       const base = parseFloat(getComputedStyle(el).fontSize);
-      for (let size = base; el.scrollHeight > box.clientHeight && size > base * 0.35;) {
+      for (let size = base; el.scrollHeight > box.clientHeight && size > 12;) {
         size = Math.round(size * 0.9);
         el.style.fontSize = `${size}px`;
       }
