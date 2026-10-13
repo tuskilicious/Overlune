@@ -107,7 +107,7 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 > Claude can draft these. They are self-written and self-reviewed by the maintainer (Overlune is a free, non-commercial hobby project with no lawyer), and must say they are not legal advice. Requirements vary by jurisdiction (GDPR, CCPA, COPPA, etc.).
 
 - **Documents:** privacy policy and terms of service, in `docs/legal/` and linked in the footer. No refund policy is needed while the product is free. The footer shows a contact email. An individual maintainer does not publish a home address.
-- **Privacy policy must state:** no accounts; settings live in the user's link and browser; Twitch chat is read anonymously; what Sentry collects; any analytics.
+- **Privacy policy must state:** accounts are optional, and for those who sign in with Twitch, what is stored, why, for how long (backups included) and how to see and delete it; settings live in the user's link and browser; Twitch chat is read anonymously; what Sentry collects; any analytics.
 - **Consent:** no cookie banner as long as there are no non-essential cookies or trackers. Adding analytics needs approval and must be cookie-free. Approved (2026-10-08): Cloudflare Web Analytics, injected by Cloudflare Pages; cookie-free, and it never sends the part of a link after `#`.
 - **Fair practice:** no dark patterns and no unsupported claims. License all fonts, sounds and images, and record them in `docs/ASSETS.md`.
 - **Accessibility:** editor meets WCAG AA contrast, has full keyboard navigation with visible focus, and has meaningful alt text. Overlays support reduced motion.
