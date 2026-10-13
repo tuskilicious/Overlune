@@ -35,7 +35,8 @@ async function api(page: Page, signedIn: boolean) {
   return calls;
 }
 
-const header = (page: Page) => page.locator(".editor-header");
+// The account sits in the site nav, where other pages have "Open the editor" (T8.1).
+const header = (page: Page) => page.getByRole("navigation", { name: "Main" });
 
 test("without the account API (as on `npm run dev`, or production before T7.9) the editor shows no account controls", async ({
   page,

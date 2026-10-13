@@ -206,15 +206,6 @@
   background: var(--bg);
 }
 
-.guide-logo {
-  display: inline-block;
-  margin-bottom: 8px;
-}
-
-.guide-logo img {
-  display: block;
-}
-
 .guide h2 {
   margin: 0 0 8px;
   font-family: var(--font-heading);

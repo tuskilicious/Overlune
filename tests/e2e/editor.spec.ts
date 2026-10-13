@@ -462,7 +462,9 @@ test("the look picker shows each theme as a picture you can click", async ({ pag
 });
 
 test("the editor shows Starting Soon in the preview by default", async ({ page }) => {
-  await expect(page.getByRole("heading", { name: "Overlune" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Free stream overlays that look pro." }),
+  ).toBeVisible();
   await expect(page.getByRole("radio", { name: "Clean Slate" })).toBeChecked();
   await expect(previewTitle(page, "Starting soon")).toBeVisible();
 });

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
 import type { Flip as FlipType } from "gsap/Flip";
-import { Link } from "react-router";
 import { localZone } from "../lib/time";
 import { useMotion, type PluginLoader } from "../lib/motion";
 import StartingSoon from "../overlays/starting/StartingSoon";
@@ -23,6 +22,7 @@ import ObsLinks, { overlays, type OverlayId as Scene } from "./ObsLinks";
 import Preview from "./Preview";
 import { sampleScene } from "./scene-samples";
 import SiteFooter from "../components/SiteFooter";
+import SiteNav from "../components/SiteNav";
 import "./editor.css";
 import Icon from "../components/Icon";
 import Account from "./Account";
@@ -699,7 +699,7 @@ export default function EditorPage() {
   };
 
   return (
-    <div className="editor" style={themeVars(brandChrome)}>
+    <div className="editor site-sky" style={themeVars(brandChrome)}>
       {/* No real #fragment jump: the address bar's fragment holds the settings. */}
       <a
         hidden={welcome}
@@ -709,21 +709,12 @@ export default function EditorPage() {
       >
         Skip to your OBS links
       </a>
+      {/* The site's nav (T8.1), with the account where other pages have "Open the editor" (T7.4). */}
+      <SiteNav position="static" action={<Account />} />
       <header className="editor-header">
-        {/* The logo leads home, as on the guide and legal pages (T6.67); the account sits on its right (T7.4). */}
-        <div className="editor-header-top">
-          <h1>
-            <Link to="/">
-              <img src="/images/brand/logo.png" alt="Overlune home" width="159" height="48" />
-            </Link>
-          </h1>
-          <Account />
-        </div>
         {/* The primary tagline from docs/BRAND.md, then what to do (T6.33). */}
-        <p>
-          <strong className="editor-tagline">Free stream overlays that look pro.</strong> Pick a
-          look, add your text, then paste into OBS.
-        </p>
+        <h1 className="editor-tagline">Free stream overlays that look pro.</h1>
+        <p>Pick a look, add your text, then paste into OBS.</p>
       </header>
 
       {/* One quiet line until something is made, then the bookmark reminder leads (T6.12). */}

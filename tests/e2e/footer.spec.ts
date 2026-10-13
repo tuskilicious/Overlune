@@ -72,3 +72,47 @@ test("an unknown address shows a not-found page with a way back (T6.51)", async 
   await page.getByRole("link", { name: "Make your overlays" }).click();
   await expect(page).toHaveURL(/\/editor$/);
 });
+
+test("every page has the site's one nav, and none scrolls sideways on a phone (T8.1)", async ({
+  page,
+}) => {
+  for (const [path, action] of [
+    ["/", "Open the editor"],
+    ["/guide", "Open the editor"],
+    ["/privacy", "Open the editor"],
+    ["/terms", "Open the editor"],
+    ["/nope", "Open the editor"],
+    ["/editor", null],
+  ] as const) {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(path);
+    const nav = page.getByRole("navigation", { name: "Main" });
+    await expect(nav.getByRole("link", { name: "Overlune home" }), path).toHaveAttribute(
+      "href",
+      "/",
+    );
+    await expect(nav.getByRole("link", { name: "Setup guide" }), path).toBeVisible();
+    if (action)
+      await expect(nav.getByRole("link", { name: action }), path).toHaveAttribute(
+        "href",
+        "/editor",
+      );
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+      path,
+    ).toBeLessThanOrEqual(390);
+  }
+  // From another page, the nav's section links lead to that part of the home page.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/guide");
+  await expect(
+    page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Setup guide" }),
+  ).toHaveAttribute("aria-current", "page");
+  await page
+    .getByRole("navigation", { name: "Main" })
+    .getByRole("link", { name: "How it works" })
+    .click();
+  await expect(page).toHaveURL(/\/#how$/);
+  await expect(page.locator("#how")).toBeInViewport();
+});

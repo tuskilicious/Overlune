@@ -61,18 +61,15 @@
   color: var(--accent);
 }
 
+/* Room between the site nav (T8.1) and the page's heading; small, so a 1366×768 laptop still sees the whole
+   preview (T6.49). */
+.editor-header {
+  margin-top: 12px;
+}
+
 .editor-header h1 {
   margin: 0;
   font-family: var(--font-heading);
-}
-
-/* The logo and the account on one row (T7.4); the account wraps under the logo on narrow windows. */
-.editor-header-top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px 24px;
 }
 
 /* Sign in with Twitch (T7.4): an outline button, as the brand keeps the filled one for Copy link. Signed in: the
@@ -156,23 +153,15 @@
   display: none;
 }
 
-/* Block, so the logo has no gap under it; the guide's h1 is text and keeps its line height. */
-.editor-header h1 img {
-  display: block;
-}
-
-/* The logo is a link home (T6.67); its focus ring hugs the image. */
-.editor-header h1 a {
-  display: inline-block;
-}
-
 .editor-header p {
   margin: 4px 0 24px;
   color: var(--text-muted);
 }
 
+/* The editor's heading is the brand's tagline (T8.1), at the section-heading size. */
 .editor-tagline {
   font-family: var(--font-heading);
+  font-size: 22px;
   color: var(--text);
 }
 
@@ -1810,7 +1799,8 @@
   position: relative;
 }
 
-.editor .editor-reset {
+/* Only in the form: Start over's confirmation shares the class, and pinned here it landed in the page's top corner. */
+.editor .editor-form .editor-reset {
   position: absolute;
   top: 12px;
   right: 16px;

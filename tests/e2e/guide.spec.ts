@@ -8,7 +8,10 @@ test("the editor links to the setup guide and back", async ({ page }) => {
   await expect(page).toHaveURL(/\/guide$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Set up your overlays in OBS");
 
-  await page.getByRole("link", { name: "Back to the editor" }).click();
+  await page
+    .getByRole("navigation", { name: "Main" })
+    .getByRole("link", { name: "Open the editor" })
+    .click();
   await expect(page.getByRole("heading", { name: "Links to paste into OBS" })).toBeVisible();
 });
 

@@ -1,0 +1,130 @@
+/* The site's one nav (T8.1), on every page: the home page's floating pill (T6.59). Plain CSS, as Tailwind is scoped to
+   the home page. The colors are the brand's (docs/BRAND.md; the same values as landing.css and brand.ts), written
+   here because the nav sits outside both scopes. */
+.site-nav {
+  --nav-night: #05061a;
+  --nav-moon: #f4f1ff;
+  --nav-haze: #a7a0d6;
+  --nav-violet: #a45efc;
+  box-sizing: border-box;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: min(64rem, calc(100% - 2rem));
+  margin: 16px auto 0;
+  padding: 8px 8px 8px 20px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 999px;
+  background: rgb(5 6 26 / 0.7);
+  backdrop-filter: blur(12px);
+  font-family: "Quicksand", sans-serif;
+  font-size: 16px;
+  color: var(--nav-haze);
+}
+
+.site-nav[data-position="fixed"] {
+  position: fixed;
+  inset: 0 0 auto;
+  top: 16px;
+  margin-top: 0;
+}
+
+.site-nav[data-position="sticky"] {
+  position: sticky;
+  top: 16px;
+}
+
+/* In the editor the nav spans the work area, so its ends line up with the columns under it. Relative, so the account
+   menu that drops from it stays above the page (z-index needs a position). */
+.site-nav[data-position="static"] {
+  position: relative;
+  width: 100%;
+  margin-top: 0;
+}
+
+.site-nav-logo,
+.site-nav-logo img {
+  display: block;
+}
+
+.site-nav-links {
+  display: none;
+  align-items: center;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .site-nav-links {
+    display: flex;
+  }
+}
+
+.site-nav-links a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-nav-links a:hover,
+.site-nav-links a[aria-current] {
+  color: var(--nav-moon);
+}
+
+/* The page or section you're on: a violet underline, as the home page's nav marks the section in view. */
+.site-nav-links a[aria-current] {
+  text-decoration: underline 2px var(--nav-violet);
+  text-underline-offset: 8px;
+}
+
+/* The one filled button style (DESIGN.md): Lune Violet with Night text. */
+.site-nav-cta {
+  flex-shrink: 0;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: var(--nav-violet);
+  color: var(--nav-night);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 300ms;
+}
+
+.site-nav-cta:hover {
+  background: var(--nav-moon);
+}
+
+.site-nav a:focus-visible {
+  outline: 2px solid var(--nav-violet);
+  outline-offset: 2px;
+}
+
+/* Phones: the logo and the button share the bar, so the button stays its natural size (the audit found it taking
+   half the bar). */
+@media (max-width: 480px) {
+  .site-nav {
+    padding-left: 14px;
+  }
+
+  .site-nav-cta {
+    padding: 8px 16px;
+    font-size: 15px;
+  }
+}
+
+/* The night-sky ground behind every page but the home page, whose hero has its own sky: a few static stars and a
+   soft violet glow at the top, never behind body text (BRAND.md). No motion, so no reduced-motion version. */
+div.site-sky {
+  background-color: var(--bg, #05061a);
+  background-image:
+    radial-gradient(circle at 8% 6%, rgb(244 241 255 / 0.55) 0 1px, transparent 2px),
+    radial-gradient(circle at 27% 14%, rgb(244 241 255 / 0.4) 0 1px, transparent 2px),
+    radial-gradient(circle at 63% 4%, rgb(244 241 255 / 0.5) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 81% 12%, rgb(244 241 255 / 0.4) 0 1px, transparent 2px),
+    radial-gradient(circle at 94% 3%, rgb(244 241 255 / 0.5) 0 1px, transparent 2px),
+    radial-gradient(60rem 26rem at 50% -8rem, rgb(74 42 227 / 0.3), transparent 70%);
+  background-repeat: no-repeat;
+  background-size: 100% 32rem;
+}
