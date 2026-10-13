@@ -98,10 +98,15 @@ test("every page has the site's one nav, and none scrolls sideways on a phone (T
         "/editor",
       );
     await page.setViewportSize({ width: 390, height: 844 });
-    expect(
-      await page.evaluate(() => document.documentElement.scrollWidth),
-      path,
-    ).toBeLessThanOrEqual(390);
+    // On failure, name what sticks out, since it can depend on the machine's fonts.
+    const wide = await page.evaluate(() => ({
+      width: document.documentElement.scrollWidth,
+      out: [...document.querySelectorAll("body *")]
+        .filter((el) => el.getBoundingClientRect().right > innerWidth)
+        .map((el) => `${el.tagName}.${el.className} "${el.textContent!.slice(0, 40)}"`)
+        .slice(-3),
+    }));
+    expect(wide.width, `${path}: ${wide.out.join(" | ")}`).toBeLessThanOrEqual(390);
   }
   // From another page, the nav's section links lead to that part of the home page.
   await page.setViewportSize({ width: 1440, height: 900 });

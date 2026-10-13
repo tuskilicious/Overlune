@@ -714,3 +714,33 @@ Approved by the owner 2026-10-09 (`docs/PRD.md` "v2 Phase 1", `docs/STACK.md` "B
 - [x] **T7.10 Release v1.6.0.** Phase 7 (T7.1 to T7.9) is merged and Sign in with Twitch is live on production, but not in a release. The owner asked to cut 1.6.0 after the launch check.
   - Accept: version 1.6.0 (new, optional accounts; no overlay or link changes); a dated changelog section in plain words; README and FUTURE-SCOPE.md name 1.6.0; the GitHub release published after the deploy is checked.
   - *Built 2026-10-13 on `chore/release-1.6.0`. `package.json` 1.6.0; CHANGELOG "1.6.0 (2026-10-13)": Accounts (Sign in with Twitch, the account menu, groundwork for saved overlays) and Privacy and safety (the rewritten policy and terms, the two cookies, limits, backups). No overlay changed, so no OBS test beyond the launch check's.*
+
+## Phase 8: Website polish
+Planned with the owner 2026-10-13, after an audit of every page at 1440×900 and 390×844 against DESIGN.md. The home page is rich (night sky, glow, motion, bento, the ruler); the editor, guide, legal pages and 404 are plain utility pages, so the site feels like two products. This phase carries the home page's world into every page. No overlay or overlay link changes. Each task is its own PR with a preview the owner checks; the audit's one real bug (home page copy saying there are no accounts) was fixed first (#207).
+
+The order after this phase, agreed the same day: vertical overlays (Phase 9), four new looks (Phase 10), saved overlays (Phase 11), then the Overlune Dock and the Android app (Phase 12). Vertical comes before the new looks so they're built vertical-ready.
+
+- [ ] **T8.1 Shared site shell.** The home page's floating nav, night-sky ground and outlined-wordmark footer on every page: guide, privacy, terms, 404 and the editor's header. One component set, not copies; the nav marks the current page.
+  - Accept: every page has the same nav and footer; axe clean; no sideways scroll at 390px; e2e for the nav on each page.
+- [ ] **T8.2 Setup guide.** A centred layout with a sticky table of contents on wide windows (the index chips become it), steps at full width on phones, and the site nav in place of "Back to the editor" alone.
+  - Accept: the table of contents follows the section in view (`aria-current`); phones get the steps full width; axe clean; checked at 1440, 1024, 768 and 390px.
+- [ ] **T8.3 Legal pages.** Privacy and terms in the same centred layout, a table of contents built from their headings, and a readable measure and spacing.
+  - Accept: the table of contents comes from `docs/legal/*.md` (no second copy); the footer e2e still passes; axe clean.
+- [ ] **T8.4 Editor polish.** The first-visit gallery gets a hero-style header and the home page's glow on look cards; the header, save box and account menu join the same family.
+  - Accept: the editor's rules in DESIGN.md still hold (one filled button, tokens, focus rings); axe clean narrow and wide; the owner approves the preview.
+- [ ] **T8.5 Home page fixes.** The empty gap under "Your whole stream, in one look"; the fact row (no orphan "Open source"); where the hero's alert cards sit; the Webcam frame and Chat card thumbnails; a quieter scroll ruler; the top bar on phones.
+  - Accept: each item fixed and seen in the preview; landing e2e passes.
+- [ ] **T8.6 Review pass.** Screenshots of every page at 1440, 1024, 768 and 390px with the browser painting live (a background preview pane freezes GSAP mid-reveal, which looked like overlapping text in the audit), axe and e2e clean, DESIGN.md updated for the shell.
+  - Accept: the owner signs off the screenshots.
+
+## Phase 9: Vertical overlays (planned)
+Overlays for a 1080×1920 canvas (TikTok, Shorts, OBS 32.1+ vertical canvases, Aitum Vertical): every look's four scenes recomposed for a tall frame, chat and alerts placed for vertical, and vertical webcam frame sizes. A new optional link option, so no existing link changes (a migration plus fixtures if the payload grows). Size L: it touches all 16 looks. Broken into tasks when it starts.
+
+## Phase 10: Four new looks (planned)
+Eclipse, Rain City, Paper Cut and Aurora Tundra (picked by the owner 2026-10-13), each with its own world and **the lune**, Overlune's signature: a crescent moon made from that look's own material (a corona, a neon sign, cut paper, frost). The bar in DESIGN.md applies, plus vertical versions from the start. Broken into tasks when it starts.
+
+## Phase 11: Saved overlays (planned, v2 Phase 2)
+Save an overlay to your account and paste its links once; edits reach OBS live through a Durable Object, and each link keeps a snapshot so it renders if the API is down. Open questions from 2026-10-13: where the Durable Object runs (a small separate Worker, recommended, or moving the site to Workers), edits going live on an "Update OBS" button or by autosave, and 10 saved overlays per account.
+
+## Phase 12: Overlune Dock and the Android app (planned)
+Approved in principle by the owner 2026-10-13. One dock UI in this repo, used in three places: `overlune.in/dock` as an OBS Custom Browser Dock (controls OBS through obs-websocket on `ws://localhost:4455`, which browsers allow from an https page, and Overlune overlays through `BroadcastChannel`, as the owner's kits do); an Android app that wraps the same UI with Capacitor (an installed app may reach OBS on the local network; the phone reaches overlays through obs-websocket's `BroadcastCustomEvent` and the dock); and, after Phase 11, settings that follow the account. Goal: everything OBS Blade's free version does (scenes, sources, Studio Mode, transitions, stream, record, replay buffer, virtual camera, audio with meters, preview, profiles, collections, hotkeys, stats), plus Overlune's own controls and chat. Built from scratch on the public obs-websocket protocol: no OBS Blade code (it's GPL-3.0). The OBS password stays in the dock or on the phone, never in a link or on Overlune's servers. Android first (Google Play, one-time $25, plus an APK on GitHub); iPhone later. Capacitor is a new dependency, approved for this phase. Broken into tasks when it starts.

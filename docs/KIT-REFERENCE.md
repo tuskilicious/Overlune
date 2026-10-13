@@ -45,6 +45,6 @@ Both kits ship a dock that runs inside OBS. Overlune's editor is a web page whos
 - **Callouts for the one thing that goes wrong** (Tuski: "the dock's status light tells you whether it found the overlay"; ICARUS: "Lock the key to YouTube"). *In:* the guide's fixes section; keep each fix next to the step it belongs to.
 
 ## 4. What not to take
-- Their per-machine setup (a local web server, a WebSocket password): Overlune stays one link per overlay, no install.
+- Their per-machine setup (a local web server, a WebSocket password): Overlune stays one link per overlay, no install. *Exception (owner, 2026-10-13):* the optional Overlune Dock and Android app (TASKS.md Phase 12) use obs-websocket and its password, kept in the dock or on the phone only. Overlay links never change for it.
 - YouTube API keys and quota juggling: out of scope until v2 (PRD).
 - Anything that puts a secret or a token in a link.

@@ -49,6 +49,9 @@ The moment Phase 1 code lands, CLAUDE.md sections 4 (data), 5 (auth) and 8 (abus
 
 Follow alerts could skip the backend by connecting to Streamer.bot running on the streamer's PC. That works without an account, but it means installing and setting up another app, which is too much for the beginners Overlune is for. So the backend route is the plan (confirmed with the Cloudflare choice, 2026-10-09).
 
+## Planned after v2 Phase 1 (owner, 2026-10-13)
+In order, each in `docs/TASKS.md`: website polish (Phase 8), vertical overlays (Phase 9), four new looks with the lune signature (Phase 10), saved overlays (Phase 11, v2 Phase 2 above), then the Overlune Dock and an Android app (Phase 12), an OBS remote built on obs-websocket with Overlune's own controls.
+
 ## Later, maybe
 Bigger ideas, to decide on after v2 Phase 2 and real use:
 - **YouTube chat and alerts.** YouTube only shares live chat through its API, which needs a server and has a small free daily allowance that a popular overlay would use up fast. Revisit once the backend exists and the costs are clear.
