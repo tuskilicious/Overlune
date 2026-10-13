@@ -18,21 +18,8 @@ import {
   type Guide,
   type Handle,
 } from "./geometry";
+import { Inspector, Layers, elementName, type Change } from "./Panels";
 import "./canvas.css";
-
-/** What each element is called on the canvas: its tag, and later the layers panel (T9.5). */
-export const elementName = (el: LayoutElement): string =>
-  ({
-    title: "Title",
-    subtitle: "Subtitle",
-    countdown: "Countdown",
-    socials: "Socials",
-    logo: "Logo",
-    ticker: "Ticker",
-    text: "Text",
-    image: "Image",
-    shape: "Shape",
-  })[el.type];
 
 type Gesture =
   | { mode: "move"; x: number; y: number; from: LayoutElement[] }
@@ -169,6 +156,25 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
     setDraft(null);
   };
 
+  const one = selected.length === 1 ? shown.find((el) => el.id === selected[0]) : undefined;
+  /** One element changed, from the panels. */
+  const change: Change = (id, patch, merge) =>
+    onCommit(
+      elements.map((el) => (el.id === id ? ({ ...el, ...patch } as LayoutElement) : el)),
+      merge,
+    );
+  /** Up (1) or down (-1) one layer: later in the list is on top. */
+  const move = (id: string, by: 1 | -1) => {
+    const at = elements.findIndex((el) => el.id === id);
+    const to = at + by;
+    if (at === -1 || to < 0 || to >= elements.length) return;
+    const next = [...elements];
+    [next[at], next[to]] = [next[to]!, next[at]!];
+    onCommit(next);
+  };
+  const select = (id: string, add: boolean) =>
+    setSelected((s) => (add ? (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]) : [id]));
+
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Escape") {
       setSelected([]);
@@ -181,6 +187,11 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
       if (next < 0 || next >= shown.length || (at === -1 && e.shiftKey)) return;
       e.preventDefault();
       setSelected([shown[at === -1 ? 0 : next]!.id]);
+      return;
+    }
+    if ((e.key === "[" || e.key === "]") && one) {
+      e.preventDefault();
+      move(one.id, e.key === "]" ? 1 : -1);
       return;
     }
     const arrows: Record<string, [number, number]> = {
@@ -211,75 +222,86 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
     height: el.h * scale,
     rotate: el.r ? `${el.r}deg` : undefined,
   });
-  const one = selected.length === 1 ? shown.find((el) => el.id === selected[0]) : undefined;
 
   return (
-    <div
-      ref={area}
-      className="canvas"
-      tabIndex={0}
-      aria-label="Canvas. Tab picks an element, the arrow keys move it, Alt and the arrow keys resize it."
-      aria-describedby="canvas-status"
-      onKeyDown={onKeyDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerUp}
-      onPointerDown={() => setSelected([])}
-      style={{ aspectRatio: `${size.width} / ${size.height}` }}
-    >
-      <Preview width={size.width} height={size.height}>
-        {scene(withElements(shown))}
-      </Preview>
-      <div className="canvas-layer">
-        {shown
-          .filter((el) => !el.hidden)
-          .map((el) => (
-            <div
-              key={el.id}
-              className="canvas-hit"
-              data-id={el.id}
-              data-locked={el.locked || undefined}
-              style={box(el)}
-              onPointerDown={(e) => startMove(e, el.id)}
+    <div className="canvas-editor">
+      <div
+        ref={area}
+        className="canvas"
+        tabIndex={0}
+        aria-label="Canvas. Tab picks an element, the arrow keys move it, Alt and the arrow keys resize it."
+        aria-describedby="canvas-status"
+        onKeyDown={onKeyDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        onPointerDown={() => setSelected([])}
+        style={{ aspectRatio: `${size.width} / ${size.height}` }}
+      >
+        <Preview width={size.width} height={size.height}>
+          {scene(withElements(shown))}
+        </Preview>
+        <div className="canvas-layer">
+          {shown
+            .filter((el) => !el.hidden)
+            .map((el) => (
+              <div
+                key={el.id}
+                className="canvas-hit"
+                data-id={el.id}
+                data-locked={el.locked || undefined}
+                style={box(el)}
+                onPointerDown={(e) => startMove(e, el.id)}
+              />
+            ))}
+          {shown
+            .filter((el) => selected.includes(el.id))
+            .map((el) => (
+              <div key={el.id} className="canvas-selection" style={box(el)} aria-hidden>
+                <span className="canvas-tag">{elementName(el)}</span>
+                {el === one &&
+                  !el.locked &&
+                  handles.map((h) => (
+                    <span
+                      key={h}
+                      className="canvas-handle"
+                      data-handle={h}
+                      onPointerDown={(e) => startResize(e, h)}
+                    />
+                  ))}
+                {el === one && !el.locked && (
+                  <span className="canvas-rotate" onPointerDown={startRotate} />
+                )}
+              </div>
+            ))}
+          {guides.map((g, i) => (
+            <span
+              key={i}
+              className="canvas-guide"
+              style={"x" in g ? { left: g.x * scale } : { top: g.y * scale }}
+              data-axis={"x" in g ? "x" : "y"}
+              aria-hidden
             />
           ))}
-        {shown
-          .filter((el) => selected.includes(el.id))
-          .map((el) => (
-            <div key={el.id} className="canvas-selection" style={box(el)} aria-hidden>
-              <span className="canvas-tag">{elementName(el)}</span>
-              {el === one &&
-                !el.locked &&
-                handles.map((h) => (
-                  <span
-                    key={h}
-                    className="canvas-handle"
-                    data-handle={h}
-                    onPointerDown={(e) => startResize(e, h)}
-                  />
-                ))}
-              {el === one && !el.locked && (
-                <span className="canvas-rotate" onPointerDown={startRotate} />
-              )}
-            </div>
-          ))}
-        {guides.map((g, i) => (
-          <span
-            key={i}
-            className="canvas-guide"
-            style={"x" in g ? { left: g.x * scale } : { top: g.y * scale }}
-            data-axis={"x" in g ? "x" : "y"}
-            aria-hidden
-          />
-        ))}
+        </div>
+        <p id="canvas-status" className="sr-only" role="status">
+          {one
+            ? `${elementName(one)} selected, at ${one.x}, ${one.y}, ${one.w} by ${one.h}${one.r ? `, turned ${one.r} degrees` : ""}${one.locked ? ", locked" : ""}.`
+            : selected.length
+              ? `${selected.length} elements selected.`
+              : "Nothing selected."}
+        </p>
       </div>
-      <p id="canvas-status" className="sr-only" role="status">
-        {one
-          ? `${elementName(one)} selected, at ${one.x}, ${one.y}, ${one.w} by ${one.h}${one.r ? `, turned ${one.r} degrees` : ""}${one.locked ? ", locked" : ""}.`
-          : selected.length
-            ? `${selected.length} elements selected.`
-            : "Nothing selected."}
-      </p>
+      <div className="canvas-panels">
+        <Layers
+          elements={elements}
+          selected={selected}
+          onSelect={select}
+          change={change}
+          move={move}
+        />
+        <Inspector el={one && elements.find((el) => el.id === one.id)} change={change} />
+      </div>
     </div>
   );
 }

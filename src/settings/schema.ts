@@ -66,6 +66,8 @@ const elementBase = {
   o: z.number().min(0).max(1).default(1),
   hidden: z.boolean().default(false),
   locked: z.boolean().default(false),
+  /** The streamer's own name for it in the layers panel (T9.5); "" shows the type's name. */
+  name: text(40),
 };
 
 /** Style a scene's own text can take on the canvas; unset keeps the look's. */
