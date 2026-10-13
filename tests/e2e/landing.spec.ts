@@ -301,11 +301,23 @@ for (const width of [390, 768, 1024, 1280, 1440]) {
 
 // T6.59: the hero shows the whole kit, touring the looks; it can be paused, and reduced motion starts it paused.
 test("the hero kit tours the looks and scenes, and Pause stops it", async ({ page }) => {
-  await page.clock.install();
+  // A paused fake clock: an installed one keeps ticking in real time, so a slow load would advance the tour itself.
+  const start = new Date("2026-10-03T12:00:00Z").getTime();
+  await page.clock.install({ time: start });
+  await page.clock.pauseAt(start + 1000);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const kit = page.locator("figure[data-kit]");
-  await expect(kit.locator(".scene")).toHaveCount(1);
+  // React shows the lazy page on a timer, so step the clock until the kit is up; its tour starts from there.
+  await expect
+    .poll(
+      async () => {
+        await page.clock.runFor(50);
+        return kit.locator(".scene").count();
+      },
+      { timeout: 15_000 },
+    )
+    .toBe(1);
   await expect(kit.getByText("LIVE", { exact: true })).toBeVisible();
   await expect(kit.locator(".alert-box")).toHaveCount(2);
   const tags = kit.getByRole("list", { name: "Scenes in every look" }).getByRole("listitem");
@@ -313,12 +325,13 @@ test("the hero kit tours the looks and scenes, and Pause stops it", async ({ pag
   await expect(tags.first()).toHaveAttribute("aria-current", "true");
   await expect(kit).toHaveAttribute("data-kit", "vaporwave-sunset");
 
-  await page.clock.runFor(4600);
+  // Jump, not runFor: stepping every animation frame of the live page takes longer than the test's timeout.
+  await page.clock.fastForward(4600);
   await expect(kit).toHaveAttribute("data-kit", "cozy-cafe");
   await expect(tags.nth(1)).toHaveAttribute("aria-current", "true");
 
   await page.getByRole("button", { name: "Pause the looks" }).click();
-  await page.clock.runFor(10_000);
+  await page.clock.fastForward(10_000);
   await expect(kit).toHaveAttribute("data-kit", "cozy-cafe");
   await expect(page.getByRole("button", { name: "Play the looks" })).toBeVisible();
 });

@@ -97,6 +97,15 @@ test("every page has the site's one nav, and none scrolls sideways on a phone (T
         "href",
         "/editor",
       );
+    // The narrowest window that shows the links (960px): each stays on one line (T8.6 found two wrapping at 768px).
+    await page.setViewportSize({ width: 960, height: 900 });
+    const wrapped = await nav
+      .getByRole("listitem")
+      .getByRole("link")
+      .evaluateAll((links) =>
+        links.filter((a) => a.getClientRects().length > 1).map((a) => a.textContent),
+      );
+    expect(wrapped, path).toEqual([]);
     await page.setViewportSize({ width: 390, height: 844 });
     // On failure, name what sticks out, since it can depend on the machine's fonts.
     const wide = await page.evaluate(() => ({
@@ -145,3 +154,30 @@ test("the legal pages index their own headings and mark the part you're reading 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(index).toBeHidden();
 });
+
+// T8.6: one axe pass over every page of the site, phone and wide, now that they share the shell.
+for (const width of [390, 1440])
+  test(`every page is axe clean at ${width}px (T8.6)`, async ({ page }) => {
+    test.slow(); // seven pages, each fully loaded
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+    for (const [path, pick] of [
+      ["/", null],
+      ["/guide", null],
+      ["/privacy", null],
+      ["/terms", null],
+      ["/nope", null],
+      ["/editor", null],
+      ["/editor", "Neon Grid"],
+    ] as const) {
+      await page.goto(path);
+      await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
+      if (pick) await page.getByRole("button", { name: pick, exact: true }).click();
+      const scan = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+        .analyze();
+      expect(
+        scan.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`),
+        `${path}${pick ? ` (${pick})` : ""}`,
+      ).toEqual([]);
+    }
+  });
