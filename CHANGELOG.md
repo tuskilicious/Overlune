@@ -2,6 +2,32 @@
 
 What changed in each Overlune release. Overlay links from every release keep working: the link format only ever gains optional settings.
 
+## 2.0.0 (2026-10-14)
+
+Move anything, anywhere: a canvas editor for every scene, a Live overlay that puts chat, alerts and your webcam frame in one source, and any canvas size. It's a big new version, but every link you've already pasted still works exactly as before: customizing is optional, and only links you copy after customizing carry a layout.
+
+### Canvas editor
+- **Customize any scene:** press Customize above the preview, then drag, resize and turn the title, countdown, logo, socials and ticker. Parts snap to the edges, the middle and each other, and each look starts from its own layout, so nothing jumps.
+- **Layers and Inspector:** hide, lock and reorder parts, and set an exact place, size, turn, see-through and colors.
+- **Add your own:** text, shapes and pictures (https links), up to 40 things per scene. Delete a part of the look and "Put back" returns it.
+- **Reset to the look** puts a scene back, and Undo takes back a whole drag.
+- **By keyboard too:** Tab picks a part, the arrow keys move it, Alt resizes it, and a "Keyboard keys" list shows them all. Screen readers hear what's picked and where.
+
+### Live overlay
+- **One source for going live:** the new Live link shows chat, alerts and the webcam frame together, each in a box you can move on the canvas. Use it instead of those three, or keep them separate as before.
+
+### Canvas sizes
+- **Your OBS canvas size:** pick 1280×720, 2560×1440, 4K or your own size next to the preview, and the scenes and Live fill it exactly. Your layout moves over with it.
+
+### Alerts
+- **Follow alerts in every look.** Follows need you to sign in with Twitch, and start showing in a coming update.
+
+### Site
+- **One site:** the night sky and the same navigation on every page; the setup guide, privacy policy and terms with an index that follows your place.
+- **A look gallery** on your first visit to the editor.
+- **The guide covers customizing,** with the canvas keys.
+- **Fixes:** the account menu stays closed until you open it, and text meant only for screen readers no longer shows on the editor and guide.
+
 ## 1.6.0 (2026-10-13)
 
 Sign in with Twitch, if you want to. Everything still works without an account, and overlays and their links are unchanged: there is nothing to re-paste.
