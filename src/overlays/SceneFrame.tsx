@@ -11,6 +11,7 @@ import type { Settings } from "../settings/schema";
 import { themes } from "../themes";
 import "../themes/fonts";
 import { applyOverrides, themeVars } from "../themes/vars";
+import { canvasOf } from "./measure";
 import SocialIcon from "./social-icons";
 import "./scene.css";
 import "./layouts.css";
@@ -51,6 +52,14 @@ export function TwoTone({ text }: { text: string }) {
       </span>
     </Fragment>
   ));
+}
+
+/** The scene's box on its canvas (T9.8, `canvasOf`); nothing on the usual 1920×1080. */
+export function canvasStyle(settings: Settings): CSSProperties | undefined {
+  const c = canvasOf(settings);
+  return c.k === 1 && c.w === 1920 && c.h === 1080
+    ? undefined
+    : ({ width: c.width / c.k, height: c.height / c.k, "--fit": c.k } as CSSProperties);
 }
 
 /** Shared 1920×1080 scene layout for Starting Soon, BRB, Stream Ending and Offline. */
@@ -113,7 +122,7 @@ export default function SceneFrame({ settings, title, subtitle, error, children,
       data-enter={theme.enter.id}
       data-bg={theme.bgEffect}
       data-theme={theme.id}
-      style={themeVars(theme)}
+      style={{ ...themeVars(theme), ...canvasStyle(settings) }}
     >
       {error}
       <div className="scene-main">

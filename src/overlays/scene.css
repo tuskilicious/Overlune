@@ -1736,3 +1736,15 @@
   min-width: 0;
   max-width: 100%;
 }
+
+/* Another canvas size (T9.8): the scene's box takes the canvas's shape and scales to fill it (canvasOf). The editor
+   scales its previews itself. */
+.scene[style*="--fit"],
+.live[style*="--fit"] {
+  scale: var(--fit);
+  transform-origin: 0 0;
+}
+
+html:has(#root > .scene[style*="--fit"], #root > .live[style*="--fit"]) {
+  overflow: hidden;
+}

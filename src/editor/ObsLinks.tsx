@@ -144,8 +144,10 @@ export default function ObsLinks({
 }) {
   const hash = encode(settings);
   // Every overlay that gets a link: the scenes, chat (sized in the editor), alerts and the webcam frame (T6.88).
+  // The scenes and Live take the canvas size picked above the preview (T9.8).
+  const canvas = settings.layouts.landscape?.size ?? { width: 1920, height: 1080 };
   const links: LinkInfo[] = [
-    ...(Object.keys(overlays) as OverlayId[]).map((id) => ({ id, ...overlays[id] })),
+    ...(Object.keys(overlays) as OverlayId[]).map((id) => ({ id, ...overlays[id], ...canvas })),
     { id: "chat", name: "Chat", width: settings.chat.width, height: settings.chat.height },
     { id: "alerts", name: "Alerts", width: 1920, height: 1080 },
     {
@@ -161,8 +163,7 @@ export default function ObsLinks({
     {
       id: "live",
       name: "Live",
-      width: 1920,
-      height: 1080,
+      ...canvas,
       optional: true,
     },
   ];
@@ -259,9 +260,10 @@ export default function ObsLinks({
           </li>
         </ol>
         <p className="editor-hint">
-          Made for OBS’s usual 1920×1080 canvas; on another size, right-click a source and choose
-          Transform → Fit to screen. Changed something here? Download it again. Streamlabs can’t
-          import this file, so paste the links below instead.
+          Made for OBS’s usual 1920×1080 canvas; on another size, pick it above the preview, and
+          right-click chat, alerts or the frame and choose Transform → Fit to screen. Changed
+          something here? Download it again. Streamlabs can’t import this file, so paste the links
+          below instead.
         </p>
       </div>
       {/* Streamers asked whether a look's update would break their setup (T6.69). */}

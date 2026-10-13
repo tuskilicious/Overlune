@@ -18,7 +18,7 @@ import {
   type Guide,
   type Handle,
 } from "./geometry";
-import { naturalBox, sceneParts } from "../../overlays/measure";
+import { canvasOf, naturalBox, rescale, sceneParts } from "../../overlays/measure";
 import { defaultLive } from "../../overlays/LiveScene";
 import { encode } from "../../settings/url";
 import { Inspector, Layers, elementName, type Adding, type Change } from "./Panels";
@@ -54,18 +54,22 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
   const [draft, setDraft] = useState<LayoutElement[] | null>(null);
   const [guides, setGuides] = useState<Guide[]>([]);
   const gesture = useRef<Gesture | null>(null);
-  const size = settings.layouts.landscape?.size ?? { width: 1920, height: 1080 };
+  /** The scene's box (T9.8): layouts are in its units. */
+  const size = canvasOf(settings);
 
   useLayoutEffect(() => {
     const el = area.current!;
-    const ro = new ResizeObserver(() => setScale(el.clientWidth / size.width));
+    const ro = new ResizeObserver(() => setScale(el.clientWidth / size.w));
     ro.observe(el);
     return () => ro.disconnect();
-  }, [size.width]);
+  }, [size.w]);
 
   const shown = draft ?? elements;
   const withElements = (els: LayoutElement[]): Settings => {
-    const landscape = settings.layouts.landscape ?? { size, scenes: {} };
+    const landscape = settings.layouts.landscape ?? {
+      size: { width: 1920, height: 1080 },
+      scenes: {},
+    };
     return {
       ...settings,
       layouts: {
@@ -126,7 +130,7 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
         const snap = snapMove(
           { x: lead.x + dx, y: lead.y + dy, w: lead.w, h: lead.h },
           others,
-          { w: size.width, h: size.height },
+          size,
           snapDistance(scale),
         );
         dx += Math.round(snap.dx);
@@ -207,8 +211,8 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
     const id = newId();
     const base = { id, r: 0, o: 1, hidden: false, locked: false, name: "" };
     const centred = (w: number, h: number) => ({
-      x: Math.round((size.width - w) / 2),
-      y: Math.round((size.height - h) / 2),
+      x: Math.round((size.w - w) / 2),
+      y: Math.round((size.h - h) / 2),
       w,
       h,
     });
@@ -228,7 +232,9 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
         radius: 16,
       };
     else if (kind === "chat" || kind === "alerts" || kind === "frame") {
-      const { x, y, w, h } = defaultLive.find((d) => d.type === kind)!;
+      const { x, y, w, h } = rescale(defaultLive, { w: 1920, h: 1080 }, size).find(
+        (d) => d.type === kind,
+      )!;
       el = { ...base, type: kind, x, y, w, h };
     } else {
       const scene = area.current?.querySelector<HTMLElement>(".scene");
@@ -337,9 +343,9 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         onPointerDown={() => setSelected([])}
-        style={{ aspectRatio: `${size.width} / ${size.height}` }}
+        style={{ aspectRatio: `${size.w} / ${size.h}` }}
       >
-        <Preview width={size.width} height={size.height}>
+        <Preview width={size.w} height={size.h}>
           {scene(withElements(shown))}
         </Preview>
         <div className="canvas-layer">

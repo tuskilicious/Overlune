@@ -286,6 +286,8 @@ The canvas follows the editor's chrome (tokens, focus rings, one filled button) 
 
 **Live (T9.7):** "Live source" in the preview bar switches the preview to the Live overlay (`/o/live`): chat, alerts and the webcam frame on one see-through 1920×1080 canvas, each today's overlay sized to its box, plus any added text, pictures and shapes. Before it's customized: the frame bottom left, chat down the right, alerts across the top. In the editor its chat shows the sample messages and Test alert plays in its alerts box; Customize edits Live's own layout, and "Put back the Chat" (or Alerts, Webcam frame) returns a removed one to its default place. Labels (latest follower and the like) come with Phase 13's data.
 
+**Canvas size (T9.8):** a select in the preview bar, where the fixed "1920 × 1080" chip was, named "Canvas size" for screen readers (the bar has no room for a visible label): 1920 × 1080, 1280 × 720, 2560 × 1440, 3840 × 2160 (4K), or "Another size…", which opens Canvas width and Canvas height with "Use this size". The hint points to OBS's Settings → Video → Base (Canvas) Resolution, and a size outside 320–3840 or past 3:1 says why instead. It applies to the four scenes and Live, their link rows and the scene collection; the layouts move onto the new size in one undo step. Portrait gets its own layout in Phase 10, so no portrait preset here.
+
 ## Editor and site UI
 The editor, setup guide, privacy and terms pages share one quiet, high-contrast chrome in Overlune's brand (`docs/BRAND.md`), so the colorful theme previews stay the loudest thing on the page. Tokens live in `src/editor/brand.ts` and reach CSS as variables on `.editor` (`themeVars`). "Must" rules are hard requirements; "should" rules are defaults.
 
