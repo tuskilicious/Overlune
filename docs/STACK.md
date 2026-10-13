@@ -72,6 +72,7 @@ All on Cloudflare, next to the site: one provider, one deploy, one domain, so th
 - Route per overlay: `/o/starting`, `/o/brb`, `/o/ending`, `/o/offline` (T6.147), `/o/chat`, `/o/alerts`, `/o/frame` (T6.88).
 - Settings are in the **hash fragment**: `#<version>.<lz-string payload>`. The fragment is never sent to servers, and it is stripped from Sentry events.
 - Optional query flag `?rm=1` (before the `#`) forces reduced motion: every animation is turned off, same as the OS "reduce motion" setting. Never remove or repurpose it.
+- Optional query flag `?canvas=vertical` (before the `#`, added in Phase 10) renders the overlay for a 1080×1920 portrait canvas (DESIGN.md "Vertical layout"). The settings after the `#` are the same as the landscape link's, so one save gives both. Any other value, or none, is the 1920×1080 landscape overlay every earlier link shows. It combines with `?rm=1` and `?test=1`. Never remove or repurpose it.
 - Optional payload field `frame` (added T6.88): the webcam frame's `width` (160 to 1920, default 640), `height` (120 to 1080, default 360) and `label` (up to 40 characters, default none). Overlay route `/o/frame`. Links without it get the defaults.
 - Optional payload field `chat.showBadges` (added T6.76, default `true`): role badges before chat names. Links without it keep badges.
 - Optional payload field `alerts.seconds` (added T6.75, 3 to 15, default 5): how long each alert stays on screen. Links without it keep 5 seconds; a value out of range falls back to 5.

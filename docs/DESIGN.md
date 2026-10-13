@@ -213,6 +213,23 @@ Set on 2026-10-07 from the owner's design handoff, an audit of the looks against
 - Composition: closed in T6.134. Every look now has its own scene layout (see "Scene layout"); layout v2 stays as the starting point for new looks.
 - Shipped looks that match a tell keep it until they are reworked: Bold Esports (near-black with one red), Neon Grid (neon with a grid).
 
+## Vertical layout (Phase 10)
+Overlays for a portrait canvas, from `?canvas=vertical` (STACK.md). The canvas is 1080×1920; the look's background and art fill all of it.
+
+**Safe zone.** TikTok Live and YouTube Shorts draw their own header, a column of buttons on the right, and captions at the bottom over the stream. Neither publishes the sizes, and third-party guides disagree (TikTok: top 130–200px, bottom 367–484px, right 120–140px; Shorts up to 288px top, 672px bottom and 192px right in Google's ad template). Overlune keeps **every word and number inside x 60–940, y 200–1440** (an 880×1240 box: 60px left, 140px right, 200px top, 480px bottom); art, motifs and backgrounds may run to the edges. These are planning numbers, checked on a real phone in T9.10, not platform specs.
+
+**Scenes (1080×1920).**
+- The logo at the top of the safe zone; the title block in its middle third (the accent rule, the headline, then the subtitle), sized to the 880px width and shrinking to fit as in landscape (T6.26), at most three lines; the countdown card under it, up to the safe zone's width; the socials as a stacked list under that.
+- Each look keeps its own alignment, type and motif; its art is recomposed for the tall frame (a sun, a grid floor or a skyline moves to where it reads in portrait) rather than stretched.
+- The entrance choreography is the landscape one, in the same order; its reduced-motion version shows everything at once.
+
+**Alerts, chat, webcam frame.**
+- Alerts: centred in the safe zone's width, in its upper third (y 260–700), clear of the bottom captions.
+- Chat: sizes that suit a tall canvas (880 wide, 400–900 tall), placed by the streamer in the safe zone.
+- Webcam frame: presets for portrait: 880×495 (a 16:9 camera), 880×880 (square), and 1080×608 (full width, its label inside the safe zone).
+
+**Editor.** A Horizontal / Vertical switch over the preview; the 9:16 preview can show the safe zone as a faint overlay (never in OBS). Vertical is offered only for looks that have it (TASKS.md Phase 10 batches).
+
 ## Overlay layout rules
 - Canvas is always 1920×1080. Keep a 64px safe margin on scenes.
 - Chat default size is 400×600, transparent background, bottom-up.
