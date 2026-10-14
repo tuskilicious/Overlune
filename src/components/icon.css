@@ -9,3 +9,319 @@
   stroke-linejoin: round;
   vertical-align: -0.05em;
 }
+
+/* Motion (2.1, after Skiper UI's "Animated Icon Buttons" on 21st.dev, ported to CSS): when the button, link or label an
+   icon is in is pointed at, it moves the way the thing it shows would, part by part (Icon.tsx draws the parts in
+   order). Spreads and zooms hold while pointed at; one-off moves play once; the typing dots keep typing. Pressed, the
+   icon presses in. Reduced motion: index.css stops every animation and transition, so they keep still. */
+.icon {
+  overflow: visible;
+  transition: scale 160ms ease-out;
+}
+
+.icon path {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    translate 320ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    rotate 420ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    scale 320ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 200ms ease;
+}
+
+:where(a, button, label, summary):active .icon {
+  scale: 0.85;
+}
+
+/* Check: the tick draws itself. */
+:where(a, button, label, summary):hover .icon[data-icon="check"] path {
+  stroke-dasharray: 1;
+  animation: icon-draw 420ms ease-out;
+}
+
+/* Copy: the two sheets fan apart. */
+:where(a, button, label, summary):hover .icon[data-icon="copy"] > :nth-child(1) {
+  translate: 0.8px 0.8px;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="copy"] > :nth-child(2) {
+  translate: -0.8px -0.8px;
+}
+
+/* Arrows go out the way they point and come back from the other side, head first. */
+:where(a, button, label, summary):hover .icon[data-icon="next"] > * {
+  animation: icon-out-right 520ms cubic-bezier(0.6, 0, 0.2, 1);
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="back"] > * {
+  animation: icon-out-left 520ms cubic-bezier(0.6, 0, 0.2, 1);
+}
+
+:where(a, button, label, summary):hover
+  .icon:is([data-icon="next"], [data-icon="back"])
+  > :nth-child(1) {
+  animation-delay: 40ms;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="arrow"] path {
+  animation: icon-through 520ms cubic-bezier(0.6, 0, 0.2, 1);
+}
+
+/* Expand: the corners spread to the edges. */
+:where(a, button, label, summary):hover .icon[data-icon="expand"] > :nth-child(1) {
+  translate: 1px -1px;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="expand"] > :nth-child(2) {
+  translate: -1px 1px;
+}
+
+/* Look: the disc turns over. */
+:where(a, button, label, summary):hover .icon[data-icon="look"] > :nth-child(2) {
+  rotate: 180deg;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="look"] {
+  animation: icon-turn-over 520ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Text: its two lines write themselves in. */
+:where(a, button, label, summary):hover .icon[data-icon="text"] > :nth-child(n + 2) {
+  stroke-dasharray: 1;
+  animation: icon-draw 360ms ease-out both;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="text"] > :nth-child(3) {
+  animation-delay: 140ms;
+}
+
+/* Socials: the person nods. */
+:where(a, button, label, summary):hover .icon[data-icon="socials"] > :nth-child(1) {
+  animation: icon-nod 560ms ease-in-out;
+}
+
+/* Chat: dots type in the bubble while pointed at. */
+.icon[data-icon="chat"] > :nth-child(n + 2) {
+  opacity: 0;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="chat"] > :nth-child(n + 2) {
+  opacity: 1;
+  animation: icon-typing 900ms ease-in-out infinite;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="chat"] > :nth-child(3) {
+  animation-delay: 150ms;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="chat"] > :nth-child(4) {
+  animation-delay: 300ms;
+}
+
+/* Alerts: the bell rings from its top, the clapper swings the other way. */
+:where(a, button, label, summary):hover .icon[data-icon="alerts"] > :nth-child(1) {
+  transform-origin: 50% 0;
+  animation: icon-ring 650ms ease-in-out;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="alerts"] > :nth-child(2) {
+  animation: icon-clapper 650ms ease-in-out;
+}
+
+/* Webcam frame: the lens zooms. */
+:where(a, button, label, summary):hover .icon[data-icon="frame"] > :nth-child(2) {
+  scale: 1.45;
+}
+
+/* Channel page: the panels pop up one after another. */
+:where(a, button, label, summary):hover .icon[data-icon="channel"] > * {
+  animation: icon-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="channel"] > :nth-child(2) {
+  animation-delay: 90ms;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="channel"] > :nth-child(3) {
+  animation-delay: 180ms;
+}
+
+/* Logo: the picture's hills draw themselves. */
+:where(a, button, label, summary):hover .icon[data-icon="logo"] > :nth-child(2) {
+  stroke-dasharray: 1;
+  animation: icon-draw 520ms ease-out;
+}
+
+/* Motion: the waves flow, each its own way. */
+:where(a, button, label, summary):hover .icon[data-icon="motion"] > :nth-child(1) {
+  animation: icon-flow 1.2s ease-in-out infinite;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="motion"] > :nth-child(2) {
+  animation: icon-flow 1.2s ease-in-out infinite reverse;
+}
+
+/* Colors: the swatches swap places. */
+:where(a, button, label, summary):hover .icon[data-icon="colors"] > :nth-child(1) {
+  translate: 2px 3px;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="colors"] > :nth-child(2) {
+  translate: -2px -3px;
+}
+
+/* Links: the chain pulls apart and snaps back. */
+:where(a, button, label, summary):hover .icon[data-icon="links"] > :nth-child(2) {
+  animation: icon-unlink-a 560ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="links"] > :nth-child(3) {
+  animation: icon-unlink-b 560ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Collapse and expand the menu: the chevrons step the way they point, one after the other. */
+:where(a, button, label, summary):hover .icon[data-icon="collapse"] > * {
+  animation: icon-step-left 460ms ease-in-out;
+}
+
+:where(a, button, label, summary):hover .icon[data-icon="open"] > * {
+  animation: icon-step-right 460ms ease-in-out;
+}
+
+:where(a, button, label, summary):hover
+  .icon:is([data-icon="collapse"], [data-icon="open"])
+  > :nth-child(2) {
+  animation-delay: 80ms;
+}
+
+@keyframes icon-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes icon-out-right {
+  45% {
+    translate: 6px 0;
+    opacity: 0;
+  }
+  46% {
+    translate: -6px 0;
+    opacity: 0;
+  }
+}
+
+@keyframes icon-out-left {
+  45% {
+    translate: -6px 0;
+    opacity: 0;
+  }
+  46% {
+    translate: 6px 0;
+    opacity: 0;
+  }
+}
+
+@keyframes icon-through {
+  45% {
+    translate: 6px -6px;
+    opacity: 0;
+  }
+  46% {
+    translate: -6px 6px;
+    opacity: 0;
+  }
+}
+
+@keyframes icon-turn-over {
+  50% {
+    scale: 1.1;
+  }
+}
+
+@keyframes icon-nod {
+  30% {
+    translate: 0 -1.2px;
+  }
+  60% {
+    translate: 0 0.4px;
+  }
+}
+
+@keyframes icon-typing {
+  0%,
+  60%,
+  100% {
+    translate: 0 0;
+  }
+  30% {
+    translate: 0 -1px;
+  }
+}
+
+@keyframes icon-ring {
+  15% {
+    rotate: 16deg;
+  }
+  35% {
+    rotate: -14deg;
+  }
+  55% {
+    rotate: 9deg;
+  }
+  75% {
+    rotate: -5deg;
+  }
+}
+
+@keyframes icon-clapper {
+  15% {
+    translate: -1px 0;
+  }
+  35% {
+    translate: 1px 0;
+  }
+  55% {
+    translate: -0.6px 0;
+  }
+  75% {
+    translate: 0.3px 0;
+  }
+}
+
+@keyframes icon-pop {
+  40% {
+    translate: 0 -1.2px;
+    scale: 1.08;
+  }
+}
+
+@keyframes icon-flow {
+  50% {
+    translate: 1.5px 0;
+  }
+}
+
+@keyframes icon-unlink-a {
+  40% {
+    translate: -1.2px 1.2px;
+  }
+}
+
+@keyframes icon-unlink-b {
+  40% {
+    translate: 1.2px -1.2px;
+  }
+}
+
+@keyframes icon-step-left {
+  40% {
+    translate: -2px 0;
+  }
+}
+
+@keyframes icon-step-right {
+  40% {
+    translate: 2px 0;
+  }
+}

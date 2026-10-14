@@ -715,7 +715,7 @@
 }
 
 .landing-mark[data-mark="No"] {
-  background: rgb(244 241 255 / 0.06);
+  background: color-mix(in srgb, var(--color-moon) 8%, transparent);
   color: var(--color-haze);
 }
 
