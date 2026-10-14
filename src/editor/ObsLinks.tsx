@@ -4,6 +4,7 @@ import { framePosition, type Settings } from "../settings/schema";
 import { encode } from "../settings/url";
 import { sceneCollection } from "./scene-collection";
 import Icon from "../components/Icon";
+import { hasPortrait, type CanvasId } from "../overlays/measure";
 
 /** The full-screen scenes, with the Browser Source size to enter in OBS. `short` labels the editor's scene picker,
  *  where the full names wrap; Offline is an extra, so it doesn't count toward "You're set" (T6.147). */
@@ -140,45 +141,64 @@ function downloadCollection(settings: Settings) {
 /** "Link to paste into OBS" for each overlay. Every link carries all settings. */
 export default function ObsLinks({
   settings,
+  canvasId = "landscape",
   heading,
 }: {
   settings: Settings;
+  /** The canvas picked over the preview (T10.4): Vertical gives the portrait links, with their sizes. */
+  canvasId?: CanvasId;
   heading: ReactNode;
 }) {
   const hash = encode(settings);
+  const portrait = canvasId === "portrait";
   // Every overlay that gets a link: the scenes, chat (sized in the editor), alerts and the webcam frame (T6.88).
   // The scenes and Live take the canvas size picked above the preview (T9.8).
-  const canvas = settings.layouts.landscape?.size ?? { width: 1920, height: 1080 };
-  const links: LinkInfo[] = [
-    ...(["starting", "brb", "ending", "offline"] as const).map((id) => ({
-      id,
-      ...overlays[id],
-      ...canvas,
-    })),
-    { id: "chat", name: "Chat", width: settings.chat.width, height: settings.chat.height },
-    { id: "alerts", name: "Alerts", width: 1920, height: 1080 },
-    {
-      id: "frame",
-      name: "Webcam frame",
-      // Placed in Overlune, the frame's overlay is full screen (T6.122).
-      ...(framePosition(settings.frame)
-        ? { width: 1920, height: 1080 }
-        : { width: settings.frame.width, height: settings.frame.height }),
-      optional: true,
-    },
-    // Live (T9.7): chat, alerts and the frame in one source, instead of the three above. An extra, like Offline.
-    {
-      id: "live",
-      name: "Live",
-      ...canvas,
-      optional: true,
-    },
-    // Just Chatting and Reaction (T10.3), extras like Live.
+  const canvas =
+    settings.layouts[canvasId]?.size ??
+    (portrait ? { width: 1080, height: 1920 } : { width: 1920, height: 1080 });
+  // Vertical (T10.4): the scenes this look has in portrait, Live, Just Chatting and Reaction. Chat, alerts and the
+  // frame on their own get their vertical sizes in T10.9; until then Live holds all three.
+  const vertical: LinkInfo[] = [
+    ...(["starting", "brb", "ending", "offline"] as const)
+      .filter((id) => hasPortrait(settings.theme, id))
+      .map((id) => ({ id, ...overlays[id], ...canvas })),
+    { id: "live", name: "Live", ...canvas, optional: hasPortrait(settings.theme, "starting") },
     ...(["chatting", "reaction"] as const).map((id) => ({ id, ...overlays[id], ...canvas })),
   ];
+  const links: LinkInfo[] = portrait
+    ? vertical
+    : [
+        ...(["starting", "brb", "ending", "offline"] as const).map((id) => ({
+          id,
+          ...overlays[id],
+          ...canvas,
+        })),
+        { id: "chat", name: "Chat", width: settings.chat.width, height: settings.chat.height },
+        { id: "alerts", name: "Alerts", width: 1920, height: 1080 },
+        {
+          id: "frame",
+          name: "Webcam frame",
+          // Placed in Overlune, the frame's overlay is full screen (T6.122).
+          ...(framePosition(settings.frame)
+            ? { width: 1920, height: 1080 }
+            : { width: settings.frame.width, height: settings.frame.height }),
+          optional: true,
+        },
+        // Live (T9.7): chat, alerts and the frame in one source, instead of the three above. An extra, like Offline.
+        {
+          id: "live",
+          name: "Live",
+          ...canvas,
+          optional: true,
+        },
+        // Just Chatting and Reaction (T10.3), extras like Live.
+        ...(["chatting", "reaction"] as const).map((id) => ({ id, ...overlays[id], ...canvas })),
+      ];
   /** Each link as last copied this visit; kept in memory only (no tracking, no storage). */
   const [copied, setCopied] = useState<Record<string, string>>({});
-  const linkFor = (id: string) => `${location.origin}/o/${id}#${hash}`;
+  // `?canvas=vertical` before the # (STACK.md): the same save, its portrait layout.
+  const linkFor = (id: string) =>
+    `${location.origin}/o/${id}${portrait ? "?canvas=vertical" : ""}#${hash}`;
   const needed = links.filter((l) => !l.optional);
   const done = needed.filter((l) => copied[l.id] === linkFor(l.id)).length;
 
@@ -244,37 +264,49 @@ export default function ObsLinks({
           </div>
         </div>
       </details>
-      {/* One file instead of six pastes (T6.90). OBS Studio only: Streamlabs can't import it. */}
-      <div className="editor-collection">
-        <h3>Faster in OBS Studio: import every scene at once</h3>
-        <p>One file makes all your Overlune scenes in OBS, with your links and sizes already in.</p>
-        <button type="button" onClick={() => downloadCollection(settings)}>
-          Download OBS scene collection
-        </button>
-        <ol>
-          <li>
-            In OBS, open the <strong>Scene Collection</strong> menu at the top and choose{" "}
-            <strong>Import</strong>.
-          </li>
-          <li>
-            Press <strong>…</strong> next to Collection Path, pick{" "}
-            <strong>overlune-scenes.json</strong> and press <strong>Import</strong>.
-          </li>
-          <li>
-            In the <strong>Scene Collection</strong> menu, choose <strong>Overlune</strong>.
-          </li>
-          <li>
-            In <strong>Overlune: Live</strong>, add your game and camera with <strong>+</strong>{" "}
-            under Sources, then drag them to the bottom of the list.
-          </li>
-        </ol>
-        <p className="editor-hint">
-          Made for OBS’s usual 1920×1080 canvas; on another size, pick it above the preview, and
-          right-click chat, alerts or the frame and choose Transform → Fit to screen. Changed
-          something here? Download it again. Streamlabs can’t import this file, so paste the links
-          below instead.
+      {portrait && (
+        <p className="editor-vertical-note">
+          <strong>Vertical links</strong> are for a vertical canvas, such as OBS 32.1’s vertical
+          canvas or the Aitum Vertical plugin. Each ends in <code>?canvas=vertical</code> before the
+          #. Switch to Horizontal above the preview for your usual links.
         </p>
-      </div>
+      )}
+      {/* One file instead of six pastes (T6.90). OBS Studio only: Streamlabs can't import it. Its scenes are
+          horizontal, so Vertical leaves it out. */}
+      {!portrait && (
+        <div className="editor-collection">
+          <h3>Faster in OBS Studio: import every scene at once</h3>
+          <p>
+            One file makes all your Overlune scenes in OBS, with your links and sizes already in.
+          </p>
+          <button type="button" onClick={() => downloadCollection(settings)}>
+            Download OBS scene collection
+          </button>
+          <ol>
+            <li>
+              In OBS, open the <strong>Scene Collection</strong> menu at the top and choose{" "}
+              <strong>Import</strong>.
+            </li>
+            <li>
+              Press <strong>…</strong> next to Collection Path, pick{" "}
+              <strong>overlune-scenes.json</strong> and press <strong>Import</strong>.
+            </li>
+            <li>
+              In the <strong>Scene Collection</strong> menu, choose <strong>Overlune</strong>.
+            </li>
+            <li>
+              In <strong>Overlune: Live</strong>, add your game and camera with <strong>+</strong>{" "}
+              under Sources, then drag them to the bottom of the list.
+            </li>
+          </ol>
+          <p className="editor-hint">
+            Made for OBS’s usual 1920×1080 canvas; on another size, pick it above the preview, and
+            right-click chat, alerts or the frame and choose Transform → Fit to screen. Changed
+            something here? Download it again. Streamlabs can’t import this file, so paste the links
+            below instead.
+          </p>
+        </div>
+      )}
       {/* Streamers asked whether a look's update would break their setup (T6.69). */}
       <p>
         Your links never change. When a look gets an update, your overlays pick it up on their own.

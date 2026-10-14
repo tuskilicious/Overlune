@@ -5,9 +5,16 @@ import { useMotion, type PluginLoader } from "../lib/motion";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
 import { defaultSettings, type LayoutElement, type Settings } from "../settings/schema";
-import { canvasOf, measureLayout, rescale } from "../overlays/measure";
+import {
+  CanvasContext,
+  canvasOf,
+  designOf,
+  hasPortrait,
+  measureLayout,
+  rescale,
+} from "../overlays/measure";
 import Canvas from "./canvas/Canvas";
-import { CanvasSize } from "./canvas/Panels";
+import { CanvasSize, SafeZone } from "./canvas/Panels";
 import LiveScene, { liveElements } from "../overlays/LiveScene";
 import CamScene, { camElements } from "../overlays/CamScene";
 import { loadSaved, save } from "../settings/storage";
@@ -541,34 +548,43 @@ export default function EditorPage() {
   /** The preview shows the Live overlay (T9.7) instead of the scene. */
   const [onLive, setOnLive] = useState(part === "live");
   const target = onLive ? "live" : scene;
+  /** Horizontal or Vertical (T10.4): which canvas the preview, Customize and the links use. Vertical holds only where
+   *  the look has it (`hasPortrait`); elsewhere the preview stays horizontal and says why. */
+  const [vertical, setVertical] = useState(false);
+  const portraitOk = hasPortrait(settings.theme, target);
+  const canvasId = vertical && portraitOk ? "portrait" : "landscape";
   /** Keeps the scene's layout (or, with null, drops it, back to the look's composed scene). Each call is its own undo
    *  step unless `merge` (a burst of nudges). */
   const commitLayout = (elements: LayoutElement[] | null, merge = false) => {
     if (!merge) lastEdit.current = 0;
     setSettings((s) => {
-      const landscape = s.layouts.landscape ?? { size: { width: 1920, height: 1080 }, scenes: {} };
-      const scenes = { ...landscape.scenes };
+      const design = designOf[canvasId];
+      const layout = s.layouts[canvasId] ?? {
+        size: { width: design.w, height: design.h },
+        scenes: {},
+      };
+      const scenes = { ...layout.scenes };
       if (elements) scenes[target] = elements;
       else delete scenes[target];
-      return { ...s, layouts: { ...s.layouts, landscape: { ...landscape, scenes } } };
+      return { ...s, layouts: { ...s.layouts, [canvasId]: { ...layout, scenes } } };
     });
   };
   /** The canvas size (T9.8): every layout moves onto the new size, in one undo step. */
   const setCanvasSize = (size: { width: number; height: number }) => {
     lastEdit.current = 0;
     setSettings((s) => {
-      const landscape = { ...(s.layouts.landscape ?? { scenes: {} }), size };
-      const next = { ...s, layouts: { ...s.layouts, landscape } };
-      const from = canvasOf(s);
-      const to = canvasOf(next);
-      landscape.scenes = Object.fromEntries(
-        Object.entries(landscape.scenes).map(([id, els]) => [id, rescale(els, from, to)]),
+      const layout = { ...(s.layouts[canvasId] ?? { scenes: {} }), size };
+      const next = { ...s, layouts: { ...s.layouts, [canvasId]: layout } };
+      const from = canvasOf(s, canvasId);
+      const to = canvasOf(next, canvasId);
+      layout.scenes = Object.fromEntries(
+        Object.entries(layout.scenes).map(([id, els]) => [id, rescale(els, from, to)]),
       );
       return next;
     });
   };
-  const canvas = canvasOf(settings);
-  const sceneLayout = settings.layouts.landscape?.scenes[target] ?? null;
+  const canvas = canvasOf(settings, canvasId);
+  const sceneLayout = settings.layouts[canvasId]?.scenes[target] ?? null;
   /** Customize, Done and Reset each replace the button just pressed, so focus follows (T9.9): into the canvas, or
    *  back to Customize, never lost to the top of the page. */
   const canvasFocus = useRef(false);
@@ -587,9 +603,9 @@ export default function EditorPage() {
   /** Customize: starts from the look's own layout, measured from the preview (T9.3), the first time. */
   const customize = () => {
     if (!sceneLayout) {
-      if (onLive) commitLayout(liveElements(settings));
+      if (onLive) commitLayout(liveElements(settings, canvasId));
       else if (scene === "chatting" || scene === "reaction")
-        commitLayout(camElements(settings, scene, "landscape"));
+        commitLayout(camElements(settings, scene, canvasId));
       else {
         const shown = document.querySelector<HTMLElement>(".editor-pick .scene");
         if (shown) commitLayout(measureLayout(shown));
@@ -1143,7 +1159,30 @@ export default function EditorPage() {
                       plays the next sample alert over the scene, as on stream. */}
                   <div className="editor-preview-bar">
                     <h2>Preview: {onLive ? "Live" : overlays[scene].name}</h2>
-                    <CanvasSize size={canvas} onChange={setCanvasSize} />
+                    {/* Horizontal or Vertical (T10.4), as two pressed buttons: the canvas the preview, Customize
+                        and the links use. */}
+                    <div className="editor-canvas-pick" role="group" aria-label="Canvas shape">
+                      {(["landscape", "portrait"] as const).map((id) => (
+                        <button
+                          key={id}
+                          type="button"
+                          aria-pressed={canvasId === id}
+                          disabled={id === "portrait" && !portraitOk}
+                          onClick={() => {
+                            setVertical(id === "portrait");
+                            setCanvasOn(false);
+                          }}
+                        >
+                          {id === "landscape" ? "Horizontal" : "Vertical"}
+                        </button>
+                      ))}
+                    </div>
+                    <CanvasSize
+                      key={canvasId}
+                      size={canvas}
+                      portrait={canvasId === "portrait"}
+                      onChange={setCanvasSize}
+                    />
                     {/* Live (T9.7): chat, alerts and the webcam frame together, in one source. */}
                     <button
                       type="button"
@@ -1190,60 +1229,70 @@ export default function EditorPage() {
                       Test alert
                     </button>
                   </div>
-                  {/* Click a part to jump to its settings; hover outlines it and names it (T6.135, the Studio board).
-                      A mouse shortcut only: the section list and the form already reach every setting by keyboard. */}
-                  {canvasOn && sceneLayout ? (
-                    <Canvas
-                      settings={settings}
-                      sceneId={target}
-                      elements={sceneLayout}
-                      onCommit={commitLayout}
-                      scene={sceneView}
-                    />
-                  ) : (
-                    <div
-                      ref={pickArea}
-                      className="editor-pick"
-                      data-hover={picked ? "" : undefined}
-                      onPointerMove={(e) => {
-                        const part = partAt(e.currentTarget, e.clientX, e.clientY);
-                        // Only when the part under the pointer changes: every pixel of movement would otherwise
-                        // re-render the whole editor.
-                        setPicked((was) => (samePick(was, part) ? was : part));
-                      }}
-                      onPointerLeave={() => setPicked(null)}
-                      onClick={(e) => {
-                        const part = partAt(e.currentTarget, e.clientX, e.clientY);
-                        if (part) jumpTo(e, part.id);
-                      }}
-                    >
-                      <Preview width={canvas.w} height={canvas.h}>
-                        {onLive ? (
-                          sceneView(settings)
-                        ) : (
-                          <>
-                            {sceneView(settings)}
-                            <AlertView settings={settings} alert={testAlert} />
-                          </>
-                        )}
-                      </Preview>
-                      {picked && (
-                        <div
-                          className="editor-pick-box"
-                          data-below={picked.top < 28 || undefined}
-                          style={{
-                            left: picked.left,
-                            top: picked.top,
-                            width: picked.width,
-                            height: picked.height,
-                          }}
-                          aria-hidden
-                        >
-                          <span>{picked.name}</span>
-                        </div>
-                      )}
-                    </div>
+                  {vertical && !portraitOk && (
+                    <p className="editor-hint" role="status">
+                      Vertical is ready for Live, Just Chatting and Reaction. This look’s{" "}
+                      {overlays[scene].name} comes in vertical in a later update.
+                    </p>
                   )}
+                  <CanvasContext.Provider value={canvasId}>
+                    {/* Click a part to jump to its settings; hover outlines it and names it (T6.135, the Studio board).
+                      A mouse shortcut only: the section list and the form already reach every setting by keyboard. */}
+                    {canvasOn && sceneLayout ? (
+                      <Canvas
+                        settings={settings}
+                        canvasId={canvasId}
+                        sceneId={target}
+                        elements={sceneLayout}
+                        onCommit={commitLayout}
+                        scene={sceneView}
+                      />
+                    ) : (
+                      <div
+                        ref={pickArea}
+                        className="editor-pick"
+                        data-hover={picked ? "" : undefined}
+                        onPointerMove={(e) => {
+                          const part = partAt(e.currentTarget, e.clientX, e.clientY);
+                          // Only when the part under the pointer changes: every pixel of movement would otherwise
+                          // re-render the whole editor.
+                          setPicked((was) => (samePick(was, part) ? was : part));
+                        }}
+                        onPointerLeave={() => setPicked(null)}
+                        onClick={(e) => {
+                          const part = partAt(e.currentTarget, e.clientX, e.clientY);
+                          if (part) jumpTo(e, part.id);
+                        }}
+                      >
+                        <Preview width={canvas.w} height={canvas.h}>
+                          {onLive ? (
+                            sceneView(settings)
+                          ) : (
+                            <>
+                              {sceneView(settings)}
+                              <AlertView settings={settings} alert={testAlert} />
+                            </>
+                          )}
+                          {canvasId === "portrait" && <SafeZone w={canvas.w} h={canvas.h} />}
+                        </Preview>
+                        {picked && (
+                          <div
+                            className="editor-pick-box"
+                            data-below={picked.top < 28 || undefined}
+                            style={{
+                              left: picked.left,
+                              top: picked.top,
+                              width: picked.width,
+                              height: picked.height,
+                            }}
+                            aria-hidden
+                          >
+                            <span>{picked.name}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </CanvasContext.Provider>
                 </div>
               </section>
               {/* Wide windows: the look picker is the filmstrip under the preview (T6.135). */}
@@ -1262,7 +1311,11 @@ export default function EditorPage() {
               </section>
               <AlertTester settings={settings} />
             </div>
-            <ObsLinks settings={settings} heading={stepHeading(steps[2][1])} />
+            <ObsLinks
+              settings={settings}
+              canvasId={vertical ? "portrait" : "landscape"}
+              heading={stepHeading(steps[2][1])}
+            />
           </div>
         </>
       )}

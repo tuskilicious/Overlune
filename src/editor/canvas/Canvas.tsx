@@ -18,9 +18,16 @@ import {
   type Guide,
   type Handle,
 } from "./geometry";
-import { canvasOf, designOf, naturalBox, rescale, sceneParts } from "../../overlays/measure";
+import {
+  canvasOf,
+  designOf,
+  naturalBox,
+  rescale,
+  sceneParts,
+  type CanvasId,
+} from "../../overlays/measure";
 import { camDefaults } from "../../overlays/CamScene";
-import { defaultLive } from "../../overlays/LiveScene";
+import { defaultLive, defaultLivePortrait } from "../../overlays/LiveScene";
 import { encode } from "../../settings/url";
 import {
   CanvasKeys,
@@ -28,6 +35,7 @@ import {
   Layers,
   elementName,
   partOf,
+  SafeZone,
   type Adding,
   type Change,
   type Part,
@@ -42,6 +50,8 @@ type Gesture =
 interface Props {
   /** The settings shown, without this scene's elements (the canvas supplies them). */
   settings: Settings;
+  /** Which layout is edited: the landscape one, or the portrait one (T10.4). */
+  canvasId: CanvasId;
   /** The scene being customized, and its elements. */
   sceneId: LayoutScene;
   elements: LayoutElement[];
@@ -57,7 +67,7 @@ interface Props {
  * element selectable, draggable, resizable and turnable, snapping to the canvas and to each other, and nudged by the
  * arrow keys. Changes stay a draft while a gesture runs, then are kept once, so undo takes back a whole drag.
  */
-export default function Canvas({ settings, sceneId, elements, scene, onCommit }: Props) {
+export default function Canvas({ settings, canvasId, sceneId, elements, scene, onCommit }: Props) {
   const area = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
   const [selected, setSelected] = useState<string[]>([]);
@@ -65,7 +75,7 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
   const [guides, setGuides] = useState<Guide[]>([]);
   const gesture = useRef<Gesture | null>(null);
   /** The scene's box (T9.8): layouts are in its units. */
-  const size = canvasOf(settings);
+  const size = canvasOf(settings, canvasId);
 
   useLayoutEffect(() => {
     const el = area.current!;
@@ -76,15 +86,16 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
 
   const shown = draft ?? elements;
   const withElements = (els: LayoutElement[]): Settings => {
-    const landscape = settings.layouts.landscape ?? {
-      size: { width: 1920, height: 1080 },
+    const design = designOf[canvasId];
+    const layout = settings.layouts[canvasId] ?? {
+      size: { width: design.w, height: design.h },
       scenes: {},
     };
     return {
       ...settings,
       layouts: {
         ...settings.layouts,
-        landscape: { ...landscape, scenes: { ...landscape.scenes, [sceneId]: els } },
+        [canvasId]: { ...layout, scenes: { ...layout.scenes, [sceneId]: els } },
       },
     };
   };
@@ -206,7 +217,7 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
         : null;
   const camScene = sceneId === "chatting" || sceneId === "reaction" ? sceneId : null;
   /** A Just Chatting or Reaction scene's own parts where they start, on this canvas (T10.3). */
-  const camParts = camScene && rescale(camDefaults[camScene].landscape, designOf.landscape, size);
+  const camParts = camScene && rescale(camDefaults[camScene][canvasId], designOf[canvasId], size);
   const parts: Part[] = camParts
     ? camParts.map(partOf).filter((p) => !elements.some((el) => partOf(el) === p))
     : sceneId === "live"
@@ -248,9 +259,8 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
         radius: 16,
       };
     else if (kind === "chat" || kind === "alerts" || kind === "frame") {
-      const { x, y, w, h } = rescale(defaultLive, { w: 1920, h: 1080 }, size).find(
-        (d) => d.type === kind,
-      )!;
+      const live = canvasId === "portrait" ? defaultLivePortrait : defaultLive;
+      const { x, y, w, h } = rescale(live, designOf[canvasId], size).find((d) => d.type === kind)!;
       el = { ...base, type: kind, x, y, w, h };
     } else {
       const scene = area.current?.querySelector<HTMLElement>(".scene");
@@ -369,6 +379,7 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
           {scene(withElements(shown))}
         </Preview>
         <div className="canvas-layer">
+          {canvasId === "portrait" && <SafeZone w={size.w} h={size.h} />}
           {shown
             .filter((el) => !el.hidden)
             .map((el) => (

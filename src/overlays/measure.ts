@@ -1,5 +1,6 @@
 import { createContext } from "react";
-import type { LayoutElement, Settings } from "../settings/schema";
+import type { LayoutElement, LayoutScene, Settings } from "../settings/schema";
+import type { ThemeId } from "../themes/types";
 
 /** Which layout an overlay draws: the landscape one, or the portrait one from `?canvas=vertical` (Phase 10). */
 export type CanvasId = "landscape" | "portrait";
@@ -10,6 +11,18 @@ export const CanvasContext = createContext<CanvasId>("landscape");
 /** The link's canvas: `?canvas=vertical` is portrait, anything else landscape (STACK.md, a public contract). */
 export const linkCanvas = (search: string): CanvasId =>
   new URLSearchParams(search).get("canvas") === "vertical" ? "portrait" : "landscape";
+
+/** Looks whose portrait art is done (T10.5 to T10.8 add them in batches of four): the editor offers their four scenes
+ *  in Vertical. Live, Just Chatting and Reaction come with both canvases for every look. */
+export const portraitLooks: ReadonlySet<ThemeId> = new Set<ThemeId>([]);
+
+/** Whether the editor offers Vertical for this scene of this look (DESIGN.md "Editor", Phase 10). */
+export const hasPortrait = (theme: ThemeId, scene: LayoutScene) =>
+  scene === "live" || scene === "chatting" || scene === "reaction" || portraitLooks.has(theme);
+
+/** The portrait safe zone (DESIGN.md): every word inside 60px from the left, 140 from the right, 240 from the top
+ *  and 680 from the bottom, clear of TikTok's and Shorts' own buttons and comments. */
+export const safeZone = { left: 60, right: 140, top: 240, bottom: 680 };
 
 /** Each canvas's design size: the looks are designed at 1920×1080, and their portrait versions at 1080×1920. */
 export const designOf: Record<CanvasId, { w: number; h: number }> = {
