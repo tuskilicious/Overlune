@@ -43,9 +43,9 @@ export const camDefaults: Record<CamSceneId, Record<CanvasId, LayoutElement[]>> 
     ]),
     // Inset a little from the safe zone's edges: a big title's letters reach past its line.
     portrait: elements("chat", [
-      { type: "title", x: 60, y: 270, w: 880, h: 130 },
-      { type: "camera", kind: "camera", x: 60, y: 420, w: 960, h: 700 },
-      { type: "subtitle", x: 60, y: 1135, w: 880, h: 95 },
+      { type: "title", x: 60, y: 250, w: 880, h: 200 },
+      { type: "camera", kind: "camera", x: 60, y: 470, w: 960, h: 640 },
+      { type: "subtitle", x: 60, y: 1125, w: 880, h: 105 },
     ]),
   },
   reaction: {
@@ -58,8 +58,8 @@ export const camDefaults: Record<CamSceneId, Record<CanvasId, LayoutElement[]>> 
     // No chat by default on a phone: TikTok and Shorts show their own over the stream.
     portrait: elements("react", [
       { type: "camera", kind: "screen", x: 60, y: 96, w: 960, h: 540 },
-      { type: "title", x: 60, y: 660, w: 880, h: 100 },
-      { type: "camera", kind: "camera", x: 60, y: 780, w: 880, h: 495 },
+      { type: "title", x: 60, y: 652, w: 880, h: 150 },
+      { type: "camera", kind: "camera", x: 60, y: 816, w: 880, h: 424 },
     ]),
   },
 };
