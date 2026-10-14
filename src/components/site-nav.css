@@ -131,35 +131,100 @@ div.site-sky {
   gap: 8px;
 }
 
-.site-nav-theme {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
+/* The light/dark toggle (2.1, a tiny sky after dhxwhy's "Sun Moon Dark Mode Theme Toggle" on 21st.dev). Night: stars and a
+   crescent moon. Day: a blue sky and the sun. The moon leaves slowly, then swoops to the lower left; the sun rises from
+   the lower right. Reduced motion: it just switches. */
+.sky-toggle {
+  position: relative;
+  overflow: hidden;
+  width: 60px;
+  height: 32px;
   padding: 0;
-  border: 1px solid color-mix(in srgb, var(--nav-haze) 40%, transparent);
-  border-radius: 50%;
-  background: transparent;
-  color: var(--nav-moon);
+  border: 1px solid color-mix(in srgb, var(--nav-haze) 45%, transparent);
+  border-radius: 999px;
+  background: linear-gradient(160deg, #0b0f3c, #2a1d7a);
   cursor: pointer;
-  transition:
-    border-color 200ms ease,
-    background-color 200ms ease;
+  isolation: isolate;
 }
 
-.site-nav-theme:hover {
-  border-color: var(--nav-violet);
-  background: color-mix(in srgb, var(--nav-violet) 15%, transparent);
-}
-
-.site-nav-theme:focus-visible {
+.sky-toggle:focus-visible {
   outline: 2px solid var(--nav-violet);
   outline-offset: 2px;
 }
 
-.site-nav-theme .icon {
+.sky-toggle > span {
+  position: absolute;
+  pointer-events: none;
+  transition:
+    opacity 600ms ease,
+    translate 700ms cubic-bezier(0.6, 0, 0.2, 1),
+    rotate 700ms cubic-bezier(0.6, 0, 0.2, 1);
+}
+
+.sky-day {
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(160deg, #6ec3ff, #bfe6ff);
+  opacity: 0;
+}
+
+.sky-stars {
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 18% 30%, #fff 0 1px, transparent 1.5px),
+    radial-gradient(circle at 38% 70%, #fff 0 0.8px, transparent 1.3px),
+    radial-gradient(circle at 70% 22%, #fff 0 1px, transparent 1.5px),
+    radial-gradient(circle at 84% 64%, #fff 0 0.8px, transparent 1.3px),
+    radial-gradient(circle at 56% 48%, #fff 0 0.6px, transparent 1.1px);
+}
+
+/* A crescent: a bright disc with a sky-colored bite. */
+.sky-moon {
+  top: 6px;
+  left: 8px;
   width: 18px;
   height: 18px;
+  border-radius: 50%;
+  box-shadow: inset -5px -2px 0 0 #f4f1ff;
+  rotate: -20deg;
+  filter: drop-shadow(0 0 4px rgb(244 241 255 / 0.6));
+}
+
+.sky-sun {
+  top: 7px;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #fff3c4, #ffc93c 60%, #ff9f1c);
+  box-shadow: 0 0 8px 2px rgb(255 201 60 / 0.7);
+  opacity: 0;
+  translate: 14px 18px;
+}
+
+.sky-toggle[data-mode="light"] .sky-day {
+  opacity: 1;
+}
+
+.sky-toggle[data-mode="light"] .sky-stars {
+  opacity: 0;
+}
+
+.sky-toggle[data-mode="light"] .sky-moon {
+  opacity: 0;
+  translate: -16px 18px;
+  rotate: -60deg;
+}
+
+.sky-toggle[data-mode="light"] .sky-sun {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sky-toggle > span {
+    transition: none;
+  }
 }
 
 /* Light mode (2.1): the pill turns daylight glass, the stars go, and the white wordmark is inverted to ink with its

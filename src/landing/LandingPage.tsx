@@ -595,13 +595,7 @@ function SupportCell({ value }: { value: Support }) {
   return (
     <>
       <span aria-hidden data-mark={value} className="landing-mark">
-        {value === "Yes" ? (
-          <Icon name="check" />
-        ) : (
-          <svg viewBox="0 0 12 12">
-            <path d="M3.5 3.5l5 5M8.5 3.5l-5 5" />
-          </svg>
-        )}
+        {value === "Yes" ? <Icon name="check" /> : <Icon name="cross" />}
       </span>
       <span className="sr-only">{value}</span>
     </>

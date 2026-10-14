@@ -379,6 +379,13 @@ Every page but the overlays shares one shell: the nav at the top, the night-sky 
 Write for a streamer opening OBS for the first time: concise, confident, helpful (BRAND.md voice).
 - Name what they see: "Link to paste into OBS", not "Browser Source URL"; "Their name", not `{user}`.
 - Buttons are verbs, 1–3 words, sentence case: "Copy link", "Start over", "Load my overlay from a link".
+- **Controls from 21st.dev (2.1, the owner: "every icon, button and toggle"), each ported as behavior in our own CSS and a little JS, no new dependency:**
+  - **Icons:** Lucide (the set 21st.dev's components use), as shape data in `src/components/lucide.ts` drawn by `Icon`, 1em, stroke 2 (ISC, docs/ASSETS.md). The section list, cards, copy tick and the "What works where" marks all use it.
+  - **Light/dark toggle:** a tiny sky after dhxwhy's "Sun Moon Dark Mode Theme Toggle": stars and a crescent at night; a blue day and the sun in light; the moon swoops off to the lower left as the sun rises from the lower right.
+  - **Switches:** after micka_design's "Switch": the knob springs across, swells on hover and stretches toward its new side while pressed; still native checkboxes.
+  - **Choice pills (segmented controls):** after micka_design's "Segmented Tabs": besides the sliding thumb on the chosen option, a soft highlight glides to the option under the pointer.
+  - **Every other site button:** after ddoemonn's "Ripple Button": a ripple spreads from where it's pressed (from the middle for Enter and Space), clipped to its shape, in its text color (`src/lib/ripple.ts`, site pages only, never overlays, canvas or previews).
+  - All of them keep still with reduced motion.
 - **Site buttons (2.0 polish, `src/components/site-buttons.css`):** the home page, nav and not-found page use two, ported from 21st.dev as CSS in the brand colors (behavior only, no dependency). `.btn-shimmer` for the main action, after Magic UI's "Shimmer Button" (MIT): a violet pill with a white spark circling its edge and an inner glow that deepens on hover and press; `.btn-light` makes it moonlight with a violet spark on the violet looks section. `.btn-glow` for the second action, after "Hover Border Gradient": a night pill with a moonlight spark round a thin edge, the edge and fill lighting violet on hover. Both keep still with reduced motion (the edge stays lit). The editor's form buttons stay plain controls.
 - Errors say what happened and what to do: "No picture loaded from this link. Check that it opens an image in your browser, not a web page."
 - Say "free" and "no account" plainly. No unmeasured claims and no promised setup times (the owner dropped "under 10 minutes" as unrealistic, 2026-10-02).

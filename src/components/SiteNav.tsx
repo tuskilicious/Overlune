@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router";
 import { setSiteTheme, useSiteTheme } from "../lib/site-theme";
-import Icon from "./Icon";
 import "./site-buttons.css";
 import "./site-nav.css";
 
@@ -58,19 +57,25 @@ export default function SiteNav({
   );
 }
 
-/** Light or dark mode for the site (2.1): follows the system until pressed, then remembers the pick here. */
+/** Light or dark mode for the site (2.1): follows the system until pressed, then remembers the pick here. A tiny sky
+ *  after dhxwhy's "Sun Moon Dark Mode Theme Toggle" on 21st.dev (behavior ported to CSS): the moon swoops off to the
+ *  lower left as the night fades to a blue day and the sun rises from the lower right, and back. */
 function ThemeToggle() {
   const theme = useSiteTheme();
   const next = theme === "light" ? "dark" : "light";
   return (
     <button
       type="button"
-      className="site-nav-theme"
+      className="sky-toggle"
+      data-mode={theme}
       aria-label={`Switch to ${next} mode`}
       title={`Switch to ${next} mode`}
       onClick={() => setSiteTheme(next)}
     >
-      <Icon name={theme === "light" ? "moon" : "sun"} />
+      <span className="sky-day" />
+      <span className="sky-stars" />
+      <span className="sky-moon" />
+      <span className="sky-sun" />
     </button>
   );
 }

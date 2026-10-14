@@ -1,11 +1,11 @@
-/* Line icons (components/Icon.tsx, T6.118): one stroke weight, sized and colored by the text beside them. */
+/* Line icons (components/Icon.tsx: Lucide, 2.1): one stroke weight, sized and colored by the text beside them. */
 .icon {
-  width: 0.85em;
-  height: 0.85em;
+  width: 1em;
+  height: 1em;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  vertical-align: -0.05em;
+  vertical-align: -0.125em;
 }
