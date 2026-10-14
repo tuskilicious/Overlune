@@ -133,7 +133,8 @@ div.site-sky {
 
 /* The light/dark toggle (2.1, after luv-jeri's "Theme Toggle" on 21st.dev): a pill with a sun that becomes a moon (its
    rays draw in or out, a bite slides over the disc) and the mode's name. Phones show the icon alone. */
-.theme-toggle {
+.theme-toggle,
+.github-star {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -154,13 +155,15 @@ div.site-sky {
 
 /* Only where there is a pointer that hovers: a tapped button on a phone would stay in its hover state. */
 @media (hover: hover) {
-  .theme-toggle:hover {
+  .theme-toggle:hover,
+  .github-star:hover {
     border-color: var(--nav-violet);
     background: color-mix(in srgb, var(--nav-violet) 14%, transparent);
   }
 }
 
-.theme-toggle:focus-visible {
+.theme-toggle:focus-visible,
+.github-star:focus-visible {
   outline: 2px solid var(--nav-violet);
   outline-offset: 2px;
 }
@@ -223,6 +226,67 @@ div.site-sky {
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
+  }
+}
+
+/* Star on GitHub (2.1): a link in the toggle's pill. On hover the star fills with Lune Violet and pops, as a starred
+   repo's does; still with reduced motion. */
+.github-star {
+  box-sizing: border-box; /* a link, so its border counts toward the 40px like the toggle's */
+  text-decoration: none;
+}
+
+.github-star svg {
+  width: 20px;
+  height: 20px;
+  fill: transparent;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  transition:
+    fill 200ms ease,
+    stroke 200ms ease,
+    scale 400ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    rotate 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (hover: hover) {
+  .github-star:hover svg {
+    fill: var(--nav-violet);
+    stroke: var(--nav-violet);
+    scale: 1.2;
+    rotate: 72deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .github-star svg {
+    transition: none;
+  }
+
+  .github-star:hover svg {
+    scale: none;
+    rotate: none;
+  }
+}
+
+/* Where the nav gets tight, the star stands alone; its name stays for screen readers (aria-label). */
+@media (max-width: 1099.98px) {
+  .github-star {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .github-star-label {
+    display: none;
+  }
+}
+
+/* Phones: no room in the bar; the footer keeps its GitHub link. */
+@media (max-width: 639.98px) {
+  .github-star {
+    display: none;
   }
 }
 

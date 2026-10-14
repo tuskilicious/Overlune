@@ -5,6 +5,7 @@ import { setSiteTheme, useSiteTheme } from "../lib/site-theme";
 import "./site-buttons.css";
 import "./site-nav.css";
 import PhoneNotice from "./PhoneNotice";
+import { repoUrl } from "./SiteFooter";
 
 /**
  * The site's one nav (T8.1): the home page's floating pill on every page, so the site reads as one product. The home
@@ -51,6 +52,13 @@ export default function SiteNav({
           )}
         </ul>
         <div className="site-nav-end">
+          {/* Star on GitHub (2.1, the owner): a plain link to the repo, no count, so no call to GitHub's API. */}
+          <a className="github-star" href={repoUrl} aria-label="Star Overlune on GitHub">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2.8l2.8 5.7 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 2.9 1.1-6.3-4.6-4.4 6.3-.9z" />
+            </svg>
+            <span className="github-star-label">Star on GitHub</span>
+          </a>
           <ThemeToggle />
           {action ?? (
             <Link to="/editor" className="site-nav-cta btn-shimmer">
