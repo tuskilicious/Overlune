@@ -704,7 +704,7 @@
   height: 0.875rem;
   fill: none;
   stroke: currentcolor;
-  stroke-width: 3; /* Lucide's 24-unit icons, drawn small */
+  stroke-width: 1.75;
   stroke-linecap: round;
   stroke-linejoin: round;
 }

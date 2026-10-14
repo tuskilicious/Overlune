@@ -101,9 +101,8 @@ export function LinkRow({
           <Icon name="copy" /> Copy link
         </span>
         <span className="editor-copy-face" data-face="copied">
-          {/* Lucide's check, drawn in as it appears. */}
-          <svg className="icon editor-copy-tick" viewBox="0 0 24 24">
-            <path d="M20 6 9 17l-5-5" pathLength={1} />
+          <svg className="icon editor-copy-tick" viewBox="0 0 12 12">
+            <path d="M2 6.5 5 9.5 10 3" pathLength={1} />
           </svg>{" "}
           Copied
         </span>

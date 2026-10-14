@@ -169,3 +169,59 @@ html[data-rm] .btn-glow::before {
 :root[data-site-theme="light"] .site-dark .btn-glow:hover::after {
   background: radial-gradient(75% 180% at 50% 50%, #3a2468, #0c0d29);
 }
+
+/* Every other button on the site (2.1, after Magic UI's "Interactive Hover Button" on 21st.dev, MIT, ported to CSS): on
+   hover a dot appears near the left edge and swells to fill the button, and the label turns to the page color. Drawn as
+   a growing circular gradient, so the button keeps its own position, size and corners. Not the look cards, the frame
+   placer, color swatches, layer rows or the toggle, which aren't plain buttons; not the shimmer and glow buttons, which
+   have their own. Reduced motion: index.css drops the transition, so it fills at once. */
+@property --ihb-r {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+:is(
+  .editor
+    button:not(
+      .editor-look-card,
+      .frame-placer-box,
+      .editor-swatch,
+      .canvas-layer-name,
+      .theme-toggle,
+      .btn-shimmer,
+      .btn-glow,
+      :disabled
+    ),
+  .landing button.rounded-full
+) {
+  --ihb-fill: var(--accent, var(--color-violet));
+  background-image: radial-gradient(
+    circle at 18px 50%,
+    var(--ihb-fill) 0 var(--ihb-r),
+    transparent var(--ihb-r)
+  );
+  transition:
+    --ihb-r 500ms cubic-bezier(0.65, 0, 0.35, 1),
+    color 250ms ease 80ms,
+    border-color 250ms ease;
+}
+
+:is(
+  .editor
+    button:not(
+      .editor-look-card,
+      .frame-placer-box,
+      .editor-swatch,
+      .canvas-layer-name,
+      .theme-toggle,
+      .btn-shimmer,
+      .btn-glow,
+      :disabled
+    ),
+  .landing button.rounded-full
+):hover {
+  --ihb-r: 420px;
+  border-color: var(--ihb-fill);
+  color: var(--bg, var(--color-night));
+}

@@ -131,99 +131,115 @@ div.site-sky {
   gap: 8px;
 }
 
-/* The light/dark toggle (2.1, a tiny sky after dhxwhy's "Sun Moon Dark Mode Theme Toggle" on 21st.dev). Night: stars and a
-   crescent moon. Day: a blue sky and the sun. The moon leaves slowly, then swoops to the lower left; the sun rises from
-   the lower right. Reduced motion: it just switches. */
-.sky-toggle {
-  position: relative;
-  overflow: hidden;
-  width: 60px;
-  height: 32px;
-  padding: 0;
+/* The light/dark toggle (2.1, after luv-jeri's "Theme Toggle" on 21st.dev): a pill with a sun that becomes a moon (its
+   rays draw in or out, a bite slides over the disc) and the mode's name. Phones show the icon alone. */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px 0 10px;
   border: 1px solid color-mix(in srgb, var(--nav-haze) 45%, transparent);
   border-radius: 999px;
-  background: linear-gradient(160deg, #0b0f3c, #2a1d7a);
+  background: transparent;
+  color: var(--nav-moon);
+  font:
+    600 15px "Quicksand",
+    sans-serif;
   cursor: pointer;
-  isolation: isolate;
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease;
 }
 
-.sky-toggle:focus-visible {
+.theme-toggle:hover {
+  border-color: var(--nav-violet);
+  background: color-mix(in srgb, var(--nav-violet) 14%, transparent);
+}
+
+.theme-toggle:focus-visible {
   outline: 2px solid var(--nav-violet);
   outline-offset: 2px;
 }
 
-.sky-toggle > span {
-  position: absolute;
-  pointer-events: none;
+.theme-toggle svg {
+  width: 22px;
+  height: 22px;
+  fill: currentcolor;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  overflow: visible;
+}
+
+.theme-toggle-core {
+  transition: r 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.theme-toggle-bite {
   transition:
-    opacity 600ms ease,
-    translate 700ms cubic-bezier(0.6, 0, 0.2, 1),
-    rotate 700ms cubic-bezier(0.6, 0, 0.2, 1);
+    cx 500ms cubic-bezier(0.65, 0, 0.35, 1),
+    cy 500ms cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-.sky-day {
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(160deg, #6ec3ff, #bfe6ff);
+.theme-toggle-rays {
+  transform-origin: 12px 12px;
+  transition:
+    opacity 300ms ease,
+    rotate 500ms cubic-bezier(0.65, 0, 0.35, 1),
+    scale 500ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Dark: the moon. The disc grows, the bite covers its top right, the rays turn away. */
+.theme-toggle[data-mode="dark"] .theme-toggle-core {
+  r: 8px;
+}
+
+.theme-toggle[data-mode="light"] .theme-toggle-bite {
+  cx: 30px;
+  cy: -6px;
+}
+
+.theme-toggle[data-mode="dark"] .theme-toggle-rays {
   opacity: 0;
+  rotate: -90deg;
+  scale: 0.4;
 }
 
-.sky-stars {
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 18% 30%, #fff 0 1px, transparent 1.5px),
-    radial-gradient(circle at 38% 70%, #fff 0 0.8px, transparent 1.3px),
-    radial-gradient(circle at 70% 22%, #fff 0 1px, transparent 1.5px),
-    radial-gradient(circle at 84% 64%, #fff 0 0.8px, transparent 1.3px),
-    radial-gradient(circle at 56% 48%, #fff 0 0.6px, transparent 1.1px);
+@media (max-width: 639.98px) {
+  .theme-toggle {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .theme-toggle-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }
 
-/* A crescent: a bright disc with a sky-colored bite. */
-.sky-moon {
-  top: 6px;
-  left: 8px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  box-shadow: inset -5px -2px 0 0 #f4f1ff;
-  rotate: -20deg;
-  filter: drop-shadow(0 0 4px rgb(244 241 255 / 0.6));
+/* The page reveal: the new mode spreads in a circle from the toggle (ThemeToggle sets where). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
-.sky-sun {
-  top: 7px;
-  right: 8px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 40%, #fff3c4, #ffc93c 60%, #ff9f1c);
-  box-shadow: 0 0 8px 2px rgb(255 201 60 / 0.7);
-  opacity: 0;
-  translate: 14px 18px;
+::view-transition-new(root) {
+  animation: theme-reveal 650ms cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-.sky-toggle[data-mode="light"] .sky-day {
-  opacity: 1;
-}
-
-.sky-toggle[data-mode="light"] .sky-stars {
-  opacity: 0;
-}
-
-.sky-toggle[data-mode="light"] .sky-moon {
-  opacity: 0;
-  translate: -16px 18px;
-  rotate: -60deg;
-}
-
-.sky-toggle[data-mode="light"] .sky-sun {
-  opacity: 1;
-  translate: 0 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sky-toggle > span {
-    transition: none;
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--reveal-x, 50%) var(--reveal-y, 0));
+  }
+  to {
+    clip-path: circle(var(--reveal-r, 150vmax) at var(--reveal-x, 50%) var(--reveal-y, 0));
   }
 }
 

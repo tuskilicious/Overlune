@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
+import { flushSync } from "react-dom";
 import { Link, useLocation } from "react-router";
 import { setSiteTheme, useSiteTheme } from "../lib/site-theme";
 import "./site-buttons.css";
@@ -57,25 +58,59 @@ export default function SiteNav({
   );
 }
 
-/** Light or dark mode for the site (2.1): follows the system until pressed, then remembers the pick here. A tiny sky
- *  after dhxwhy's "Sun Moon Dark Mode Theme Toggle" on 21st.dev (behavior ported to CSS): the moon swoops off to the
- *  lower left as the night fades to a blue day and the sun rises from the lower right, and back. */
+/**
+ * Light or dark mode for the site (2.1): follows the system until pressed, then remembers the pick here. After
+ * luv-jeri's "Theme Toggle" on 21st.dev (behavior ported, no code): the sun's rays draw in and a bite slides off to make
+ * the moon, or back, and the new mode spreads over the page in a circle from the button (the View Transitions API,
+ * where the browser has it; otherwise, or with reduced motion, it just switches). Its label, "Light" or "Dark", says the
+ * mode in use; the name says what pressing it does.
+ */
 function ThemeToggle() {
   const theme = useSiteTheme();
   const next = theme === "light" ? "dark" : "light";
+  const flip = (e: MouseEvent<HTMLButtonElement>) => {
+    const still =
+      matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      document.documentElement.dataset.rm !== undefined;
+    if (still || !document.startViewTransition) return setSiteTheme(next);
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = r.left + r.width / 2;
+    const y = r.top + r.height / 2;
+    const root = document.documentElement.style;
+    root.setProperty("--reveal-x", `${x}px`);
+    root.setProperty("--reveal-y", `${y}px`);
+    root.setProperty(
+      "--reveal-r",
+      `${Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))}px`,
+    );
+    document.startViewTransition(() => flushSync(() => setSiteTheme(next)));
+  };
   return (
     <button
       type="button"
-      className="sky-toggle"
+      className="theme-toggle"
       data-mode={theme}
       aria-label={`Switch to ${next} mode`}
       title={`Switch to ${next} mode`}
-      onClick={() => setSiteTheme(next)}
+      onClick={flip}
     >
-      <span className="sky-day" />
-      <span className="sky-stars" />
-      <span className="sky-moon" />
-      <span className="sky-sun" />
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <mask id="theme-toggle-bite">
+          <rect width="24" height="24" fill="#fff" />
+          <circle className="theme-toggle-bite" cx="17" cy="7" r="7" fill="#000" />
+        </mask>
+        <circle
+          className="theme-toggle-core"
+          cx="12"
+          cy="12"
+          r="5"
+          mask="url(#theme-toggle-bite)"
+        />
+        <g className="theme-toggle-rays">
+          <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+        </g>
+      </svg>
+      <span className="theme-toggle-label">{theme === "light" ? "Light" : "Dark"}</span>
     </button>
   );
 }
