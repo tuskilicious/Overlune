@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router";
+import "./site-buttons.css";
 import "./site-nav.css";
 
 /**
@@ -44,7 +45,7 @@ export default function SiteNav({
         )}
       </ul>
       {action ?? (
-        <Link to="/editor" className="site-nav-cta">
+        <Link to="/editor" className="site-nav-cta btn-shimmer">
           Open the editor
         </Link>
       )}

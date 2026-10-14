@@ -94,6 +94,18 @@
   text-decoration: none;
 }
 
+/* Phones: "Sign in" fits on one line next to the logo; " with Twitch" is still read out. */
+@media (max-width: 479.98px) {
+  .editor-account-long {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 .editor-account-signin:hover {
   background: var(--surface);
 }
@@ -1192,11 +1204,24 @@
 .site-footer {
   --footer-mark-stroke: color-mix(in srgb, var(--text-muted) 45%, transparent);
   --footer-mark-fill: var(--bg);
-  margin-top: 48px;
-  padding-top: 24px;
+  /* The home page's footer measure and padding, so the footer looks the same on every page. */
+  box-sizing: border-box;
+  width: 100%; /* also in a flex column, like the not-found page */
+  max-width: 80rem;
+  margin: 48px auto 0;
+  padding: 32px 32px 0;
   border-top: var(--border);
   font-size: 14px;
   color: var(--text-muted);
+}
+
+/* Links in a list, like the home page's: underlined on hover and focus only. */
+.site-footer a {
+  text-decoration: none;
+}
+
+.site-footer a:is(:hover, :focus-visible) {
+  text-decoration: underline;
 }
 
 /* Look filters (T6.60): pills above the picker; a filtered-out look is hidden, not removed. */

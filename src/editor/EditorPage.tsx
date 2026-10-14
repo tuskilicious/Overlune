@@ -536,7 +536,7 @@ export default function EditorPage() {
   /** The canvas (T9.4): on for the scene in the preview, which then holds a layout. */
   const [canvasOn, setCanvasOn] = useState(false);
   /** The preview shows the Live overlay (T9.7) instead of the scene. */
-  const [onLive, setOnLive] = useState(false);
+  const [onLive, setOnLive] = useState(part === "live");
   const target = onLive ? "live" : scene;
   /** Keeps the scene's layout (or, with null, drops it, back to the look's composed scene). Each call is its own undo
    *  step unless `merge` (a burst of nudges). */
@@ -948,7 +948,7 @@ export default function EditorPage() {
                     // Open at the top with the preview in view; focus still lands on the picked look (T6.29).
                     requestAnimationFrame(() => {
                       document.getElementById(lookRadio(id))?.focus({ preventScroll: true });
-                      if (!part) scrollTo(0, 0); // ?part= scrolls to its own place
+                      if (!part || part === "live") scrollTo(0, 0); // ?part= scrolls to its own place; Live is the preview up here
                     });
                   }}
                 >
