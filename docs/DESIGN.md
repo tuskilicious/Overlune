@@ -221,8 +221,8 @@ Overlays for a portrait canvas, from `?canvas=vertical` (STACK.md): `layouts.por
 **Default portrait layouts.** Built per look from its own parts, like T9.3's measured defaults, then placed for the tall frame:
 - Starting Soon, BRB, Ending, Offline: the logo at the top of the safe zone, the title block in its middle (rule, headline, subtitle) in at most three lines across 880px, the countdown card under it, the socials stacked under that. The look's own alignment, type and motif stay; its art is recomposed for the tall frame (a sun, a grid floor or a skyline moves to where it reads in portrait) rather than stretched.
 - Live: the camera frame 960×540 at (60, 96), chat 880 wide in the lower half of the safe zone, alerts in its upper third (y 260–700).
-- Just Chatting: the camera 960×1280 at (60, 220), the header above it and the topic under it, inside the safe zone where the camera allows.
-- Reaction: the reaction box 960×540 at (60, 96), the camera 960×720 at (60, 980), chat where space allows.
+- Just Chatting: the header at (60, 270), 880×130; the camera 960×700 at (60, 420); the topic under it at (60, 1135), 880×95 (inset from the zone's edges, since a big title's letters reach past its line).
+- Reaction: the reaction box 960×540 at (60, 96), the header at (60, 660), the camera 880×495 at (60, 780); no chat by default, since TikTok and Shorts show their own.
 (The camera boxes start from the owner's Tuskilicious kit.)
 
 **Alerts, chat and webcam frame on their own.** Alerts centred in the safe zone's width, in its upper third (y 260–700). Chat 880 wide and 400–900 tall. Webcam frame presets for portrait: 880×495 (16:9), 880×880 (square), 1080×608 (full width, its label inside the safe zone).
@@ -233,7 +233,7 @@ Overlays for a portrait canvas, from `?canvas=vertical` (STACK.md): `layouts.por
 Two more scenes, approved by the owner 2026-10-14 from their kit. Unlike Live they are full-screen scenes in the look (its background, art and type), with the camera showing through a hole: the `camera` element, edged by the look's webcam-frame border, with an entrance and a reduced-motion version like the frame's.
 - **Just Chatting:** a header ("Just chatting", editable), a "Talking about" line with the streamer's topic (editable in the editor and, later, from the dock), the camera large.
 - **Reaction:** a header, a reaction box outlined in the look's accent where the streamer places the video they react to (in OBS, under the overlay), the camera smaller, and chat.
-Both are canvas layouts from the start, so every part moves, resizes and can be removed; Put back returns a removed part.
+Both are canvas layouts from the start, so every part moves, resizes and can be removed; Put back returns a removed part ("Reaction box" for the video's hole). Landscape defaults: Just Chatting's camera 1280×720 at (64, 180) with the header and topic to its right; Reaction's box 1344×756 at (64, 64), the camera 416×312 and chat down the right, the header under the box. The frame's name label isn't shown on these cameras: it sits on the edge, where the hole would cut it. In the editor, "Scene to edit" lists six scenes, three to a row, and Just Chatting's subtitle field reads "Talking about (your topic)". Their links are extras, after Live.
 
 ## Overlay layout rules
 - Canvas is always 1920×1080. Keep a 64px safe margin on scenes.

@@ -10,6 +10,7 @@ import OverlayPlaceholder from "./overlays/OverlayPlaceholder";
 import StartingSoon from "./overlays/starting/StartingSoon";
 import TextScene from "./overlays/TextScene";
 import LiveScene from "./overlays/LiveScene";
+import CamScene from "./overlays/CamScene";
 import SentryTestPage from "./components/SentryTestPage";
 
 // GSAP and Tailwind live in this chunk only, so the editor and overlays never load them.
@@ -108,6 +109,23 @@ export default function App() {
           <Route
             path="/o/live"
             element={<FromLink>{(s, error) => <LiveScene settings={s} error={error} />}</FromLink>}
+          />
+          {/* Just Chatting and Reaction (T10.3): the look around the camera. */}
+          <Route
+            path="/o/chatting"
+            element={
+              <FromLink>
+                {(s, error) => <CamScene scene="chatting" settings={s} error={error} />}
+              </FromLink>
+            }
+          />
+          <Route
+            path="/o/reaction"
+            element={
+              <FromLink>
+                {(s, error) => <CamScene scene="reaction" settings={s} error={error} />}
+              </FromLink>
+            }
           />
           <Route path="/o/:overlay" element={<OverlayPlaceholder />} />
           {showSentryTest && <Route path="/_sentry-test" element={<SentryTestPage />} />}

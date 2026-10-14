@@ -9,7 +9,7 @@ test.use({ viewport: { width: 1080, height: 1920 } });
 
 const hash = (settings: unknown) =>
   `#1.${lz.compressToEncodedURIComponent(JSON.stringify(settings))}`;
-const scenes = ["starting", "brb", "ending", "offline"] as const;
+const scenes = ["starting", "brb", "ending", "offline", "chatting", "reaction"] as const;
 
 /** Sample content with every part, including a long title and handle, the countdown and the ticker. */
 const sample = (theme: string, ticker: boolean) => ({
@@ -25,6 +25,7 @@ const sample = (theme: string, ticker: boolean) => ({
     tz: "UTC",
   },
   brb: { subtitle: "Grabbing a drink" },
+  chatting: { subtitle: "Your desk setups and what we build next" },
   ticker: { show: ticker },
 });
 

@@ -1748,3 +1748,45 @@
 html:has(#root > .scene[style*="--fit"], #root > .live[style*="--fit"]) {
   overflow: hidden;
 }
+
+/* Just Chatting and Reaction (T10.3, CamScene): the look's background with holes for the camera and the video; every
+   part is a layout element. The reaction box is outlined in the accent; the title and topic fit their boxes. */
+.cam-scene .layout-el > .frame {
+  width: 100%;
+  height: 100%;
+}
+
+.cam-screen {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  border: 4px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow: 0 0 32px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.cam-scene .layout-el-title > .scene-title,
+.cam-scene .layout-el-subtitle > .scene-subtitle {
+  margin: 0;
+  max-width: 100%;
+  overflow-wrap: normal;
+}
+
+.cam-topic-label {
+  display: block;
+  margin-bottom: 0.3em;
+  font-size: 0.55em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.cam-scene .layout-el-chat .chat {
+  width: 100%;
+  height: 100%;
+}
+
+.cam-scene .layout-el-alerts .alerts {
+  width: 100%;
+  height: 100%;
+}

@@ -12,6 +12,9 @@ export const overlays = {
   brb: { name: "Be Right Back", short: "BRB", width: 1920, height: 1080 },
   ending: { name: "Stream Ending", short: "Ending", width: 1920, height: 1080 },
   offline: { name: "Offline", short: "Offline", width: 1920, height: 1080, optional: true },
+  // T10.3: the look around your camera.
+  chatting: { name: "Just Chatting", short: "Chatting", width: 1920, height: 1080, optional: true },
+  reaction: { name: "Reaction", short: "Reaction", width: 1920, height: 1080, optional: true },
 } as const;
 
 export type OverlayId = keyof typeof overlays;
@@ -147,7 +150,11 @@ export default function ObsLinks({
   // The scenes and Live take the canvas size picked above the preview (T9.8).
   const canvas = settings.layouts.landscape?.size ?? { width: 1920, height: 1080 };
   const links: LinkInfo[] = [
-    ...(Object.keys(overlays) as OverlayId[]).map((id) => ({ id, ...overlays[id], ...canvas })),
+    ...(["starting", "brb", "ending", "offline"] as const).map((id) => ({
+      id,
+      ...overlays[id],
+      ...canvas,
+    })),
     { id: "chat", name: "Chat", width: settings.chat.width, height: settings.chat.height },
     { id: "alerts", name: "Alerts", width: 1920, height: 1080 },
     {
@@ -166,6 +173,8 @@ export default function ObsLinks({
       ...canvas,
       optional: true,
     },
+    // Just Chatting and Reaction (T10.3), extras like Live.
+    ...(["chatting", "reaction"] as const).map((id) => ({ id, ...overlays[id], ...canvas })),
   ];
   /** Each link as last copied this visit; kept in memory only (no tracking, no storage). */
   const [copied, setCopied] = useState<Record<string, string>>({});
