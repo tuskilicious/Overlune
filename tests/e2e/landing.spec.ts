@@ -280,7 +280,7 @@ for (const width of [390, 768, 1024, 1280, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const cards = page.locator(".landing-cards > li");
-    await expect(cards).toHaveCount(7);
+    await expect(cards).toHaveCount(8);
     for (const box of await cards.evaluateAll((els) => els.map((el) => el.getBoundingClientRect())))
       expect(box.right).toBeLessThanOrEqual(width);
     const scrollers = await page.evaluate(
@@ -350,7 +350,7 @@ test("the hero lists four facts, all true for v1", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("list", { name: "At a glance" }).getByRole("listitem")).toHaveText([
     `${themeIds.length} looks`,
-    "Scenes, chat and alerts",
+    "Move anything, anywhere",
     "Free, no account needed",
     "Open source",
   ]);
@@ -359,12 +359,12 @@ test("the hero lists four facts, all true for v1", async ({ page }) => {
 test("each overlay card opens its part of the editor", async ({ page }) => {
   await page.goto("/");
   const cards = page
-    .getByRole("region", { name: "Seven overlays in every look" })
+    .getByRole("region", { name: "Eight overlays in every look" })
     .getByRole("link");
-  await expect(cards).toHaveCount(7);
+  await expect(cards).toHaveCount(8);
   const hrefs = await cards.evaluateAll((els) => els.map((el) => el.getAttribute("href")));
   expect(hrefs).toEqual(
-    ["starting", "brb", "ending", "offline", "chat", "frame", "alerts"].map(
+    ["starting", "brb", "ending", "offline", "chat", "frame", "alerts", "live"].map(
       (p) => `/editor?part=${p}`,
     ),
   );
@@ -377,6 +377,21 @@ test("each overlay card opens its part of the editor", async ({ page }) => {
   await page.getByRole("button", { name: "Cozy Café", exact: true }).click();
   await expect(page.getByRole("radio", { name: "Be Right Back" })).toBeChecked();
   await expect(page.locator("#part-scenes")).toBeInViewport();
+});
+
+test("the Live card opens the editor with the Live preview on (2.0)", async ({ page }) => {
+  await page.goto("/");
+  await page
+    .getByRole("region", { name: "Eight overlays in every look" })
+    .getByRole("link", { name: /^Live/ })
+    .click();
+  await expect(page.getByRole("heading", { name: "Pick a look to start" })).toBeVisible();
+  await page.getByRole("button", { name: "Cozy Café", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Live source" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(page.getByRole("heading", { name: "Preview: Live" })).toBeInViewport();
 });
 
 test("the chat card opens the chat settings", async ({ page }) => {
@@ -409,6 +424,7 @@ test("the landing page says what works where (T6.69, T6.79)", async ({ page }) =
   await expect(know.locator("summary")).toHaveText([
     "What you’ll need",
     "Works in OBS and Streamlabs",
+    "Make it yours",
     "Extras for your channel",
     "Your links never break",
   ]);
@@ -421,7 +437,8 @@ test("the landing page says what works where (T6.69, T6.79)", async ({ page }) =
   const table = page.getByRole("table", { name: "Which overlays work on which platform" });
   const row = (name: string) => table.getByRole("row").filter({ hasText: name }).locator("td");
   await expect(row("Scenes")).toHaveText(["Yes", "Yes", "Yes"]);
-  await expect(row("Chat")).toHaveText(["Yes", "Not yet", "Not yet"]);
+  await expect(row("Your chat, in your look")).toHaveText(["Yes", "Not yet", "Not yet"]);
+  await expect(row("in one source")).toHaveText(["Yes", "Not yet", "Not yet"]);
   await expect(row("Webcam frame")).toHaveText(["Yes", "Yes", "Yes"]);
   await expect(row("Raids, subs")).toHaveText(["Yes", "Not yet", "No"]);
   await expect(row("Follow alerts")).toHaveText(["Not yet", "No", "No"]);

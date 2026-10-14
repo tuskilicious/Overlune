@@ -16,7 +16,7 @@ export default function NotFoundPage() {
         <h1>This page doesn’t exist</h1>
         <p>The address may have a typo, or the page moved. Pick up from here:</p>
         <div className="notfound-actions">
-          <Link to="/editor" className="notfound-primary">
+          <Link to="/editor" className="notfound-primary btn-shimmer">
             Make your overlays
           </Link>
           <Link to="/guide">Set up your overlays in OBS</Link>

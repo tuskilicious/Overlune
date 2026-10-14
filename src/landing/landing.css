@@ -55,7 +55,8 @@
 
 .landing .editor-preview > .scene,
 .landing .editor-preview > .chat,
-.landing .editor-preview > .alerts {
+.landing .editor-preview > .alerts,
+.landing .editor-preview > .live {
   transform: scale(var(--scale));
   transform-origin: 0 0;
 }
@@ -170,6 +171,16 @@
   pointer-events: none;
 }
 
+/* Phones: the headline fills the card's width, so the moon sits above it, smaller, instead of on its letters. */
+@media (max-width: 639.98px) {
+  .landing-moon {
+    top: 1rem;
+    width: 40px;
+    height: 40px;
+    box-shadow: 10px -4px 0 0 var(--color-moon);
+  }
+}
+
 /* The page's one gradient glow (BRAND.md): the hero frame's edge, Lune Violet to Signal Cyan. The hero's primary
    button gets the matching glow; no other card or button glows. */
 .landing-glow-frame {
@@ -190,12 +201,6 @@
 .landing-glow-frame > :first-child {
   overflow: hidden;
   border-radius: calc(1.5rem - 2px);
-}
-
-.landing-glow-button {
-  box-shadow:
-    0 0 0 1px rgb(24 210 245 / 0.45),
-    0 10px 32px -8px rgb(164 94 252 / 0.7);
 }
 
 /* The hero alerts stay on screen through each step of the tour: their fade-out (alerts.css) waits for the end
@@ -328,24 +333,7 @@
   }
 }
 
-/* Odd one out: Alerts takes the whole last row, where a wide card suits a wide alert. */
-@media (min-width: 640px) and (max-width: 1023.98px) {
-  .landing-cards > [data-part="alerts"] {
-    grid-column: span 2;
-  }
-
-  /* ...as a letterbox, so the row stays the height of the others. */
-  .landing-cards > [data-part="alerts"] .aspect-video {
-    aspect-ratio: 32 / 9;
-  }
-
-  .landing-cards > [data-part="alerts"] .aspect-video > div {
-    width: 55%;
-    margin-top: 5%;
-  }
-}
-
-/* Two tiers (T6.148): the four scenes, then the three overlays that sit over the game, in wider cards. Twelve
+/* Two tiers (T6.148): the four scenes, then the four overlays that sit over the game (Live among them, 2.0). Twelve
    columns so both tiers share one grid: two scenes a row until four fit with room for their names (200px+). */
 @media (min-width: 1024px) {
   .landing-cards {
@@ -354,10 +342,6 @@
 
   .landing-cards > li {
     grid-column: span 6;
-  }
-
-  .landing-cards > :is([data-part="chat"], [data-part="frame"], [data-part="alerts"]) {
-    grid-column: span 4;
   }
 }
 
