@@ -4,6 +4,7 @@ import { setSiteTheme, useSiteTheme } from "../lib/site-theme";
 import Icon from "./Icon";
 import "./site-buttons.css";
 import "./site-nav.css";
+import PhoneNotice from "./PhoneNotice";
 
 /**
  * The site's one nav (T8.1): the home page's floating pill on every page, so the site reads as one product. The home
@@ -22,39 +23,43 @@ export default function SiteNav({
 }) {
   const { pathname } = useLocation();
   return (
-    <nav aria-label="Main" className="site-nav" data-position={position}>
-      <Link to="/" className="site-nav-logo">
-        <img src="/images/brand/logo.png" alt="Overlune home" width="120" height="36" />
-      </Link>
-      <ul className="site-nav-links">
-        {links ?? (
-          <>
-            <li>
-              <Link to="/#kit">Overlays</Link>
-            </li>
-            <li>
-              <Link to="/#looks">Looks</Link>
-            </li>
-            <li>
-              <Link to="/#how">How it works</Link>
-            </li>
-            <li>
-              <Link to="/guide" aria-current={pathname === "/guide" ? "page" : undefined}>
-                Setup guide
-              </Link>
-            </li>
-          </>
-        )}
-      </ul>
-      <div className="site-nav-end">
-        <ThemeToggle />
-        {action ?? (
-          <Link to="/editor" className="site-nav-cta btn-shimmer">
-            Open the editor
-          </Link>
-        )}
-      </div>
-    </nav>
+    <>
+      {/* On a phone: Overlune is made on a computer (2.1). */}
+      <PhoneNotice />
+      <nav aria-label="Main" className="site-nav" data-position={position}>
+        <Link to="/" className="site-nav-logo">
+          <img src="/images/brand/logo.png" alt="Overlune home" width="120" height="36" />
+        </Link>
+        <ul className="site-nav-links">
+          {links ?? (
+            <>
+              <li>
+                <Link to="/#kit">Overlays</Link>
+              </li>
+              <li>
+                <Link to="/#looks">Looks</Link>
+              </li>
+              <li>
+                <Link to="/#how">How it works</Link>
+              </li>
+              <li>
+                <Link to="/guide" aria-current={pathname === "/guide" ? "page" : undefined}>
+                  Setup guide
+                </Link>
+              </li>
+            </>
+          )}
+        </ul>
+        <div className="site-nav-end">
+          <ThemeToggle />
+          {action ?? (
+            <Link to="/editor" className="site-nav-cta btn-shimmer">
+              Open the editor
+            </Link>
+          )}
+        </div>
+      </nav>
+    </>
   );
 }
 
