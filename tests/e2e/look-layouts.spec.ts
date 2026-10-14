@@ -28,10 +28,16 @@ const sample = (theme: string, ticker: boolean) => ({
 const link = (scene: string, settings: unknown) =>
   `/o/${scene}#1.${lz.compressToEncodedURIComponent(JSON.stringify(settings))}`;
 
-/** A still screenshot of the scene: reduced motion, fonts loaded, the countdown's clock fixed. */
-async function shot(page: Page, url: string) {
+/** A still screenshot of the scene: reduced motion, fonts loaded, the countdown's clock fixed. Within a scene only the
+ *  link's `#` part changes, so the page doesn't reload and the last render is still up: wait for the one this link
+ *  draws (composed or layout, ticker or not), or the shot can catch the previous one on a busy machine. */
+async function shot(page: Page, url: string, { layout = false, ticker = false }) {
   await page.goto(url);
-  await page.locator(".scene").waitFor();
+  await page
+    .locator(
+      `.scene${layout ? "[data-layout]" : ":not([data-layout])"}${ticker ? "[data-ticker]" : ":not([data-ticker])"}`,
+    )
+    .waitFor();
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(150);
   return page.screenshot({ clip: { x: 0, y: 0, width: 1920, height: 1080 } });
@@ -87,7 +93,7 @@ for (const theme of themeIds)
     for (const scene of scenes)
       for (const ticker of [false, true]) {
         const settings = sample(theme, ticker);
-        const composed = await shot(page, link(scene, settings));
+        const composed = await shot(page, link(scene, settings), { ticker });
         // The editor's own measuring code, loaded from the dev server.
         const elements = await page.evaluate(async (path) => {
           const { measureLayout } = (await import(
@@ -98,6 +104,7 @@ for (const theme of themeIds)
         const custom = await shot(
           page,
           link(scene, { ...settings, layouts: { landscape: { scenes: { [scene]: elements } } } }),
+          { layout: true, ticker },
         );
         await expect(page.locator(".scene[data-layout]")).toHaveCount(1);
         const ratio = await diffRatio(page, composed, custom);

@@ -822,6 +822,11 @@ Planned with the owner 2026-10-13. Overlune for vertical streams (TikTok Live, Y
 - [ ] **T10.10 OBS test and release 2.1.0.** Every vertical overlay, Just Chatting and Reaction through `docs/OBS-TESTING.md` on a real vertical canvas, and the safe zone checked on a phone in a private TikTok or YouTube live test (DESIGN.md numbers corrected if needed), then a release.
   - Accept: the OBS test is logged; 2.1.0 published.
 
+### Flaky test (2026-10-15)
+- [x] **T10.11 Make the look-layouts test reliable.** "abyss: each scene's default layout renders like the composed scene" failed twice in full e2e runs on 2026-10-15 and passed when rerun alone.
+  - Accept: the test checks the same thing (the same pixel threshold) without depending on timing; it passes 20 times in a row and in the full suite.
+  - *Built 2026-10-15 on `fix/abyss-layout-flake`. Within one scene the test's links differ only after `#`, so `page.goto` keeps the same page (checked: a value set on `window` survives it), and waiting for `.scene` passed at once on the previous render. On a busy machine, the screenshot and the measuring could then catch the scene before it redrew. Each screenshot now waits for the scene its link draws: composed or layout, with or without the ticker. The 0.5% threshold is unchanged. The failure didn't reproduce locally before the fix, so this is the race found by reading the test, not one seen failing. Test only, no app change.*
+
 ## Phase 11: Four new looks (planned)
 Eclipse, Rain City, Paper Cut and Aurora Tundra (picked by the owner 2026-10-13), each with its own world and **the lune**, Overlune's signature: a crescent moon made from that look's own material (a corona, a neon sign, cut paper, frost). The bar in DESIGN.md applies, plus vertical versions from the start. Broken into tasks when it starts.
 
