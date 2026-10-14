@@ -1,0 +1,99 @@
+/* The phone notice (PhoneNotice.tsx): a card at the foot of the screen, over the page, in the brand's night (or its
+   light mode). Plain CSS, like the nav, since it shows on every site page. */
+.phone-notice {
+  --pn-bg: #0b0f3c;
+  --pn-text: #f4f1ff;
+  --pn-muted: #a7a0d6;
+  --pn-violet: #a45efc;
+  --pn-night: #05061a;
+  position: fixed;
+  z-index: 60;
+  left: 12px;
+  right: 12px;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  display: grid;
+  gap: 8px;
+  padding: 18px 18px 16px;
+  border: 1px solid color-mix(in srgb, var(--pn-violet) 45%, transparent);
+  border-radius: 20px;
+  background: var(--pn-bg);
+  box-shadow: 0 18px 48px -12px rgb(0 0 0 / 0.6);
+  color: var(--pn-muted);
+  font-family: "Nunito", sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  animation: phone-notice-in 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root[data-site-theme="light"] .phone-notice {
+  --pn-bg: #ffffff;
+  --pn-text: #16123a;
+  --pn-muted: #574f86;
+  --pn-violet: #7b3fe4;
+  --pn-night: #f6f4fd;
+  box-shadow: 0 18px 48px -12px rgb(22 18 58 / 0.35);
+}
+
+.phone-notice p {
+  margin: 0;
+}
+
+.phone-notice-title {
+  font-family: "Quicksand", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--pn-text);
+}
+
+.phone-notice-app {
+  font-size: 14px;
+}
+
+.phone-notice-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.phone-notice-actions button {
+  flex: 1;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--pn-muted) 50%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pn-text);
+  font:
+    700 15px "Quicksand",
+    sans-serif;
+  cursor: pointer;
+}
+
+.phone-notice-actions button:first-child {
+  border-color: var(--pn-violet);
+  background: var(--pn-violet);
+  color: var(--pn-night);
+}
+
+.phone-notice-actions button:focus-visible {
+  outline: 2px solid var(--pn-violet);
+  outline-offset: 2px;
+}
+
+.phone-notice-sent {
+  font-size: 14px;
+  color: var(--pn-text);
+}
+
+@keyframes phone-notice-in {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phone-notice {
+    animation: none;
+  }
+}
