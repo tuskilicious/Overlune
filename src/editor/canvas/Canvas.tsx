@@ -11,6 +11,7 @@ import type { LayoutElement, LayoutScene, Settings } from "../../settings/schema
 import Preview from "../Preview";
 import {
   angleTo,
+  clampMove,
   handles,
   resize,
   snapDistance,
@@ -73,6 +74,8 @@ export default function Canvas({ settings, canvasId, sceneId, elements, scene, o
   const [selected, setSelected] = useState<string[]>([]);
   const [draft, setDraft] = useState<LayoutElement[] | null>(null);
   const [guides, setGuides] = useState<Guide[]>([]);
+  /** Safe areas and thirds over the canvas (the overlay playbook), on request; never in OBS. */
+  const [frameGuides, setFrameGuides] = useState(false);
   const gesture = useRef<Gesture | null>(null);
   /** The scene's box (T9.8): layouts are in its units. */
   const size = canvasOf(settings, canvasId);
@@ -103,6 +106,9 @@ export default function Canvas({ settings, canvasId, sceneId, elements, scene, o
     const r = area.current!.getBoundingClientRect();
     return { x: (e.clientX - r.left) / scale, y: (e.clientY - r.top) / scale };
   };
+  /** The selected elements a move takes along: locked ones stay. */
+  const moving = (from: LayoutElement[]) =>
+    from.filter((el) => selected.includes(el.id) && !el.locked);
   const update = (
     from: LayoutElement[],
     ids: string[],
@@ -158,6 +164,7 @@ export default function Canvas({ settings, canvasId, sceneId, elements, scene, o
         dy += Math.round(snap.dy);
         lines = snap.guides;
       }
+      ({ dx, dy } = clampMove(moving(g.from), dx, dy, size));
       setGuides(lines);
       setDraft(update(g.from, selected, (el) => ({ ...el, x: el.x + dx, y: el.y + dy })));
     } else if (g.mode === "resize") {
@@ -339,7 +346,9 @@ export default function Canvas({ settings, canvasId, sceneId, elements, scene, o
     if (!dir || !selected.length) return;
     e.preventDefault();
     const step = e.shiftKey ? 10 : 1;
-    const [dx, dy] = [dir[0] * step, dir[1] * step];
+    // Alt resizes, which the clamp doesn't limit; a move stays on the canvas.
+    const by = { dx: dir[0] * step, dy: dir[1] * step };
+    const { dx, dy } = e.altKey ? by : clampMove(moving(elements), by.dx, by.dy, size);
     onCommit(
       update(elements, selected, (el) =>
         e.altKey
@@ -380,6 +389,19 @@ export default function Canvas({ settings, canvasId, sceneId, elements, scene, o
         </Preview>
         <div className="canvas-layer">
           {canvasId === "portrait" && <SafeZone w={size.w} h={size.h} />}
+          {frameGuides && (
+            <div className="canvas-frame-guides" data-canvas={canvasId} aria-hidden>
+              {canvasId === "landscape" && (
+                <>
+                  <span className="canvas-safe" data-safe="action" />
+                  <span className="canvas-safe" data-safe="title" />
+                </>
+              )}
+              {["x1", "x2", "y1", "y2"].map((t) => (
+                <span key={t} className="canvas-third" data-third={t} />
+              ))}
+            </div>
+          )}
           {shown
             .filter((el) => !el.hidden)
             .map((el) => (
@@ -449,6 +471,14 @@ export default function Canvas({ settings, canvasId, sceneId, elements, scene, o
           duplicate={(id) => duplicate([id])}
         />
         {/* Turning is in the inspector's Turn box, for the keyboard. */}
+        <label className="canvas-guides-toggle">
+          <input
+            type="checkbox"
+            checked={frameGuides}
+            onChange={(e) => setFrameGuides(e.target.checked)}
+          />
+          {canvasId === "landscape" ? "Show safe areas and thirds" : "Show thirds"}
+        </label>
         <details className="canvas-keys-box">
           <summary>Keyboard keys</summary>
           <CanvasKeys />

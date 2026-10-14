@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { angleTo, resize, snapMove } from "../../../src/editor/canvas/geometry";
+import { angleTo, clampMove, resize, snapMove } from "../../../src/editor/canvas/geometry";
 
 const canvas = { w: 1920, h: 1080 };
 
@@ -55,5 +55,26 @@ describe("angleTo", () => {
   });
   it("rounds to a step", () => {
     expect(angleTo(box, 120, -30, 15)).toBe(45);
+  });
+});
+
+describe("clampMove", () => {
+  it("stops a box at the canvas's edges", () => {
+    const box = { x: 100, y: 100, w: 200, h: 100 };
+    expect(clampMove([box], -500, 0, canvas)).toEqual({ dx: -100, dy: 0 });
+    expect(clampMove([box], 5000, 5000, canvas)).toEqual({ dx: 1620, dy: 880 });
+    expect(clampMove([box], 30, -20, canvas)).toEqual({ dx: 30, dy: -20 });
+  });
+
+  it("keeps a group together, by its outer edges", () => {
+    const a = { x: 100, y: 100, w: 100, h: 100 };
+    const b = { x: 1700, y: 900, w: 100, h: 100 };
+    expect(clampMove([a, b], 500, 500, canvas)).toEqual({ dx: 120, dy: 80 });
+  });
+
+  it("lets a box already off the edge come back, but never go further out", () => {
+    const off = { x: -50, y: 0, w: 200, h: 100 };
+    expect(clampMove([off], -10, 0, canvas)).toEqual({ dx: 0, dy: 0 });
+    expect(clampMove([off], 20, 0, canvas)).toEqual({ dx: 20, dy: 0 });
   });
 });
