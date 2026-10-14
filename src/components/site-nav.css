@@ -122,3 +122,66 @@ div.site-sky {
   background-repeat: no-repeat;
   background-size: 100% 32rem;
 }
+
+/* The toggle and the main action, together at the nav's end (2.1). */
+.site-nav-end {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.site-nav-theme {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--nav-haze) 40%, transparent);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--nav-moon);
+  cursor: pointer;
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease;
+}
+
+.site-nav-theme:hover {
+  border-color: var(--nav-violet);
+  background: color-mix(in srgb, var(--nav-violet) 15%, transparent);
+}
+
+.site-nav-theme:focus-visible {
+  outline: 2px solid var(--nav-violet);
+  outline-offset: 2px;
+}
+
+.site-nav-theme .icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Light mode (2.1): the pill turns daylight glass, the stars go, and the white wordmark is inverted to ink with its
+   violet crescent kept (a 180° hue turn undoes the inversion's hue flip). */
+:root[data-site-theme="light"] .site-nav {
+  --nav-night: #f6f4fd;
+  --nav-moon: #16123a;
+  --nav-haze: #574f86;
+  --nav-violet: #7b3fe4;
+  border-color: rgb(22 18 58 / 0.1);
+  background: rgb(255 255 255 / 0.75);
+  box-shadow: 0 8px 24px -12px rgb(22 18 58 / 0.25);
+}
+
+:root[data-site-theme="light"] .site-nav-logo img {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+:root[data-site-theme="light"] div.site-sky {
+  background-image: radial-gradient(
+    60rem 26rem at 50% -8rem,
+    rgb(123 63 228 / 0.14),
+    transparent 70%
+  );
+}

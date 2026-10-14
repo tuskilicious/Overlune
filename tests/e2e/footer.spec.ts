@@ -156,9 +156,16 @@ test("the legal pages index their own headings and mark the part you're reading 
 });
 
 // T8.6: one axe pass over every page of the site, phone and wide, now that they share the shell.
-for (const width of [390, 1440])
-  test(`every page is axe clean at ${width}px (T8.6)`, async ({ page }) => {
+// 2.1: in light mode too.
+for (const [width, mode] of [
+  [390, "dark"],
+  [1440, "dark"],
+  [390, "light"],
+  [1440, "light"],
+] as const)
+  test(`every page is axe clean at ${width}px in ${mode} mode (T8.6)`, async ({ page }) => {
     test.slow(); // seven pages, each fully loaded
+    await page.addInitScript((m) => localStorage.setItem("overlune-site-theme", m), mode);
     await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
     for (const [path, pick] of [
       ["/", null],

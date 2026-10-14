@@ -14,7 +14,8 @@ import { loadSaved, save } from "../settings/storage";
 import { decodeLink, encode } from "../settings/url";
 import { themes } from "../themes";
 import { blurbs } from "../themes/blurbs";
-import { brandChrome } from "./brand";
+import { brandFor } from "./brand";
+import { useSiteTheme } from "../lib/site-theme";
 import { themeIds, type ThemeId } from "../themes/types";
 import { themeVars } from "../themes/vars";
 import ChatView from "../overlays/chat/ChatView";
@@ -405,6 +406,7 @@ function initialState(): { settings: Settings; status: string } {
 }
 
 export default function EditorPage() {
+  const siteTheme = useSiteTheme();
   const [initial] = useState(initialState);
   const [settings, setSettings] = useState<Settings>(initial.settings);
   /** A landing-page card can open one part of the editor: /editor?part=brb (T6.59). Read once. */
@@ -777,7 +779,7 @@ export default function EditorPage() {
   };
 
   return (
-    <div className="editor site-sky" style={themeVars(brandChrome)}>
+    <div className="editor site-sky" style={themeVars(brandFor(siteTheme))}>
       {/* No real #fragment jump: the address bar's fragment holds the settings. */}
       <a
         hidden={welcome}

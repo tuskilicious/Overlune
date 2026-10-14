@@ -145,3 +145,27 @@ html[data-rm] .btn-glow::before {
   background: var(--btn-spark);
   opacity: 0.35;
 }
+
+/* Light mode (2.1): the second action turns white with an ink label and a violet spark, except in the sections that
+   stay night (.site-dark, landing.css). */
+:root[data-site-theme="light"] .btn-glow {
+  --btn-fill: #ffffff;
+  --btn-spark: var(--btn-violet);
+  background: rgb(22 18 58 / 0.16);
+  color: #16123a;
+}
+
+:root[data-site-theme="light"] .btn-glow:hover::after {
+  background: radial-gradient(75% 180% at 50% 50%, #efe6ff, #ffffff);
+}
+
+:root[data-site-theme="light"] .site-dark .btn-glow {
+  --btn-fill: #0c0d29;
+  --btn-spark: var(--btn-moon);
+  background: rgb(244 241 255 / 0.18);
+  color: var(--btn-moon);
+}
+
+:root[data-site-theme="light"] .site-dark .btn-glow:hover::after {
+  background: radial-gradient(75% 180% at 50% 50%, #3a2468, #0c0d29);
+}

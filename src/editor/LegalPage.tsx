@@ -3,7 +3,8 @@ import SiteFooter from "../components/SiteFooter";
 import SiteNav from "../components/SiteNav";
 import { parseMarkdown, type Inline } from "../lib/markdown";
 import { useHeadingAbove } from "../lib/useHeadingAbove";
-import { brandChrome } from "./brand";
+import { brandFor } from "./brand";
+import { useSiteTheme } from "../lib/site-theme";
 import { themeVars } from "../themes/vars";
 import privacy from "../../docs/legal/privacy.md?raw";
 import terms from "../../docs/legal/terms.md?raw";
@@ -40,6 +41,7 @@ const slug = (text: string) =>
  * beside the text on wide windows and marking the part you're reading.
  */
 export default function LegalPage({ page }: { page: keyof typeof sources }) {
+  const siteTheme = useSiteTheme();
   const blocks = useMemo(() => parseMarkdown(sources[page]), [page]);
   const title = blocks.find((b) => b.type === "h1");
   const headings = useMemo(
@@ -52,7 +54,7 @@ export default function LegalPage({ page }: { page: keyof typeof sources }) {
   const ids = useMemo(() => headings.map(([id]) => id), [headings]);
   const reading = useHeadingAbove(ids);
   return (
-    <div className="editor guide site-sky" style={themeVars(brandChrome)}>
+    <div className="editor guide site-sky" style={themeVars(brandFor(siteTheme))}>
       <SiteNav />
       <div className="guide-layout legal-layout">
         <header className="editor-header legal">

@@ -1,15 +1,17 @@
 import { Link } from "react-router";
 import SiteFooter from "../components/SiteFooter";
 import SiteNav from "../components/SiteNav";
-import { brandChrome } from "./brand";
+import { brandFor } from "./brand";
+import { useSiteTheme } from "../lib/site-theme";
 import { themeVars } from "../themes/vars";
 import "./editor.css";
 import "./guide.css";
 
 /** Any address the app doesn't know, e.g. a typo (T6.51). Overlay links have their own placeholder (/o/:overlay). */
 export default function NotFoundPage() {
+  const siteTheme = useSiteTheme();
   return (
-    <div className="editor guide notfound-page site-sky" style={themeVars(brandChrome)}>
+    <div className="editor guide notfound-page site-sky" style={themeVars(brandFor(siteTheme))}>
       <SiteNav />
       {/* One clear way forward and two quieter ones, centered in the space under a soft brand glow (T6.104). */}
       <main className="notfound">
