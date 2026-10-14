@@ -345,7 +345,13 @@
     left: 0;
     right: 0;
     bottom: 0;
-    padding: 12px 16px;
+    /* Never taller than the screen less the nav's band: with the canvas, its panels scroll inside the dock instead
+       of running off the top or under the nav. */
+    box-sizing: border-box;
+    max-height: calc(100dvh - 88px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 12px 16px max(12px, env(safe-area-inset-bottom));
     background: var(--bg);
     border-top: var(--border);
     box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4);
@@ -362,6 +368,22 @@
 
   .editor-scene-preview-body {
     margin-top: 12px;
+  }
+
+  /* The dock's bar on a phone: the name on its own line, then the controls, smaller, in one or two rows. */
+  .editor .editor-scene-preview .editor-preview-bar {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .editor .editor-scene-preview .editor-preview-bar h2 {
+    flex-basis: 100%;
+    font-size: 15px;
+  }
+
+  .editor .editor-scene-preview .editor-preview-bar :is(button, select) {
+    padding: 6px 10px;
+    font-size: 14px;
   }
 
   /* Short enough to leave room for the form above it. */
@@ -598,8 +620,10 @@
     background-color 200ms ease-out;
 }
 
-.editor label.editor-check:not(.editor-days *):hover input[type="checkbox"]::before {
-  scale: 1.08;
+@media (hover: hover) {
+  .editor label.editor-check:not(.editor-days *):hover input[type="checkbox"]::before {
+    scale: 1.08;
+  }
 }
 
 /* Pressed: the knob stretches (to the right when off, to the left when on, so it reaches toward its new side). */
@@ -1565,6 +1589,17 @@
   .editor-link label > span > .editor-link-name + .editor-sep + .editor-chip {
     margin-left: 0;
   }
+
+  /* The name keeps its line: Copy link goes under the link instead of beside the name. */
+  .editor .editor-link {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editor .editor-link button {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+  }
 }
 
 /* "Copy all links" (T6.70): an outline button above the rows (the filled style stays for each row's Copy link),
@@ -1790,11 +1825,13 @@
     opacity 160ms ease-out;
 }
 
-.editor-segmented:has(> label:hover)::before {
-  opacity: 1;
+@media (hover: hover) {
+  .editor-segmented:has(> label:hover)::before {
+    opacity: 1;
+  }
 }
 
-.editor-segmented.editor-scenes::before {
+.editor-segmented.editor-scene-pick::before {
   height: calc((100% - 6px) / 2);
   top: 3px;
   bottom: auto;
@@ -1824,82 +1861,82 @@
   --h: 5;
 }
 
-.editor-segmented.editor-scenes:has(> label:nth-of-type(1):hover) {
+.editor-segmented.editor-scene-pick:has(> label:nth-of-type(1):hover) {
   --h: 0;
   --hr: 0;
 }
 
-.editor-segmented.editor-scenes:has(> label:nth-of-type(2):hover) {
+.editor-segmented.editor-scene-pick:has(> label:nth-of-type(2):hover) {
   --h: 1;
   --hr: 0;
 }
 
-.editor-segmented.editor-scenes:has(> label:nth-of-type(3):hover) {
+.editor-segmented.editor-scene-pick:has(> label:nth-of-type(3):hover) {
   --h: 2;
   --hr: 0;
 }
 
-.editor-segmented.editor-scenes:has(> label:nth-of-type(4):hover) {
+.editor-segmented.editor-scene-pick:has(> label:nth-of-type(4):hover) {
   --h: 0;
   --hr: 1;
 }
 
-.editor-segmented.editor-scenes:has(> label:nth-of-type(5):hover) {
+.editor-segmented.editor-scene-pick:has(> label:nth-of-type(5):hover) {
   --h: 1;
   --hr: 1;
 }
 
-.editor-segmented.editor-scenes:has(> label:nth-of-type(6):hover) {
+.editor-segmented.editor-scene-pick:has(> label:nth-of-type(6):hover) {
   --h: 2;
   --hr: 1;
 }
 
 /* Scene to edit (T10.3): six scenes, three to a row, so each name has room; the highlight moves by row and column. */
-.editor fieldset.editor-segmented.editor-scenes,
-.editor-segmented.editor-scenes {
+.editor fieldset.editor-segmented.editor-scene-pick,
+.editor-segmented.editor-scene-pick {
   grid-auto-flow: row;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   --n: 3;
 }
 
-.editor-segmented.editor-scenes::after {
+.editor-segmented.editor-scene-pick::after {
   height: calc((100% - 6px) / 2);
   top: 3px;
   bottom: auto;
   transform: translate(calc(var(--i) * 100%), calc(var(--r, 0) * 100%));
 }
 
-.editor-segmented.editor-scenes:has(> label:nth-of-type(1) :checked) {
+.editor-segmented.editor-scene-pick:has(> label:nth-of-type(1) :checked) {
   --n: 3; /* beats the generic count for four and more */
   --i: 0;
   --r: 0;
 }
 
-.editor-segmented.editor-scenes:has(> label:nth-of-type(2) :checked) {
+.editor-segmented.editor-scene-pick:has(> label:nth-of-type(2) :checked) {
   --n: 3;
   --i: 1;
   --r: 0;
 }
 
-.editor-segmented.editor-scenes:has(> label:nth-of-type(3) :checked) {
+.editor-segmented.editor-scene-pick:has(> label:nth-of-type(3) :checked) {
   --n: 3;
   --i: 2;
   --r: 0;
 }
 
-.editor-segmented.editor-scenes:has(> label:nth-of-type(4) :checked) {
+.editor-segmented.editor-scene-pick:has(> label:nth-of-type(4) :checked) {
   --n: 3;
   --i: 0;
   --r: 1;
 }
 
-.editor-segmented.editor-scenes:has(> label:nth-of-type(5) :checked) {
+.editor-segmented.editor-scene-pick:has(> label:nth-of-type(5) :checked) {
   --n: 3;
   --i: 1;
   --r: 1;
 }
 
-.editor-segmented.editor-scenes:has(> label:nth-of-type(6) :checked) {
+.editor-segmented.editor-scene-pick:has(> label:nth-of-type(6) :checked) {
   --n: 3;
   --i: 2;
   --r: 1;

@@ -51,7 +51,7 @@ export default function SceneText({
     <>
       <fieldset id="part-scenes" className="editor-part" tabIndex={-1}>
         <legend>Scene to edit</legend>
-        <div className="editor-scenes editor-segmented">
+        <div className="editor-scenes editor-scene-pick editor-segmented">
           {(Object.keys(overlays) as Scene[]).map((id) => (
             <label key={id}>
               <input
