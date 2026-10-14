@@ -11,6 +11,10 @@ export const CanvasContext = createContext<CanvasId>("landscape");
 export const linkCanvas = (search: string): CanvasId =>
   new URLSearchParams(search).get("canvas") === "vertical" ? "portrait" : "landscape";
 
+/** The portrait safe zone (DESIGN.md): every word inside 60px from the left, 140 from the right, 240 from the top
+ *  and 680 from the bottom, clear of TikTok's and Shorts' own buttons and comments. */
+export const safeZone = { left: 60, right: 140, top: 240, bottom: 680 };
+
 /** Each canvas's design size: the looks are designed at 1920×1080, and their portrait versions at 1080×1920. */
 export const designOf: Record<CanvasId, { w: number; h: number }> = {
   landscape: { w: 1920, h: 1080 },

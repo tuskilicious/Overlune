@@ -1056,11 +1056,12 @@
   }
 
   /* Scene titles sit at the bottom of the frame, so the whole preview must fit under the header on a 768px-tall
-     laptop, or a first visit looks like an empty box (T6.49). 390px covers the header, save box, steps bar and
-     preview heading above it at the top of the page (about 320-350px, depending on how the save box wraps). */
+     laptop, or a first visit looks like an empty box (T6.49). 450px covers the header, save box, steps bar and
+     preview bar above it at the top of the page (up to about 440px with saved work's longer save box; the bar
+     takes two rows on a laptop since the Horizontal / Vertical switch, T10.4). */
   .editor-scene-preview .editor-preview,
   .editor-scene-preview .canvas {
-    max-width: max(320px, calc((100vh - 390px) * var(--aspect, 16 / 9)));
+    max-width: max(320px, calc((100vh - 450px) * var(--aspect, 16 / 9)));
   }
 
   /* On the canvas the cap is the canvas's own (it holds the layer of handles too), so the scene inside never draws
@@ -2420,4 +2421,49 @@
   transform: scale(var(--scale));
   transform-origin: 0 0;
   scale: none;
+}
+
+/* Horizontal / Vertical (T10.4): two buttons joined into one control. */
+.editor-canvas-pick {
+  display: inline-flex;
+}
+
+.editor .editor-canvas-pick button:first-child {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+
+/* The picked one fills with Lune Violet, as the look filters do (Night text, 5.3:1). */
+.editor .editor-canvas-pick button[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+.editor .editor-canvas-pick button:last-child {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+  margin-inline-start: -1px;
+}
+
+/* A vertical preview, held to the window's height by the cap above (T6.49), sits centred. */
+.editor-scene-preview-body :is(.editor-preview, .canvas) {
+  margin-inline: auto;
+}
+
+.editor-preview {
+  position: relative;
+}
+
+/* The portrait safe zone (DESIGN.md): a faint guide in the editor, never in OBS. */
+.safe-zone {
+  position: absolute;
+  z-index: 1;
+  border: 1px dashed rgb(24 210 245 / 0.7);
+  pointer-events: none;
+}
+
+.editor-vertical-note code {
+  font-size: 0.9em;
 }

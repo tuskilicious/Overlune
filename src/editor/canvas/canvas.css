@@ -15,6 +15,11 @@
   outline-offset: 2px;
 }
 
+/* The scene fills the canvas edge to edge, so it lines up with the layer of handles over it: no preview border. */
+.canvas > .editor-preview {
+  border: 0;
+}
+
 .canvas-layer {
   position: absolute;
   inset: 0;

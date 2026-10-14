@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { LayoutElement } from "../../settings/schema";
 import { isHttpsUrl } from "../../lib/url-safety";
 import { colorTokens, type ColorToken } from "../../themes/types";
+import { safeZone } from "../../overlays/measure";
 
 /** What each element is called: the streamer's name for it, or its type's. */
 export const typeName: Record<LayoutElement["type"], string> = {
@@ -496,12 +497,34 @@ export function Inspector({
 }
 
 type Size = { width: number; height: number };
-const sizes: [width: number, height: number, label: string][] = [
+const landscapeSizes: [width: number, height: number, label: string][] = [
   [1920, 1080, "1920 × 1080"],
   [1280, 720, "1280 × 720"],
   [2560, 1440, "2560 × 1440"],
   [3840, 2160, "3840 × 2160 (4K)"],
 ];
+/** A vertical canvas's common sizes: the landscape ones turned on end. */
+const portraitSizes = landscapeSizes.map(([w, h, label]): [number, number, string] => [
+  h,
+  w,
+  label.replace(`${w} × ${h}`, `${h} × ${w}`),
+]);
+
+/** The portrait safe zone as a faint box over a vertical preview (DESIGN.md), in the box's own units. Never in OBS. */
+export function SafeZone({ w, h }: { w: number; h: number }) {
+  return (
+    <span
+      className="safe-zone"
+      aria-hidden
+      style={{
+        left: `${(safeZone.left / w) * 100}%`,
+        right: `${(safeZone.right / w) * 100}%`,
+        top: `${(safeZone.top / h) * 100}%`,
+        bottom: `${(safeZone.bottom / h) * 100}%`,
+      }}
+    />
+  );
+}
 
 /** A size the scenes can be drawn at: 320 to 3840 each way, and at most three times as wide as tall or the other way
  *  round, so a layout stays inside the link's limits. */
@@ -513,7 +536,16 @@ export const goodSize = ({ width, height }: Size) =>
  * The canvas size (T9.8): the scenes and Live are drawn at the size of the streamer's OBS canvas. A common size, or
  * their own; the layouts keep their places when it changes.
  */
-export function CanvasSize({ size, onChange }: { size: Size; onChange: (size: Size) => void }) {
+export function CanvasSize({
+  size,
+  portrait = false,
+  onChange,
+}: {
+  size: Size;
+  portrait?: boolean;
+  onChange: (size: Size) => void;
+}) {
+  const sizes = portrait ? portraitSizes : landscapeSizes;
   const common = sizes.some(([w, h]) => w === size.width && h === size.height);
   const [custom, setCustom] = useState<{ width: string; height: string } | null>(null);
   const typed = custom && { width: Number(custom.width), height: Number(custom.height) };
