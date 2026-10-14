@@ -152,9 +152,12 @@ div.site-sky {
     background-color 200ms ease;
 }
 
-.theme-toggle:hover {
-  border-color: var(--nav-violet);
-  background: color-mix(in srgb, var(--nav-violet) 14%, transparent);
+/* Only where there is a pointer that hovers: a tapped button on a phone would stay in its hover state. */
+@media (hover: hover) {
+  .theme-toggle:hover {
+    border-color: var(--nav-violet);
+    background: color-mix(in srgb, var(--nav-violet) 14%, transparent);
+  }
 }
 
 .theme-toggle:focus-visible {
