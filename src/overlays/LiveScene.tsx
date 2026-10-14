@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { useContext, type CSSProperties, type ReactNode } from "react";
 import type { AlertEvent } from "../alerts/events";
 import type { LayoutElement, Settings } from "../settings/schema";
 import { themes } from "../themes";
@@ -10,24 +10,47 @@ import Chat from "./chat/Chat";
 import ChatView, { type ChatMessage } from "./chat/ChatView";
 import Frame from "./frame/Frame";
 import { Added } from "./LayoutScene";
-import { canvasOf, rescale } from "./measure";
+import { CanvasContext, canvasOf, designOf, rescale, type CanvasId } from "./measure";
 import { canvasStyle } from "./SceneFrame";
 import "./scene.css";
 
+const live = (boxes: Pick<LayoutElement, "type" | "x" | "y" | "w" | "h">[]) =>
+  boxes.map(
+    (b, i) =>
+      ({
+        id: `live${i}`,
+        r: 0,
+        o: 1,
+        hidden: false,
+        locked: false,
+        name: "",
+        ...b,
+      }) as LayoutElement,
+  );
+
 /** Where Live puts things before it's customized: chat down the right, alerts at the top, the frame bottom left. */
-export const defaultLive: LayoutElement[] = [
+export const defaultLive: LayoutElement[] = live([
   { type: "frame", x: 64, y: 656, w: 640, h: 360 },
   { type: "chat", x: 1456, y: 120, w: 400, h: 600 },
   { type: "alerts", x: 410, y: 64, w: 1100, h: 320 },
-].map(
-  (b, i) =>
-    ({ id: `live${i}`, r: 0, o: 1, hidden: false, locked: false, name: "", ...b }) as LayoutElement,
-);
+]);
 
-/** The Live overlay's elements: its layout, or the default moved onto its canvas (T9.8). */
-export const liveElements = (settings: Settings) =>
-  settings.layouts.landscape?.scenes.live ??
-  rescale(defaultLive, { w: 1920, h: 1080 }, canvasOf(settings));
+/** On a portrait canvas (Phase 10, DESIGN.md "Default portrait layouts"): the camera frame across the top, chat in
+ *  the lower half of the safe zone, alerts in its upper third. */
+export const defaultLivePortrait: LayoutElement[] = live([
+  { type: "frame", x: 60, y: 96, w: 960, h: 540 },
+  { type: "chat", x: 60, y: 760, w: 880, h: 480 },
+  { type: "alerts", x: 60, y: 260, w: 880, h: 440 },
+]);
+
+/** The Live overlay's elements on a canvas: its layout, or the default moved onto its box (T9.8). */
+export const liveElements = (settings: Settings, canvas: CanvasId = "landscape") =>
+  settings.layouts[canvas]?.scenes.live ??
+  rescale(
+    canvas === "portrait" ? defaultLivePortrait : defaultLive,
+    designOf[canvas],
+    canvasOf(settings, canvas),
+  );
 
 /**
  * /o/live (T9.7): one browser source with chat, alerts and the webcam frame, each in its box on a see-through
@@ -45,6 +68,7 @@ export default function LiveScene({
   sample?: { messages: ChatMessage[]; alert: AlertEvent | null };
 }) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
+  const canvas = useContext(CanvasContext);
   const part = (el: LayoutElement): ReactNode => {
     const box = { ...settings };
     switch (el.type) {
@@ -79,10 +103,10 @@ export default function LiveScene({
     <div
       className="live"
       data-theme={theme.id}
-      style={{ ...themeVars(theme), ...canvasStyle(settings) }}
+      style={{ ...themeVars(theme), ...canvasStyle(settings, canvas) }}
     >
       {error}
-      {liveElements(settings)
+      {liveElements(settings, canvas)
         .filter((el) => !el.hidden)
         .map((el) => (
           <div

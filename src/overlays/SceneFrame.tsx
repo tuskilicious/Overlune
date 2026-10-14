@@ -1,5 +1,6 @@
 import {
   Fragment,
+  useContext,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -11,7 +12,7 @@ import type { Settings } from "../settings/schema";
 import { themes } from "../themes";
 import "../themes/fonts";
 import { applyOverrides, themeVars } from "../themes/vars";
-import { canvasOf } from "./measure";
+import { CanvasContext, canvasOf, naturalBox, type CanvasId } from "./measure";
 import SocialIcon from "./social-icons";
 import "./scene.css";
 import "./layouts.css";
@@ -55,16 +56,20 @@ export function TwoTone({ text }: { text: string }) {
 }
 
 /** The scene's box on its canvas (T9.8, `canvasOf`); nothing on the usual 1920×1080. */
-export function canvasStyle(settings: Settings): CSSProperties | undefined {
-  const c = canvasOf(settings);
-  return c.k === 1 && c.w === 1920 && c.h === 1080
-    ? undefined
-    : ({ width: c.width / c.k, height: c.height / c.k, "--fit": c.k } as CSSProperties);
+export function canvasStyle(
+  settings: Settings,
+  canvas: CanvasId = "landscape",
+): CSSProperties | undefined {
+  const c = canvasOf(settings, canvas);
+  if (c.k === 1 && c.w === 1920 && c.h === 1080) return undefined;
+  const box = { width: c.width / c.k, height: c.height / c.k };
+  return (c.k === 1 ? box : { ...box, "--fit": c.k }) as CSSProperties;
 }
 
 /** Shared 1920×1080 scene layout for Starting Soon, BRB, Stream Ending and Offline. */
 export default function SceneFrame({ settings, title, subtitle, error, children, layer }: Props) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
+  const canvas = useContext(CanvasContext);
   // A row added in the editor but not filled in yet would show as a bare "Twitch" box on stream (T6.27).
   const socials = settings.socials.filter((s) => s.handle.trim());
   const scene = useRef<HTMLDivElement>(null);
@@ -80,17 +85,27 @@ export default function SceneFrame({ settings, title, subtitle, error, children,
       .find((el) => getComputedStyle(el).position !== "absolute") as HTMLElement | undefined;
     if (!box || !t || !last) return;
     // Layout offsets, not scroll sizes: entrance animations transform the content and would look like overflow.
+    // In portrait the content can run past its column (a look's socials card under a long title), so the fit
+    // counts the content's own height there; landscape keeps its fit exactly, so no old link changes (Phase 10).
+    const height = () =>
+      canvas === "portrait" ? Math.max(last.offsetHeight, last.scrollHeight) : last.offsetHeight;
     const bottom = () =>
-      (last.offsetParent === box ? 0 : -box.offsetTop) + last.offsetTop + last.offsetHeight;
+      (last.offsetParent === box ? 0 : -box.offsetTop) + last.offsetTop + height();
     const room = box.clientHeight - parseFloat(getComputedStyle(box).paddingBottom);
     t.style.fontSize = "";
     const base = parseFloat(getComputedStyle(t).fontSize);
     // ponytail: step search, at most ~10 layouts; binary search if the title limit ever grows a lot
-    for (let size = base; bottom() > room && size > base * 0.35;) {
+    // In portrait the column is narrow, so a long word shrinks the title too, instead of breaking (Phase 10).
+    const wide = () => canvas === "portrait" && t.scrollWidth > t.clientWidth;
+    // Portrait content sits at the zone's foot, so content that's too tall spills out of the top instead.
+    const first = last.firstElementChild as HTMLElement | null;
+    const roof = parseFloat(getComputedStyle(box).paddingTop);
+    const high = () => canvas === "portrait" && !!first && naturalBox(first, box).y < roof - 1;
+    for (let size = base; (bottom() > room || wide() || high()) && size > base * 0.35;) {
       size = Math.round(size * 0.9);
       t.style.fontSize = `${size}px`;
     }
-  }, []);
+  }, [canvas]);
   // Only when the text or settings change: the countdown ticks every second and must not cost a re-fit.
   useLayoutEffect(() => {
     fit();
@@ -122,7 +137,8 @@ export default function SceneFrame({ settings, title, subtitle, error, children,
       data-enter={theme.enter.id}
       data-bg={theme.bgEffect}
       data-theme={theme.id}
-      style={{ ...themeVars(theme), ...canvasStyle(settings) }}
+      data-canvas={canvas === "portrait" ? canvas : undefined}
+      style={{ ...themeVars(theme), ...canvasStyle(settings, canvas) }}
     >
       {error}
       <div className="scene-main">

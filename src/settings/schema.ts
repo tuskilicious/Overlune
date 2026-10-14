@@ -119,15 +119,16 @@ export const layoutScenes = ["starting", "brb", "ending", "offline", "live"] as 
 export type LayoutScene = (typeof layoutScenes)[number];
 
 /** A canvas and its customized scenes. A scene with no list renders the look's composed scene. */
-const layout = z.object({
-  size: z
-    .object({
-      width: z.number().int().min(320).max(3840).default(1920),
-      height: z.number().int().min(320).max(3840).default(1080),
-    })
-    .prefault({}),
-  scenes: z.partialRecord(z.enum(layoutScenes), z.array(layoutElement).max(40)).default({}),
-});
+const layout = (width: number, height: number) =>
+  z.object({
+    size: z
+      .object({
+        width: z.number().int().min(320).max(3840).default(width),
+        height: z.number().int().min(320).max(3840).default(height),
+      })
+      .prefault({}),
+    scenes: z.partialRecord(z.enum(layoutScenes), z.array(layoutElement).max(40)).default({}),
+  });
 
 export const settingsV1 = z.object({
   theme: z.enum(themeIds).default("clean-slate"),
@@ -243,7 +244,9 @@ export const settingsV1 = z.object({
   liteMotion: z.boolean().default(false),
   /** The canvas editor's layouts (T9.2, docs/STACK.md "Layout model"). Old links have no field: every scene renders as
    *  the look composes it, exactly as before. Portrait joins in Phase 10. */
-  layouts: z.object({ landscape: layout.optional() }).default({}),
+  layouts: z
+    .object({ landscape: layout(1920, 1080).optional(), portrait: layout(1080, 1920).optional() })
+    .default({}),
   /** "Advanced" overrides on top of the theme (T2.7). Empty means the theme as designed. */
   advanced: z
     .object({

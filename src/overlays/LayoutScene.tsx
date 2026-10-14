@@ -4,7 +4,7 @@ import type { LayoutElement, LayoutScene, Settings } from "../settings/schema";
 /** The composed scenes; Live has its own renderer (LiveScene). */
 type SceneId = Exclude<LayoutScene, "live">;
 import type { ColorToken } from "../themes/types";
-import { naturalBox, sceneParts } from "./measure";
+import { naturalBox, sceneParts, type CanvasId } from "./measure";
 import SceneFrame from "./SceneFrame";
 import Countdown from "./starting/Countdown";
 import "./scene.css";
@@ -201,7 +201,11 @@ export default function LayoutScene({
   );
 }
 
-/** A scene's elements when it was customized for the landscape canvas, else null (the composed scene). */
-export function customized(settings: Settings, scene: SceneId): LayoutElement[] | null {
-  return settings.layouts.landscape?.scenes[scene] ?? null;
+/** A scene's elements when it was customized for this canvas, else null (the composed scene). */
+export function customized(
+  settings: Settings,
+  scene: SceneId,
+  canvas: CanvasId = "landscape",
+): LayoutElement[] | null {
+  return settings.layouts[canvas]?.scenes[scene] ?? null;
 }

@@ -1402,3 +1402,68 @@
 .scene[data-theme="quest"] .scene-main:has(.scene-logo) .scene-title {
   padding-right: 112px;
 }
+
+/* Portrait (Phase 10, DESIGN.md "Vertical layout"): from `?canvas=vertical`, a 1080×1920 scene whose words stay in the
+   safe zone (x 60–940, y 240–1240), clear of the phone apps' header, buttons and live comments. The padding is that
+   zone, so each look's own composition lands inside it; the columns stack, the socials go two by two, and the ticker
+   sits at the zone's foot, inside its width. Art and backgrounds still fill the whole canvas. */
+.scene[data-canvas="portrait"][data-theme] {
+  padding: 240px 140px 680px 60px;
+}
+
+.scene[data-canvas="portrait"][data-theme][data-ticker] {
+  padding-bottom: 784px; /* the ticker, then a gap, above the zone's foot */
+}
+
+.scene[data-canvas="portrait"][data-theme] .scene-main {
+  grid-template: none / minmax(0, 1fr);
+  gap: 0;
+}
+
+.scene[data-canvas="portrait"][data-theme] .scene-main > * {
+  grid-column: 1;
+  grid-row: auto;
+}
+
+/* The countdown and socials stack under the title block, whatever card or row the look puts them in. */
+.scene[data-canvas="portrait"][data-theme] .scene-side {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 32px;
+  box-sizing: border-box; /* a look's padded card stays inside the zone */
+  width: 100%;
+  min-width: 0;
+  margin: 48px 0 0; /* no look's bleed into the margins */
+  align-self: auto;
+}
+
+/* Each card only as tall as what's in it: a look that stretches them to fill its column would starve the title. */
+.scene[data-canvas="portrait"][data-theme] .scene-side > * {
+  flex: none;
+}
+
+.scene[data-canvas="portrait"][data-theme] .scene-title {
+  max-width: 100%;
+  overflow-wrap: normal; /* a long word shrinks the title instead (SceneFrame's fit) */
+}
+
+.scene[data-canvas="portrait"][data-theme] .scene-socials {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-flow: row;
+}
+
+.scene[data-canvas="portrait"][data-theme] .scene-ticker {
+  left: 60px;
+  right: 140px;
+  bottom: 680px;
+}
+
+/* Arcade's socials are a high-score table, one wide row each: one column in portrait too. */
+.scene[data-canvas="portrait"][data-theme="arcade-8bit"] .scene-socials {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.scene[data-canvas="portrait"][data-theme="arcade-8bit"] .scene-socials li {
+  grid-template-columns: 96px 56px minmax(0, 1fr) minmax(0, 1fr);
+}
