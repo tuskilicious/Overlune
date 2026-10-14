@@ -43,20 +43,25 @@ test.describe("wide", () => {
     await expect(page.locator(".safe-zone")).toHaveCount(0);
   });
 
-  test("Vertical waits for a look's portrait art on its scenes, and says so", async ({ page }) => {
+  test("every scene of every look has Vertical", async ({ page }) => {
     await open(page);
-    const vertical = page.getByRole("button", { name: "Vertical" });
-    await expect(vertical).toBeDisabled();
-    await page.getByRole("button", { name: "Live source" }).click();
-    await vertical.click();
-    await expect(vertical).toHaveAttribute("aria-pressed", "true");
-    // Back to Starting Soon: horizontal again, with the reason.
-    await page.getByRole("button", { name: "Live source" }).click();
-    await expect(page.getByText("comes in vertical in a later update")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Horizontal" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
+    await page.getByRole("button", { name: "Vertical" }).click();
+    await expect(page.locator(".editor-scene-preview .safe-zone")).toBeVisible();
+    await expect(page.locator(".editor-scene-preview .scene")).toHaveAttribute(
+      "data-canvas",
+      "portrait",
     );
+    await expect(
+      page.locator(".editor-link").filter({ hasText: "Starting Soon" }).locator("input"),
+    ).toHaveValue(/\/o\/starting\?canvas=vertical#1\./);
+    // Customize measures the vertical scene into the portrait layout, inside the 1080-wide box.
+    await page.getByRole("button", { name: "Customize" }).click();
+    await expect(page.locator(".canvas .safe-zone")).toBeVisible();
+    const saved = await layouts(page);
+    const starting = saved.portrait!.scenes.starting as { x: number; w: number }[];
+    // A fresh Clean Slate has only its title; it sits in the safe zone's 880px width.
+    expect(starting.map((el) => [el.x, el.w])).toEqual([[60, 880]]);
+    expect(saved.landscape?.scenes.starting).toBeUndefined();
   });
 
   test("Vertical: a 9:16 preview with the safe zone, portrait sizes and vertical links", async ({
@@ -75,7 +80,6 @@ test.describe("wide", () => {
       /\/o\/live\?canvas=vertical#1\./,
     );
     await expect(links.filter({ hasText: "Just Chatting" })).toContainText("1080");
-    await expect(links.filter({ hasText: "Starting Soon" })).toHaveCount(0);
     await expect(page.getByText("Download OBS scene collection")).toHaveCount(0);
     await axe(page);
   });

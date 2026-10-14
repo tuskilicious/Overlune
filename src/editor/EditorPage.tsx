@@ -5,14 +5,7 @@ import { useMotion, type PluginLoader } from "../lib/motion";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
 import { defaultSettings, type LayoutElement, type Settings } from "../settings/schema";
-import {
-  CanvasContext,
-  canvasOf,
-  designOf,
-  hasPortrait,
-  measureLayout,
-  rescale,
-} from "../overlays/measure";
+import { CanvasContext, canvasOf, designOf, measureLayout, rescale } from "../overlays/measure";
 import Canvas from "./canvas/Canvas";
 import { CanvasSize, SafeZone } from "./canvas/Panels";
 import LiveScene, { liveElements } from "../overlays/LiveScene";
@@ -548,11 +541,10 @@ export default function EditorPage() {
   /** The preview shows the Live overlay (T9.7) instead of the scene. */
   const [onLive, setOnLive] = useState(part === "live");
   const target = onLive ? "live" : scene;
-  /** Horizontal or Vertical (T10.4): which canvas the preview, Customize and the links use. Vertical holds only where
-   *  the look has it (`hasPortrait`); elsewhere the preview stays horizontal and says why. */
+  /** Horizontal or Vertical (T10.4): which canvas the preview, Customize and the links use. Every scene of every look
+   *  has Vertical, on the shared portrait default until a look gets its own art (owner, 2026-10-15). */
   const [vertical, setVertical] = useState(false);
-  const portraitOk = hasPortrait(settings.theme, target);
-  const canvasId = vertical && portraitOk ? "portrait" : "landscape";
+  const canvasId = vertical ? "portrait" : "landscape";
   /** Keeps the scene's layout (or, with null, drops it, back to the look's composed scene). Each call is its own undo
    *  step unless `merge` (a burst of nudges). */
   const commitLayout = (elements: LayoutElement[] | null, merge = false) => {
@@ -1167,7 +1159,6 @@ export default function EditorPage() {
                           key={id}
                           type="button"
                           aria-pressed={canvasId === id}
-                          disabled={id === "portrait" && !portraitOk}
                           onClick={() => {
                             setVertical(id === "portrait");
                             setCanvasOn(false);
@@ -1229,12 +1220,6 @@ export default function EditorPage() {
                       Test alert
                     </button>
                   </div>
-                  {vertical && !portraitOk && (
-                    <p className="editor-hint" role="status">
-                      Vertical is ready for Live, Just Chatting and Reaction. This look’s{" "}
-                      {overlays[scene].name} comes in vertical in a later update.
-                    </p>
-                  )}
                   <CanvasContext.Provider value={canvasId}>
                     {/* Click a part to jump to its settings; hover outlines it and names it (T6.135, the Studio board).
                       A mouse shortcut only: the section list and the form already reach every setting by keyboard. */}
@@ -1311,11 +1296,7 @@ export default function EditorPage() {
               </section>
               <AlertTester settings={settings} />
             </div>
-            <ObsLinks
-              settings={settings}
-              canvasId={vertical ? "portrait" : "landscape"}
-              heading={stepHeading(steps[2][1])}
-            />
+            <ObsLinks settings={settings} canvasId={canvasId} heading={stepHeading(steps[2][1])} />
           </div>
         </>
       )}

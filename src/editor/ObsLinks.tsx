@@ -4,7 +4,7 @@ import { framePosition, type Settings } from "../settings/schema";
 import { encode } from "../settings/url";
 import { sceneCollection } from "./scene-collection";
 import Icon from "../components/Icon";
-import { hasPortrait, type CanvasId } from "../overlays/measure";
+import type { CanvasId } from "../overlays/measure";
 
 /** The full-screen scenes, with the Browser Source size to enter in OBS. `short` labels the editor's scene picker,
  *  where the full names wrap; Offline is an extra, so it doesn't count toward "You're set" (T6.147). */
@@ -156,13 +156,15 @@ export default function ObsLinks({
   const canvas =
     settings.layouts[canvasId]?.size ??
     (portrait ? { width: 1080, height: 1920 } : { width: 1920, height: 1080 });
-  // Vertical (T10.4): the scenes this look has in portrait, Live, Just Chatting and Reaction. Chat, alerts and the
-  // frame on their own get their vertical sizes in T10.9; until then Live holds all three.
+  // Vertical (T10.4): the scenes, Live, Just Chatting and Reaction. Chat, alerts and the frame on their own get their
+  // vertical sizes in T10.9; until then Live holds all three.
   const vertical: LinkInfo[] = [
-    ...(["starting", "brb", "ending", "offline"] as const)
-      .filter((id) => hasPortrait(settings.theme, id))
-      .map((id) => ({ id, ...overlays[id], ...canvas })),
-    { id: "live", name: "Live", ...canvas, optional: hasPortrait(settings.theme, "starting") },
+    ...(["starting", "brb", "ending", "offline"] as const).map((id) => ({
+      id,
+      ...overlays[id],
+      ...canvas,
+    })),
+    { id: "live", name: "Live", ...canvas, optional: true },
     ...(["chatting", "reaction"] as const).map((id) => ({ id, ...overlays[id], ...canvas })),
   ];
   const links: LinkInfo[] = portrait
