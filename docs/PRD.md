@@ -93,11 +93,12 @@ Streamers asked for freedom, as in StreamElements' overlay editor, without losin
 - **Done when:** a streamer can rebuild any scene by hand, by mouse or keyboard, every old link renders as before, and 2.0.0 is released.
 
 ## Vertical overlays (approved 2026-10-13, `docs/TASKS.md` Phase 10, built on the canvas editor)
-Streamers increasingly go live in portrait: TikTok Live, YouTube Shorts and OBS's vertical canvases (OBS 32.1+, or the Aitum Vertical plugin). Every look gets portrait versions of its four scenes, and alerts, chat and the webcam frame work on a tall canvas.
+Streamers increasingly go live in portrait: TikTok Live, YouTube Shorts and OBS's vertical canvases (OBS 32.1+, or the Aitum Vertical plugin). Every look gets portrait versions of its scenes (Live, Just Chatting and Reaction included), and alerts, chat and the webcam frame work on a tall canvas. Built on the canvas editor: portrait is its own layout in the same save, so either can be customized without touching the other.
 - **One save, two canvases.** A vertical link is the same save after the `#` plus `?canvas=vertical` before it. No existing link changes, and no account is needed.
 - **Made for the phone screen.** Text stays out of the places where TikTok and Shorts draw their own buttons and captions (DESIGN.md "Vertical layout").
 - **Rolled out in batches** of four, each batch checked in OBS on a vertical canvas; the editor offers Vertical only for looks that have it until all sixteen do.
-- **Done when:** every look's scenes, alerts, chat and frame pass the OBS test on a vertical canvas, every old link renders as before, and 1.7.0 is released.
+- **Two new scenes (owner, 2026-10-14):** Just Chatting (a large camera with a header and a "Talking about" line) and Reaction (a camera beside the video being reacted to, with chat), in every look, landscape and vertical.
+- **Done when:** every look's scenes, alerts, chat and frame pass the OBS test on a vertical canvas, the safe zone is checked on a phone in a private live test, every old link renders as before, and 2.1.0 is released.
 
 ## v2 Phase 1: accounts on Cloudflare (approved 2026-10-09)
 The v2 gate (5 real streamers, T6.6) is met, and the owner approved starting v2 on Cloudflare (`docs/STACK.md` "Backend"). Phase 1 is the foundation the later phases build on; it adds no overlay features yet.

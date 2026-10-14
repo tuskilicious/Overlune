@@ -795,27 +795,27 @@ The owner asked to take every good idea from their own YouTube overlay kit (a Cl
   - **Transitions in theme colours:** wipe, bloom, blinds, iris, pixel, bars, cut. These play inside an "all scenes" source the dock switches, since OBS can't use a web page as a transition.
 
 ## Phase 10: Vertical overlays
-Planned with the owner 2026-10-13. Overlune for vertical streams (TikTok Live, YouTube Shorts, OBS 32.1+ vertical canvases, the Aitum Vertical plugin): every look's four scenes in portrait (1080×1920), and alerts, chat and the webcam frame placed for a tall canvas. **The link:** the same save after the `#`, plus an optional `?canvas=vertical` flag before it (like `?rm=1`), so one save gives both sets of links and no existing link changes; the flag joins the link contract in STACK.md and is never removed or repurposed. **Rollout:** looks in batches of four, each merged after the owner's OBS check; until all sixteen are done, the editor offers Vertical only for looks that have it. Phase 11's new looks are built vertical-ready. **Re-planned on the canvas (owner, 2026-10-13):** Phase 9's canvas comes first, so a vertical layout becomes a 1080×1920 canvas with portrait starting layouts per look instead of per-look portrait CSS; the batches, the safe zone and the link flag stay, and the tasks below are revised when Phase 10 starts (one save holds both layouts; `?canvas=vertical` picks the portrait one).
+Planned with the owner 2026-10-13. Overlune for vertical streams (TikTok Live, YouTube Shorts, OBS 32.1+ vertical canvases, the Aitum Vertical plugin): every look's four scenes in portrait (1080×1920), and alerts, chat and the webcam frame placed for a tall canvas. **The link:** the same save after the `#`, plus an optional `?canvas=vertical` flag before it (like `?rm=1`), so one save gives both sets of links and no existing link changes; the flag joins the link contract in STACK.md and is never removed or repurposed. **Rollout:** looks in batches of four, each merged after the owner's OBS check; until all sixteen are done, the editor offers Vertical only for looks that have it. Phase 11's new looks are built vertical-ready. **Re-planned on the canvas (owner, 2026-10-13; tasks revised in T10.1, 2026-10-14):** a vertical layout is `layouts.portrait`, a 1080×1920 canvas with a portrait default per look instead of per-look portrait CSS; one save holds both layouts and `?canvas=vertical` picks the portrait one; the batches, the safe zone and the link flag stay. Just Chatting and Reaction (approved 2026-10-14) are built here, in both canvases.
 
 - [ ] **T10.1 Plan and rules.** The vertical plan in the PRD; `?canvas=vertical` in STACK.md's URL format; the portrait layout and the safe zones in DESIGN.md (where TikTok's and Shorts' own buttons and captions sit over the stream, checked against their current apps); FUTURE-SCOPE.md updated.
   - Accept: the owner approves the PR; no code changes.
-- [ ] **T10.2 The portrait scene layout.** `?canvas=vertical` read once (like `?rm=1`); scenes at 1080×1920 with one shared portrait layout for every look (logo at the top, the title block in the middle third, the countdown under it, socials stacked), text that shrinks to fit, the entrance choreography and its reduced-motion version; overlay fixtures for vertical links.
-  - Accept: every old-link fixture renders exactly as before; a vertical link renders at 1080×1920 with nothing in the safe zones; unit and e2e tests.
-- [ ] **T10.3 Vertical looks, batch 1:** Clean Slate, Neon Grid, Vaporwave Sunset, Bold Esports. Each look's art and motif checked and adjusted for portrait (grid floors, the sun and palms, the angled slabs).
-  - Accept: contrast tests cover the portrait scenes; e2e renders all four scenes of each look; the owner OBS-checks them on a vertical canvas.
-- [ ] **T10.4 Vertical looks, batch 2:** Cozy Café, Arcade 8-Bit, Pastel Cloud, Forest Night.
-  - Accept: as T10.3.
-- [ ] **T10.5 Vertical looks, batch 3:** Daylight, Abyss, Session, Shonen.
-  - Accept: as T10.3.
-- [ ] **T10.6 Vertical looks, batch 4:** Sakura, Skate Deck, Phosphor, Quest.
-  - Accept: as T10.3; every look now has vertical.
-- [ ] **T10.7 Alerts, chat and webcam frame for vertical.** Alerts placed for a tall canvas, chat sizes that suit one, and vertical webcam frame presets, all clear of the safe zones.
-  - Accept: e2e for each; the owner OBS-checks them with a test alert.
-- [ ] **T10.8 Editor: Horizontal / Vertical.** A switch over the preview, a 9:16 preview with the safe zones as an optional overlay, and the links section giving the chosen canvas's links and sizes; Vertical only for looks that have it.
-  - Accept: axe clean narrow and wide; e2e for the switch and the vertical links; old editor bookmarks open as before.
-- [ ] **T10.9 Setup guide: vertical.** How to add the links to a vertical canvas in OBS 32.1+, with Aitum Vertical, and in Streamlabs, with the sizes.
-  - Accept: the guide's tests pass; the owner checks the steps in OBS.
-- [ ] **T10.10 OBS test and release 2.1.0.** Every vertical overlay through `docs/OBS-TESTING.md` on a real vertical canvas, then a release.
+- [ ] **T10.2 The portrait canvas.** `layouts.portrait` and `?canvas=vertical` read once (like `?rm=1`); `canvasOf` with the 1080×1920 design for portrait; the four scenes and Live render from the portrait layout, or a shared portrait default (DESIGN.md "Default portrait layouts") until a look has its own; text that shrinks to fit; the entrance and its reduced-motion version; vertical link fixtures.
+  - Accept: every old-link fixture renders exactly as before (2.0.0's tall landscape sizes included); a vertical link renders at 1080×1920 with no words outside the safe zone; unit and e2e tests.
+- [ ] **T10.3 Just Chatting and Reaction.** The `chatting` and `reaction` scene ids, the `camera` element (a masked hole edged by the look's frame border), their settings and routes, landscape and portrait defaults, editor rows for their text, and links (as extras, like Offline and Live).
+  - Accept: old links unchanged; every look renders both scenes in both canvases; contrast tests cover their text; e2e for the routes, the hole and the canvas; the owner OBS-checks them with a real camera.
+- [ ] **T10.4 Editor: Horizontal / Vertical.** The switch over the preview; the 9:16 preview and canvas with the safe zone guide; Customize edits the chosen canvas's layout; the links section gives the chosen canvas's links and sizes; Vertical only for looks whose portrait art is done.
+  - Accept: axe clean narrow and wide; e2e for the switch, the separate layouts and the vertical links; old editor bookmarks open as before.
+- [ ] **T10.5 Vertical looks, batch 1:** Clean Slate, Neon Grid, Vaporwave Sunset, Bold Esports. Each look's portrait default and its art recomposed for the tall frame (grid floors, the sun and palms, the angled slabs).
+  - Accept: contrast tests cover the portrait scenes; e2e renders every scene of each look in portrait; the owner OBS-checks them on a vertical canvas.
+- [ ] **T10.6 Vertical looks, batch 2:** Cozy Café, Arcade 8-Bit, Pastel Cloud, Forest Night.
+  - Accept: as T10.5.
+- [ ] **T10.7 Vertical looks, batch 3:** Daylight, Abyss, Session, Shonen.
+  - Accept: as T10.5.
+- [ ] **T10.8 Vertical looks, batch 4:** Sakura, Skate Deck, Phosphor, Quest.
+  - Accept: as T10.5; every look now has vertical.
+- [ ] **T10.9 Alerts, chat, webcam frame and the guide for vertical.** Alerts placed for a tall canvas, chat sizes and webcam frame presets for one; the setup guide's vertical part (OBS 32.1+ vertical canvases, Aitum Vertical, Streamlabs) and the two new scenes.
+  - Accept: e2e for each; the guide's tests pass; the owner checks the steps in OBS with a test alert.
+- [ ] **T10.10 OBS test and release 2.1.0.** Every vertical overlay, Just Chatting and Reaction through `docs/OBS-TESTING.md` on a real vertical canvas, and the safe zone checked on a phone in a private TikTok or YouTube live test (DESIGN.md numbers corrected if needed), then a release.
   - Accept: the OBS test is logged; 2.1.0 published.
 
 ## Phase 11: Four new looks (planned)
