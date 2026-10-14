@@ -58,7 +58,8 @@ export default function Account() {
           <svg viewBox="0 0 24 24" aria-hidden focusable="false">
             <path d={siTwitch.path} />
           </svg>
-          Sign in with Twitch
+          {/* Phones show "Sign in" by the Twitch mark; the whole name stays for screen readers. */}
+          Sign in<span className="editor-account-long"> with Twitch</span>
         </a>
       ) : (
         <details className="editor-account-menu">

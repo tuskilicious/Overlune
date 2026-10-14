@@ -214,21 +214,26 @@ Set on 2026-10-07 from the owner's design handoff, an audit of the looks against
 - Shipped looks that match a tell keep it until they are reworked: Bold Esports (near-black with one red), Neon Grid (neon with a grid).
 
 ## Vertical layout (Phase 10)
-Overlays for a portrait canvas, from `?canvas=vertical` (STACK.md). The canvas is 1080×1920; the look's background and art fill all of it.
+Overlays for a portrait canvas, from `?canvas=vertical` (STACK.md): `layouts.portrait`, 1080×1920 unless the streamer picks another size, drawn at scale 1 so the type reads at phone size. The look's background and art fill all of it. The portrait layout is its own: moving something on the vertical canvas never moves it on the landscape one.
 
-**Safe zone.** TikTok Live and YouTube Shorts draw their own header, a column of buttons on the right, and captions at the bottom over the stream. Neither publishes the sizes, and third-party guides disagree (TikTok: top 130–200px, bottom 367–484px, right 120–140px; Shorts up to 288px top, 672px bottom and 192px right in Google's ad template). Overlune keeps **every word and number inside x 60–940, y 200–1440** (an 880×1240 box: 60px left, 140px right, 200px top, 480px bottom); art, motifs and backgrounds may run to the edges. These are planning numbers, checked on a real phone in T9.10, not platform specs.
+**Safe zone.** On a phone, TikTok Live and YouTube's vertical live streams draw a header at the top, a column of buttons on the right, and the live comments, gifts and message box over the lower part of the stream (TikTok's comments scroll up the lower left). Neither app publishes the sizes, and third-party guides (all measured on recorded Shorts and TikToks, not live) disagree: TikTok's top 130–240px, bottom 367–660px, right 120–300px; Shorts' top 120–380px, bottom 300–672px, right 96–201px. Overlune's planning box keeps **every word and number inside x 60–940, y 240–1240** (880×1000: 60px left, 140px right, 240px top, 680px bottom, which also clears live comments). Art, motifs, backgrounds and the camera may run to the edges. These are planning numbers, checked on a real phone in a private live test in T10.10 and corrected then; the editor draws them as a faint guide (never in OBS).
 
-**Scenes (1080×1920).**
-- The logo at the top of the safe zone; the title block in its middle third (the accent rule, the headline, then the subtitle), sized to the 880px width and shrinking to fit as in landscape (T6.26), at most three lines; the countdown card under it, up to the safe zone's width; the socials as a stacked list under that.
-- Each look keeps its own alignment, type and motif; its art is recomposed for the tall frame (a sun, a grid floor or a skyline moves to where it reads in portrait) rather than stretched.
-- The entrance choreography is the landscape one, in the same order; its reduced-motion version shows everything at once.
+**Default portrait layouts.** Built per look from its own parts, like T9.3's measured defaults, then placed for the tall frame:
+- Starting Soon, BRB, Ending, Offline: the logo at the top of the safe zone, the title block in its middle (rule, headline, subtitle) in at most three lines across 880px, the countdown card under it, the socials stacked under that. The look's own alignment, type and motif stay; its art is recomposed for the tall frame (a sun, a grid floor or a skyline moves to where it reads in portrait) rather than stretched.
+- Live: the camera frame 960×540 at (60, 96), chat 880 wide in the lower half of the safe zone, alerts in its upper third (y 260–700).
+- Just Chatting: the camera 960×1280 at (60, 220), the header above it and the topic under it, inside the safe zone where the camera allows.
+- Reaction: the reaction box 960×540 at (60, 96), the camera 960×720 at (60, 980), chat where space allows.
+(The camera boxes start from the owner's Tuskilicious kit.)
 
-**Alerts, chat, webcam frame.**
-- Alerts: centred in the safe zone's width, in its upper third (y 260–700), clear of the bottom captions.
-- Chat: sizes that suit a tall canvas (880 wide, 400–900 tall), placed by the streamer in the safe zone.
-- Webcam frame: presets for portrait: 880×495 (a 16:9 camera), 880×880 (square), and 1080×608 (full width, its label inside the safe zone).
+**Alerts, chat and webcam frame on their own.** Alerts centred in the safe zone's width, in its upper third (y 260–700). Chat 880 wide and 400–900 tall. Webcam frame presets for portrait: 880×495 (16:9), 880×880 (square), 1080×608 (full width, its label inside the safe zone).
 
-**Editor.** A Horizontal / Vertical switch over the preview; the 9:16 preview can show the safe zone as a faint overlay (never in OBS). Vertical is offered only for looks that have it (TASKS.md Phase 10 batches).
+**Editor.** A Horizontal / Vertical switch over the preview picks which canvas the preview, Customize and the links use. The vertical preview is 9:16 and can show the safe zone. The links section gives the chosen canvas's links (the vertical ones carry `?canvas=vertical`) and sizes. Vertical is offered only for looks whose portrait art is done (TASKS.md Phase 10 batches); Just Chatting and Reaction come with both canvases.
+
+## Just Chatting and Reaction (Phase 10)
+Two more scenes, approved by the owner 2026-10-14 from their kit. Unlike Live they are full-screen scenes in the look (its background, art and type), with the camera showing through a hole: the `camera` element, edged by the look's webcam-frame border, with an entrance and a reduced-motion version like the frame's.
+- **Just Chatting:** a header ("Just chatting", editable), a "Talking about" line with the streamer's topic (editable in the editor and, later, from the dock), the camera large.
+- **Reaction:** a header, a reaction box outlined in the look's accent where the streamer places the video they react to (in OBS, under the overlay), the camera smaller, and chat.
+Both are canvas layouts from the start, so every part moves, resizes and can be removed; Put back returns a removed part.
 
 ## Overlay layout rules
 - Canvas is always 1920×1080. Keep a 64px safe margin on scenes.
@@ -367,6 +372,7 @@ Every page but the overlays shares one shell: the nav at the top, the night-sky 
 Write for a streamer opening OBS for the first time: concise, confident, helpful (BRAND.md voice).
 - Name what they see: "Link to paste into OBS", not "Browser Source URL"; "Their name", not `{user}`.
 - Buttons are verbs, 1–3 words, sentence case: "Copy link", "Start over", "Load my overlay from a link".
+- **Site buttons (2.0 polish, `src/components/site-buttons.css`):** the home page, nav and not-found page use two, ported from 21st.dev as CSS in the brand colors (behavior only, no dependency). `.btn-shimmer` for the main action, after Magic UI's "Shimmer Button" (MIT): a violet pill with a white spark circling its edge and an inner glow that deepens on hover and press; `.btn-light` makes it moonlight with a violet spark on the violet looks section. `.btn-glow` for the second action, after "Hover Border Gradient": a night pill with a moonlight spark round a thin edge, the edge and fill lighting violet on hover. Both keep still with reduced motion (the edge stays lit). The editor's form buttons stay plain controls.
 - Errors say what happened and what to do: "No picture loaded from this link. Check that it opens an image in your browser, not a web page."
 - Say "free" and "no account" plainly. No unmeasured claims and no promised setup times (the owner dropped "under 10 minutes" as unrealistic, 2026-10-02).
 

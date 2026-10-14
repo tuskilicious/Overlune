@@ -27,6 +27,7 @@ import ChatView from "../overlays/chat/ChatView";
 import StartingSoon from "../overlays/starting/StartingSoon";
 import TextScene from "../overlays/TextScene";
 import Frame from "../overlays/frame/Frame";
+import LiveScene from "../overlays/LiveScene";
 import { themes } from "../themes";
 import { blurbs } from "../themes/blurbs";
 import { themeIds, type ThemeId } from "../themes/types";
@@ -292,6 +293,12 @@ const elements: { part: string; name: string; line: string; theme: ThemeId }[] =
     line: "Raids, subs, gift subs and bits.",
     theme: "bold-esports",
   },
+  {
+    part: "live",
+    name: "Live",
+    line: "Chat, alerts and your frame in one source.",
+    theme: "abyss",
+  },
 ];
 
 function ElementShot({ part, theme }: { part: string; theme: ThemeId }) {
@@ -316,6 +323,15 @@ function ElementShot({ part, theme }: { part: string; theme: ThemeId }) {
           />
         </LazyPreview>
       </div>
+    );
+  if (part === "live")
+    return (
+      <LazyPreview>
+        <LiveScene
+          settings={sampleScene(theme)}
+          sample={{ messages: chatSamples, alert: testAlerts[2]! }}
+        />
+      </LazyPreview>
     );
   if (part === "alerts")
     return (
@@ -344,7 +360,7 @@ function Magnified({ part, theme }: { part: string; theme: ThemeId }) {
     <div
       className="landing-still relative aspect-video overflow-hidden rounded-xl bg-night"
       // Chat, the webcam frame and alerts sit over a game, so their thumbnails show one behind them (T8.5).
-      data-over-game={["chat", "frame", "alerts"].includes(part) || undefined}
+      data-over-game={["chat", "frame", "alerts", "live"].includes(part) || undefined}
       onPointerEnter={(ev) => {
         if (ev.pointerType === "touch") return;
         aim(ev);
@@ -516,6 +532,10 @@ const goodToKnow = [
     "Each overlay is a Browser source in OBS Studio or Streamlabs Desktop, whatever platform you stream to.",
   ],
   [
+    "Make it yours",
+    "Press Customize in the editor to move, resize or turn anything, add your own text, shapes and pictures, and match your OBS canvas size.",
+  ],
+  [
     "Extras for your channel",
     "Twitch panels and an offline banner in your look, downloaded as pictures from the editor.",
   ],
@@ -556,6 +576,11 @@ const support: {
         on: ["Yes", "Not yet", "No"],
       },
       {
+        overlay: "Live",
+        detail: "Chat, alerts and your frame in one source",
+        on: ["Yes", "Not yet", "Not yet"],
+      },
+      {
         overlay: "Follow alerts",
         detail: "Need a Twitch login",
         on: ["Not yet", "No", "No"],
@@ -583,11 +608,14 @@ function SupportCell({ value }: { value: Support }) {
   );
 }
 
-const facts = [`${themeIds.length} looks`, "Scenes, chat and alerts", "Free, no account needed"];
+const facts = [`${themeIds.length} looks`, "Move anything, anywhere", "Free, no account needed"];
 
 const steps = [
   ["Pick a look", `${themeIds.length} looks, each with matching scenes, chat and alerts.`],
-  ["Add your details", "Your title, countdown, socials and Twitch channel name."],
+  [
+    "Add your details",
+    "Your title, countdown, socials and Twitch channel name. Then move anything you like.",
+  ],
   [
     "Paste into OBS",
     "Copy each link into a Browser source, or import every scene at once in OBS Studio. The setup guide shows how.",
@@ -649,7 +677,8 @@ function StreamStage() {
           </h2>
           <p className="mt-6 max-w-xl text-lg text-haze">
             Chat, alerts and your webcam frame sit over your game in the same colors and fonts as
-            your scenes. Switch the look and they all change together.
+            your scenes, as three sources or one Live source. Switch the look and they all change
+            together.
           </p>
         </div>
         <div role="group" aria-label="Show it in" className="flex flex-wrap gap-2">
@@ -854,7 +883,7 @@ function LooksShowcase() {
               <Icon name="expand" /> Full screen
             </button>
           </div>
-          <Link to="/editor" className={`${button} mt-8 bg-moon text-night hover:bg-white`}>
+          <Link to="/editor" className={`${button} btn-shimmer btn-light mt-8`}>
             Use {themes[active].name}
           </Link>
         </div>
@@ -1097,20 +1126,14 @@ export default function LandingPage() {
                     ))}
                   </h1>
                   <p className="mt-8 max-w-xl text-xl leading-relaxed text-haze">
-                    Pick a look, add your text, and paste one link per overlay into OBS. Four
-                    scenes, from Starting Soon to Offline, plus chat and alerts, all matching.
+                    Pick a look, add your text, move anything where you want it, and paste one link
+                    per overlay into OBS. Scenes, chat, alerts and a webcam frame, all matching.
                   </p>
                   <div className="mt-10 flex flex-wrap gap-4">
-                    <Link
-                      to="/editor"
-                      className={`${button} landing-glow-button bg-violet text-night hover:bg-moon`}
-                    >
+                    <Link to="/editor" className={`${button} btn-shimmer`}>
                       {returning ? "Continue your overlay" : "Make your overlays"}
                     </Link>
-                    <a
-                      href="#looks"
-                      className={`${button} border border-moon/40 text-moon hover:border-moon`}
-                    >
+                    <a href="#looks" className={`${button} btn-glow`}>
                       See the looks
                     </a>
                   </div>
@@ -1156,8 +1179,8 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* The seven overlays, each opening its part of the editor (T6.59): the scenes in one row, the overlays that
-            sit over the game in a wider row under them (T6.148). */}
+        {/* The eight overlays, each opening its part of the editor (T6.59): the scenes in one row, the overlays that
+            sit over the game in a row under them (T6.148), Live (2.0) among them. */}
         <section id="kit" className="px-6 pt-24 md:px-12 md:pt-32" aria-labelledby="kit-heading">
           <div className="mx-auto max-w-7xl">
             <h2
@@ -1165,7 +1188,7 @@ export default function LandingPage() {
               data-reveal
               className="font-heading text-[clamp(2.25rem,4vw,3.5rem)] font-bold"
             >
-              Seven overlays in every look
+              Eight overlays in every look
             </h2>
             <p className="mt-4 max-w-xl text-lg text-haze">Open any of them in the editor.</p>
             {/* Tall cards, after the reference's services row (T6.124): the one under the pointer fills with violet from
@@ -1381,16 +1404,10 @@ export default function LandingPage() {
               Make your stream look pro.
             </h2>
             <div className="mt-12 flex flex-wrap justify-center gap-4">
-              <Link
-                to="/editor"
-                className={`${button} bg-violet px-10 py-5 text-xl text-night hover:bg-moon`}
-              >
+              <Link to="/editor" className={`${button} btn-shimmer px-10 py-5 text-xl`}>
                 Make your overlays
               </Link>
-              <Link
-                to="/guide"
-                className={`${button} border border-moon/40 px-10 py-5 text-xl text-moon hover:border-moon`}
-              >
+              <Link to="/guide" className={`${button} btn-glow px-10 py-5 text-xl`}>
                 Read the setup guide
               </Link>
             </div>

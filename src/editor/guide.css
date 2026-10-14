@@ -338,17 +338,8 @@
 
 .notfound-actions .notfound-primary {
   padding: 12px 28px;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--bg);
   font-family: var(--font-heading);
-  font-weight: 700;
-  text-decoration: none;
-  transition: background-color 150ms ease;
-}
-
-.notfound-actions .notfound-primary:hover {
-  background: color-mix(in srgb, var(--accent) 80%, var(--text));
+  font-weight: 700; /* its look is .btn-shimmer (site-buttons.css) */
 }
 
 /* The index (T6.118): the guide's parts as a row of chips that jump there. */
@@ -522,5 +513,12 @@
 @media (max-width: 1023px) {
   .legal-layout > .guide-index {
     display: none;
+  }
+}
+
+/* Wide windows: an overlay's name stays on one line in the sizes table. */
+@media (min-width: 640px) {
+  .guide-sizes th[scope="row"] {
+    white-space: nowrap;
   }
 }

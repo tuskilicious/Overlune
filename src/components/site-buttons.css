@@ -1,0 +1,147 @@
+/* The site's buttons (2.0 polish, DESIGN.md "Editor and site UI"), on the home page, nav, guide and not-found page.
+   Behavior ported from two 21st.dev components, rebuilt in CSS in Overlune's brand colors (no code or dependency):
+   - `.btn-shimmer`, the main action, after Magic UI's "Shimmer Button" (dillionverma, MIT): a spark of light circles
+     the pill's edge, with a soft inner glow that deepens on hover and press.
+   - `.btn-glow`, the second action, after "Hover Border Gradient" (Shatlyk1011): a highlight travels round a thin
+     border, and on hover the whole edge lights up in violet.
+   Both keep still with reduced motion: the edge stays lit, nothing travels. */
+@property --btn-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.btn-shimmer,
+.btn-glow {
+  --btn-violet: #a45efc;
+  --btn-moon: #f4f1ff;
+  --btn-night: #05061a;
+  --btn-cyan: #18d2f5;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 999px;
+  text-decoration: none;
+  transition:
+    translate 200ms ease,
+    box-shadow 300ms ease,
+    color 300ms ease;
+}
+
+.btn-shimmer:active,
+.btn-glow:active {
+  translate: 0 1px;
+}
+
+/* The travelling light: a slim wedge of a conic gradient, turning behind a fill inset by the border's width. */
+.btn-shimmer::before,
+.btn-glow::before {
+  content: "";
+  position: absolute;
+  inset: -150% -10%;
+  z-index: -2;
+  background: conic-gradient(
+    from var(--btn-angle),
+    transparent 0 72%,
+    var(--btn-spark) 86%,
+    transparent 100%
+  );
+  animation: btn-turn var(--btn-speed) linear infinite;
+}
+
+.btn-shimmer::after,
+.btn-glow::after {
+  content: "";
+  position: absolute;
+  inset: var(--btn-edge);
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--btn-fill);
+  transition:
+    background-color 300ms ease,
+    box-shadow 300ms ease;
+}
+
+@keyframes btn-turn {
+  to {
+    --btn-angle: 360deg;
+  }
+}
+
+/* Main action: violet, a white spark. */
+.btn-shimmer {
+  --btn-fill: var(--btn-violet);
+  --btn-spark: #fff;
+  --btn-edge: 2px;
+  --btn-speed: 3s;
+  background: color-mix(in srgb, var(--btn-violet) 70%, var(--btn-night));
+  color: var(--btn-night);
+  box-shadow: 0 10px 32px -8px rgb(164 94 252 / 0.7);
+}
+
+.btn-shimmer::after {
+  box-shadow: inset 0 -8px 10px rgb(255 255 255 / 0.12);
+}
+
+.btn-shimmer:hover {
+  box-shadow: 0 12px 40px -6px rgb(164 94 252 / 0.85);
+}
+
+.btn-shimmer:hover::after {
+  box-shadow: inset 0 -6px 12px rgb(255 255 255 / 0.3);
+}
+
+.btn-shimmer:active::after {
+  box-shadow: inset 0 -10px 12px rgb(255 255 255 / 0.3);
+}
+
+/* On violet (the looks section): moonlight, a violet spark. */
+.btn-shimmer.btn-light {
+  --btn-fill: var(--btn-moon);
+  --btn-spark: var(--btn-violet);
+  background: color-mix(in srgb, var(--btn-moon) 55%, var(--btn-violet));
+  box-shadow: 0 10px 32px -10px rgb(5 6 26 / 0.6);
+}
+
+/* Second action: night glass, a moonlight spark on a faint edge; hover lights the whole edge violet. */
+.btn-glow {
+  --btn-fill: #0c0d29;
+  --btn-spark: var(--btn-moon);
+  --btn-edge: 1px;
+  --btn-speed: 4s;
+  background: rgb(244 241 255 / 0.18);
+  color: var(--btn-moon);
+}
+
+.btn-glow:hover {
+  background: var(--btn-violet);
+  box-shadow:
+    0 0 0 1px var(--btn-violet),
+    0 0 28px -2px rgb(164 94 252 / 0.75);
+}
+
+.btn-glow:hover::after {
+  background: radial-gradient(75% 180% at 50% 50%, #3a2468, #0c0d29);
+}
+
+.btn-shimmer:focus-visible,
+.btn-glow:focus-visible {
+  outline: 2px solid var(--btn-cyan);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-shimmer::before,
+  .btn-glow::before {
+    animation: none;
+    background: var(--btn-spark);
+    opacity: 0.35;
+  }
+}
+
+html[data-rm] .btn-shimmer::before,
+html[data-rm] .btn-glow::before {
+  animation: none;
+  background: var(--btn-spark);
+  opacity: 0.35;
+}

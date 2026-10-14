@@ -104,7 +104,7 @@ export default function SetupGuide() {
   const current = done.indexOf(false);
   const toggle = (i: number) => () => setDone((d) => d.map((v, j) => (j === i ? !v : v)));
   const sizes = [
-    ...Object.values(overlays).map((o) => ({ ...o, note: "or the canvas size you picked" })),
+    ...Object.values(overlays).map((o) => ({ ...o, note: "" })),
     {
       name: "Chat",
       width: defaultSettings.chat.width,
@@ -122,7 +122,7 @@ export default function SetupGuide() {
       name: "Live",
       width: 1920,
       height: 1080,
-      note: "optional: chat, alerts and the webcam frame in one source, instead of those three; or your canvas size",
+      note: "optional: chat, alerts and the webcam frame in one source, instead of those three",
     },
   ];
   return (
@@ -203,7 +203,10 @@ export default function SetupGuide() {
                   ))}
                 </tbody>
               </table>
-              <p>Every link carries your settings, so you only paste it once.</p>
+              <p>
+                Picked another canvas size in the editor? Then the scenes and Live take that size
+                instead of 1920 × 1080. Every link carries your settings, so you only paste it once.
+              </p>
             </Step>
 
             <Step
