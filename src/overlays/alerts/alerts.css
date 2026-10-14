@@ -111,12 +111,12 @@
     alert-out 400ms ease-in calc(var(--alert-ms) - 400ms) forwards;
 }
 
-/* Fluid (T6.123): the box drops in out of a blur and leaves the same way, rising. */
+/* Fluid (T6.123): the box drops in, settling to full size, and leaves rising. Transform and opacity only: a blur
+   repaints every frame in OBS. */
 @keyframes alert-in {
   from {
     opacity: 0;
-    transform: translateY(-32px);
-    filter: blur(8px);
+    transform: translateY(-32px) scale(0.96);
   }
 }
 
@@ -124,7 +124,6 @@
   to {
     opacity: 0;
     transform: translateY(-16px);
-    filter: blur(6px);
   }
 }
 

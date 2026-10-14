@@ -66,13 +66,15 @@ export default function App() {
           <Route
             path="/o/starting"
             element={
-              <FromLink>{(s, error) => <StartingSoon settings={s} error={error} />}</FromLink>
+              <FromLink replay>
+                {(s, error) => <StartingSoon settings={s} error={error} />}
+              </FromLink>
             }
           />
           <Route
             path="/o/offline"
             element={
-              <FromLink>
+              <FromLink replay>
                 {(s, error) => <TextScene scene="offline" settings={s} error={error} />}
               </FromLink>
             }
@@ -80,7 +82,7 @@ export default function App() {
           <Route
             path="/o/brb"
             element={
-              <FromLink>
+              <FromLink replay>
                 {(s, error) => <TextScene scene="brb" settings={s} error={error} />}
               </FromLink>
             }
@@ -88,7 +90,7 @@ export default function App() {
           <Route
             path="/o/ending"
             element={
-              <FromLink>
+              <FromLink replay>
                 {(s, error) => <TextScene scene="ending" settings={s} error={error} />}
               </FromLink>
             }
@@ -114,7 +116,7 @@ export default function App() {
           <Route
             path="/o/chatting"
             element={
-              <FromLink>
+              <FromLink replay>
                 {(s, error) => <CamScene scene="chatting" settings={s} error={error} />}
               </FromLink>
             }

@@ -241,6 +241,30 @@ Both are canvas layouts from the start, so every part moves, resizes and can be 
 - Alerts render centered-top by default, with no background outside the alert box.
 - Error states use the theme's surface and text colors, stay readable, and never flash.
 
+### The overlay playbook (owner, 2026-10-15)
+The owner's lessons from building an OBS pack, adopted for every overlay change. Overlune already met most of them:
+- motion tiers that drop whole layers (Full, Lite, Still);
+- a countdown that redraws once a second and only while shown;
+- paused animations when OBS hides a source;
+- a first-in, first-out alert queue holding 5 seconds by default;
+- every colour a theme token, and bad link settings falling back.
+
+The rules every change keeps:
+- **Animate transform and opacity only.** No animated `filter`, shadows, masks or blend modes. Each repaints every frame in OBS. The entrances lost their blur for this, Vaporwave's sun stripes stopped sliding, and Session's grain lost its multiply blend.
+- **No full-frame blend modes on looping layers.**
+- **Decorations are built once** (CSS backgrounds and pseudo-elements), never re-rendered.
+- **Motion stays off the gameplay area:** on frames, edges and full-screen scenes.
+- **Clear of the platform's controls:** the player bar and corners in landscape, and the safe zone in portrait.
+- **Vertical is its own layout,** never a crop.
+- **Long names wrap or shrink;** columns never squash.
+- **Every timer and listener is cleaned up.**
+- **OBS's page events are used:** a hidden source pauses, and a full-screen scene's entrance replays when its source goes on air (`obsSourceActiveChanged`; chat, alerts and Live don't remount).
+
+Not adopted, because they don't fit a hosted overlay whose settings live in the link:
+- single-file zip builds and backup folders;
+- a dock talking to the overlays over BroadcastChannel;
+- API keys in builds (Overlune has none, and tokens never go in links).
+
 ### Scene layout (T6.35, T6.134)
 Each look has its own scene composition (T6.134, plan and sketches in `docs/LAYOUTS.md`), built in `src/overlays/layouts.css` on the shared markup. Layout v2 (below) is the default a new look starts from. Theme ids, settings and links never changed, so pasted links picked up every new layout. Per-look rules key on `data-theme` (and `data-bg` for background effects) on `.scene`, `.chat` and `.alerts`; BRB, Stream Ending and the offline banner have no countdown, which `.scene-main:has(.countdown)` tells apart (OBS 31+).
 

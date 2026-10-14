@@ -367,7 +367,8 @@
   pointer-events: none;
 }
 
-/* The sun: centered on the horizon, half set. Solid at the top, striped below, the stripes sliding down. */
+/* The sun: centered on the horizon, half set. Solid at the top, striped below. The stripes hold still: sliding them
+   moved the mask, which repaints the whole sun every frame in OBS (the overlay playbook: transform and opacity only). */
 .scene[data-bg="sunset"]::before {
   left: calc(50% - 280px);
   top: calc(80% - 280px);
@@ -382,15 +383,6 @@
   mask-size:
     100% 100%,
     100% 30px;
-  animation: sun-stripes 1.6s linear infinite;
-}
-
-@keyframes sun-stripes {
-  to {
-    mask-position:
-      0 0,
-      0 30px;
-  }
 }
 
 /* The floor: a perspective grid from the horizon to the bottom edge, scrolling toward the viewer. */
@@ -471,8 +463,7 @@
 @keyframes scene-slide-fade {
   from {
     opacity: 0;
-    transform: translateY(24px);
-    filter: blur(10px);
+    transform: translateY(24px) scale(0.98);
   }
 }
 
@@ -850,8 +841,8 @@
   z-index: 1;
   pointer-events: none;
   background: url("/images/themes/print-grain.svg");
-  opacity: 0.35;
-  mix-blend-mode: multiply;
+  opacity: 0.28; /* no blend mode (a full-frame blend on this flickering layer costs OBS every frame), so a touch
+     lighter to keep the title's contrast as it was */
 }
 
 /* Huge ink caps set tight enough that the lines crash together. */
