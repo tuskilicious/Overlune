@@ -78,6 +78,30 @@ test("signed in: the Twitch picture and name, then sign out", async ({ page }) =
   expect(calls).toContain("POST /api/auth/signout");
 });
 
+test("the account panel eases open, and just opens with reduced motion", async ({ page }) => {
+  await api(page, true);
+  await page.goto("/editor");
+  const menu = header(page).locator(".editor-account-menu summary");
+  await expect(menu).toHaveText("MoonStreamer");
+  // The animation the panel plays as it opens.
+  const easing = () =>
+    page.evaluate(() =>
+      document
+        .getAnimations()
+        .filter((a) => (a.effect as KeyframeEffect).target?.closest?.(".editor-account-menu"))
+        .flatMap((a) => (a instanceof CSSAnimation ? [a.animationName] : [])),
+    );
+  await menu.click();
+  expect(await easing()).toEqual(["account-in"]);
+  await expect(header(page).getByText("Signed in with Twitch as moonstreamer.")).toBeVisible();
+  await menu.click(); // closed again
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.waitForTimeout(400);
+  await menu.click();
+  expect(await easing()).toEqual([]);
+  await expect(header(page).getByText("Signed in with Twitch as moonstreamer.")).toBeVisible();
+});
+
 test("deleting the account asks first, then signs out", async ({ page }) => {
   const calls = await api(page, true);
   await page.goto("/editor");

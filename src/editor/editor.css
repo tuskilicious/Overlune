@@ -148,6 +148,31 @@
   border-radius: var(--radius);
   background: var(--surface);
   box-shadow: 0 16px 40px rgb(0 0 0 / 0.4);
+  transform-origin: top right;
+}
+
+/* The panel eases in from under the profile button instead of appearing at once (owner, 2026-10-14). */
+.editor-account-menu[open] .editor-account-panel {
+  animation: account-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes account-in {
+  from {
+    opacity: 0;
+    translate: 0 -6px;
+    scale: 0.97;
+  }
+}
+
+.editor-account-menu summary {
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.editor-account-menu summary:hover,
+.editor-account-menu[open] summary {
+  background: var(--surface);
 }
 
 .editor-account-panel p {
