@@ -127,3 +127,41 @@ test("a portrait layout in the save is used, and the landscape one is left alone
   const wide = (await page.locator(".scene-title").boundingBox())!;
   expect(Math.round(wide.y + wide.height / 2)).toBe(200);
 });
+
+test.describe("alerts, chat and the frame on their own (T10.9)", () => {
+  test("a vertical alert sits across the safe zone in its upper third", async ({ page }) => {
+    await page.goto(`/o/alerts?canvas=vertical&test=1${hash(sample("clean-slate", false))}`);
+    const canvas = (await page.locator(".alerts").boundingBox())!;
+    expect([canvas.width, canvas.height]).toEqual([1080, 1920]);
+    const box = page.locator(".alert-box");
+    await expect(box).toBeVisible();
+    const b = (await box.boundingBox())!;
+    expect(b.x).toBeGreaterThanOrEqual(60 - 1);
+    expect(b.x + b.width).toBeLessThanOrEqual(940 + 1);
+    expect(b.y).toBeGreaterThanOrEqual(260 - 1);
+    expect(b.y + b.height).toBeLessThanOrEqual(1240);
+    await expect(page.locator(".alerts-test-label")).toBeInViewport();
+  });
+
+  test("a vertical frame is the frame at its own size, even if it was placed", async ({ page }) => {
+    await page.goto(
+      `/o/frame?canvas=vertical${hash({ theme: "neon-grid", frame: { width: 880, height: 495, x: 900, y: 500 } })}`,
+    );
+    await expect(page.locator(".frame-canvas")).toHaveCount(0);
+    // Its size by CSS: the entrance scales it in.
+    await expect(page.locator(".frame")).toHaveCSS("width", "880px");
+    await expect(page.locator(".frame")).toHaveCSS("height", "495px");
+    // Without the flag, the placed frame is where the streamer put it, as before.
+    await page.goto(
+      `/o/frame${hash({ theme: "neon-grid", frame: { width: 880, height: 495, x: 900, y: 500 } })}`,
+    );
+    await expect(page.locator(".frame-canvas")).toHaveCount(1);
+  });
+
+  test("a vertical Live still sizes its alerts by their box", async ({ page }) => {
+    await page.goto(`/o/live?canvas=vertical&test=1${hash(sample("clean-slate", false))}`);
+    const el = (await page.locator(".layout-el-alerts").boundingBox())!;
+    const alerts = (await page.locator(".layout-el-alerts .alerts").boundingBox())!;
+    expect([alerts.width, alerts.height]).toEqual([el.width, el.height]);
+  });
+});

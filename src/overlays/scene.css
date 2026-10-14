@@ -1725,7 +1725,9 @@
   overflow: hidden;
 }
 
-.layout-el-alerts .alerts {
+/* `[data-canvas]` too: a vertical Live sizes its alerts by its box, not by alerts.css's portrait canvas. */
+.layout-el-alerts .alerts,
+.layout-el-alerts .alerts[data-canvas] {
   width: 100%;
   height: 100%;
   padding: 0;
@@ -1787,7 +1789,8 @@ html:has(#root > .scene[style*="--fit"], #root > .live[style*="--fit"]) {
   height: 100%;
 }
 
-.cam-scene .layout-el-alerts .alerts {
+.cam-scene .layout-el-alerts .alerts,
+.cam-scene .layout-el-alerts .alerts[data-canvas] {
   width: 100%;
   height: 100%;
 }

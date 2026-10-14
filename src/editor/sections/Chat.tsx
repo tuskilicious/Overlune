@@ -116,6 +116,25 @@ export default function Chat({
                 onChange={(height) => updateChat({ height })}
               />
             </div>
+            {/* Common sizes (T10.9): the usual side box, and across a vertical stream's safe zone. */}
+            <div className="editor-quick" role="group" aria-label="Common chat sizes">
+              {(
+                [
+                  [400, 600, "Side box"],
+                  [880, 500, "Vertical, short"],
+                  [880, 800, "Vertical, tall"],
+                ] as const
+              ).map(([w, h, name]) => (
+                <button
+                  key={name}
+                  type="button"
+                  aria-pressed={settings.chat.width === w && settings.chat.height === h}
+                  onClick={() => updateChat({ width: w, height: h })}
+                >
+                  {name} {w} × {h}
+                </button>
+              ))}
+            </div>
             <p id="size-hint" className="editor-hint">
               Enter the same width and height in OBS. They’re shown next to the Chat link.
             </p>

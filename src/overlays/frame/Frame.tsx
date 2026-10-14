@@ -1,8 +1,9 @@
-import type { CSSProperties, ReactNode } from "react";
+import { useContext, type CSSProperties, type ReactNode } from "react";
 import { framePosition, type Settings } from "../../settings/schema";
 import { themes } from "../../themes";
 import "../../themes/fonts";
 import { applyOverrides, themeVars } from "../../themes/vars";
+import { CanvasContext } from "../measure";
 import "./frame.css";
 
 /** /o/frame (T6.88): a border in the look, with a clear middle for the camera underneath it in OBS. */
@@ -19,8 +20,10 @@ export default function Frame({ settings, error }: { settings: Settings; error?:
       {error}
     </div>
   );
-  // Placed in Overlune (T6.122): a transparent 1920×1080 canvas with the frame where the streamer put it.
-  const at = framePosition(settings.frame);
+  // Placed in Overlune (T6.122): a transparent 1920×1080 canvas with the frame where the streamer put it. A vertical
+  // link (T10.9) is the frame at its own size, to place in OBS: the placement is on the landscape canvas.
+  const vertical = useContext(CanvasContext) === "portrait";
+  const at = !vertical && framePosition(settings.frame);
   if (!at) return frame;
   return (
     <div

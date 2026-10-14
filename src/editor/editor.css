@@ -2467,3 +2467,11 @@
 .editor-vertical-note code {
   font-size: 0.9em;
 }
+
+/* A quick row's name, before its chips (T10.9: "Vertical"). */
+.editor-quick-label {
+  align-self: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}

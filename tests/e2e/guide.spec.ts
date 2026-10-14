@@ -152,3 +152,11 @@ test("on phones each step uses the full width (T8.2)", async ({ page }) => {
   expect(step.width).toBeGreaterThan(340);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });
+
+test("the guide has a vertical part with each app's steps (T10.9)", async ({ page }) => {
+  await page.goto("/guide");
+  const part = page.getByRole("region", { name: "Streaming vertical? (TikTok, YouTube Shorts)" });
+  await expect(part).toBeVisible();
+  for (const app of ["OBS Studio 32.1 or later:", "Aitum Vertical plugin:", "Streamlabs Desktop:"])
+    await expect(part.getByText(app)).toBeVisible();
+});
