@@ -3,7 +3,8 @@ import { useHeadingAbove } from "../lib/useHeadingAbove";
 import SiteFooter from "../components/SiteFooter";
 import SiteNav from "../components/SiteNav";
 import { defaultSettings } from "../settings/schema";
-import { brandChrome } from "./brand";
+import { brandFor } from "./brand";
+import { useSiteTheme } from "../lib/site-theme";
 import "../themes/fonts";
 import { themeVars } from "../themes/vars";
 import { overlays } from "./ObsLinks";
@@ -99,6 +100,7 @@ const guideIndex = [
 const guideIds = guideIndex.map(([id]) => id);
 
 export default function SetupGuide() {
+  const siteTheme = useSiteTheme();
   const reading = useHeadingAbove(guideIds);
   const [done, setDone] = useState([false, false, false]);
   const current = done.indexOf(false);
@@ -132,7 +134,7 @@ export default function SetupGuide() {
     { ...overlays.reaction, note: "optional: your camera beside the video you react to" },
   ];
   return (
-    <div className="editor guide site-sky" style={themeVars(brandChrome)}>
+    <div className="editor guide site-sky" style={themeVars(brandFor(siteTheme))}>
       <SiteNav />
       {/* Centred under the nav (T8.2): on wide windows the index is a sticky column beside the steps and marks the
           part you're reading; narrower, it's the row of chips under the heading. */}

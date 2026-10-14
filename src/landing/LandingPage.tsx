@@ -232,7 +232,7 @@ function HeroKit() {
             <li
               key={id}
               aria-current={id === scene || undefined}
-              className="rounded-full border border-white/15 px-3 py-1 text-sm text-haze aria-[current=true]:border-violet aria-[current=true]:bg-violet aria-[current=true]:text-night"
+              className="rounded-full border border-moon/15 px-3 py-1 text-sm text-haze aria-[current=true]:border-violet aria-[current=true]:bg-violet aria-[current=true]:text-night"
             >
               {sceneNames[id]}
             </li>
@@ -241,7 +241,7 @@ function HeroKit() {
         <button
           type="button"
           onClick={() => setPlaying((p) => !p)}
-          className="ml-auto cursor-pointer rounded-full border border-white/15 bg-transparent px-3 py-1 font-body text-sm text-haze hover:text-moon"
+          className="ml-auto cursor-pointer rounded-full border border-moon/15 bg-transparent px-3 py-1 font-body text-sm text-haze hover:text-moon"
         >
           {playing ? "Pause the looks" : "Play the looks"}
         </button>
@@ -688,7 +688,7 @@ function StreamStage() {
               type="button"
               aria-pressed={look === id}
               onClick={() => setLook(id)}
-              className="cursor-pointer rounded-full border border-white/15 bg-transparent px-4 py-2 font-body text-sm text-haze hover:border-moon hover:text-moon aria-pressed:border-violet aria-pressed:bg-violet aria-pressed:text-night"
+              className="cursor-pointer rounded-full border border-moon/15 bg-transparent px-4 py-2 font-body text-sm text-haze hover:border-moon hover:text-moon aria-pressed:border-violet aria-pressed:bg-violet aria-pressed:text-night"
             >
               {themes[id].name}
             </button>
@@ -1032,7 +1032,8 @@ export default function LandingPage() {
             );
             gsap.fromTo(
               "[data-word]",
-              { opacity: 0.4 }, // still 3:1 for this large text before it lights up (WCAG 1.4.3)
+              // Still 3:1 for this large text before it lights up (WCAG 1.4.3): ink on light needs more.
+              { opacity: document.documentElement.dataset.siteTheme === "light" ? 0.55 : 0.4 },
               {
                 opacity: 1,
                 stagger: 0.05,
@@ -1106,7 +1107,7 @@ export default function LandingPage() {
             </div>
             <div
               data-hero-card
-              className="landing-hero-card landing-sky relative z-10 mx-auto w-full max-w-[90rem] px-6 py-16 md:px-12 md:py-20"
+              className="landing-hero-card landing-sky site-dark relative z-10 mx-auto w-full max-w-[90rem] px-6 py-16 md:px-12 md:py-20"
             >
               <HeroSky />
               <span aria-hidden className="landing-moon" />
@@ -1167,7 +1168,7 @@ export default function LandingPage() {
         </section>
 
         {/* Theme names, scrolling. A second copy makes the loop seamless and is hidden from screen readers. */}
-        <div className="overflow-hidden border-y border-white/10 py-6" aria-label="Themes">
+        <div className="overflow-hidden border-y border-moon/10 py-6" aria-label="Themes">
           <div className="landing-marquee flex w-max gap-12 font-heading text-3xl font-bold text-haze/70 md:text-5xl">
             {[0, 1].map((copy) => (
               <p key={copy} className="flex gap-12 pr-12" aria-hidden={copy === 1 || undefined}>
@@ -1233,7 +1234,7 @@ export default function LandingPage() {
         <section
           id="looks"
           data-curve
-          className="landing-curve relative px-6 py-32 md:px-12 md:py-40"
+          className="landing-curve site-dark relative px-6 py-32 md:px-12 md:py-40"
           aria-labelledby="looks-heading"
         >
           <LooksShowcase />
@@ -1288,12 +1289,12 @@ export default function LandingPage() {
               tabIndex={0}
               role="region"
               aria-label="What works where, by platform"
-              className="relative mt-10 overflow-x-auto rounded-3xl border border-white/10 bg-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet"
+              className="relative mt-10 overflow-x-auto rounded-3xl border border-moon/10 bg-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet"
             >
               <table className="landing-support w-full min-w-[34rem] border-collapse text-left">
                 <caption className="sr-only">Which overlays work on which platform</caption>
                 <thead>
-                  <tr className="border-b border-white/10">
+                  <tr className="border-b border-moon/10">
                     <th
                       scope="col"
                       className="p-3 align-bottom font-heading text-sm text-haze md:p-4 md:px-6 md:text-base"
@@ -1315,7 +1316,7 @@ export default function LandingPage() {
                 </thead>
                 {support.map(({ group, rows }) => (
                   <tbody key={group}>
-                    <tr className="border-b border-white/10 bg-night/50">
+                    <tr className="border-b border-moon/10 bg-night/50">
                       <th
                         scope="colgroup"
                         colSpan={4}
@@ -1325,7 +1326,7 @@ export default function LandingPage() {
                       </th>
                     </tr>
                     {rows.map((row) => (
-                      <tr key={row.overlay} className="border-b border-white/10">
+                      <tr key={row.overlay} className="border-b border-moon/10">
                         <th scope="row" className="p-3 align-top font-normal md:p-4 md:px-6">
                           <span className="block font-heading text-lg font-bold">
                             {row.overlay}
@@ -1364,7 +1365,7 @@ export default function LandingPage() {
               Good to know
             </h2>
             {/* Questions that open in place, with round toggles, after the reference's FAQ (T6.124). */}
-            <div className="divide-y divide-white/10 border-y border-white/10">
+            <div className="divide-y divide-moon/10 border-y border-moon/10">
               {goodToKnow.map(([term, text]) => (
                 <details key={term} className="landing-faq group">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 font-heading text-xl font-bold">
@@ -1395,7 +1396,7 @@ export default function LandingPage() {
         {/* Action. */}
         <section id="start" className="px-3 pb-6 md:px-6" aria-labelledby="cta-heading">
           {/* After 21st.dev's "CTA Banner" (behavior only, T6.152): corner brackets, scanlines and a slow scan. */}
-          <div className="landing-cta mx-auto max-w-[90rem] px-6 pt-20 pb-24 text-center md:px-12 md:pt-28 md:pb-32">
+          <div className="landing-cta site-dark mx-auto max-w-[90rem] px-6 pt-20 pb-24 text-center md:px-12 md:pt-28 md:pb-32">
             <h2
               id="cta-heading"
               data-reveal

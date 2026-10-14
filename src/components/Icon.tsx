@@ -24,6 +24,9 @@ const paths = {
   links: "M5 7l2-2M4.5 5.5l-1 1a1.8 1.8 0 0 0 2.5 2.5l1-1M7.5 6.5l1-1A1.8 1.8 0 0 0 6 3L5 4",
   collapse: "M7 3 4 6l3 3M10 3 7 6l3 3",
   open: "M5 3l3 3-3 3M2 3l3 3-3 3",
+  // The site's light and dark mode (2.1).
+  sun: "M8.5 6a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0M6 .8V2M6 10v1.2M.8 6H2M10 6h1.2M2.3 2.3l.9.9M8.8 8.8l.9.9M2.3 9.7l.9-.9M8.8 3.2l.9-.9",
+  moon: "M9.8 7.6A4.2 4.2 0 0 1 4.4 2.2a4.2 4.2 0 1 0 5.4 5.4",
 } as const;
 
 export type IconName = keyof typeof paths;

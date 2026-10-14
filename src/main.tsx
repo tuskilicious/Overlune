@@ -3,9 +3,13 @@ import { createRoot } from "react-dom/client";
 import { reportError, startSentry } from "./lib/sentry";
 import App from "./App";
 import "./index.css";
+import { applySiteTheme } from "./lib/site-theme";
 
 // Sentry loads after the page has drawn (T6.93); errors before then are queued.
 startSentry();
+
+// The site's light or dark mode, before the first paint; overlays keep their looks' own colors.
+if (!location.pathname.startsWith("/o/")) applySiteTheme();
 
 // ?rm=1 forces reduced motion (public link contract, docs/STACK.md). OBS doesn't always pass on the OS setting.
 if (new URLSearchParams(location.search).get("rm") === "1")

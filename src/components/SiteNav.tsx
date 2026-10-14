@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router";
+import { setSiteTheme, useSiteTheme } from "../lib/site-theme";
+import Icon from "./Icon";
 import "./site-buttons.css";
 import "./site-nav.css";
 
@@ -44,11 +46,31 @@ export default function SiteNav({
           </>
         )}
       </ul>
-      {action ?? (
-        <Link to="/editor" className="site-nav-cta btn-shimmer">
-          Open the editor
-        </Link>
-      )}
+      <div className="site-nav-end">
+        <ThemeToggle />
+        {action ?? (
+          <Link to="/editor" className="site-nav-cta btn-shimmer">
+            Open the editor
+          </Link>
+        )}
+      </div>
     </nav>
+  );
+}
+
+/** Light or dark mode for the site (2.1): follows the system until pressed, then remembers the pick here. */
+function ThemeToggle() {
+  const theme = useSiteTheme();
+  const next = theme === "light" ? "dark" : "light";
+  return (
+    <button
+      type="button"
+      className="site-nav-theme"
+      aria-label={`Switch to ${next} mode`}
+      title={`Switch to ${next} mode`}
+      onClick={() => setSiteTheme(next)}
+    >
+      <Icon name={theme === "light" ? "moon" : "sun"} />
+    </button>
   );
 }

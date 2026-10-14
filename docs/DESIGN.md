@@ -295,6 +295,13 @@ The canvas follows the editor's chrome (tokens, focus rings, one filled button) 
 
 **Keyboard and screen readers (T9.9):** Customize moves focus into the canvas; Done and Reset to the look move it back to Customize, so focus never drops to the top of the page. The canvas's status line (what's picked, where, how big) is read by screen readers, not shown. "Keyboard keys", folded under the panels, lists every key for people who don't use a screen reader; the setup guide's "Make it yours" part repeats them from the same list (`canvasKeys`). Turning by keyboard is the Inspector's Turn box.
 
+## Light mode (2.1)
+The site (home page, editor, guide, legal pages and not-found page) has a light mode as well as its night one. A sun or moon button in the nav switches it; until it's pressed the site follows the system's setting, and a pick is kept in the browser's local storage (`src/lib/site-theme.ts`, never in a link). Overlays and their previews never change: they're in their look's own colors.
+- **The palette is the brand, flipped.** Page `#F6F4FD`, cards `#FFFFFF`, ink `#16123A`, muted `#574F86`, violet `#7B3FE4` (deeper than Lune Violet, for AA contrast on light), cyan `#0B6C85`, borders `#D9D4F0`. The home page swaps its Tailwind color variables under `:root[data-site-theme="light"]`, so every utility follows; the editor's pages use `brandChromeLight` (`brand.ts`).
+- **Windows onto the night stay night.** The hero card, the violet looks section and the closing panel keep the dark tokens (`.site-dark`), with their buttons. The looks section fades into the page's own color below it.
+- **Details:** the white wordmark is inverted to ink, with a hue turn that keeps its violet crescent; the nav is daylight glass; the editor pages' stars give way to a faint violet glow; hairlines follow the text color instead of fixed white; the promise's words start at 55% in light (3:1 for large text) instead of 40%.
+- Every page is axe clean in both modes, at 390 and 1440px (`tests/e2e/footer.spec.ts`).
+
 ## Editor and site UI
 The editor, setup guide, privacy and terms pages share one quiet, high-contrast chrome in Overlune's brand (`docs/BRAND.md`), so the colorful theme previews stay the loudest thing on the page. Tokens live in `src/editor/brand.ts` and reach CSS as variables on `.editor` (`themeVars`). "Must" rules are hard requirements; "should" rules are defaults.
 

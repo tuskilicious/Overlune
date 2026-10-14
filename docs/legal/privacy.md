@@ -16,7 +16,7 @@ Overlune is a free, open-source stream overlay maker at overlune.in. This page d
 Everything you set in the editor (theme, titles, socials, logo link, chat channel name, alert messages, and where you placed things on the canvas, including any text and picture links you added) is saved in two places, both on your side:
 
 1. **Your overlay links.** Settings are stored in the part of the link after the `#`. Browsers never send that part to the website, so our host does not receive your settings when an overlay loads.
-2. **Your browser's local storage**, so the editor remembers your work. It stays on your device. "Start over" in the editor resets it to the defaults, and clearing your browser's site data for Overlune deletes it.
+2. **Your browser's local storage**, so the editor remembers your work (and the site remembers light or dark mode, if you pick one). It stays on your device. "Start over" in the editor resets it to the defaults, and clearing your browser's site data for Overlune deletes it.
 
 Anyone you give a link to can see the settings inside it. Your links never contain passwords or login tokens.
 
