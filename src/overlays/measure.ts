@@ -1,13 +1,32 @@
+import { createContext } from "react";
 import type { LayoutElement, Settings } from "../settings/schema";
 
+/** Which layout an overlay draws: the landscape one, or the portrait one from `?canvas=vertical` (Phase 10). */
+export type CanvasId = "landscape" | "portrait";
+
+/** The canvas the overlays under it draw (FromLink sets it from the link; the editor from its switch). */
+export const CanvasContext = createContext<CanvasId>("landscape");
+
+/** The link's canvas: `?canvas=vertical` is portrait, anything else landscape (STACK.md, a public contract). */
+export const linkCanvas = (search: string): CanvasId =>
+  new URLSearchParams(search).get("canvas") === "vertical" ? "portrait" : "landscape";
+
+/** Each canvas's design size: the looks are designed at 1920×1080, and their portrait versions at 1080×1920. */
+export const designOf: Record<CanvasId, { w: number; h: number }> = {
+  landscape: { w: 1920, h: 1080 },
+  portrait: { w: 1080, h: 1920 },
+};
+
 /**
- * The canvas a scene is drawn on (T9.8). The looks are designed at 1920×1080, so a scene is drawn on a box of the
- * canvas's shape whose short side matches that design, then scaled (`k`) to the canvas: 1280×720 and 4K are the same
- * scene at another scale, and a wider or taller canvas gets a wider or taller scene. Layouts are in the box's units.
+ * The box a scene is drawn on (T9.8, Phase 10). A scene is drawn on a box of the canvas's shape whose short side
+ * matches its design, then scaled (`k`) to the canvas: 1280×720 and 4K are the same landscape scene at another scale,
+ * and a wider or taller canvas gets a wider or taller scene. A portrait layout uses the portrait design, so 1080×1920
+ * is drawn at scale 1. Layouts are in the box's units.
  */
-export function canvasOf(settings: Settings) {
-  const { width, height } = settings.layouts.landscape?.size ?? { width: 1920, height: 1080 };
-  const k = Math.min(width / 1920, height / 1080);
+export function canvasOf(settings: Settings, canvas: CanvasId = "landscape") {
+  const design = designOf[canvas];
+  const { width, height } = settings.layouts[canvas]?.size ?? { width: design.w, height: design.h };
+  const k = Math.min(width / design.w, height / design.h);
   return { width, height, k, w: Math.round(width / k), h: Math.round(height / k) };
 }
 

@@ -1748,3 +1748,40 @@
 html:has(#root > .scene[style*="--fit"], #root > .live[style*="--fit"]) {
   overflow: hidden;
 }
+
+/* Portrait (Phase 10, DESIGN.md "Vertical layout"): from `?canvas=vertical`, a 1080×1920 scene whose words stay in the
+   safe zone (x 60–940, y 240–1240), clear of the phone apps' header, buttons and live comments. The padding is that
+   zone, so each look's own composition lands inside it; the columns stack, the socials go two by two, and the ticker
+   sits at the zone's foot, inside its width. Art and backgrounds still fill the whole canvas. */
+.scene[data-canvas="portrait"] {
+  padding: 240px 140px 680px 60px;
+}
+
+.scene[data-canvas="portrait"][data-ticker] {
+  padding-bottom: 784px; /* the ticker, then a gap, above the zone's foot */
+}
+
+.scene[data-canvas="portrait"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.scene[data-canvas="portrait"] .scene-side {
+  grid-area: auto;
+  min-width: 0;
+  margin-top: 48px;
+}
+
+.scene[data-canvas="portrait"] .scene-title {
+  overflow-wrap: normal; /* a long word shrinks the title instead (SceneFrame's fit) */
+}
+
+.scene[data-canvas="portrait"] .scene-socials {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.scene[data-canvas="portrait"] .scene-ticker {
+  left: 60px;
+  right: 140px;
+  bottom: 680px;
+}
