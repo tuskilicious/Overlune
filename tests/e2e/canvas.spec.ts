@@ -303,3 +303,33 @@ test.describe("adding and removing (T9.6)", () => {
     await expect(add).toHaveCount(0);
   });
 });
+
+test.describe("the overlay playbook (2.1)", () => {
+  test("a drag stops at the canvas's edge, and so do the arrow keys", async ({ page }) => {
+    const title = (await layoutInLink(page))!.find((e) => e.type === "title")!;
+    const from = await canvasPoint(page, title.x + 40, title.y + title.h / 2);
+    await page.mouse.move(from.x, from.y);
+    await page.mouse.down();
+    await page.mouse.move(from.x - 2000, from.y + 2000, { steps: 6 });
+    await page.mouse.up();
+    const moved = (await layoutInLink(page))!.find((e) => e.type === "title")!;
+    expect(moved.x).toBe(0);
+    expect(moved.y + moved.h).toBe(1080);
+    await page.keyboard.press("Shift+ArrowLeft");
+    await page.keyboard.press("Shift+ArrowDown");
+    expect((await layoutInLink(page))!.find((e) => e.type === "title")).toMatchObject({
+      x: 0,
+      y: moved.y,
+    });
+  });
+
+  test("safe areas and thirds show on request", async ({ page }) => {
+    await expect(page.locator(".canvas-frame-guides")).toHaveCount(0);
+    await page.getByLabel("Show safe areas and thirds").check();
+    await expect(page.locator(".canvas .canvas-safe")).toHaveCount(2);
+    await expect(page.locator(".canvas .canvas-third")).toHaveCount(4);
+    const canvas = (await page.locator(".canvas").boundingBox())!;
+    const action = (await page.locator('.canvas-safe[data-safe="action"]').boundingBox())!;
+    expect(action.x - canvas.x).toBeCloseTo(canvas.width * 0.05, 0);
+  });
+});

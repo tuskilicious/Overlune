@@ -44,6 +44,26 @@ export function snapMove(
   };
 }
 
+/**
+ * Limits a move of `boxes` by (dx, dy) so the group stays on the canvas (the overlay playbook: placement clamps to the
+ * frame). A group already hanging off an edge (an older layout) may stay there, but never goes further out.
+ */
+export function clampMove(
+  boxes: Box[],
+  dx: number,
+  dy: number,
+  canvas: { w: number; h: number },
+): { dx: number; dy: number } {
+  if (!boxes.length) return { dx, dy };
+  const left = Math.min(...boxes.map((b) => b.x));
+  const top = Math.min(...boxes.map((b) => b.y));
+  const right = Math.max(...boxes.map((b) => b.x + b.w));
+  const bottom = Math.max(...boxes.map((b) => b.y + b.h));
+  const axis = (d: number, lo: number, hi: number, size: number) =>
+    Math.min(Math.max(d, Math.min(0, -lo)), Math.max(0, size - hi));
+  return { dx: axis(dx, left, right, canvas.w), dy: axis(dy, top, bottom, canvas.h) };
+}
+
 /** Which edges a resize handle moves: n, s, e, w and the corners. */
 export type Handle = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
 export const handles: Handle[] = ["nw", "n", "ne", "e", "se", "s", "sw", "w"];

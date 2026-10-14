@@ -315,3 +315,67 @@
   margin: 0;
   color: var(--text-muted);
 }
+
+/* Safe areas and thirds (the overlay playbook), on request: action safe 5% in, title safe 10% in, and the thirds. Faint
+   Signal Cyan, as the snapping guides; never in OBS. */
+.canvas-frame-guides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.canvas-safe,
+.canvas-third {
+  position: absolute;
+  border: 0 dashed rgb(24 210 245 / 0.55);
+}
+
+.canvas-safe[data-safe="action"] {
+  inset: 5%;
+  border-width: 1px;
+}
+
+.canvas-safe[data-safe="title"] {
+  inset: 10%;
+  border-width: 1px;
+  border-color: rgb(24 210 245 / 0.35);
+}
+
+.canvas-third[data-third^="x"] {
+  top: 0;
+  bottom: 0;
+  border-left-width: 1px;
+  border-color: rgb(24 210 245 / 0.3);
+}
+
+.canvas-third[data-third="x1"] {
+  left: 33.333%;
+}
+
+.canvas-third[data-third="x2"] {
+  left: 66.667%;
+}
+
+.canvas-third[data-third^="y"] {
+  left: 0;
+  right: 0;
+  border-top-width: 1px;
+  border-color: rgb(24 210 245 / 0.3);
+}
+
+.canvas-third[data-third="y1"] {
+  top: 33.333%;
+}
+
+.canvas-third[data-third="y2"] {
+  top: 66.667%;
+}
+
+.canvas-guides-toggle {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 8px;
+  align-items: center;
+  width: fit-content;
+  cursor: pointer;
+}
