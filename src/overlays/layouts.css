@@ -1467,3 +1467,114 @@
 .scene[data-canvas="portrait"][data-theme="arcade-8bit"] .scene-socials li {
   grid-template-columns: 96px 56px minmax(0, 1fr) minmax(0, 1fr);
 }
+
+.scene[data-canvas="portrait"][data-theme="arcade-8bit"] .scene-socials li {
+  grid-template-columns: 96px 56px minmax(0, 0.7fr) minmax(0, 1.3fr); /* room for a long handle */
+}
+
+/* Each look's art, moved for the tall frame (T10.5 to T10.8): out from behind the words, mostly into the bottom
+   third, where the phone apps' comments sit over the stream and only art goes. */
+
+/* Quest: the parchment fills the zone (its grid rows are implicit in portrait, so it can't span them). */
+.scene[data-canvas="portrait"][data-theme="quest"] .scene-main {
+  position: relative;
+  isolation: isolate;
+}
+
+.scene[data-canvas="portrait"][data-theme="quest"] .scene-main::before {
+  position: absolute;
+  z-index: -1;
+  inset: -24px -32px -16px -32px;
+  grid-area: auto;
+  margin: 0;
+}
+
+/* Bold Esports: the slash cuts across the foot instead of the title. */
+.scene[data-canvas="portrait"][data-theme="bold-esports"]::before {
+  top: auto;
+  bottom: 0;
+  width: 100%;
+  height: 34%;
+}
+
+/* Daylight: the sun sets low on the right, under the zone. */
+.scene[data-canvas="portrait"][data-theme="daylight"]::before {
+  top: auto;
+  right: -60px;
+  bottom: 300px;
+}
+
+/* Skate Deck: the board rocks under the stickers. */
+.scene[data-canvas="portrait"][data-bg="skate"]::before {
+  top: auto;
+  right: 110px;
+  bottom: 330px;
+}
+
+/* Shonen: one panel in portrait, so the gutter between panels goes. */
+.scene[data-canvas="portrait"][data-theme="shonen"] .scene-main::after {
+  display: none;
+}
+
+/* Phosphor: the window keeps its title bar, but the boot log goes: in the narrow zone its lines would cost the
+   title its size. */
+.scene[data-canvas="portrait"][data-bg="phosphor"][data-theme="phosphor"]::before {
+  display: none;
+}
+
+/* Phosphor: the prompt starts under the window's title bar. */
+.scene[data-canvas="portrait"][data-theme="phosphor"] .scene-main {
+  padding: 96px 40px 32px;
+}
+
+/* Bold Esports: the bar runs edge to edge behind the countdown and socials, at the zone's foot. */
+.scene[data-canvas="portrait"][data-theme="bold-esports"] .scene-main {
+  position: relative;
+  isolation: isolate;
+}
+
+.scene[data-canvas="portrait"][data-theme="bold-esports"] .scene-main::before {
+  position: absolute;
+  z-index: -1;
+  top: auto;
+  right: -140px;
+  bottom: -40px;
+  left: -60px;
+  height: 480px;
+  margin: 0;
+}
+
+/* Phosphor's monospace handles need the full width: one social a row. */
+.scene[data-canvas="portrait"][data-theme="phosphor"] .scene-socials {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Forest Night: the moon rises above the zone, clear of a title at its top. */
+.scene[data-canvas="portrait"][data-bg="fireflies"] {
+  background:
+    radial-gradient(
+      circle at 80% 7%,
+      color-mix(in srgb, var(--primary) 90%, transparent) 0 64px,
+      color-mix(in srgb, var(--primary) 20%, transparent) 68px,
+      transparent 360px
+    ),
+    url("/images/themes/forest-treeline.svg") center bottom / 100% 240px no-repeat,
+    var(--bg);
+}
+
+/* Phosphor's window title bar is the text scenes' furniture; around a camera it would sit behind the title. */
+.scene.cam-scene[data-canvas="portrait"][data-theme="phosphor"] .scene-main::before {
+  display: none;
+}
+
+/* Bold Esports' slab and socials bleed off the landscape frame's left edge and below its foot; in the zone they sit
+   flush. */
+.scene[data-canvas="portrait"][data-theme="bold-esports"] :is(.countdown, .scene-socials) {
+  margin: 0;
+  transform: none;
+}
+
+/* Anton's text box stands a third of an em above its tight lines: room for it, so the fit keeps it in the zone. */
+.scene[data-canvas="portrait"][data-theme="bold-esports"] .scene-title {
+  padding-top: 0.12em;
+}

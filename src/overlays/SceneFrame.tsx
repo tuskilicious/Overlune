@@ -86,11 +86,18 @@ export default function SceneFrame({ settings, title, subtitle, error, children,
     if (!box || !t || !last) return;
     // Layout offsets, not scroll sizes: entrance animations transform the content and would look like overflow.
     // In portrait the content can run past its column (a look's socials card under a long title), so the fit
-    // counts the content's own height there; landscape keeps its fit exactly, so no old link changes (Phase 10).
-    const height = () =>
-      canvas === "portrait" ? Math.max(last.offsetHeight, last.scrollHeight) : last.offsetHeight;
+    // counts each part's own box there, and the cards' contents (a look may cap a card's height). Not the scroll height: a title's descenders spill a few pixels past its line
+    // box, which at the zone's foot read as overflow at any size and shrank the title to its floor. Landscape keeps
+    // its fit exactly, so no old link changes (Phase 10).
     const bottom = () =>
-      (last.offsetParent === box ? 0 : -box.offsetTop) + last.offsetTop + height();
+      canvas === "portrait"
+        ? Math.max(
+            ...[last, ...last.querySelectorAll(":scope > *, :scope > * > *")].map((el) => {
+              const b = naturalBox(el as HTMLElement, box);
+              return b.y + b.h;
+            }),
+          )
+        : (last.offsetParent === box ? 0 : -box.offsetTop) + last.offsetTop + last.offsetHeight;
     const room = box.clientHeight - parseFloat(getComputedStyle(box).paddingBottom);
     t.style.fontSize = "";
     const base = parseFloat(getComputedStyle(t).fontSize);

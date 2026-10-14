@@ -1765,8 +1765,9 @@ html:has(#root > .scene[style*="--fit"], #root > .live[style*="--fit"]) {
   box-shadow: 0 0 32px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
-.cam-scene .layout-el-title > .scene-title,
-.cam-scene .layout-el-subtitle > .scene-subtitle {
+/* `.scene.` outranks each look's own title rules in layouts.css (a margin to clear its art), which load later. */
+.scene.cam-scene .layout-el-title > .scene-title,
+.scene.cam-scene .layout-el-subtitle > .scene-subtitle {
   margin: 0;
   max-width: 100%;
   overflow-wrap: normal;
