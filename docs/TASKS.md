@@ -772,6 +772,28 @@ Asked for by the owner 2026-10-13 ("the editor should give the users freedom", a
   - Accept: every overlay passes `docs/OBS-TESTING.md`, old links included; 2.0.0 published.
   - Prepared 2026-10-14: version 2.0.0, the changelog, FUTURE-SCOPE.md. Launch checklist re-checked where nothing needs the owner: `npm audit` 0 vulnerabilities; production headers, HSTS, CSP with frame-ancestors and HTTP→HTTPS unchanged; no API, migration or `_headers` change since 1.6.0, so access tests and backups stand; no production Sentry errors since Phase 9 began; old-link fixtures in CI. Waiting on the owner's OBS run (Live with chat and a test alert, Starting Soon and Live at 1280×720, an old link, the keyboard try for T9.9), then T9.7–T9.10 are ticked, the checklist dated and 2.0.0 tagged and published.
 
+## Picks from the owner's Tuskilicious kit (2026-10-14)
+The owner asked to take every good idea from their own YouTube overlay kit (a Claude Design project: six scenes in landscape and vertical, alert and chat widgets, a Control Dock). Ideas and behavior only, rebuilt in Overlune's code, its looks and its rules (CLAUDE.md: lightweight, reduced motion, no secrets in links). Where each lands:
+
+- **Phase 10 (vertical):** the kit's portrait camera boxes as starting places: a full-width camera (960×1280 at 60,220) for chatting, a 16:9 camera at the top for gameplay, a reaction camera low on the screen; its vertical scenes reuse the landscape widgets at portrait sizes, which is what the canvas does.
+- **Phase 11 (looks) → an Effects level and a "pizzazz" vocabulary:** one setting with three steps, Full, Lite and Off (today's Lite and Less motion fold into it), plus effects any look can use, each CSS-only, theme-coloured, paused by Off and gone with reduced motion: a chrome headline with a passing **sheen**, a rotating **holo foil** border (webcam frame, alerts), a **lens flare** sweep, rising **embers**, a red/blue **glitch split** every few seconds, slow 3D **orbit rings**, **frosted glass** cards, and a **beat pulse** with a BPM setting (a timer, not audio: listening needs microphone access in OBS). At least one new look (a "Holo" look) is built from them, and the four Phase 11 looks may borrow them.
+- **New scenes (needs the owner's yes):** **Just Chatting** (a full camera cut-out with a header and a "Talking about" topic line) and **Reaction** (a camera box beside a reaction frame), next to Starting, BRB, Ending and Offline. Each is a layout on the canvas, so it costs a scene id in `layoutScenes` and a link, not a new renderer.
+- **Alerts (Phase 13 for the events, any time for the look):** an entrance that slams in with a white flash, two shockwave rings and sparkles, as one of each look's alert styles; YouTube member and Super Chat alerts with the YouTube connection.
+- **Chat (Phase 13):** one feed merging Twitch and YouTube chat. YouTube needs an API key, so it is read server-side (a Function), never with a key in the link; the kit's quota guard carries over: search only while OBS says it's streaming (`window.obsstudio.getStatus`). Overlune already removes messages that mods delete and reconnects when a chat connection goes quiet.
+- **Now Playing (Phase 13):** a card that pops in when the Spotify track changes and hides after a few seconds, with a progress bar. Spotify sign-in lives in the account, never in the link.
+- **Dock (Phase 14):** what the kit's Control Dock does, through obs-websocket and `BroadcastChannel`:
+  - **Go live in one click:** Starting with its countdown, then Live; **switch to Live at 0:00** by itself.
+  - **BRB auto-return:** BRB for a set time, then back to Live.
+  - **Test alerts** from the dock.
+  - **Quick text sets:** saved titles and topics swapped in one tap.
+  - **Saved style sets:** accent pairs, font pair, effects level.
+  - **Keys 1–6, B and R** for scenes, BRB and replay.
+  - **The overlay follows OBS:** a scene changed by a hotkey or Stream Deck is matched.
+  - **Webcam frame nudging** by arrows.
+  - **A chat status light.**
+  - **Quiet reconnects** after OBS restarts, with open panels remembered.
+  - **Transitions in theme colours:** wipe, bloom, blinds, iris, pixel, bars, cut. These play inside an "all scenes" source the dock switches, since OBS can't use a web page as a transition.
+
 ## Phase 10: Vertical overlays
 Planned with the owner 2026-10-13. Overlune for vertical streams (TikTok Live, YouTube Shorts, OBS 32.1+ vertical canvases, the Aitum Vertical plugin): every look's four scenes in portrait (1080×1920), and alerts, chat and the webcam frame placed for a tall canvas. **The link:** the same save after the `#`, plus an optional `?canvas=vertical` flag before it (like `?rm=1`), so one save gives both sets of links and no existing link changes; the flag joins the link contract in STACK.md and is never removed or repurposed. **Rollout:** looks in batches of four, each merged after the owner's OBS check; until all sixteen are done, the editor offers Vertical only for looks that have it. Phase 11's new looks are built vertical-ready. **Re-planned on the canvas (owner, 2026-10-13):** Phase 9's canvas comes first, so a vertical layout becomes a 1080×1920 canvas with portrait starting layouts per look instead of per-look portrait CSS; the batches, the safe zone and the link flag stay, and the tasks below are revised when Phase 10 starts (one save holds both layouts; `?canvas=vertical` picks the portrait one).
 
@@ -793,8 +815,8 @@ Planned with the owner 2026-10-13. Overlune for vertical streams (TikTok Live, Y
   - Accept: axe clean narrow and wide; e2e for the switch and the vertical links; old editor bookmarks open as before.
 - [ ] **T10.9 Setup guide: vertical.** How to add the links to a vertical canvas in OBS 32.1+, with Aitum Vertical, and in Streamlabs, with the sizes.
   - Accept: the guide's tests pass; the owner checks the steps in OBS.
-- [ ] **T10.10 OBS test and release 1.7.0.** Every vertical overlay through `docs/OBS-TESTING.md` on a real vertical canvas, then a release.
-  - Accept: the OBS test is logged; 1.7.0 published.
+- [ ] **T10.10 OBS test and release 2.1.0.** Every vertical overlay through `docs/OBS-TESTING.md` on a real vertical canvas, then a release.
+  - Accept: the OBS test is logged; 2.1.0 published.
 
 ## Phase 11: Four new looks (planned)
 Eclipse, Rain City, Paper Cut and Aurora Tundra (picked by the owner 2026-10-13), each with its own world and **the lune**, Overlune's signature: a crescent moon made from that look's own material (a corona, a neon sign, cut paper, frost). The bar in DESIGN.md applies, plus vertical versions from the start. Broken into tasks when it starts.
