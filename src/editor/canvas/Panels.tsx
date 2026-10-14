@@ -14,11 +14,14 @@ export const typeName: Record<LayoutElement["type"], string> = {
   chat: "Chat",
   alerts: "Alerts",
   frame: "Webcam frame",
+  camera: "Camera",
   text: "Text",
   image: "Image",
   shape: "Shape",
 };
-export const elementName = (el: LayoutElement) => el.name.trim() || typeName[el.type];
+export const elementName = (el: LayoutElement) =>
+  el.name.trim() ||
+  (el.type === "camera" && el.kind === "screen" ? "Reaction box" : typeName[el.type]);
 
 const tokenName: Record<ColorToken, string> = {
   bg: "Background",
@@ -30,7 +33,13 @@ const tokenName: Record<ColorToken, string> = {
 };
 
 /** Adds an element: new text, a shape, a picture (with its https link), or one of the scene's own parts put back. */
-export type Adding = (kind: LayoutElement["type"], src?: string) => void;
+/** A part "Put back" can return: an element type, or the Reaction scene's video box (a `camera` of kind `screen`). */
+export type Part = LayoutElement["type"] | "screen";
+export const partOf = (el: LayoutElement): Part =>
+  el.type === "camera" && el.kind === "screen" ? "screen" : el.type;
+const partName = (p: Part) => (p === "screen" ? "Reaction box" : typeName[p]);
+
+export type Adding = (kind: Part, src?: string) => void;
 
 /** One element changed; `merge` joins a burst of typing or nudging into one undo step. */
 export type Change = (id: string, patch: Partial<LayoutElement>, merge?: boolean) => void;
@@ -56,7 +65,7 @@ export function Layers({
   change: Change;
   move: (id: string, by: 1 | -1) => void;
   /** The scene's own parts not in the layout, which can be put back. */
-  parts: LayoutElement["type"][];
+  parts: Part[];
   add: Adding;
   /** Why nothing more can be added, or null. */
   room: string | null;
@@ -94,10 +103,10 @@ export function Layers({
             <button
               key={t}
               type="button"
-              aria-label={`Put back the ${typeName[t]}`}
+              aria-label={`Put back the ${partName(t)}`}
               onClick={() => add(t)}
             >
-              {typeName[t]}
+              {partName(t)}
             </button>
           ))}
         </div>

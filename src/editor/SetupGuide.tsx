@@ -104,7 +104,10 @@ export default function SetupGuide() {
   const current = done.indexOf(false);
   const toggle = (i: number) => () => setDone((d) => d.map((v, j) => (j === i ? !v : v)));
   const sizes = [
-    ...Object.values(overlays).map((o) => ({ ...o, note: "" })),
+    ...[overlays.starting, overlays.brb, overlays.ending, overlays.offline].map((o) => ({
+      ...o,
+      note: "",
+    })),
     {
       name: "Chat",
       width: defaultSettings.chat.width,
@@ -124,6 +127,9 @@ export default function SetupGuide() {
       height: 1080,
       note: "optional: chat, alerts and the webcam frame in one source, instead of those three",
     },
+    // Just Chatting and Reaction (T10.3), in the editor's order.
+    { ...overlays.chatting, note: "optional: the look around your camera" },
+    { ...overlays.reaction, note: "optional: your camera beside the video you react to" },
   ];
   return (
     <div className="editor guide site-sky" style={themeVars(brandChrome)}>

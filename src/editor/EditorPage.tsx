@@ -9,6 +9,7 @@ import { canvasOf, measureLayout, rescale } from "../overlays/measure";
 import Canvas from "./canvas/Canvas";
 import { CanvasSize } from "./canvas/Panels";
 import LiveScene, { liveElements } from "../overlays/LiveScene";
+import CamScene, { camElements } from "../overlays/CamScene";
 import { loadSaved, save } from "../settings/storage";
 import { decodeLink, encode } from "../settings/url";
 import { themes } from "../themes";
@@ -570,10 +571,23 @@ export default function EditorPage() {
    *  back to Customize, never lost to the top of the page. */
   const canvasFocus = useRef(false);
   const customizeButton = useRef<HTMLButtonElement>(null);
+  /** The scene the preview and the canvas show: Live, or the scene picked (T9.7, T10.3). */
+  const sceneView = (s: Settings) =>
+    onLive ? (
+      <LiveScene settings={s} sample={{ messages: chatSamples, alert: testAlert }} />
+    ) : scene === "starting" ? (
+      <StartingSoon settings={s} />
+    ) : scene === "chatting" || scene === "reaction" ? (
+      <CamScene scene={scene} settings={s} sample={{ messages: chatSamples, alert: null }} />
+    ) : (
+      <TextScene scene={scene} settings={s} />
+    );
   /** Customize: starts from the look's own layout, measured from the preview (T9.3), the first time. */
   const customize = () => {
     if (!sceneLayout) {
       if (onLive) commitLayout(liveElements(settings));
+      else if (scene === "chatting" || scene === "reaction")
+        commitLayout(camElements(settings, scene, "landscape"));
       else {
         const shown = document.querySelector<HTMLElement>(".editor-pick .scene");
         if (shown) commitLayout(measureLayout(shown));
@@ -1182,18 +1196,7 @@ export default function EditorPage() {
                       sceneId={target}
                       elements={sceneLayout}
                       onCommit={commitLayout}
-                      scene={(s) =>
-                        onLive ? (
-                          <LiveScene
-                            settings={s}
-                            sample={{ messages: chatSamples, alert: testAlert }}
-                          />
-                        ) : scene === "starting" ? (
-                          <StartingSoon settings={s} />
-                        ) : (
-                          <TextScene scene={scene} settings={s} />
-                        )
-                      }
+                      scene={sceneView}
                     />
                   ) : (
                     <div
@@ -1214,17 +1217,10 @@ export default function EditorPage() {
                     >
                       <Preview width={canvas.w} height={canvas.h}>
                         {onLive ? (
-                          <LiveScene
-                            settings={settings}
-                            sample={{ messages: chatSamples, alert: testAlert }}
-                          />
+                          sceneView(settings)
                         ) : (
                           <>
-                            {scene === "starting" ? (
-                              <StartingSoon settings={settings} />
-                            ) : (
-                              <TextScene scene={scene} settings={settings} />
-                            )}
+                            {sceneView(settings)}
                             <AlertView settings={settings} alert={testAlert} />
                           </>
                         )}

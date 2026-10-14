@@ -84,7 +84,8 @@ export default function SceneText({
         </label>
         <CharsLeft id="chars-title" value={current.title} max={60} />
         <label>
-          Subtitle
+          {/* Just Chatting's subtitle is its topic, shown under "Talking about" (T10.3). */}
+          {scene === "chatting" ? "Talking about (your topic)" : "Subtitle"}
           <input
             value={current.subtitle}
             maxLength={120}

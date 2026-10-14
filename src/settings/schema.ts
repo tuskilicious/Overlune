@@ -90,6 +90,13 @@ export const layoutElement = z.discriminatedUnion("type", [
   z.object({ ...elementBase, type: z.literal("chat") }),
   z.object({ ...elementBase, type: z.literal("alerts") }),
   z.object({ ...elementBase, type: z.literal("frame") }),
+  /** Just Chatting and Reaction (T10.3): a hole the camera (or, as `screen`, the video being reacted to) shows
+   *  through from under the overlay in OBS, edged by the look's frame (or an accent outline). */
+  z.object({
+    ...elementBase,
+    type: z.literal("camera"),
+    kind: z.enum(["camera", "screen"]).default("camera"),
+  }),
   z.object({
     ...elementBase,
     type: z.literal("text"),
@@ -115,7 +122,15 @@ export const layoutElement = z.discriminatedUnion("type", [
 ]);
 export type LayoutElement = z.output<typeof layoutElement>;
 
-export const layoutScenes = ["starting", "brb", "ending", "offline", "live"] as const;
+export const layoutScenes = [
+  "starting",
+  "brb",
+  "ending",
+  "offline",
+  "live",
+  "chatting",
+  "reaction",
+] as const;
 export type LayoutScene = (typeof layoutScenes)[number];
 
 /** A canvas and its customized scenes. A scene with no list renders the look's composed scene. */
@@ -168,6 +183,10 @@ export const settingsV1 = z.object({
   ending: z.object({ title: text(60, "Thanks for watching!"), subtitle: text(120) }).prefault({}),
   /** Offline scene (T6.147). Optional settings: older links get these defaults. */
   offline: z.object({ title: text(60, "Offline right now"), subtitle: text(120) }).prefault({}),
+  /** Just Chatting (T10.3): its header, and the topic as the subtitle ("Talking about"). */
+  chatting: z.object({ title: text(60, "Just chatting"), subtitle: text(120) }).prefault({}),
+  /** Reaction (T10.3): its header and an optional line under it. */
+  reaction: z.object({ title: text(60, "Reacting live"), subtitle: text(120) }).prefault({}),
   /** Chat overlay (T3.3). `channel` is a Twitch login; "" until the streamer adds it. */
   chat: z
     .object({

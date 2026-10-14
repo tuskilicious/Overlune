@@ -20,17 +20,20 @@ const tokenVar: Record<ColorToken, string> = {
 };
 
 /** A layout color as CSS: a look token's variable, or the #rrggbb itself (the schema allows nothing else). */
-const color = (c: string | undefined) =>
+export const color = (c: string | undefined) =>
   c === undefined ? undefined : c.startsWith("#") ? c : `var(${tokenVar[c as ColorToken]})`;
 
-/** Shrinks added text until its lines fit its box. The streamer picks the box, so it may go down to 12px. */
-function Fitted({
+/** Shrinks added text until its lines fit its box. The streamer picks the box, so it may go down to 12px. `wide`
+ *  also shrinks it until its longest word fits across (a scene title in a small box, T10.3). */
+export function Fitted({
   className,
   style,
+  wide = false,
   children,
 }: {
   className: string;
   style: CSSProperties;
+  wide?: boolean;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -41,7 +44,9 @@ function Fitted({
     const fit = () => {
       el.style.fontSize = style.fontSize === undefined ? "" : `${style.fontSize}px`;
       const base = parseFloat(getComputedStyle(el).fontSize);
-      for (let size = base; el.offsetHeight > box.clientHeight + 1 && size > 12;) {
+      const over = () =>
+        el.offsetHeight > box.clientHeight + 1 || (wide && el.scrollWidth > box.clientWidth + 1);
+      for (let size = base; over() && size > 12;) {
         size = Math.round(size * 0.9);
         el.style.fontSize = `${size}px`;
       }

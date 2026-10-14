@@ -18,10 +18,20 @@ import {
   type Guide,
   type Handle,
 } from "./geometry";
-import { canvasOf, naturalBox, rescale, sceneParts } from "../../overlays/measure";
+import { canvasOf, designOf, naturalBox, rescale, sceneParts } from "../../overlays/measure";
+import { camDefaults } from "../../overlays/CamScene";
 import { defaultLive } from "../../overlays/LiveScene";
 import { encode } from "../../settings/url";
-import { CanvasKeys, Inspector, Layers, elementName, type Adding, type Change } from "./Panels";
+import {
+  CanvasKeys,
+  Inspector,
+  Layers,
+  elementName,
+  partOf,
+  type Adding,
+  type Change,
+  type Part,
+} from "./Panels";
 import "./canvas.css";
 
 type Gesture =
@@ -194,8 +204,12 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
       : linkBytes(elements) > 24_000
         ? "Your link is full (24 KB). Delete something to add more."
         : null;
-  const parts: LayoutElement["type"][] =
-    sceneId === "live"
+  const camScene = sceneId === "chatting" || sceneId === "reaction" ? sceneId : null;
+  /** A Just Chatting or Reaction scene's own parts where they start, on this canvas (T10.3). */
+  const camParts = camScene && rescale(camDefaults[camScene].landscape, designOf.landscape, size);
+  const parts: Part[] = camParts
+    ? camParts.map(partOf).filter((p) => !elements.some((el) => partOf(el) === p))
+    : sceneId === "live"
       ? (["chat", "alerts", "frame"] as const).filter((t) => !elements.some((el) => el.type === t))
       : sceneParts
           .filter(
@@ -217,7 +231,9 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
       h,
     });
     let el: LayoutElement;
-    if (kind === "text")
+    const start = camParts?.find((d) => partOf(d) === kind);
+    if (start) el = { ...start, ...base };
+    else if (kind === "text")
       el = { ...base, type: "text", ...centred(800, 120), text: "Your text", font: "heading" };
     else if (kind === "image")
       el = { ...base, type: "image", ...centred(400, 400), src: src!, fit: "contain" };
@@ -238,7 +254,9 @@ export default function Canvas({ settings, sceneId, elements, scene, onCommit }:
       el = { ...base, type: kind, x, y, w, h };
     } else {
       const scene = area.current?.querySelector<HTMLElement>(".scene");
-      const part = scene?.querySelector<HTMLElement>(sceneParts.find(([, t]) => t === kind)![0]);
+      const part = scene?.querySelector<HTMLElement>(
+        sceneParts.find(([, t]) => t === kind)?.[0] ?? "",
+      );
       const box = scene && part ? naturalBox(part, scene) : centred(600, 160);
       el = { ...base, type: kind, ...box } as LayoutElement;
     }
