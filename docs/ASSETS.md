@@ -4,7 +4,7 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 
 | Asset | Type | Used in | Source URL | License | Attribution required? | Added |
 |---|---|---|---|---|---|---|
-| `public/images/themes/rain-city-sign.svg`: original crescent tube sign with a faint halo stroke | SVG / CSS mask | Rain City scenes, reflection, alerts and Twitch panels (T11.4) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-15 |
+| `public/images/themes/rain-city-sign.svg`: original crescent tube sign (a true two-circle crescent, tilted) with a faint body fill and halo stroke | SVG / CSS mask | Rain City scenes, reflection, alerts and Twitch panels (T11.4) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-15 |
 | `public/images/themes/rain-city-rain.svg`: original seamless 240px rain-streak tile | SVG / CSS mask | Rain City's rain over the sign column, Full motion only (T11.4) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-15 |
 | `public/sounds/rain-city.ogg`: a glass tap (1760 and 2793 Hz partials) with a muted rain-like tail of low-passed noise, synthesized by `tests/make-sounds.py` without samples; 1.1 seconds, -13.1 LUFS integrated, -1.4 dBTP | sound | Rain City alerts (T11.4) | Own work (Overlune) | Own work; released under CC0 1.0 | No | 2026-10-15 |
 | `public/images/themes/eclipse-corona.svg`: original crescent silhouette with lunar dust | SVG / CSS mask | Eclipse scenes, alerts and Twitch panels (T11.3) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-15 |

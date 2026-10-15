@@ -11,6 +11,10 @@
   --rc-panel-w: 400px;
   --rc-panel-h: 560px;
   --rc-panel-right: 112px;
+  /* The tube, centred in its panel (the sign's art is 300×320). */
+  --rc-tube-w: 340px;
+  --rc-tube-h: 363px;
+  --rc-tube-top: 98px;
   background:
     linear-gradient(var(--accent), var(--accent)) right var(--rc-panel-right) top
       var(--rc-panel-h) / var(--rc-panel-w) 3px no-repeat,
@@ -42,10 +46,10 @@
   position: absolute;
   z-index: -1;
   pointer-events: none;
-  right: calc(var(--rc-panel-right) + 70px);
-  top: 110px;
-  width: 260px;
-  height: 277px;
+  right: calc(var(--rc-panel-right) + (var(--rc-panel-w) - var(--rc-tube-w)) / 2);
+  top: var(--rc-tube-top);
+  width: var(--rc-tube-w);
+  height: var(--rc-tube-h);
   background: var(--accent);
   mask: url("/images/themes/rain-city-sign.svg") center / contain no-repeat;
   animation: rain-city-sign-on 900ms steps(1, end) both;
@@ -116,11 +120,11 @@
   position: absolute;
   z-index: -1;
   pointer-events: none;
-  right: calc(var(--rc-panel-right) + 70px);
+  right: calc(var(--rc-panel-right) + (var(--rc-panel-w) - var(--rc-tube-w)) / 2);
   /* Flipped about its bottom edge, which sits just under the kerb, so the reflection lies in the street. */
-  top: calc(var(--rc-street) + 10px - 277px);
-  width: 260px;
-  height: 277px;
+  top: calc(var(--rc-street) + 10px - var(--rc-tube-h));
+  width: var(--rc-tube-w);
+  height: var(--rc-tube-h);
   background: var(--accent);
   opacity: 0.16;
   mask: url("/images/themes/rain-city-sign.svg") center / contain no-repeat;
@@ -295,10 +299,13 @@
   --rc-panel-w: 360px;
   --rc-panel-h: 200px;
   --rc-panel-right: 140px;
+  /* Smaller, and above the safe zone. */
+  --rc-tube-w: 260px;
+  --rc-tube-h: 277px;
+  --rc-tube-top: -40px;
 }
 
 .scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"]::before {
-  top: -40px;
   right: 190px;
 }
 

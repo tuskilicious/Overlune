@@ -1,8 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 320">
-  <!-- Original Overlune crescent tube sign, MIT. Used as a CSS mask: color comes from the theme's tokens. A faint
-       wide stroke is the tube's halo, so the sign reads as lit without an animated or filtered glow. -->
-  <g fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round">
-    <path opacity=".18" stroke-width="22" d="M185 32C67 16 12 129 64 222c31 55 96 73 148 43C119 282 62 167 116 85c15-23 39-42 69-53Z"/>
-    <path stroke-width="8" d="M185 32C67 16 12 129 64 222c31 55 96 73 148 43C119 282 62 167 116 85c15-23 39-42 69-53Z"/>
+  <!-- Original Overlune crescent tube sign, MIT. Used as a CSS mask: color comes from the theme's tokens.
+       A true crescent: an outer circle (center 150,160, r 110) less an inner one (center 185,160, r 95), so both tips
+       match. Tilted a little, like a hung sign. A faint fill gives the tube a body and a wide faint stroke is its halo,
+       so it reads as lit without an animated or filtered glow. -->
+  <g transform="rotate(-14 150 160)" stroke="white" stroke-linejoin="round" stroke-linecap="round">
+    <path id="c" d="M211.43 68.75A110 110 0 1 0 211.43 251.25A95 95 0 1 1 211.43 68.75Z" fill="white" fill-opacity=".1" stroke-opacity=".18" stroke-width="22"/>
+    <path d="M211.43 68.75A110 110 0 1 0 211.43 251.25A95 95 0 1 1 211.43 68.75Z" fill="none" stroke-width="8"/>
   </g>
 </svg>

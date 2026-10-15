@@ -225,10 +225,11 @@ test("Rain City downloads matching panels, banner and saved OBS collection links
       // Outside the sign, the night; somewhere on the tube's stroke, the tube's cyan.
       const [outside] = await pngPixels(page, bytes, [[1000, 80]]);
       expect(outside!.slice(0, 3)).toEqual([16, 26, 36]);
+      // The crescent's left edge: the art's (43, 187) after its tilt, at the tube's 340/300 scale from (1438, 98).
       const tube = await pngPixels(
         page,
         bytes,
-        Array.from({ length: 21 }, (_, i) => [1478 + 64 * 0.867, 110 + (120 + i * 5) * 0.867]),
+        Array.from({ length: 20 }, (_, i) => [1472 + i * 3, 309]),
       );
       expect(Math.max(...tube.map((p) => p[1]!))).toBeGreaterThan(150);
     }
