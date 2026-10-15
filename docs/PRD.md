@@ -100,6 +100,14 @@ Streamers increasingly go live in portrait: TikTok Live, YouTube Shorts and OBS'
 - **Two new scenes (owner, 2026-10-14):** Just Chatting (a large camera with a header and a "Talking about" line) and Reaction (a camera beside the video being reacted to, with chat), in every look, landscape and vertical.
 - **Done when:** every look's scenes, alerts, chat and frame pass the OBS test on a vertical canvas, the safe zone is checked on a phone in a private live test, every old link renders as before, and 2.1.0 is released.
 
+## New looks (Phase 11, names and concepts approved 2026-10-13)
+Eclipse, Rain City, Paper Cut and Aurora Tundra extend the catalog after the vertical release. Each is a complete stream kit with its own composition, heading face, alert sound and **the lune**: a crescent moon made from that look's material (a corona, a neon sign, cut paper or frost). The implementation plan is in `docs/TASKS.md`; proposed directions are in DESIGN.md for the owner's choice before building.
+- **Both canvases from the start.** All six scenes, Live, chat, alerts and the webcam frame work horizontally and vertically. Portrait is recomposed around the existing safe zone, not cropped or stretched from landscape.
+- **Every surface matches.** Twitch panels, the offline banner, the editor's previews and OBS exports belong to the same kit. A look enters the picker only when its full kit is ready for the owner's preview and OBS check.
+- **Existing tools and links.** Reuse the bundled fonts and current stack. Theme IDs are appended; no old ID, font ID, setting default or link format changes. Existing links and customized layouts keep their appearance.
+- **Out of scope:** saved overlays, connections, uploads, the dock, new animation controls, and redesigning the shipped looks. New dependencies need owner approval; every shipped asset needs a recorded license allowing redistribution and use on streams.
+- **Done when:** the owner has picked the directions, every new kit passes the design bar and the horizontal and vertical OBS checks are logged, old links pass unchanged, and the release is published after owner merge approval.
+
 ## v2 Phase 1: accounts on Cloudflare (approved 2026-10-09)
 The v2 gate (5 real streamers, T6.6) is met, and the owner approved starting v2 on Cloudflare (`docs/STACK.md` "Backend"). Phase 1 is the foundation the later phases build on; it adds no overlay features yet.
 - **Optional "Sign in with Twitch".** The editor, every overlay and every old link keep working signed out.

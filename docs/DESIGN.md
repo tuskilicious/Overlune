@@ -213,6 +213,63 @@ Set on 2026-10-07 from the owner's design handoff, an audit of the looks against
 - Composition: closed in T6.134. Every look now has its own scene layout (see "Scene layout"); layout v2 stays as the starting point for new looks.
 - Shipped looks that match a tell keep it until they are reworked: Bold Esports (near-black with one red), Neon Grid (neon with a grid).
 
+## Phase 11 directions (proposed 2026-10-15)
+The owner picked the names and lune materials on 2026-10-13. These are starting directions for T11.2's two candidates per look, not approved artwork or shipped tokens. Record the owner's selections here before building. The bar above, KIT-REFERENCE.md and the overlay playbook apply. Keep the current safe-zone numbers and all shipped looks unchanged.
+
+**Shared decisions.** Each look uses two type roles, a heading face not used as another look's heading, an original alert sound, and one crescent made from its own material. The proposed faces below are already bundled; body-face reuse is allowed. Use CSS or original SVG art, not new runtime libraries or video. A lune must remain identifiable in Still mode. Do not put ambient effects over a live camera or gameplay. Text uses the theme tokens; test the rendered result over the actual art before accepting a palette.
+
+### Eclipse: the corona
+- **Material and memorable move:** a single crescent of lit lunar dust around an otherwise unlit disc, occupying the open side of an observatory title plate. Keep the crescent visible without an animated glow.
+- **Proposed palette:** night violet `#12101E` (bg), instrument violet `#211E32` (surface), moon white `#F2EDE5` (primary/text), corona gold `#DBAD60` (accent), dust lilac `#B6ACCA` (muted).
+- **Proposed type:** Manrope 700 for broad, measured headings; Barlow for supporting words. **Sound:** a low rounded strike with a brief high overtone, synthesized without samples.
+- **Composition:** landscape has a large left-aligned title, the crescent to the right, and countdown/socials on one low instrument rail. Portrait moves the crescent above the safe zone; title, countdown and socials stack inside it. Without a countdown, the rail closes to the socials and subtitle.
+  ```text
+  Landscape:  logo                  crescent
+              title + subtitle     open sky
+              countdown | socials
+  Portrait:   crescent / [logo, title, countdown, socials in safe zone]
+  ```
+- **Principles:** one celestial object; precise type; the gold marks the corona and emphasis. **Motion:** one short corona reveal using opacity/transform; any slow drift is Full only, Lite holds it, Still has no entrance. **Anti-pattern check:** no starfield, neon grid, glass cards or animated blur; the violet is the named night material, not an interchangeable tinted black.
+
+### Rain City: the sign reflected in a wet street
+- **Material and memorable move:** a crescent tube sign whose broken reflection appears in the street below. The sign and its reflection are one motif, not a second skyline decoration.
+- **Proposed palette:** wet asphalt `#101A24` (bg), blue shopfront `#1B2B38` (surface), sign white `#F0F4F5` (primary), tube cyan `#71D6D1` (accent), mist white `#E8EFF2` (text), rain grey `#A8BDC8` (muted).
+- **Proposed type:** Rajdhani 700 for narrow sign lettering; Archivo for supporting words. **Sound:** a short glass tap with a muted rain-like tail, synthesized without samples.
+- **Composition:** landscape puts the title on a left shopfront column, countdown above a low street-level socials strip, and the sign in the right opening. Portrait lifts the sign above the safe zone and fits the shopfront column to its full width; the reflection lives below the words.
+  ```text
+  Landscape:  logo / title       crescent sign
+              subtitle          open street
+              countdown / socials / reflection
+  Portrait:   sign / [shopfront text + countdown + socials] / reflection
+  ```
+- **Principles:** one sign; a strong vertical edge; reflections stay under the words. **Motion:** fixed rain layers translate only in Full, Lite removes them, Still also removes entrances. Reflections stay static: no animated masks or filters. **Anti-pattern check:** no synthwave floor, scanlines or glowing panel borders; the sign belongs to a street, distinct from Neon Grid and Vaporwave Sunset.
+
+### Paper Cut: a crescent cut through layered sheets
+- **Material and memorable move:** a crescent-shaped opening through overlapping blue and white paper. Depth comes from the edges of the sheets, not thick borders, tilted stickers or a stack of cards.
+- **Proposed palette:** blue paper `#E8EEF4` (bg), white sheet `#FFFFFF` (surface), cut-edge ink `#243550` (primary/text), plum paper `#8540A8` (accent), pencil blue `#536176` (muted).
+- **Proposed type:** Quicksand 700 for cut-letter headings; Nunito Sans for supporting words. **Sound:** two soft paper-like taps, synthesized without samples.
+- **Composition:** landscape has a stepped paper edge on the left carrying the title, the cut crescent in the right sheet, and countdown/socials on two aligned folds. Portrait makes the title sheet a vertical strip inside the safe zone; the crescent opening sits above it. Camera holes remain transparent and clear of the paper art.
+  ```text
+  Landscape:  logo / title       cut crescent
+              subtitle          open sheet
+              countdown         socials
+  Portrait:   cut crescent / [title sheet, subtitle, countdown, socials]
+  ```
+- **Principles:** readable cut edges; generous paper space; plum is one sheet and emphasis. **Motion:** sheets settle once by translation; no ambient loop is needed. Lite keeps that entrance, Still places them immediately. **Anti-pattern check:** no cream/clay pairing, sketch doodles, sticker tilt or manga panels; the material is layered cut paper rather than café stationery or Shonen ink.
+
+### Aurora Tundra: a crescent caught in frost
+- **Material and memorable move:** a frost crescent etched into the edge of a low ice shelf. A restrained aurora may sit high behind it; the crescent, not the aurora, identifies the look.
+- **Proposed palette:** polar blue `#142D38` (bg), ice shelf `#203E49` (surface), snow white `#EFF8FA` (primary/text), pale aurora `#A7E6D2` (accent), frost grey `#B5CCD1` (muted).
+- **Proposed type:** Alegreya 700 in upright display type; Manrope for supporting words. **Sound:** a clear ice-like chime with a short quiet decay, synthesized without samples.
+- **Composition:** landscape places the title above a low ice shelf, with countdown at its left end, socials at its right and the crescent cut into the open right edge. Portrait puts the ice/crescent art below the safe zone, with the text column above it. Keep both camera scenes' headers and topic inside the zone.
+  ```text
+  Landscape:  logo / title                    sky
+              subtitle                 frost crescent
+              countdown ===== ice shelf ===== socials
+  Portrait:   [logo, title, subtitle, countdown, socials] / frost shelf
+  ```
+- **Principles:** cold open space; one etched crescent; the horizon anchors the information. **Motion:** any aurora layer only translates/fades in Full and is removed in Lite; Still also removes entrances. Frost stays static. **Anti-pattern check:** no pine forest, underwater snow, decorative italic serif or full-frame blend. Compare against Forest Night and Abyss at the board checkpoint.
+
 ## Vertical layout (Phase 10)
 Overlays for a portrait canvas, from `?canvas=vertical` (STACK.md): `layouts.portrait`, 1080×1920 unless the streamer picks another size, drawn at scale 1 so the type reads at phone size. The look's background and art fill all of it. The portrait layout is its own: moving something on the vertical canvas never moves it on the landscape one.
 
