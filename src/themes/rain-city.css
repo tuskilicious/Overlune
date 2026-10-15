@@ -1,0 +1,339 @@
+/* Rain City B, "Last train home" (T11.4): a station marquee on a wet night street. One crescent tube sign hangs in a
+   lit panel, and its reflection lies in the street below. Every selector belongs to Rain City, including the shared
+   widgets used in Live and the camera scenes.
+   Layers, back to front: the scene background (sky, the sign's panel, the street), the tube (::before), rain over the
+   sign column (scene-main::before, Full only), the street again (scene-main::after, so rain ends at the kerb), then the
+   reflection (::after). Rain moves by transform only; the reflection is still. */
+.scene[data-theme="rain-city"] {
+  position: relative;
+  isolation: isolate;
+  --rc-street: 72%;
+  --rc-panel-w: 400px;
+  --rc-panel-h: 560px;
+  --rc-panel-right: 112px;
+  background:
+    linear-gradient(var(--accent), var(--accent)) right var(--rc-panel-right) top
+      var(--rc-panel-h) / var(--rc-panel-w) 3px no-repeat,
+    linear-gradient(var(--surface), var(--surface)) right var(--rc-panel-right) top 0 /
+      var(--rc-panel-w) var(--rc-panel-h) no-repeat,
+    linear-gradient(
+      180deg,
+      transparent 0 var(--rc-street),
+      color-mix(in srgb, var(--accent) 24%, transparent) var(--rc-street)
+        calc(var(--rc-street) + 2px),
+      #0b131b calc(var(--rc-street) + 2px)
+    ),
+    var(--bg);
+}
+
+/* The crescent tube: the look's accent through the sign's mask, switched on once like a real tube. */
+.scene[data-theme="rain-city"]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  right: calc(var(--rc-panel-right) + 70px);
+  top: 110px;
+  width: 260px;
+  height: 277px;
+  background: var(--accent);
+  mask: url("/images/themes/rain-city-sign.svg") center / contain no-repeat;
+  animation: rain-city-sign-on 900ms steps(1, end) both;
+}
+
+@keyframes rain-city-sign-on {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.7;
+  }
+  45% {
+    opacity: 0.15;
+  }
+  60% {
+    opacity: 1;
+  }
+}
+
+/* Rain over the sign column only, clear of the words. 240px taller than the sky so one tile's fall loops seamlessly;
+   the street layer above it hides what falls past the kerb. */
+.scene[data-theme="rain-city"] .scene-main::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  right: var(--rc-panel-right);
+  width: var(--rc-panel-w);
+  top: -240px;
+  height: calc(var(--rc-street) + 240px);
+  background: var(--text-muted);
+  opacity: 0.35;
+  mask: url("/images/themes/rain-city-rain.svg") 0 0 / 240px 240px repeat;
+  animation: rain-city-rain 1.2s linear infinite;
+}
+
+@keyframes rain-city-rain {
+  to {
+    transform: translateY(240px);
+  }
+}
+
+.scene[data-theme="rain-city"] .scene-main::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  inset: var(--rc-street) 0 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 24%, transparent) 0 2px,
+    #0b131b 2px
+  );
+}
+
+/* The sign's reflection in the wet street: still, flattened, faint. */
+.scene[data-theme="rain-city"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  right: calc(var(--rc-panel-right) + 70px);
+  /* Flipped about its bottom edge, which sits just under the kerb, so the reflection lies in the street. */
+  top: calc(var(--rc-street) + 10px - 277px);
+  width: 260px;
+  height: 277px;
+  background: var(--accent);
+  opacity: 0.16;
+  mask: url("/images/themes/rain-city-sign.svg") center / contain no-repeat;
+  transform: scaleY(-0.45);
+  transform-origin: bottom;
+}
+
+/* Lite and Still: no rain at all (a whole layer, as the overlay playbook asks). */
+:is(html[data-lite], html[data-rm], .editor-lite, .editor-shot)
+  .scene[data-theme="rain-city"]
+  .scene-main::before {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene[data-theme="rain-city"] .scene-main::before {
+    display: none;
+  }
+}
+
+/* The marquee: station lettering on the left, clear of the sign column. */
+.scene[data-theme="rain-city"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  gap: 0;
+}
+
+.scene[data-theme="rain-city"] .scene-title {
+  grid-area: 2 / 1;
+  max-width: 1180px;
+  margin-top: 96px;
+  font-size: 168px;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.scene[data-theme="rain-city"] .scene-title::before {
+  content: none;
+}
+
+.scene[data-theme="rain-city"] .scene-subtitle {
+  grid-area: 3 / 1;
+  max-width: 34ch;
+  margin-top: 36px;
+  font-size: 36px;
+  color: var(--text);
+}
+
+.scene[data-theme="rain-city"] .scene-side {
+  grid-area: 5 / 1;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 56px;
+  width: 100%;
+  min-width: 0;
+}
+
+.scene[data-theme="rain-city"] .countdown {
+  flex: none;
+  padding: 0;
+  align-items: flex-start;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-align: left;
+}
+
+.scene[data-theme="rain-city"] .countdown-time {
+  font-family: var(--font-heading);
+  font-size: 132px;
+  font-weight: 700;
+  line-height: 0.9;
+}
+
+.scene[data-theme="rain-city"] .countdown-at {
+  font-size: 24px;
+  color: var(--text-muted);
+}
+
+.scene[data-theme="rain-city"] .countdown-edge {
+  display: none;
+}
+
+.scene[data-theme="rain-city"] .scene-socials {
+  margin-left: auto; /* on the right of the street, with or without a countdown */
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: end;
+  gap: 12px;
+  min-width: 0;
+  text-align: right;
+}
+
+.scene[data-theme="rain-city"] .scene-handle {
+  font-size: 30px;
+}
+
+.scene[data-theme="rain-city"] .scene-ticker {
+  background: var(--surface);
+  border-top: 2px solid var(--accent);
+}
+
+/* Portrait: the sign hangs above the safe zone, the words keep the station's right edge, and the street and its
+   reflection lie below the zone. Rain stays off: here the sign column is where the words are. The extra effect
+   attribute outranks the shared portrait defaults, whatever the order the CSS loads in. */
+.scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"] {
+  --rc-street: 68%;
+  --rc-panel-w: 360px;
+  --rc-panel-h: 200px;
+  --rc-panel-right: 140px;
+}
+
+.scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"]::before {
+  top: -40px;
+  right: 190px;
+}
+
+.scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"]::after {
+  right: 190px;
+}
+
+.scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"] .scene-main::before {
+  display: none;
+}
+
+.scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"] .scene-main {
+  justify-items: end;
+  text-align: right;
+}
+
+.scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"] .scene-title {
+  margin-top: 0;
+  font-size: 150px;
+  max-width: 100%;
+}
+
+.scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"] .scene-title-end {
+  display: block;
+}
+
+.scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"] .scene-subtitle {
+  margin: 28px 0 0;
+}
+
+.scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"] .scene-side {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 32px;
+}
+
+.scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"] .countdown {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"] .scene-socials {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Camera scenes: no rain or reflection near a live camera; a small still sign in the header. */
+.scene.cam-scene[data-theme="rain-city"][data-bg="rain-city"] {
+  background: var(--bg);
+}
+
+.scene.cam-scene[data-theme="rain-city"][data-bg="rain-city"]::before {
+  width: 44px;
+  height: 47px;
+  top: 10px;
+  right: 112px;
+  animation: none;
+}
+
+.scene.cam-scene[data-theme="rain-city"][data-bg="rain-city"]::after,
+.scene.cam-scene[data-theme="rain-city"][data-bg="rain-city"] .scene-main::before,
+.scene.cam-scene[data-theme="rain-city"][data-bg="rain-city"] .scene-main::after {
+  display: none;
+}
+
+.chat[data-theme="rain-city"] .chat-msg {
+  border-left: 3px solid var(--accent);
+}
+
+.alerts[data-theme="rain-city"] .alert-box {
+  border-left: 4px solid var(--accent);
+  padding-left: 148px;
+}
+
+.alerts[data-theme="rain-city"] .alert-box::before {
+  inset: 36px auto auto 32px;
+  width: 88px;
+  height: 94px;
+  background: var(--accent);
+  mask: url("/images/themes/rain-city-sign.svg") center / contain no-repeat;
+}
+
+.alerts[data-theme="rain-city"] .alert-box::after {
+  display: none;
+}
+
+.alerts[data-theme="rain-city"] .alert-burst {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--accent) 18%, transparent),
+    transparent
+  );
+}
+
+.frame[data-theme="rain-city"] .frame-edge {
+  border-color: var(--surface);
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.frame[data-theme="rain-city"] .frame-edge::after {
+  display: none;
+}
+
+.channel-panel[data-theme="rain-city"] {
+  border-left: 3px solid var(--accent);
+}
+
+.channel-panel[data-theme="rain-city"] .channel-panel-bar {
+  width: 40px;
+  height: 43px;
+  border-radius: 0;
+  mask: url("/images/themes/rain-city-sign.svg") center / contain no-repeat;
+}
+
+.channel-panel[data-theme="rain-city"] .channel-panel-title {
+  min-width: 0;
+}

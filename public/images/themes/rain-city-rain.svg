@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <!-- Original Overlune rain tile, MIT. A CSS mask: thin slanted streaks that repeat seamlessly every 240px. -->
+  <g stroke="white" stroke-width="1.5" stroke-linecap="round">
+    <path opacity=".7" d="M28 10l-6 34M96 60l-6 34M170 4l-6 34M214 120l-6 34M60 150l-6 34M132 190l-6 34"/>
+    <path opacity=".4" d="M12 96l-4 22M150 108l-4 22M226 30l-4 22M88 214l-4 22"/>
+  </g>
+</svg>

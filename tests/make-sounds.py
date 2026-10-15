@@ -1,5 +1,5 @@
 """Synthesizes Overlune's own alert sounds (T6.142): Phosphor, Daylight, Abyss, Sakura, Skate Deck, Session, Shonen
-Quest and Eclipse. Our own work,
+Quest, Eclipse and Rain City. Our own work,
 no samples (CC0, docs/ASSETS.md). Mono, 44.1 kHz. Needs numpy and ffmpeg (not project dependencies; run by hand).
 Each is normalized to -12 LUFS integrated (ffmpeg loudnorm, measured with silence padding so short sounds gate
 correctly) with true peak <= -1 dBTP, then encoded as Ogg Vorbis.
@@ -169,6 +169,14 @@ def eclipse():
     return fade(place(1.05, (0.0, strike), (0.12, overtone)), 8)
 
 
+def rain_city():
+    # A short glass tap (two inharmonic partials, a quick decay), then a muted rain-like tail of soft filtered noise.
+    x = t(0.5)
+    tap = (np.sin(2 * np.pi * 1760 * x) + 0.5 * np.sin(2 * np.pi * 2793 * x)) * env(len(x), 0.003, 0.12)
+    tail = lowpass(rng.standard_normal(int(SR * 0.9)), 1800) * env(int(SR * 0.9), 0.06, 0.3) * 0.6
+    return fade(place(1.1, (0.0, tap), (0.04, tail)), 8)
+
+
 def write_wav(path, sig):
     sig = sig / np.max(np.abs(sig)) * 0.5
     with wave.open(str(path), "wb") as w:
@@ -188,7 +196,7 @@ def loudness(path):
     return float(j["input_i"]), float(j["input_tp"])
 
 
-for name, make in [("phosphor", phosphor), ("daylight", daylight), ("abyss", abyss), ("sakura", sakura), ("skate-deck", skate), ("session", session), ("shonen", shonen), ("quest", quest), ("eclipse", eclipse)]:
+for name, make in [("phosphor", phosphor), ("daylight", daylight), ("abyss", abyss), ("sakura", sakura), ("skate-deck", skate), ("session", session), ("shonen", shonen), ("quest", quest), ("eclipse", eclipse), ("rain-city", rain_city)]:
     if len(sys.argv) > 3 and name not in sys.argv[3:]:
         continue
     raw = OUT / f"{name}.raw.wav"
