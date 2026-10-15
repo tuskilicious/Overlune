@@ -1,0 +1,241 @@
+/* Eclipse A: the corona is the only celestial object. The rail is furniture, not another card stack.
+   All selectors belong to Eclipse, including the shared widgets used in Live and the camera scenes. */
+.scene[data-theme="eclipse"] {
+  position: relative;
+  isolation: isolate;
+  background: var(--bg);
+}
+
+.scene[data-theme="eclipse"]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  width: 620px;
+  height: 620px;
+  right: 112px;
+  top: 64px;
+  background: linear-gradient(110deg, var(--accent), var(--primary) 62%, var(--accent));
+  mask: url("/images/themes/eclipse-corona.svg") center / contain no-repeat;
+  transform-origin: center;
+  animation:
+    eclipse-reveal 1000ms ease-out both,
+    eclipse-drift 18s ease-in-out 1000ms infinite;
+}
+
+@keyframes eclipse-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+}
+
+@keyframes eclipse-drift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(1deg);
+  }
+}
+
+.scene[data-theme="eclipse"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  gap: 0;
+}
+
+.scene[data-theme="eclipse"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 1120px;
+  font-size: 180px;
+  line-height: 1.05;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
+
+.scene[data-theme="eclipse"] .scene-title::before {
+  content: none;
+}
+
+.scene[data-theme="eclipse"] .scene-title-end {
+  display: block;
+}
+
+.scene[data-theme="eclipse"] .scene-subtitle {
+  grid-area: 4 / 1;
+  margin: 32px 0 48px;
+  max-width: 38ch;
+  font-size: 38px;
+}
+
+.scene[data-theme="eclipse"] .scene-side {
+  grid-area: 5 / 1;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 56px;
+  width: 100%;
+  min-width: 0;
+  padding-top: 28px;
+  border-top: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+.scene[data-theme="eclipse"] .countdown {
+  flex: none;
+  padding: 20px 32px;
+  align-items: flex-start;
+  justify-content: center;
+  border: 0;
+  border-left: 2px solid var(--accent);
+  border-radius: 0;
+  text-align: left;
+  box-shadow: none;
+}
+
+.scene[data-theme="eclipse"] .countdown-time {
+  font-size: 72px;
+}
+
+.scene[data-theme="eclipse"] .countdown-at {
+  font-size: 26px;
+}
+
+.scene[data-theme="eclipse"] .countdown-edge {
+  display: none;
+}
+
+.scene[data-theme="eclipse"] .scene-socials {
+  flex: 1;
+  align-content: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px 32px;
+  min-width: 0;
+}
+
+.scene[data-theme="eclipse"] .scene-icon {
+  width: 48px;
+  height: 48px;
+  padding: 10px;
+  border-radius: 50%;
+}
+
+.scene[data-theme="eclipse"] .scene-socials li {
+  column-gap: 16px;
+}
+
+.scene[data-theme="eclipse"] .scene-handle {
+  font-size: 30px;
+}
+
+.scene[data-theme="eclipse"] .scene-ticker {
+  background: var(--surface);
+  border-top: 1px solid var(--accent);
+}
+
+/* The extra effect attribute outranks the shared portrait defaults, regardless of CSS chunk order. */
+.scene[data-theme="eclipse"][data-bg="eclipse"][data-canvas="portrait"] .scene-main {
+  box-sizing: border-box;
+  /* Integer offset measurements can round a half-pixel social row beyond the zone and keep shrinking the title.
+     Two pixels of internal room keep the rail clear without changing the shared fit or any earlier look. */
+  padding-bottom: 2px;
+}
+
+.scene[data-theme="eclipse"][data-bg="eclipse"][data-canvas="portrait"]::before {
+  width: 320px;
+  height: 320px;
+  top: -80px;
+  right: 100px;
+}
+
+.scene[data-theme="eclipse"][data-bg="eclipse"][data-canvas="portrait"] .scene-title {
+  font-size: 140px;
+  max-width: 100%;
+}
+
+.scene[data-theme="eclipse"][data-bg="eclipse"][data-canvas="portrait"] .scene-subtitle {
+  margin: 28px 0 0;
+}
+
+.scene[data-theme="eclipse"][data-bg="eclipse"][data-canvas="portrait"] .scene-side {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 28px;
+  margin-top: 32px;
+  padding-top: 28px;
+}
+
+.scene[data-theme="eclipse"][data-bg="eclipse"][data-canvas="portrait"] .scene-socials {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Camera holes clear every art layer. A still header crescent stays out of the camera and reaction boxes. */
+.scene.cam-scene[data-theme="eclipse"][data-bg="eclipse"]::before {
+  width: 48px;
+  height: 48px;
+  top: 8px;
+  right: 112px;
+  animation: none;
+}
+
+.chat[data-theme="eclipse"] .chat-msg {
+  border-left: 2px solid var(--accent);
+}
+
+.alerts[data-theme="eclipse"] .alert-box {
+  border-top: 2px solid var(--accent);
+  padding-left: 156px;
+}
+
+.alerts[data-theme="eclipse"] .alert-box::before {
+  inset: 40px auto auto 28px;
+  width: 96px;
+  height: 96px;
+  background: var(--accent);
+  mask: url("/images/themes/eclipse-corona.svg") center / contain no-repeat;
+}
+
+.alerts[data-theme="eclipse"] .alert-box::after {
+  display: none;
+}
+
+.alerts[data-theme="eclipse"] .alert-burst {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--accent) 22%, transparent),
+    transparent
+  );
+}
+
+.frame[data-theme="eclipse"] .frame-edge {
+  border-color: var(--surface);
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.frame[data-theme="eclipse"] .frame-edge::after {
+  background: none;
+  border: 1px solid var(--accent);
+  inset: calc(var(--edge) * -0.6);
+  animation: none;
+}
+
+.frame[data-theme="eclipse"] .frame-label {
+  border-top-width: 1px;
+}
+
+.channel-panel[data-theme="eclipse"] {
+  border-top: 2px solid var(--accent);
+  gap: 18px;
+}
+
+.channel-panel[data-theme="eclipse"] .channel-panel-bar {
+  width: 40px;
+  height: 52px;
+  border-radius: 0;
+  mask: url("/images/themes/eclipse-corona.svg") center / contain no-repeat;
+}
+
+.channel-panel[data-theme="eclipse"] .channel-panel-title {
+  min-width: 0;
+}

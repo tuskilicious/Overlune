@@ -7,7 +7,7 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 
 - **Stack:** React + Vite on Cloudflare Pages, with Pages Functions + D1 for optional Twitch sign-in (v2).
 - **Settings:** they live in the overlay link's fragment (`#1.<lz-string>`, zod schema, additive-only: old links must keep working).
-- **Looks:** 16 (themes), each with Starting Soon, BRB, Ending, Offline, Just Chatting and Reaction scenes, plus chat, alerts, a webcam frame and Live (chat, alerts and frame in one source).
+- **Looks:** 16 on production, with Eclipse built for review on `codex/eclipse` as the next look. Each has Starting Soon, BRB, Ending, Offline, Just Chatting and Reaction scenes, plus chat, alerts, a webcam frame and Live (chat, alerts and frame in one source).
 - **Canvas editor:** Phase 9; moves every part of a scene.
 - **Release:** 2.1.0 (T10.10), released 2026-10-15. PR #255 merged after owner approval and all three checks passed; annotated tag `v2.1.0` and the GitHub release are published. Cloudflare Pages deployed main successfully; overlune.in serves `overlune@2.1.0+07d573d`, matching the merge commit.
 - **Vertical:** Phase 10 complete; `?canvas=vertical`, 1080×1920.
@@ -57,13 +57,13 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 - #250: canvas placement clamps to the frame, plus "Show safe areas and thirds".
 
 ### Open PRs
-`design/phase-11-directions`: T11.2's static direction boards and owner-approved choices; awaits the owner's PR merge instruction. Planning PR #257 was approved and merged with all three checks passing. Release #255 and its handoff #256 are merged, as are Dependabot's #248 and #249 and the look-layouts test fix #253.
+`codex/eclipse`: T11.3's Eclipse A kit, built for review with lint, typecheck, 435 unit/API tests, the production build and 542 Playwright tests passing (one Linux-only screenshot test skipped on Windows). Direction PR #258 merged on the owner's "merge" instruction after all three checks passed. Planning #257, release #255 and handoff #256 are merged, as are Dependabot's #248 and #249 and the look-layouts test fix #253.
 
 ### Done with the owner's OBS check (2026-10-15)
 T10.2–T10.10 are ticked: the owner reported the vertical OBS check and the phone safe-zone check passed. The phone check was a private TikTok or YouTube live with no words under the apps' buttons or comments. Both are logged in `docs/OBS-TESTING.md`; OBS version and CPU not recorded. DESIGN.md's safe-zone numbers are unchanged.
 
 ### Waiting on the owner
-- **T11.2 PR merge approval.** The owner approved Eclipse A (Observatory rail), Rain City B (Last train home), Paper Cut B (Window in the paper) and Aurora Tundra A (Ice shelf) on 2026-10-15. DESIGN.md records the choices. Open `docs/phase-11-directions.html` offline to review both candidates, both canvases and their widget studies; fonts and licenses are included. No new production look has shipped. Next is T11.3 after this task's PR is merged.
+- **T11.3 Eclipse OBS review.** Eclipse A is built on `codex/eclipse`, with the complete kit and full local checks passing. Check it in OBS horizontally and vertically per OBS-TESTING.md, including real chat, a test alert and its sound, source hide/show, Full/Lite/Still, camera transparency and CPU. T11.3 stays unticked; no OBS pass has been reported. Production still has the previous catalog until the PR is approved and merged. The four chosen directions remain Eclipse A, Rain City B, Paper Cut B and Aurora Tundra A in DESIGN.md; the offline comparison board is `docs/phase-11-directions.html`.
 - **Vaporwave's sun stripes** now hold still (performance). If the owner wants motion back, rebuild the stripes so they move with transform only.
 
 ### Next tasks (in order)
@@ -71,7 +71,7 @@ T10.2–T10.10 are ticked: the owner reported the vertical OBS check and the pho
    - The looks: Eclipse, Rain City, Paper Cut and Aurora Tundra, each with "the lune" (a crescent moon in that look's own material).
    - They follow DESIGN.md's bar for a new look, the owner's kits (`docs/KIT-REFERENCE.md`) and the overlay playbook.
    - They're vertical-ready from the start.
-   - T11.1 and T11.2 are done. Merge T11.2's PR on the owner's instruction, then build Eclipse A in T11.3. Build the remaining selected complete kits one at a time (T11.4–T11.6), followed by the catalog review and release (T11.7).
+   - T11.1 and T11.2 are merged. T11.3 is built and locally verified; its PR awaits the owner's Eclipse OBS checks and merge instruction. Build Rain City B next (T11.4), then Paper Cut B and Aurora Tundra A, followed by the catalog review and release (T11.7).
 2. Phases 12–14 (saved overlays, connections, dock + Android app) are planned in TASKS.md; not started.
 
 ## Where things live (vertical and canvas)
