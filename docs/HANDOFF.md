@@ -9,7 +9,8 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 - **Settings:** they live in the overlay link's fragment (`#1.<lz-string>`, zod schema, additive-only: old links must keep working).
 - **Looks:** 16 (themes), each with Starting Soon, BRB, Ending, Offline, Just Chatting and Reaction scenes, plus chat, alerts, a webcam frame and Live (chat, alerts and frame in one source).
 - **Canvas editor:** Phase 9; moves every part of a scene.
-- **Vertical:** Phase 10, in progress; `?canvas=vertical`, 1080×1920.
+- **Release:** 2.1.0 (T10.10); release PR prepared, with publication after the owner says "merge" and all three CI checks pass.
+- **Vertical:** Phase 10 complete; `?canvas=vertical`, 1080×1920.
 
 ## How the owner works (follow this)
 - **One task, one branch, one PR.** Plan, build, run `npm run lint`, `npm run typecheck` and `npm test`, plus the Playwright e2e suite (`npx playwright test`), then commit, push and open a PR.
@@ -55,26 +56,22 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 - #250: canvas placement clamps to the frame, plus "Show safe areas and thirds".
 
 ### Open PRs
-None, as of the end of 2026-10-15. Dependabot's #248 and #249 were merged; #253 made the Abyss look-layouts test reliable.
+`release/2.1.0`: the T10.10 release PR awaits the owner's merge approval and all three CI checks. Dependabot's #248 and #249 were merged; #253 made the Abyss look-layouts test reliable.
 
 ### Done with the owner's OBS check (2026-10-15)
-T10.2, T10.3, T10.5–T10.8 and T10.9 are ticked: the owner reported "obs check is done" for the vertical overlays. Logged in `docs/OBS-TESTING.md` with the details not recorded.
+T10.2–T10.10 are ticked: the owner reported the vertical OBS check and the phone safe-zone check passed. The phone check was a private TikTok or YouTube live with no words under the apps' buttons or comments. Both are logged in `docs/OBS-TESTING.md`; OBS version and CPU not recorded. DESIGN.md's safe-zone numbers are unchanged.
 
 ### Waiting on the owner
-- **The phone safe-zone check** (part of T10.10): a private TikTok or YouTube live on a phone, to confirm no words sit under the apps' buttons or comments.
+- **Merge approval for the 2.1.0 release PR.** After "merge", wait for `checks`, `gitleaks` and Cloudflare Pages; merge, pull main, tag `v2.1.0`, publish the GitHub release and confirm the main production deploy and new build on overlune.in. No further OBS or phone confirmation is needed.
 - **Vaporwave's sun stripes** now hold still (performance). If the owner wants motion back, rebuild the stripes so they move with transform only.
 
 ### Next tasks (in order)
-1. **T10.10:**
-   - Every vertical overlay, Just Chatting and Reaction through `docs/OBS-TESTING.md` on a real vertical canvas.
-   - The safe zone checked on a phone in a private TikTok or YouTube live; correct the DESIGN.md numbers if needed.
-   - Then release **2.1.0**: version bump, changelog, tag, GitHub release, with the pre-launch checklist in CLAUDE.md re-checked.
-2. **Phase 11: four new looks.**
+1. **Phase 11: four new looks.**
    - The looks: Eclipse, Rain City, Paper Cut and Aurora Tundra, each with "the lune" (a crescent moon in that look's own material).
    - They follow DESIGN.md's bar for a new look, the owner's kits (`docs/KIT-REFERENCE.md`) and the overlay playbook.
    - They're vertical-ready from the start.
    - Break the phase into tasks in TASKS.md first.
-3. Phases 12–14 (saved overlays, connections, dock + Android app) are planned in TASKS.md; not started.
+2. Phases 12–14 (saved overlays, connections, dock + Android app) are planned in TASKS.md; not started.
 
 ## Where things live (vertical and canvas)
 - **`src/overlays/measure.ts`:**
@@ -104,7 +101,7 @@ T10.2, T10.3, T10.5–T10.8 and T10.9 are ticked: the owner reported "obs check 
   - When one fails after an intended change, download the run's `playwright-results` artifact.
   - Copy the actual image over `tests/e2e/*.visual.spec.ts-snapshots/…`, as the README says.
 - **Layout-measuring tests** must wait for `document.fonts.ready` and settled or reduced motion.
-- **Unexplained console error:** "Cannot read properties of null (reading 'style')" appeared in the Vite log during a full run (2026-10-15). It fails no test and didn't reproduce in single specs; suspect `RulerStrip` in `src/landing/LandingPage.tsx` (`tape.current!`). Unconfirmed.
+- **Known console messages:** "Cannot read properties of null (reading 'style')" recurred during the 2.1.0 full run (2026-10-15), with a stack pointing to `RulerStrip` in `src/landing/LandingPage.tsx:456` (`tape.current!.style`). ResizeObserver loop messages also appeared. The full run passed (517 tests; one Linux-only screenshot test skipped on Windows); investigate separately from the release paperwork.
 - **Other habits:**
   - Restart the dev server after switching branches (Vite can serve stale CSS).
   - Use `gh run download` for artifacts, not PowerShell redirection.
