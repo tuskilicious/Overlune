@@ -56,13 +56,13 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 - #250: canvas placement clamps to the frame, plus "Show safe areas and thirds".
 
 ### Open PRs
-`docs/2.1.0-release-handoff`: documentation-only follow-up recording the completed release; awaits owner merge approval. Release PR #255, Dependabot's #248 and #249, and the look-layouts test fix #253 are merged.
+`docs/phase-11-plan`: documentation-only T11.1 planning PR for Eclipse, Rain City, Paper Cut and Aurora Tundra; awaits the owner's review and merge instruction. Release #255 and its handoff #256 are merged, as are Dependabot's #248 and #249 and the look-layouts test fix #253.
 
 ### Done with the owner's OBS check (2026-10-15)
 T10.2–T10.10 are ticked: the owner reported the vertical OBS check and the phone safe-zone check passed. The phone check was a private TikTok or YouTube live with no words under the apps' buttons or comments. Both are logged in `docs/OBS-TESTING.md`; OBS version and CPU not recorded. DESIGN.md's safe-zone numbers are unchanged.
 
 ### Waiting on the owner
-- **The 2.1.0 release is complete.** No further OBS or phone confirmation is needed. Phase 11 is next; break it into tasks first.
+- **T11.1 planning review.** The 2.1.0 release is complete. Phase 11 now has scope in PRD.md, proposed directions in DESIGN.md, and tasks in TASKS.md. The proposed palettes, compositions and type roles need the owner's choice in T11.2 before implementation; no new look has shipped.
 - **Vaporwave's sun stripes** now hold still (performance). If the owner wants motion back, rebuild the stripes so they move with transform only.
 
 ### Next tasks (in order)
@@ -70,7 +70,7 @@ T10.2–T10.10 are ticked: the owner reported the vertical OBS check and the pho
    - The looks: Eclipse, Rain City, Paper Cut and Aurora Tundra, each with "the lune" (a crescent moon in that look's own material).
    - They follow DESIGN.md's bar for a new look, the owner's kits (`docs/KIT-REFERENCE.md`) and the overlay playbook.
    - They're vertical-ready from the start.
-   - Break the phase into tasks in TASKS.md first.
+   - Review T11.1's planning PR, then T11.2's two composition candidates per look. Build the selected complete kits one at a time (T11.3–T11.6), then the catalog review and release (T11.7).
 2. Phases 12–14 (saved overlays, connections, dock + Android app) are planned in TASKS.md; not started.
 
 ## Where things live (vertical and canvas)
