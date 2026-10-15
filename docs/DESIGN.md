@@ -213,8 +213,19 @@ Set on 2026-10-07 from the owner's design handoff, an audit of the looks against
 - Composition: closed in T6.134. Every look now has its own scene layout (see "Scene layout"); layout v2 stays as the starting point for new looks.
 - Shipped looks that match a tell keep it until they are reworked: Bold Esports (near-black with one red), Neon Grid (neon with a grid).
 
-## Phase 11 directions (proposed 2026-10-15)
-The owner picked the names and lune materials on 2026-10-13. These are starting directions for T11.2's two candidates per look, not approved artwork or shipped tokens. Record the owner's selections here before building. The bar above, KIT-REFERENCE.md and the overlay playbook apply. Keep the current safe-zone numbers and all shipped looks unchanged.
+## Phase 11 directions (picked 2026-10-15)
+The owner picked the names and lune materials on 2026-10-13, then approved Eclipse A, Rain City B, Paper Cut B and Aurora Tundra A from [the direction board](phase-11-directions.html) on 2026-10-15. The board includes both candidates for comparison, with Starting Soon in both canvases, chat/alert/frame studies, sound ideas and motion notes. It opens offline with the bundled fonts and their licenses included. These are the selected design directions; the production kits are still to be built and OBS-tested. The bar above, KIT-REFERENCE.md and the overlay playbook apply. Keep the current safe-zone numbers and all shipped looks unchanged.
+
+| Look | Candidate A | Candidate B | Owner's choice |
+|------|-------------|-------------|----------------|
+| Eclipse | Observatory rail | Orbital axis | A, Observatory rail |
+| Rain City | Corner shop | Last train home | B, Last train home |
+| Paper Cut | Folded folio | Window in the paper | B, Window in the paper |
+| Aurora Tundra | Ice shelf | Frost arch | A, Ice shelf |
+
+**Selected compositions.** Eclipse keeps its left title and low instrument rail, with the corona in the open right side. Rain City uses B's right-aligned station lettering and left tube sign; portrait keeps that right alignment, with its sign above and reflection below the words. Paper Cut uses B's large right-hand paper window, with title and countdown on a split baseline; portrait stacks the words above a low crescent window. Aurora Tundra keeps A's low shelf and open sky; the frost crescent sits below the portrait safe zone. These selections override the initial composition sketches below where they differ. Palettes, type roles, sound ideas and Full/Lite/Still behavior stay as described below and on the board.
+
+**Board review.** The candidates change alignment, information placement and the shape of the lune's surrounding material, rather than only recoloring a scene. The selected looks avoid a starfield, synthwave grid, café stationery, manga panels, pine trees and underwater snow. Original SVG/CSS art and existing bundled fonts only; no new dependency. Text and safe-zone checks cover desktop and phone widths. Still mode keeps each crescent identifiable. Motion notes describe future behavior; the comparison board itself is static and is not an OBS pass.
 
 **Shared decisions.** Each look uses two type roles, a heading face not used as another look's heading, an original alert sound, and one crescent made from its own material. The proposed faces below are already bundled; body-face reuse is allowed. Use CSS or original SVG art, not new runtime libraries or video. A lune must remain identifiable in Still mode. Do not put ambient effects over a live camera or gameplay. Text uses the theme tokens; test the rendered result over the actual art before accepting a palette.
 

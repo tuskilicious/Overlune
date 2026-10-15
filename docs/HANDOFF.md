@@ -14,6 +14,7 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 
 ## How the owner works (follow this)
 - **One task, one branch, one PR.** Plan, build, run `npm run lint`, `npm run typecheck` and `npm test`, plus the Playwright e2e suite (`npx playwright test`), then commit, push and open a PR.
+- **Shared work:** the owner works with Claude Code too. Check for changes from the other agent before committing, stage only the current task's files, and leave this handoff current.
 - **Merging:** the owner says "merge". Then wait for all three CI checks (`checks`, `gitleaks`, Cloudflare Pages) to pass before `gh pr merge N --merge`.
 - **Stacked PRs:** retarget to main (`gh pr edit N --base main`) before merging, and don't delete a base branch while a child PR still points at it.
 - **Overlay tasks stay unticked** in `docs/TASKS.md` until the owner reports their OBS check passed. Never log an OBS pass the owner didn't state.
@@ -56,13 +57,13 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 - #250: canvas placement clamps to the frame, plus "Show safe areas and thirds".
 
 ### Open PRs
-`docs/phase-11-plan`: documentation-only T11.1 planning PR for Eclipse, Rain City, Paper Cut and Aurora Tundra; awaits the owner's review and merge instruction. Release #255 and its handoff #256 are merged, as are Dependabot's #248 and #249 and the look-layouts test fix #253.
+`design/phase-11-directions`: T11.2's static direction boards and owner-approved choices; awaits the owner's PR merge instruction. Planning PR #257 was approved and merged with all three checks passing. Release #255 and its handoff #256 are merged, as are Dependabot's #248 and #249 and the look-layouts test fix #253.
 
 ### Done with the owner's OBS check (2026-10-15)
 T10.2–T10.10 are ticked: the owner reported the vertical OBS check and the phone safe-zone check passed. The phone check was a private TikTok or YouTube live with no words under the apps' buttons or comments. Both are logged in `docs/OBS-TESTING.md`; OBS version and CPU not recorded. DESIGN.md's safe-zone numbers are unchanged.
 
 ### Waiting on the owner
-- **T11.1 planning review.** The 2.1.0 release is complete. Phase 11 now has scope in PRD.md, proposed directions in DESIGN.md, and tasks in TASKS.md. The proposed palettes, compositions and type roles need the owner's choice in T11.2 before implementation; no new look has shipped.
+- **T11.2 PR merge approval.** The owner approved Eclipse A (Observatory rail), Rain City B (Last train home), Paper Cut B (Window in the paper) and Aurora Tundra A (Ice shelf) on 2026-10-15. DESIGN.md records the choices. Open `docs/phase-11-directions.html` offline to review both candidates, both canvases and their widget studies; fonts and licenses are included. No new production look has shipped. Next is T11.3 after this task's PR is merged.
 - **Vaporwave's sun stripes** now hold still (performance). If the owner wants motion back, rebuild the stripes so they move with transform only.
 
 ### Next tasks (in order)
@@ -70,7 +71,7 @@ T10.2–T10.10 are ticked: the owner reported the vertical OBS check and the pho
    - The looks: Eclipse, Rain City, Paper Cut and Aurora Tundra, each with "the lune" (a crescent moon in that look's own material).
    - They follow DESIGN.md's bar for a new look, the owner's kits (`docs/KIT-REFERENCE.md`) and the overlay playbook.
    - They're vertical-ready from the start.
-   - Review T11.1's planning PR, then T11.2's two composition candidates per look. Build the selected complete kits one at a time (T11.3–T11.6), then the catalog review and release (T11.7).
+   - T11.1 and T11.2 are done. Merge T11.2's PR on the owner's instruction, then build Eclipse A in T11.3. Build the remaining selected complete kits one at a time (T11.4–T11.6), followed by the catalog review and release (T11.7).
 2. Phases 12–14 (saved overlays, connections, dock + Android app) are planned in TASKS.md; not started.
 
 ## Where things live (vertical and canvas)
@@ -93,6 +94,7 @@ T10.2–T10.10 are ticked: the owner reported the vertical OBS check and the pho
 - **OBS events:** in `src/main.tsx` (pause when hidden) and `src/overlays/FromLink.tsx` (`replay` remounts full-screen scenes when they go on air).
 
 ## Testing gotchas
+- **Direction board:** open `docs/phase-11-directions.html` as a local file or with a separate static server. Vite's page-preview plugin expects the app's HTML metadata and rejects this standalone document; requesting it through Vite also broadcasts an error overlay to other open app pages. Keep board checks separate from the app suite.
 - **Dev server address:** it answers on `http://[::1]:5173`, and Playwright reuses any server on 5173.
   - Another checkout or session using that server will test the wrong code, or drop connections mid-run.
   - When in doubt, run Playwright on its own port with a temporary config at the repo root, and delete it before committing.
