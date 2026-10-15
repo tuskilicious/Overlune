@@ -55,20 +55,13 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 - #250: canvas placement clamps to the frame, plus "Show safe areas and thirds".
 
 ### Open PRs
-- **#251 (T10.9):**
-  - Vertical alerts (`/o/alerts?canvas=vertical`, the box in the safe zone's upper third), and a vertical frame link at its own size.
-  - Chat and webcam frame size presets for vertical, and vertical links for chat, alerts and the frame.
-  - The guide's "Streaming vertical?" section.
-  - Waiting for CI and the owner's "merge".
-- **#248, #249:** Dependabot minor/patch bumps. Not reviewed yet; check CI and the changelogs before suggesting a merge.
+None, as of the end of 2026-10-15. Dependabot's #248 and #249 were merged; #253 made the Abyss look-layouts test reliable.
+
+### Done with the owner's OBS check (2026-10-15)
+T10.2, T10.3, T10.5–T10.8 and T10.9 are ticked: the owner reported "obs check is done" for the vertical overlays. Logged in `docs/OBS-TESTING.md` with the details not recorded.
 
 ### Waiting on the owner
-- **OBS checks on a vertical canvas:**
-  - T10.2: vertical links render.
-  - T10.3: Just Chatting and Reaction with a real camera.
-  - T10.5–T10.8: the 16 looks in vertical.
-  - T10.9: a vertical test alert, and the guide steps checked in OBS 32.1, Aitum Vertical and Streamlabs.
-  - Until each passes, those tasks stay unticked.
+- **The phone safe-zone check** (part of T10.10): a private TikTok or YouTube live on a phone, to confirm no words sit under the apps' buttons or comments.
 - **Vaporwave's sun stripes** now hold still (performance). If the owner wants motion back, rebuild the stripes so they move with transform only.
 
 ### Next tasks (in order)
@@ -111,7 +104,6 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
   - When one fails after an intended change, download the run's `playwright-results` artifact.
   - Copy the actual image over `tests/e2e/*.visual.spec.ts-snapshots/…`, as the README says.
 - **Layout-measuring tests** must wait for `document.fonts.ready` and settled or reduced motion.
-- **Known flake:** `look-layouts.spec.ts` Abyss fails now and then under the full run and passes alone. A separate session is fixing it.
 - **Unexplained console error:** "Cannot read properties of null (reading 'style')" appeared in the Vite log during a full run (2026-10-15). It fails no test and didn't reproduce in single specs; suspect `RulerStrip` in `src/landing/LandingPage.tsx` (`tape.current!`). Unconfirmed.
 - **Other habits:**
   - Restart the dev server after switching branches (Vite can serve stale CSS).
