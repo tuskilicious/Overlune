@@ -20,4 +20,5 @@ export const blurbs: Record<ThemeId, string> = {
   phosphor: "A green terminal glowing at midnight.",
   quest: "A quest log in gold, parchment and embers.",
   eclipse: "A gold corona over a quiet observatory rail.",
+  "rain-city": "A crescent sign over a wet street, last train home.",
 };

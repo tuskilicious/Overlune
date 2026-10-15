@@ -139,6 +139,7 @@ const moods = {
     "abyss",
     "sakura",
     "eclipse",
+    "rain-city",
   ],
   Retro: ["arcade-8bit", "vaporwave-sunset", "session", "phosphor"],
   Bold: ["neon-grid", "bold-esports", "shonen", "skate-deck", "quest"],

@@ -57,7 +57,7 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 - #250: canvas placement clamps to the frame, plus "Show safe areas and thirds".
 
 ### Current task
-PR #259 (`codex/eclipse`) contains T11.3's Eclipse A kit. Lint, typecheck, 435 unit/API tests, the production build and 542 Playwright tests passed locally (one Linux-only screenshot test skipped on Windows). The owner reported the horizontal and vertical OBS checks passed and authorized merge with "passed merge" on 2026-10-15. All three checks must pass on the final commit before merging; check GitHub for its current state. Direction #258, planning #257, release #255 and handoff #256 are merged, as are Dependabot's #248 and #249 and the look-layouts test fix #253.
+T11.4 Rain City B is built on `feat/rain-city` (Claude, 2026-10-15), PR open. Eclipse (#259) is merged. The owner reported Rain City's OBS check passed ("good passed", after two design passes: station furniture, then a true crescent); T11.4 is ticked and logged. #260 merges on the owner's word. DESIGN.md "Rain City" describes what was built; `tests/e2e/rain-city.spec.ts` covers it. Note for the next look: DESIGN.md's "Selected compositions" line says Rain City B is "right-aligned lettering, left tube sign", but the board the owner picked from (`docs/phase-11-directions.html`) has the title left and the sign right in landscape (right-aligned only in portrait). The build follows the board.
 
 ### Done with the owner's OBS check (2026-10-15)
 T10.2–T10.10 are ticked: the owner reported the vertical OBS check and the phone safe-zone check passed. The phone check was a private TikTok or YouTube live with no words under the apps' buttons or comments. Both are logged in `docs/OBS-TESTING.md`; OBS version and CPU not recorded. DESIGN.md's safe-zone numbers are unchanged.
@@ -72,7 +72,7 @@ T11.3 is ticked: the owner reported Eclipse's requested horizontal and vertical 
    - The looks: Eclipse, Rain City, Paper Cut and Aurora Tundra, each with "the lune" (a crescent moon in that look's own material).
    - They follow DESIGN.md's bar for a new look, the owner's kits (`docs/KIT-REFERENCE.md`) and the overlay playbook.
    - They're vertical-ready from the start.
-   - T11.1 and T11.2 are merged. T11.3's owner OBS pass and merge approval are recorded in #259. Once #259 is merged, build Rain City B next (T11.4), then Paper Cut B and Aurora Tundra A, followed by the catalog review and release (T11.7). The chosen directions are in DESIGN.md and the offline comparison board is `docs/phase-11-directions.html`.
+   - T11.1 and T11.2 are merged. T11.3 (Eclipse) is merged; T11.4 (Rain City) passed the owner's OBS check. Then Paper Cut B (T11.5) and Aurora Tundra A (T11.6), followed by the checkpoint after T11.4 and T11.6 and the catalog review and release (T11.7). Each new look follows Eclipse's and Rain City's pattern: one `src/themes/<id>.css` scoped by `data-theme`, registration in types.ts, index.ts, blurbs, the editor's moods and the landing tour, a fixture, a spec, the sound in `tests/make-sounds.py`, ASSETS and README. The chosen directions are in DESIGN.md and the offline comparison board is `docs/phase-11-directions.html`.
 2. Phases 12–14 (saved overlays, connections, dock + Android app) are planned in TASKS.md; not started.
 
 ## Where things live (vertical and canvas)

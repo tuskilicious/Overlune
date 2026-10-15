@@ -19,6 +19,7 @@ export const themeIds = [
   "phosphor",
   "quest",
   "eclipse",
+  "rain-city",
 ] as const;
 /** Bundled @fontsource families (OFL, docs/ASSETS.md). Loaded by src/themes/fonts.ts. Only add to the end. */
 export const fontIds = [
@@ -69,7 +70,8 @@ export type BgEffect =
   | "skate"
   | "phosphor"
   | "quest"
-  | "eclipse";
+  | "eclipse"
+  | "rain-city";
 export type AnimId = "slide-fade" | "bounce" | "steps" | "wipe";
 export type AlertAnimId = "slide-fade" | "glitch" | "bounce" | "steps" | "wipe";
 export type BadgeStyle = "pill";

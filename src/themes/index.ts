@@ -10,6 +10,7 @@ import { neonGrid } from "./neon-grid";
 import { pastelCloud } from "./pastel-cloud";
 import { phosphor } from "./phosphor";
 import { quest } from "./quest";
+import { rainCity } from "./rain-city";
 import { sakura } from "./sakura";
 import { session } from "./session";
 import { shonen } from "./shonen";
@@ -17,6 +18,7 @@ import { skateDeck } from "./skate-deck";
 import { vaporwaveSunset } from "./vaporwave-sunset";
 import type { Theme, ThemeId } from "./types";
 import "./eclipse.css";
+import "./rain-city.css";
 
 export const themes: Record<ThemeId, Theme> = {
   "clean-slate": cleanSlate,
@@ -36,4 +38,5 @@ export const themes: Record<ThemeId, Theme> = {
   phosphor,
   quest,
   eclipse,
+  "rain-city": rainCity,
 };
