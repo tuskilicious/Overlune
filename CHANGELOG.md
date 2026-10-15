@@ -2,6 +2,33 @@
 
 What changed in each Overlune release. Overlay links from every release keep working: the link format only ever gains optional settings.
 
+## 2.1.0 (2026-10-15)
+
+Every existing link still works. Your overlays now fit a vertical stream too, with two new scenes and a smoother time in OBS. There is nothing to re-paste for your current setup.
+
+### Vertical overlays
+- **All 16 looks, tall too:** vertical scenes at 1080×1920, with `?canvas=vertical` in the link. Words stay inside a safe zone clear of the apps' buttons and comments, checked by the owner on a phone in a private live stream.
+- **Horizontal or Vertical:** switch above the editor's preview to pick your canvas. Customize each layout separately, then copy its links and sizes into OBS.
+- **Matching widgets:** vertical alerts, chat sizes and webcam-frame sizes for your tall canvas.
+- **Streaming vertical?** The setup guide now covers OBS vertical canvases, Aitum Vertical and Streamlabs Dual Output.
+
+### New scenes
+- **Just Chatting:** a large space for your camera, a heading and a line for what you're talking about.
+- **Reaction:** spaces for your camera and the video you're reacting to, with chat. Both new scenes come in every look, horizontal and vertical.
+
+### Editor
+- **Parts stay on the canvas** when you move or resize them.
+- **Show safe areas and thirds:** guides help you place things clear of the edges and the apps' controls.
+- **Star on GitHub:** a link in the navigation if you want to support the project.
+
+### Smoother in OBS
+- **Lighter effects:** entrances no longer blur, Vaporwave Sunset's sun stripes hold still, and Session's grain no longer blends across the scene.
+- **Entrances replay** when OBS shows a scene live again.
+
+### Site
+- **Light or dark:** choose the site's mode from the navigation, with new icons, buttons and a matching toggle.
+- **Clearer on phones:** a note explains that Overlune is made for a computer, and mobile editor fixes keep the preview and controls usable.
+
 ## 2.0.0 (2026-10-14)
 
 Move anything, anywhere: a canvas editor for every scene, a Live overlay that puts chat, alerts and your webcam frame in one source, and any canvas size. It's a big new version, but every link you've already pasted still works exactly as before: customizing is optional, and only links you copy after customizing carry a layout.
