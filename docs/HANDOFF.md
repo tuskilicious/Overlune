@@ -7,9 +7,9 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 
 - **Stack:** React + Vite on Cloudflare Pages, with Pages Functions + D1 for optional Twitch sign-in (v2).
 - **Settings:** they live in the overlay link's fragment (`#1.<lz-string>`, zod schema, additive-only: old links must keep working).
-- **Looks:** 16 on production, with Eclipse built for review on `codex/eclipse` as the next look. Each has Starting Soon, BRB, Ending, Offline, Just Chatting and Reaction scenes, plus chat, alerts, a webcam frame and Live (chat, alerts and frame in one source).
+- **Looks:** 17, including Eclipse A (T11.3, PR #259). Each has Starting Soon, BRB, Ending, Offline, Just Chatting and Reaction scenes, plus chat, alerts, a webcam frame and Live (chat, alerts and frame in one source).
 - **Canvas editor:** Phase 9; moves every part of a scene.
-- **Release:** 2.1.0 (T10.10), released 2026-10-15. PR #255 merged after owner approval and all three checks passed; annotated tag `v2.1.0` and the GitHub release are published. Cloudflare Pages deployed main successfully; overlune.in serves `overlune@2.1.0+07d573d`, matching the merge commit.
+- **Release:** 2.1.0 (T10.10), released 2026-10-15. PR #255 merged after owner approval and all three checks passed; annotated tag `v2.1.0` and the GitHub release are published. At release, Cloudflare Pages deployed main successfully and overlune.in served `overlune@2.1.0+07d573d`, matching the merge commit. Phase 11's catalog release remains T11.7.
 - **Vertical:** Phase 10 complete; `?canvas=vertical`, 1080×1920.
 
 ## How the owner works (follow this)
@@ -56,14 +56,15 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 - #247: overlay playbook performance fixes. Entrances lost their blur, Vaporwave's sun stripes no longer slide, Session's grain lost its blend, and scenes replay their entrance on OBS `obsSourceActiveChanged`.
 - #250: canvas placement clamps to the frame, plus "Show safe areas and thirds".
 
-### Open PRs
-`codex/eclipse`: T11.3's Eclipse A kit, built for review with lint, typecheck, 435 unit/API tests, the production build and 542 Playwright tests passing (one Linux-only screenshot test skipped on Windows). Direction PR #258 merged on the owner's "merge" instruction after all three checks passed. Planning #257, release #255 and handoff #256 are merged, as are Dependabot's #248 and #249 and the look-layouts test fix #253.
+### Current task
+PR #259 (`codex/eclipse`) contains T11.3's Eclipse A kit. Lint, typecheck, 435 unit/API tests, the production build and 542 Playwright tests passed locally (one Linux-only screenshot test skipped on Windows). The owner reported the horizontal and vertical OBS checks passed and authorized merge with "passed merge" on 2026-10-15. All three checks must pass on the final commit before merging; check GitHub for its current state. Direction #258, planning #257, release #255 and handoff #256 are merged, as are Dependabot's #248 and #249 and the look-layouts test fix #253.
 
 ### Done with the owner's OBS check (2026-10-15)
 T10.2–T10.10 are ticked: the owner reported the vertical OBS check and the phone safe-zone check passed. The phone check was a private TikTok or YouTube live with no words under the apps' buttons or comments. Both are logged in `docs/OBS-TESTING.md`; OBS version and CPU not recorded. DESIGN.md's safe-zone numbers are unchanged.
 
+T11.3 is ticked: the owner reported Eclipse's requested horizontal and vertical OBS checks passed on the PR #259 preview and approved merge. Logged as an owner-reported pass in `docs/OBS-TESTING.md`; OBS version and CPU not recorded, Streamlabs not tested.
+
 ### Waiting on the owner
-- **T11.3 Eclipse OBS review.** Eclipse A is built on `codex/eclipse`, with the complete kit and full local checks passing. Check it in OBS horizontally and vertically per OBS-TESTING.md, including real chat, a test alert and its sound, source hide/show, Full/Lite/Still, camera transparency and CPU. T11.3 stays unticked; no OBS pass has been reported. Production still has the previous catalog until the PR is approved and merged. The four chosen directions remain Eclipse A, Rain City B, Paper Cut B and Aurora Tundra A in DESIGN.md; the offline comparison board is `docs/phase-11-directions.html`.
 - **Vaporwave's sun stripes** now hold still (performance). If the owner wants motion back, rebuild the stripes so they move with transform only.
 
 ### Next tasks (in order)
@@ -71,7 +72,7 @@ T10.2–T10.10 are ticked: the owner reported the vertical OBS check and the pho
    - The looks: Eclipse, Rain City, Paper Cut and Aurora Tundra, each with "the lune" (a crescent moon in that look's own material).
    - They follow DESIGN.md's bar for a new look, the owner's kits (`docs/KIT-REFERENCE.md`) and the overlay playbook.
    - They're vertical-ready from the start.
-   - T11.1 and T11.2 are merged. T11.3 is built and locally verified; its PR awaits the owner's Eclipse OBS checks and merge instruction. Build Rain City B next (T11.4), then Paper Cut B and Aurora Tundra A, followed by the catalog review and release (T11.7).
+   - T11.1 and T11.2 are merged. T11.3's owner OBS pass and merge approval are recorded in #259. Once #259 is merged, build Rain City B next (T11.4), then Paper Cut B and Aurora Tundra A, followed by the catalog review and release (T11.7). The chosen directions are in DESIGN.md and the offline comparison board is `docs/phase-11-directions.html`.
 2. Phases 12–14 (saved overlays, connections, dock + Android app) are planned in TASKS.md; not started.
 
 ## Where things live (vertical and canvas)
