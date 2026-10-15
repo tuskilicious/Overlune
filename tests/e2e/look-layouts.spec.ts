@@ -84,13 +84,15 @@ async function diffRatio(page: Page, a: Uint8Array, b: Uint8Array) {
 
 test.use({ viewport: { width: 1920, height: 1080 } });
 
+// One test per scene, not per look: Abyss's snow makes its 16 full-size screenshots take twice as long as other
+// looks', which ran past the 30s test timeout on a busy machine.
 for (const theme of themeIds)
-  test(`${theme}: each scene's default layout renders like the composed scene`, async ({
-    page,
-  }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.clock.setFixedTime(NOW);
-    for (const scene of scenes)
+  for (const scene of scenes)
+    test(`${theme} ${scene}: the default layout renders like the composed scene`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.clock.setFixedTime(NOW);
       for (const ticker of [false, true]) {
         const settings = sample(theme, ticker);
         const composed = await shot(page, link(scene, settings), { ticker });
@@ -110,4 +112,4 @@ for (const theme of themeIds)
         const ratio = await diffRatio(page, composed, custom);
         expect(ratio, `${theme} ${scene}${ticker ? " with ticker" : ""}`).toBeLessThan(0.005);
       }
-  });
+    });
