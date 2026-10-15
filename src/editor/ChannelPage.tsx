@@ -21,26 +21,44 @@ const fileName = (s: string) =>
 /** Turns an element into a PNG and saves it. html-to-image loads only now, so overlays and first visits never carry it. */
 async function savePng(el: HTMLElement, name: string, width: number, height: number) {
   const { toPng } = await import("html-to-image");
-  // html-to-image leaves out pictures drawn by ::after (Vaporwave's palms). For the capture only, a real element
-  // copies that layer and the ::after hides; the overlays themselves never change.
-  const after = getComputedStyle(el, "::after");
-  let standIn: HTMLDivElement | null = null;
-  if (after.backgroundImage.includes("url(")) {
-    standIn = document.createElement("div");
+  // html-to-image can't embed image URLs in pseudo-elements, including Eclipse's SVG mask. For the capture
+  // only, copy those layers into real elements whose images it can embed; the overlay itself stays unchanged.
+  const standIns: HTMLDivElement[] = [];
+  for (const [pseudo, marker] of [
+    ["::after", "shot"],
+    ["::before", "shotBefore"],
+  ] as const) {
+    const layer = getComputedStyle(el, pseudo);
+    if (
+      !layer.maskImage.includes("url(") &&
+      !(pseudo === "::after" && layer.backgroundImage.includes("url("))
+    )
+      continue;
+    const standIn = document.createElement("div");
     for (const p of [
       "position",
       "inset",
+      "width",
+      "height",
       "z-index",
+      "background-color",
       "background-image",
       "background-size",
       "background-position",
       "background-repeat",
-      "opacity", // Session's grain is a faint multiply layer, not a solid one
+      "mask-image",
+      "mask-size",
+      "mask-position",
+      "mask-repeat",
+      "mask-mode",
+      "mask-composite",
+      "opacity", // Keep faint texture layers faint in the exported picture.
       "mix-blend-mode",
     ] as const)
-      standIn.style.setProperty(p, after.getPropertyValue(p));
-    el.dataset.shot = "";
+      standIn.style.setProperty(p, layer.getPropertyValue(p));
+    el.dataset[marker] = "";
     el.appendChild(standIn);
+    standIns.push(standIn);
   }
   let url: string;
   try {
@@ -52,8 +70,9 @@ async function savePng(el: HTMLElement, name: string, width: number, height: num
       imagePlaceholder: EMPTY_GIF,
     });
   } finally {
-    standIn?.remove();
+    for (const standIn of standIns) standIn.remove();
     delete el.dataset.shot;
+    delete el.dataset.shotBefore;
   }
   const a = document.createElement("a");
   a.href = url;

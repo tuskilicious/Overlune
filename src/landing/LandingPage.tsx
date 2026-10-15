@@ -185,6 +185,7 @@ const tour: [ThemeId, KitScene][] = [
   ["skate-deck", "brb"],
   ["phosphor", "ending"],
   ["quest", "offline"],
+  ["eclipse", "starting"],
 ];
 
 /** The hero picture: a live scene in a stream frame, two alerts in the same look, and the scene names. It tours
@@ -1095,7 +1096,7 @@ export default function LandingPage() {
         <section className="landing-hero relative px-3 pt-24 md:px-6 md:pt-28">
           <div data-hero-stage className="relative flex min-h-[calc(100dvh-7rem)] items-center">
             <div data-collage aria-hidden className="landing-collage">
-              {[0, 1, 2, 3].map((row) => (
+              {Array.from({ length: Math.ceil(themeIds.length / 4) }, (_, row) => (
                 <div key={row} data-collage-row className="landing-collage-row">
                   {themeIds.slice(row * 4, row * 4 + 4).map((id) => (
                     <div key={id} className="landing-collage-tile">

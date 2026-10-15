@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <!-- Original Overlune corona silhouette, MIT. Color comes from the theme's CSS tokens. -->
+  <path fill="white" d="M290 25C189-1 66 65 61 188c-5 125 112 215 225 183-86 3-149-72-145-169 4-94 68-168 149-177Z"/>
+  <g fill="white" opacity=".45">
+    <circle cx="61" cy="150" r="2"/><circle cx="55" cy="180" r="3"/>
+    <circle cx="58" cy="218" r="2"/><circle cx="75" cy="267" r="3"/>
+    <circle cx="112" cy="312" r="2"/><circle cx="111" cy="58" r="2"/>
+    <circle cx="179" cy="22" r="2"/><circle cx="209" cy="377" r="2"/>
+  </g>
+</svg>

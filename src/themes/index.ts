@@ -4,6 +4,7 @@ import { boldEsports } from "./bold-esports";
 import { cleanSlate } from "./clean-slate";
 import { cozyCafe } from "./cozy-cafe";
 import { daylight } from "./daylight";
+import { eclipse } from "./eclipse";
 import { forestNight } from "./forest-night";
 import { neonGrid } from "./neon-grid";
 import { pastelCloud } from "./pastel-cloud";
@@ -15,6 +16,7 @@ import { shonen } from "./shonen";
 import { skateDeck } from "./skate-deck";
 import { vaporwaveSunset } from "./vaporwave-sunset";
 import type { Theme, ThemeId } from "./types";
+import "./eclipse.css";
 
 export const themes: Record<ThemeId, Theme> = {
   "clean-slate": cleanSlate,
@@ -33,4 +35,5 @@ export const themes: Record<ThemeId, Theme> = {
   "skate-deck": skateDeck,
   phosphor,
   quest,
+  eclipse,
 };

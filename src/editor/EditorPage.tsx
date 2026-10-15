@@ -130,7 +130,16 @@ const motionHints = {
 
 /** Look filters (T6.60). Each look is in one group. */
 const moods = {
-  Calm: ["clean-slate", "cozy-cafe", "pastel-cloud", "forest-night", "daylight", "abyss", "sakura"],
+  Calm: [
+    "clean-slate",
+    "cozy-cafe",
+    "pastel-cloud",
+    "forest-night",
+    "daylight",
+    "abyss",
+    "sakura",
+    "eclipse",
+  ],
   Retro: ["arcade-8bit", "vaporwave-sunset", "session", "phosphor"],
   Bold: ["neon-grid", "bold-esports", "shonen", "skate-deck", "quest"],
 } as const satisfies Record<string, readonly ThemeId[]>;

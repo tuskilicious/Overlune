@@ -4,6 +4,8 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 
 | Asset | Type | Used in | Source URL | License | Attribution required? | Added |
 |---|---|---|---|---|---|---|
+| `public/images/themes/eclipse-corona.svg`: original crescent silhouette with lunar dust | SVG / CSS mask | Eclipse scenes, alerts and Twitch panels (T11.3) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-15 |
+| `public/sounds/eclipse.ogg`: a rounded 110 Hz strike and brief 880 Hz overtone, synthesized by `tests/make-sounds.py` without samples; 1.05 seconds, -12.5 LUFS integrated, -1.9 dBTP | sound | Eclipse alerts (T11.3) | Own work (Overlune) | Own work; released under CC0 1.0 | No | 2026-10-15 |
 | Original crescent artwork and static scene/widget studies in `docs/phase-11-directions.html` (T11.2) | SVG / CSS design study | Phase 11 direction board only; not registered production looks | Drawn for Overlune | Own work (MIT, same as the code); embedded unchanged Fontsource files use their existing SIL OFL 1.1 licenses, included in the board | No | 2026-10-15 |
 | Twitch, YouTube, TikTok, Instagram, X and Discord logos (`simple-icons` 16.33.0, path data only) | icon | Socials row on redesigned scenes (T6.35) | https://simpleicons.org | CC0 1.0 for the package; each logo is a trademark of its owner, shown only to identify the streamer's account on that platform | No | 2026-10-02 |
 | Inter (`@fontsource/inter` 5.3.0, weights 400/600/700) | font | Clean Slate, editor | https://fontsource.org/fonts/inter | SIL OFL 1.1 | No | 2026-09-30 |
@@ -34,12 +36,12 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 | Nunito Sans (`@fontsource/nunito-sans` 5.3.0, weights 400/600/700) | font | Advanced font picker; Forest Night (T6.3); Daylight body (T6.89) | https://fontsource.org/fonts/nunito-sans | SIL OFL 1.1 | No | 2026-10-01 |
 | `public/sounds/forest-night.ogg` (Kenney Interface Sounds 1.0, `bong_001.ogg`, unchanged) | sound | Forest Night alert sound | https://kenney.nl/assets/interface-sounds | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
 | Anton (`@fontsource/anton` 5.3.0, weight 400) | font | Advanced font picker; Bold Esports (T6.4) | https://fontsource.org/fonts/anton | SIL OFL 1.1 | No | 2026-10-01 |
-| Barlow (`@fontsource/barlow` 5.3.0, weights 400/600/700) | font | Advanced font picker; Bold Esports (T6.4) | https://fontsource.org/fonts/barlow | SIL OFL 1.1 | No | 2026-10-01 |
+| Barlow (`@fontsource/barlow` 5.3.0, weights 400/600/700) | font | Advanced font picker; Bold Esports (T6.4); Eclipse body text (T11.3) | https://fontsource.org/fonts/barlow | SIL OFL 1.1 | No | 2026-10-01 |
 | `public/sounds/bold-esports.ogg` (Kenney Digital Audio 1.0, `zapThreeToneUp.ogg`, unchanged) | sound | Bold Esports alert sound | https://kenney.nl/assets/digital-audio | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
 | Audiowide (`@fontsource/audiowide` 5.3.0, weight 400) | font | Advanced font picker; Vaporwave Sunset (T6.5) | https://fontsource.org/fonts/audiowide | SIL OFL 1.1 | No | 2026-10-01 |
 | Space Grotesk (`@fontsource/space-grotesk` 5.3.0, weights 400/600/700) | font | Advanced font picker; Vaporwave Sunset (T6.5); Daylight headings (T6.89) | https://fontsource.org/fonts/space-grotesk | SIL OFL 1.1 | No | 2026-10-01 |
 | Unbounded (`@fontsource/unbounded` 5.3.0, weights 400/500/700) | font | Advanced font picker; Abyss headings (T6.109) | https://fontsource.org/fonts/unbounded | SIL OFL 1.1 | No | 2026-10-07 |
-| Manrope (`@fontsource/manrope` 5.3.0, weights 400/600/700) | font | Advanced font picker; Abyss body text (T6.109) | https://fontsource.org/fonts/manrope | SIL OFL 1.1 | No | 2026-10-07 |
+| Manrope (`@fontsource/manrope` 5.3.0, weights 400/600/700) | font | Advanced font picker; Abyss body text (T6.109); Eclipse headings (T11.3) | https://fontsource.org/fonts/manrope | SIL OFL 1.1 | No | 2026-10-07 |
 | Archivo Black (`@fontsource/archivo-black` 5.3.0, weight 400) | font | Advanced font picker; Session headings (T6.110) | https://fontsource.org/fonts/archivo-black | SIL OFL 1.1 | No | 2026-10-07 |
 | Archivo (`@fontsource/archivo` 5.3.0, weights 400/600/700) | font | Advanced font picker; Session body text (T6.110) | https://fontsource.org/fonts/archivo | SIL OFL 1.1 | No | 2026-10-07 |
 | `public/images/landing/aurora.webp` (a frame of the landing page's aurora shader, `src/landing/HeroSky.tsx`, captured in Unicorn Studio's editor) | image | Landing hero sky: the reduced-motion and no-WebGL version (T6.151) | Rendered for Overlune from its own shader | Own work (MIT, same as the code) | No | 2026-10-09 |
