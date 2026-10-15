@@ -223,7 +223,7 @@ test("Rain City downloads matching panels, banner and saved OBS collection links
     if (width === 1920) {
       // The lune must survive PNG export as a crescent, not the rectangular gradient underneath its mask.
       // Outside the sign, the night; somewhere on the tube's stroke, the tube's cyan.
-      const [outside] = await pngPixels(page, bytes, [[1000, 600]]);
+      const [outside] = await pngPixels(page, bytes, [[1000, 80]]);
       expect(outside!.slice(0, 3)).toEqual([16, 26, 36]);
       const tube = await pngPixels(
         page,

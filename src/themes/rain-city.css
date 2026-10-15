@@ -14,8 +14,18 @@
   background:
     linear-gradient(var(--accent), var(--accent)) right var(--rc-panel-right) top
       var(--rc-panel-h) / var(--rc-panel-w) 3px no-repeat,
+    /* The tube lights its panel: a still bloom, never an animated glow. */
+    radial-gradient(closest-side, color-mix(in srgb, var(--accent) 26%, transparent), transparent)
+      right var(--rc-panel-right) top 0 / var(--rc-panel-w) var(--rc-panel-h) no-repeat,
     linear-gradient(var(--surface), var(--surface)) right var(--rc-panel-right) top 0 /
       var(--rc-panel-w) var(--rc-panel-h) no-repeat,
+    /* The city's glow on the low sky, just above the street. */
+    linear-gradient(
+        180deg,
+        transparent 40%,
+        color-mix(in srgb, var(--accent) 7%, transparent) var(--rc-street),
+        transparent var(--rc-street)
+      ),
     linear-gradient(
       180deg,
       transparent 0 var(--rc-street),
@@ -85,11 +95,19 @@
   z-index: -1;
   pointer-events: none;
   inset: var(--rc-street) 0 0;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--accent) 24%, transparent) 0 2px,
-    #0b131b 2px
-  );
+  /* Wet asphalt: the sign and the station lettering smear their light down the street. */
+  background:
+    radial-gradient(
+      ellipse 150px 260px at calc(100% - var(--rc-panel-right) - var(--rc-panel-w) / 2) 0,
+      color-mix(in srgb, var(--accent) 24%, transparent),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 560px 180px at 620px 0,
+      color-mix(in srgb, var(--primary) 7%, transparent),
+      transparent
+    ),
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 30%, transparent) 0 2px, #0b131b 2px);
 }
 
 /* The sign's reflection in the wet street: still, flattened, faint. */
@@ -141,8 +159,35 @@
   text-transform: uppercase;
 }
 
+/* A platform tag above the station name, in the kits' kicker style: tracked caps in an outlined tag. */
 .scene[data-theme="rain-city"] .scene-title::before {
-  content: none;
+  content: "Platform 1 · Last train home";
+  display: block;
+  width: fit-content;
+  height: auto;
+  margin: 0 0 0.3em;
+  padding: 0.09em 0.22em;
+  border: 2px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  border-radius: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 0.16em;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.3;
+}
+
+/* The line home: a route with its stops, under the subtitle. Still. */
+.scene[data-theme="rain-city"] .scene-subtitle::after {
+  content: "";
+  display: block;
+  width: min(100%, 640px);
+  height: 18px;
+  margin-top: 44px;
+  background:
+    radial-gradient(circle, var(--bg) 0 4px, var(--accent) 5px 8px, transparent 9px) 0 50% / 128px
+      18px repeat-x,
+    linear-gradient(var(--accent), var(--accent)) 0 50% / 100% 3px no-repeat;
 }
 
 .scene[data-theme="rain-city"] .scene-subtitle {
@@ -174,11 +219,36 @@
   text-align: left;
 }
 
-.scene[data-theme="rain-city"] .countdown-time {
+/* A departure board: "Departs in", then each character on its own split-flap tile. */
+.scene[data-theme="rain-city"] .countdown::before {
+  content: "Departs in";
+  margin-bottom: 14px;
+  color: var(--accent);
   font-family: var(--font-heading);
-  font-size: 132px;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.scene[data-theme="rain-city"] .countdown-time {
+  display: flex;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-size: 104px;
   font-weight: 700;
-  line-height: 0.9;
+  line-height: 1;
+}
+
+.scene[data-theme="rain-city"] .countdown-ch {
+  min-width: 0.62em;
+  padding: 0.08em 0.06em 0.02em;
+  text-align: center;
+  background:
+    linear-gradient(#0b131b, #0b131b) 0 calc(50% + 1px) / 100% 2px no-repeat,
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 70%, #000), var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  border-radius: 4px;
 }
 
 .scene[data-theme="rain-city"] .countdown-at {
@@ -201,6 +271,15 @@
 
 .scene[data-theme="rain-city"] .scene-handle {
   font-size: 30px;
+}
+
+.scene[data-theme="rain-city"] .scene-icon {
+  width: 60px;
+  height: 60px;
+  padding: 15px;
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 2px;
 }
 
 .scene[data-theme="rain-city"] .scene-ticker {
@@ -244,6 +323,11 @@
 
 .scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"] .scene-title-end {
   display: block;
+}
+
+.scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"] .scene-title::before,
+.scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"] .scene-subtitle::after {
+  margin-left: auto;
 }
 
 .scene[data-theme="rain-city"][data-bg="rain-city"][data-canvas="portrait"] .scene-subtitle {
