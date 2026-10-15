@@ -9,7 +9,7 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 - **Settings:** they live in the overlay link's fragment (`#1.<lz-string>`, zod schema, additive-only: old links must keep working).
 - **Looks:** 16 (themes), each with Starting Soon, BRB, Ending, Offline, Just Chatting and Reaction scenes, plus chat, alerts, a webcam frame and Live (chat, alerts and frame in one source).
 - **Canvas editor:** Phase 9; moves every part of a scene.
-- **Release:** 2.1.0 (T10.10); release PR prepared, with publication after the owner says "merge" and all three CI checks pass.
+- **Release:** 2.1.0 (T10.10), released 2026-10-15. PR #255 merged after owner approval and all three checks passed; annotated tag `v2.1.0` and the GitHub release are published. Cloudflare Pages deployed main successfully; overlune.in serves `overlune@2.1.0+07d573d`, matching the merge commit.
 - **Vertical:** Phase 10 complete; `?canvas=vertical`, 1080×1920.
 
 ## How the owner works (follow this)
@@ -56,13 +56,13 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 - #250: canvas placement clamps to the frame, plus "Show safe areas and thirds".
 
 ### Open PRs
-`release/2.1.0`: the T10.10 release PR awaits the owner's merge approval and all three CI checks. Dependabot's #248 and #249 were merged; #253 made the Abyss look-layouts test reliable.
+`docs/2.1.0-release-handoff`: documentation-only follow-up recording the completed release; awaits owner merge approval. Release PR #255, Dependabot's #248 and #249, and the look-layouts test fix #253 are merged.
 
 ### Done with the owner's OBS check (2026-10-15)
 T10.2–T10.10 are ticked: the owner reported the vertical OBS check and the phone safe-zone check passed. The phone check was a private TikTok or YouTube live with no words under the apps' buttons or comments. Both are logged in `docs/OBS-TESTING.md`; OBS version and CPU not recorded. DESIGN.md's safe-zone numbers are unchanged.
 
 ### Waiting on the owner
-- **Merge approval for the 2.1.0 release PR.** After "merge", wait for `checks`, `gitleaks` and Cloudflare Pages; merge, pull main, tag `v2.1.0`, publish the GitHub release and confirm the main production deploy and new build on overlune.in. No further OBS or phone confirmation is needed.
+- **The 2.1.0 release is complete.** No further OBS or phone confirmation is needed. Phase 11 is next; break it into tasks first.
 - **Vaporwave's sun stripes** now hold still (performance). If the owner wants motion back, rebuild the stripes so they move with transform only.
 
 ### Next tasks (in order)
