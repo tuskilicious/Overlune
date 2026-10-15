@@ -4,6 +4,8 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 
 | Asset | Type | Used in | Source URL | License | Attribution required? | Added |
 |---|---|---|---|---|---|---|
+| `public/images/themes/paper-cut-crescent.svg`: original true crescent (two circles, tilted) | SVG / CSS mask | Paper Cut's window through the plum sheet, its shadow, alerts and Twitch panels (T11.5) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-16 |
+| `public/sounds/paper-cut.ogg`: two soft paper taps (band-limited noise with a low 180 Hz body), synthesized by `tests/make-sounds.py` without samples; 0.62 seconds, -13.9 LUFS integrated, -1.0 dBTP | sound | Paper Cut alerts (T11.5) | Own work (Overlune) | Own work; released under CC0 1.0 | No | 2026-10-16 |
 | `public/images/themes/rain-city-sign.svg`: original crescent tube sign (a true two-circle crescent, tilted) with a faint body fill and halo stroke | SVG / CSS mask | Rain City scenes, reflection, alerts and Twitch panels (T11.4) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-15 |
 | `public/images/themes/rain-city-rain.svg`: original seamless 240px rain-streak tile | SVG / CSS mask | Rain City's rain over the sign column, Full motion only (T11.4) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-15 |
 | `public/sounds/rain-city.ogg`: a glass tap (1760 and 2793 Hz partials) with a muted rain-like tail of low-passed noise, synthesized by `tests/make-sounds.py` without samples; 1.1 seconds, -13.1 LUFS integrated, -1.4 dBTP | sound | Rain City alerts (T11.4) | Own work (Overlune) | Own work; released under CC0 1.0 | No | 2026-10-15 |
@@ -33,10 +35,10 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 | VT323 (`@fontsource/vt323` 5.3.0, weight 400; `src/themes/vt323.css` adds `size-adjust: 130%`) | font | Advanced font picker; Arcade 8-Bit (T6.1) | https://fontsource.org/fonts/vt323 | SIL OFL 1.1 | No | 2026-10-01 |
 | `public/sounds/arcade-8bit.ogg` (Kenney Digital Audio 1.0, `powerUp1.ogg`, unchanged) | sound | Arcade 8-Bit alert sound | https://kenney.nl/assets/digital-audio | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
 | Baloo 2 (`@fontsource/baloo-2` 5.3.0, weights 400/600/700) | font | Advanced font picker; Pastel Cloud (T6.2) | https://fontsource.org/fonts/baloo-2 | SIL OFL 1.1 | No | 2026-10-01 |
-| Quicksand (`@fontsource/quicksand` 5.3.0, weights 400/600/700) | font | Advanced font picker; Pastel Cloud (T6.2) | https://fontsource.org/fonts/quicksand | SIL OFL 1.1 | No | 2026-10-01 |
+| Quicksand (`@fontsource/quicksand` 5.3.0, weights 400/600/700) | font | Advanced font picker; Pastel Cloud (T6.2); Paper Cut headings (T11.5) | https://fontsource.org/fonts/quicksand | SIL OFL 1.1 | No | 2026-10-01 |
 | `public/sounds/pastel-cloud.ogg` (Kenney Interface Sounds 1.0, `pluck_002.ogg`, unchanged) | sound | Pastel Cloud alert sound | https://kenney.nl/assets/interface-sounds | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
 | Lora (`@fontsource/lora` 5.3.0, weights 400/600/700) | font | Advanced font picker; Forest Night (T6.3) | https://fontsource.org/fonts/lora | SIL OFL 1.1 | No | 2026-10-01 |
-| Nunito Sans (`@fontsource/nunito-sans` 5.3.0, weights 400/600/700) | font | Advanced font picker; Forest Night (T6.3); Daylight body (T6.89) | https://fontsource.org/fonts/nunito-sans | SIL OFL 1.1 | No | 2026-10-01 |
+| Nunito Sans (`@fontsource/nunito-sans` 5.3.0, weights 400/600/700) | font | Advanced font picker; Forest Night (T6.3); Daylight body (T6.89); Paper Cut body text (T11.5) | https://fontsource.org/fonts/nunito-sans | SIL OFL 1.1 | No | 2026-10-01 |
 | `public/sounds/forest-night.ogg` (Kenney Interface Sounds 1.0, `bong_001.ogg`, unchanged) | sound | Forest Night alert sound | https://kenney.nl/assets/interface-sounds | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
 | Anton (`@fontsource/anton` 5.3.0, weight 400) | font | Advanced font picker; Bold Esports (T6.4) | https://fontsource.org/fonts/anton | SIL OFL 1.1 | No | 2026-10-01 |
 | Barlow (`@fontsource/barlow` 5.3.0, weights 400/600/700) | font | Advanced font picker; Bold Esports (T6.4); Eclipse body text (T11.3) | https://fontsource.org/fonts/barlow | SIL OFL 1.1 | No | 2026-10-01 |
@@ -57,6 +59,6 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 | Cinzel (`@fontsource/cinzel` 5.3.0, weights 600/700) | font | Advanced font picker; Quest headings (T6.128) | https://fontsource.org/fonts/cinzel | SIL OFL 1.1 | No | 2026-10-07 |
 | Alegreya (`@fontsource/alegreya` 5.3.0, weights 400/700) | font | Advanced font picker; Quest body text (T6.128) | https://fontsource.org/fonts/alegreya | SIL OFL 1.1 | No | 2026-10-07 |
 | `public/images/themes/forest-treeline.svg` (generated pine silhouettes) | image | Forest Night treeline (T6.112) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-07 |
-| `public/images/themes/paper-grain.svg` (SVG fractal noise filter) | image | Cozy Café paper grain (T6.112) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-07 |
+| `public/images/themes/paper-grain.svg` (SVG fractal noise filter) | image | Cozy Café paper grain (T6.112); Paper Cut sheets (T11.5) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-07 |
 | `public/sounds/vaporwave-sunset.ogg` (Kenney Digital Audio 1.0, `threeTone1.ogg`, unchanged) | sound | Vaporwave Sunset alert sound | https://kenney.nl/assets/digital-audio | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
 | `public/images/themes/vaporwave-palms.svg` (palm silhouettes, simple paths) | image | Vaporwave Sunset scene background | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-01 |

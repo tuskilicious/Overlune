@@ -21,4 +21,5 @@ export const blurbs: Record<ThemeId, string> = {
   quest: "A quest log in gold, parchment and embers.",
   eclipse: "A gold corona over a quiet observatory rail.",
   "rain-city": "A crescent sign over a wet street, last train home.",
+  "paper-cut": "A crescent window cut through layered plum and white paper.",
 };

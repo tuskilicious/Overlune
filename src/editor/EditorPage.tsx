@@ -140,6 +140,7 @@ const moods = {
     "sakura",
     "eclipse",
     "rain-city",
+    "paper-cut",
   ],
   Retro: ["arcade-8bit", "vaporwave-sunset", "session", "phosphor"],
   Bold: ["neon-grid", "bold-esports", "shonen", "skate-deck", "quest"],

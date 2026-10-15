@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 320">
+  <!-- Original Overlune crescent window, MIT. Used as a CSS mask: the hole cut through Paper Cut's plum sheet, its
+       shadow, and the alert and panel marks. A true crescent: an outer circle (center 150,160, r 110) less an inner one
+       (center 185,160, r 95), so both tips match, tilted a little like a hand-cut shape. -->
+  <path transform="rotate(-14 150 160)" fill="white" d="M211.43 68.75A110 110 0 1 0 211.43 251.25A95 95 0 1 1 211.43 68.75Z"/>
+</svg>

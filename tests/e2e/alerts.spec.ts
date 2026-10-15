@@ -170,6 +170,7 @@ for (const theme of [
   "quest",
   "eclipse",
   "rain-city",
+  "paper-cut",
 ])
   test(`${theme} plays its own alert sound (T6.142)`, async ({ page }) => {
     const twitch = await fakeTwitch(page);

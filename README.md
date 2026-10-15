@@ -10,7 +10,7 @@ It includes:
 - A socials ticker
 - Twitch panels and an offline banner, downloaded as pictures
 - One file that imports every scene into OBS Studio
-- 18 looks: Clean Slate, Neon Grid, Cozy Café, Arcade 8-Bit, Pastel Cloud, Forest Night, Bold Esports, Vaporwave Sunset, Daylight, Abyss, Session, Shonen, Sakura, Skate Deck, Phosphor, Quest, Eclipse and Rain City
+- 19 looks: Clean Slate, Neon Grid, Cozy Café, Arcade 8-Bit, Pastel Cloud, Forest Night, Bold Esports, Vaporwave Sunset, Daylight, Abyss, Session, Shonen, Sakura, Skate Deck, Phosphor, Quest, Eclipse, Rain City and Paper Cut
 - A step-by-step setup guide for OBS and Streamlabs
 
 Everything matches one theme. Paste the links into OBS or Streamlabs and you're live.

@@ -1,0 +1,332 @@
+/* Paper Cut B, "Window in the paper" (T11.5): layered sheets with one crescent window cut through the plum. Depth is
+   the sheets' own edges and still shadows; nothing loops. Every selector belongs to Paper Cut, including the shared
+   widgets used in Live and the camera scenes.
+   Layers, back to front: blue paper (the scene's background), the white sheet (::before), the plum sheet's shadow with
+   the window's cut-edge shadow (scene-main::after), the plum sheet with the window cut through it (::after). The sheets settle once by translation; Still places them at once. */
+.scene[data-theme="paper-cut"] {
+  position: relative;
+  isolation: isolate;
+  /* The plum sheet and its window, as one box: where it sits, and where the crescent is cut in it. */
+  --pc-sheet-w: 1114px;
+  --pc-sheet-h: 626px;
+  --pc-win-x: 512px;
+  --pc-win-y: 70px;
+  --pc-win-w: 420px;
+  --pc-win-h: 448px;
+  --pc-ink: rgb(36 53 80 / 0.22);
+  background: url("/images/themes/paper-grain.svg"), var(--bg);
+}
+
+/* The white sheet, laid on the blue. */
+.scene[data-theme="paper-cut"]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  inset: 40px;
+  background: url("/images/themes/paper-grain.svg"), var(--surface);
+  box-shadow:
+    0 2px 4px rgb(36 53 80 / 0.08),
+    0 16px 36px rgb(36 53 80 / 0.14);
+  animation: paper-cut-settle 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* The plum sheet: a slanted offcut over the top right, the crescent window cut clean through it. */
+.scene[data-theme="paper-cut"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  top: 0;
+  right: 0;
+  width: var(--pc-sheet-w);
+  height: var(--pc-sheet-h);
+  background: url("/images/themes/paper-grain.svg"), var(--accent);
+  clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%);
+  mask:
+    linear-gradient(#000 0 0),
+    url("/images/themes/paper-cut-crescent.svg") var(--pc-win-x) var(--pc-win-y) / var(--pc-win-w)
+      var(--pc-win-h) no-repeat;
+  mask-composite: exclude;
+  animation: paper-cut-settle-in 800ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
+}
+
+/* The plum sheet's shadow on the white: the same slant as a gradient (no clip, so its blur stays soft), drawn once.
+   The window is cut from it too, 10px down and right of where the shadow lands, so inside the window the plum's cut
+   edge throws a thin shadow on the white below, and the rest of the window stays clean paper. */
+.scene[data-theme="paper-cut"] .scene-main::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  top: 0;
+  right: 0;
+  width: var(--pc-sheet-w);
+  height: var(--pc-sheet-h);
+  background: linear-gradient(104deg, transparent 12.3%, var(--pc-ink) 12.3%);
+  /* The mask is in the shadow's own space, before its move: (+12, -14) puts the hole on the window, then (+10, +12). */
+  mask:
+    linear-gradient(#000 0 0),
+    url("/images/themes/paper-cut-crescent.svg") calc(var(--pc-win-x) + 22px)
+      calc(var(--pc-win-y) - 2px) / var(--pc-win-w) var(--pc-win-h) no-repeat;
+  mask-composite: exclude;
+  filter: blur(12px);
+  transform: translate(-12px, 14px);
+}
+
+@keyframes paper-cut-settle {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+@keyframes paper-cut-settle-in {
+  from {
+    opacity: 0;
+    transform: translate(40px, -24px);
+  }
+}
+
+/* Words on the white, below the plum; the countdown and socials on a blue sheet laid on top, bottom right. */
+/* The title block sits centred down the left, as on the board, with paper above and below it. */
+.scene[data-theme="paper-cut"] .scene-main {
+  grid-template-columns: minmax(0, 1fr) 600px;
+  grid-template-rows: auto minmax(0, 1fr) auto auto minmax(0, 0.7fr);
+  column-gap: 72px;
+}
+
+.scene[data-theme="paper-cut"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 680px;
+  font-size: 170px;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.scene[data-theme="paper-cut"] .scene-title::before {
+  width: 120px;
+  height: 14px;
+  margin-bottom: 40px;
+  border-radius: 1px;
+  /* A plum offcut, not a drawn rule. */
+  box-shadow: 0 3px 6px rgb(36 53 80 / 0.18);
+}
+
+.scene[data-theme="paper-cut"] .scene-title-end {
+  display: block;
+}
+
+.scene[data-theme="paper-cut"] .scene-subtitle {
+  grid-area: 4 / 1;
+  max-width: 34ch;
+  margin-top: 28px;
+  font-size: 36px;
+  color: var(--text-muted);
+}
+
+.scene[data-theme="paper-cut"] .scene-side {
+  grid-area: 3 / 2 / 6 / 3;
+  align-self: end;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 28px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 40px 48px;
+  background: url("/images/themes/paper-grain.svg"), var(--bg);
+  box-shadow:
+    0 2px 4px rgb(36 53 80 / 0.08),
+    0 14px 30px rgb(36 53 80 / 0.16);
+}
+
+.scene[data-theme="paper-cut"] .scene-main:not(:has(.countdown, .scene-socials)) .scene-side {
+  display: none;
+}
+
+.scene[data-theme="paper-cut"] .countdown {
+  flex: none;
+  padding: 0;
+  align-items: flex-start;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-align: left;
+}
+
+.scene[data-theme="paper-cut"] .countdown-time {
+  font-family: var(--font-heading);
+  font-size: 112px;
+  font-weight: 700;
+  line-height: 0.95;
+  color: var(--primary);
+}
+
+.scene[data-theme="paper-cut"] .countdown-at {
+  font-size: 24px;
+  color: var(--text-muted);
+}
+
+.scene[data-theme="paper-cut"] .countdown-edge {
+  display: none;
+}
+
+.scene[data-theme="paper-cut"] .scene-socials {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 28px;
+  min-width: 0;
+  padding-top: 24px;
+  border-top: 2px solid var(--accent);
+}
+
+.scene[data-theme="paper-cut"] .scene-icon {
+  width: 56px;
+  height: 56px;
+  padding: 14px;
+  color: var(--surface);
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.scene[data-theme="paper-cut"] .scene-handle {
+  font-size: 28px;
+}
+
+.scene[data-theme="paper-cut"] .scene-ticker {
+  background: var(--surface);
+  border-top: 3px solid var(--accent);
+}
+
+/* Portrait: a white sheet holds the words inside the safe zone; the plum sheet and its window lie below the zone. The
+   extra effect attribute outranks the shared portrait defaults, whatever the order the CSS loads in. */
+.scene[data-theme="paper-cut"][data-bg="paper-cut"][data-canvas="portrait"] {
+  --pc-sheet-w: 1080px;
+  --pc-sheet-h: 640px;
+  --pc-win-x: 560px;
+  --pc-win-y: 96px;
+  --pc-win-w: 360px;
+  --pc-win-h: 384px;
+}
+
+.scene[data-theme="paper-cut"][data-bg="paper-cut"][data-canvas="portrait"]::before {
+  inset: 168px 40px 620px;
+}
+
+.scene[data-theme="paper-cut"][data-bg="paper-cut"][data-canvas="portrait"]::after {
+  top: auto;
+  bottom: 0;
+  clip-path: polygon(0 9%, 100% 0, 100% 100%, 0 100%);
+}
+
+.scene[data-theme="paper-cut"][data-bg="paper-cut"][data-canvas="portrait"] .scene-main::after {
+  top: auto;
+  bottom: 0;
+  background: linear-gradient(175deg, transparent 6%, var(--pc-ink) 6%);
+  mask:
+    linear-gradient(#000 0 0),
+    url("/images/themes/paper-cut-crescent.svg") calc(var(--pc-win-x) + 10px)
+      calc(var(--pc-win-y) + 26px) / var(--pc-win-w) var(--pc-win-h) no-repeat;
+  mask-composite: exclude;
+  transform: translate(0, -14px);
+}
+
+.scene[data-theme="paper-cut"][data-bg="paper-cut"][data-canvas="portrait"] .scene-title {
+  max-width: 100%;
+  font-size: 150px;
+}
+
+.scene[data-theme="paper-cut"][data-bg="paper-cut"][data-canvas="portrait"] .scene-subtitle {
+  margin: 24px 0 0;
+}
+
+.scene[data-theme="paper-cut"][data-bg="paper-cut"][data-canvas="portrait"] .scene-side {
+  padding: 32px 36px;
+}
+
+/* Camera scenes: one white sheet, no plum offcut or window near a live camera; a small plum crescent in the header. */
+.scene.cam-scene[data-theme="paper-cut"][data-bg="paper-cut"]::after {
+  top: 14px;
+  right: 112px;
+  width: 44px;
+  height: 47px;
+  background: var(--accent);
+  clip-path: none;
+  mask: url("/images/themes/paper-cut-crescent.svg") center / contain no-repeat;
+  animation: none;
+}
+
+.scene.cam-scene[data-theme="paper-cut"][data-bg="paper-cut"] .scene-main::after {
+  display: none;
+}
+
+.chat[data-theme="paper-cut"] .chat-msg {
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 4px 10px rgb(36 53 80 / 0.12);
+}
+
+.chat[data-theme="paper-cut"] .chat-msg + .chat-msg {
+  border-top: 3px solid var(--accent);
+}
+
+.alerts[data-theme="paper-cut"] .alert-box {
+  padding-left: 148px;
+  box-shadow:
+    0 2px 4px rgb(36 53 80 / 0.08),
+    0 16px 36px rgb(36 53 80 / 0.16);
+}
+
+.alerts[data-theme="paper-cut"] .alert-box::before {
+  inset: 38px auto auto 34px;
+  width: 84px;
+  height: 90px;
+  background: var(--accent);
+  mask: url("/images/themes/paper-cut-crescent.svg") center / contain no-repeat;
+}
+
+.alerts[data-theme="paper-cut"] .alert-box::after {
+  display: none;
+}
+
+.alerts[data-theme="paper-cut"] .alert-burst {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--accent) 16%, transparent),
+    transparent
+  );
+}
+
+.frame[data-theme="paper-cut"] .frame-edge {
+  border-color: var(--surface);
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 0 2px var(--accent),
+    0 10px 24px rgb(36 53 80 / 0.16);
+}
+
+.frame[data-theme="paper-cut"] .frame-edge::after {
+  display: none;
+}
+
+.channel-panel[data-theme="paper-cut"] {
+  border-top: 3px solid var(--accent);
+}
+
+.channel-panel[data-theme="paper-cut"] .channel-panel-bar {
+  width: 40px;
+  height: 43px;
+  border-radius: 0;
+  mask: url("/images/themes/paper-cut-crescent.svg") center / contain no-repeat;
+}
+
+.channel-panel[data-theme="paper-cut"] .channel-panel-title {
+  min-width: 0;
+}
+
+/* PNG export (panels and banner): html-to-image can't embed the window's mask on this shadow layer, so it would grey
+   the window over. The export leaves the shadow out; the overlay itself keeps it. */
+.scene[data-theme="paper-cut"][data-shot] .scene-main::after {
+  display: none;
+}
