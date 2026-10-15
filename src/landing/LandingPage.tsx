@@ -187,6 +187,7 @@ const tour: [ThemeId, KitScene][] = [
   ["quest", "offline"],
   ["eclipse", "starting"],
   ["rain-city", "brb"],
+  ["paper-cut", "ending"],
 ];
 
 /** The hero picture: a live scene in a stream frame, two alerts in the same look, and the scene names. It tours
