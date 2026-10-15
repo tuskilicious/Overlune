@@ -45,7 +45,7 @@ test.describe("wide", () => {
 
   test("every scene of every look has Vertical", async ({ page }) => {
     await open(page);
-    await page.getByRole("button", { name: "Vertical" }).click();
+    await page.getByRole("button", { name: "Vertical", exact: true }).click();
     await expect(page.locator(".editor-scene-preview .safe-zone")).toBeVisible();
     await expect(page.locator(".editor-scene-preview .scene")).toHaveAttribute(
       "data-canvas",
@@ -69,7 +69,7 @@ test.describe("wide", () => {
   }) => {
     await open(page);
     await page.getByRole("button", { name: "Live source" }).click();
-    await page.getByRole("button", { name: "Vertical" }).click();
+    await page.getByRole("button", { name: "Vertical", exact: true }).click();
     const preview = (await page.locator(".editor-scene-preview .editor-preview").boundingBox())!;
     expect(preview.height / preview.width).toBeCloseTo(16 / 9, 1);
     await expect(page.locator(".editor-scene-preview .safe-zone")).toBeVisible();
@@ -89,7 +89,7 @@ test.describe("wide", () => {
     await page.getByRole("button", { name: "Live source" }).click();
     await page.getByRole("button", { name: "Customize" }).click();
     await page.getByRole("button", { name: "Done" }).click();
-    await page.getByRole("button", { name: "Vertical" }).click();
+    await page.getByRole("button", { name: "Vertical", exact: true }).click();
     await page.getByRole("button", { name: "Customize" }).click();
     await expect(page.locator(".canvas .safe-zone")).toBeVisible();
     await page.getByRole("button", { name: "Done" }).click();
@@ -109,12 +109,36 @@ test.describe("narrow", () => {
     await open(page);
     await page.getByRole("button", { name: "Show preview" }).click();
     await page.getByRole("button", { name: "Live source" }).click();
-    const vertical = page.getByRole("button", { name: "Vertical" });
+    const vertical = page.getByRole("button", { name: "Vertical", exact: true });
     await vertical.click();
     await expect(page.locator(".editor-scene-preview .safe-zone")).toBeVisible();
     // Scanned once the pressed fill has faded in: Night on Lune Violet.
     await page.mouse.move(0, 0);
     await expect(vertical).toHaveCSS("color", "rgb(5, 6, 26)");
     await axe(page);
+  });
+});
+
+test.describe("chat, alerts and the frame in vertical (T10.9)", () => {
+  test.use({ viewport: { width: 1440, height: 1000 } });
+
+  test("vertical sizes for chat and the frame, and their vertical links", async ({ page }) => {
+    await open(page);
+    await page.getByText("More chat options", { exact: true }).click();
+    await page.getByRole("button", { name: "Vertical, tall 880 × 800" }).click();
+    await page
+      .getByRole("group", { name: "Camera sizes for a vertical stream" })
+      .getByRole("button", { name: "880 × 880" })
+      .click();
+    await page.getByRole("button", { name: "Live source" }).click();
+    await page.getByRole("button", { name: "Vertical", exact: true }).click();
+    const links = page.locator(".editor-link");
+    const row = (name: string) => links.filter({ has: page.getByText(name, { exact: true }) });
+    await expect(row("Chat").locator("input")).toHaveValue(/\/o\/chat\?canvas=vertical#1\./);
+    await expect(row("Chat")).toContainText("Width 880");
+    await expect(row("Chat")).toContainText("Height 800");
+    await expect(row("Alerts")).toContainText("Width 1080");
+    await expect(row("Alerts")).toContainText("Height 1920");
+    await expect(row("Webcam frame")).toContainText("Height 880");
   });
 });

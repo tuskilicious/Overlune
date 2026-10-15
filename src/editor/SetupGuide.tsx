@@ -458,6 +458,47 @@ export default function SetupGuide() {
             </ul>
           </Fix>
 
+          {/* Vertical (T10.9): TikTok Live, YouTube Shorts. The same save gives both sets of links. */}
+          <section aria-labelledby="vertical-heading">
+            <h2 id="vertical-heading">Streaming vertical? (TikTok, YouTube Shorts)</h2>
+            <p>
+              Your overlays come in a tall 1080×1920 version too, made to keep every word clear of
+              the buttons and comments the phone apps put over your stream.
+            </p>
+            <ol>
+              <li>
+                In the editor, press <strong>Vertical</strong> above the preview. The preview turns
+                tall, and the links section gives your vertical links and their sizes.
+              </li>
+              <li>
+                Add each link as a Browser source on your <strong>vertical canvas</strong>, with the
+                width and height shown next to it, the same way as in the steps above:
+                <ul>
+                  <li>
+                    <strong>OBS Studio 32.1 or later:</strong> add them to the vertical canvas.
+                  </li>
+                  <li>
+                    <strong>Aitum Vertical plugin:</strong> add them in its vertical canvas’s own
+                    Sources list.
+                  </li>
+                  <li>
+                    <strong>Streamlabs Desktop:</strong> turn on Dual Output and add them to the
+                    vertical display.
+                  </li>
+                </ul>
+              </li>
+              <li>
+                For a vertical webcam frame, pick a size under <strong>Vertical</strong> in the
+                Webcam frame part; for chat, one of the <strong>Vertical</strong> chat sizes.
+              </li>
+            </ol>
+            <p>
+              Your horizontal links don’t change: a vertical link is the same save with{" "}
+              <code>?canvas=vertical</code> before the #. Press <strong>Horizontal</strong> to get
+              your usual links back.
+            </p>
+          </section>
+
           <section aria-labelledby="streamlabs-heading">
             <h2 id="streamlabs-heading">Using Streamlabs Desktop?</h2>
             <p>It works the same way, with slightly different names:</p>

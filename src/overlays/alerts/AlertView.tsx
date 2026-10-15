@@ -1,10 +1,11 @@
-import type { CSSProperties, ReactNode } from "react";
+import { useContext, type CSSProperties, type ReactNode } from "react";
 import type { AlertEvent } from "../../alerts/events";
 import { fillTemplate } from "../../alerts/templates";
 import type { Settings } from "../../settings/schema";
 import { themes } from "../../themes";
 import "../../themes/fonts";
 import { applyOverrides, themeVars } from "../../themes/vars";
+import { CanvasContext } from "../measure";
 import "./alerts.css";
 
 /** What happened, above the message. The message itself is the streamer's template. */
@@ -24,16 +25,24 @@ interface Props {
   error?: ReactNode;
 }
 
-/** 1920×1080 transparent canvas with one alert box centered at the top. Names and templates render as text only. */
+/** 1920×1080 transparent canvas with one alert box centered at the top, or on a vertical link 1080×1920 with the box in
+ *  the safe zone's upper third (T10.9). Names and templates render as text only. */
 export default function AlertView({ settings, alert, error }: Props) {
   const theme = applyOverrides(themes[settings.theme], settings.advanced);
+  const canvas = useContext(CanvasContext);
   // The fade-out starts just before the alert's time is up (alerts.css).
   const style = {
     ...themeVars(theme),
     "--alert-ms": `${settings.alerts.seconds * 1000}ms`,
   } as CSSProperties;
   return (
-    <div className="alerts" data-anim={theme.alertAnim} data-theme={theme.id} style={style}>
+    <div
+      className="alerts"
+      data-anim={theme.alertAnim}
+      data-theme={theme.id}
+      data-canvas={canvas === "portrait" ? canvas : undefined}
+      style={style}
+    >
       {error}
       {/* A burst of the look's light behind the box as each alert lands (T6.117); hidden at rest. */}
       {alert && <div className="alert-burst" aria-hidden />}

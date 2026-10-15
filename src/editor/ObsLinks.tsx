@@ -156,14 +156,23 @@ export default function ObsLinks({
   const canvas =
     settings.layouts[canvasId]?.size ??
     (portrait ? { width: 1080, height: 1920 } : { width: 1920, height: 1080 });
-  // Vertical (T10.4): the scenes, Live, Just Chatting and Reaction. Chat, alerts and the frame on their own get their
-  // vertical sizes in T10.9; until then Live holds all three.
+  // Vertical (T10.4, T10.9): the scenes, chat at its own size, alerts on the whole canvas, the frame at its own size
+  // (its placement is for the landscape canvas), Live, Just Chatting and Reaction.
   const vertical: LinkInfo[] = [
     ...(["starting", "brb", "ending", "offline"] as const).map((id) => ({
       id,
       ...overlays[id],
       ...canvas,
     })),
+    { id: "chat", name: "Chat", width: settings.chat.width, height: settings.chat.height },
+    { id: "alerts", name: "Alerts", ...canvas },
+    {
+      id: "frame",
+      name: "Webcam frame",
+      width: settings.frame.width,
+      height: settings.frame.height,
+      optional: true,
+    },
     { id: "live", name: "Live", ...canvas, optional: true },
     ...(["chatting", "reaction"] as const).map((id) => ({ id, ...overlays[id], ...canvas })),
   ];

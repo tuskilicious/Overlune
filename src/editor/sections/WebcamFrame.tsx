@@ -13,6 +13,13 @@ const frameSizes = [
   [480, 480],
 ] as const;
 
+/** For a vertical stream (T10.9, DESIGN.md): 16:9 and square across the safe zone, and 16:9 across the whole width. */
+const verticalFrameSizes = [
+  [880, 495],
+  [880, 880],
+  [1080, 608],
+] as const;
+
 /** The webcam frame: its size, where it goes (T6.122) and its name tab. */
 export default function WebcamFrame({
   settings,
@@ -51,18 +58,26 @@ export default function WebcamFrame({
           onChange={(height) => updateFrame({ height })}
         />
       </div>
-      <div className="editor-quick" role="group" aria-label="Common camera sizes">
-        {frameSizes.map(([w, h]) => (
-          <button
-            key={`${w}x${h}`}
-            type="button"
-            aria-pressed={settings.frame.width === w && settings.frame.height === h}
-            onClick={() => updateFrame({ width: w, height: h })}
-          >
-            {w} × {h}
-          </button>
-        ))}
-      </div>
+      {(
+        [
+          ["Common camera sizes", frameSizes],
+          ["Camera sizes for a vertical stream", verticalFrameSizes],
+        ] as const
+      ).map(([name, sizes]) => (
+        <div key={name} className="editor-quick" role="group" aria-label={name}>
+          {name !== "Common camera sizes" && <span className="editor-quick-label">Vertical</span>}
+          {sizes.map(([w, h]) => (
+            <button
+              key={`${w}x${h}`}
+              type="button"
+              aria-pressed={settings.frame.width === w && settings.frame.height === h}
+              onClick={() => updateFrame({ width: w, height: h })}
+            >
+              {w} × {h}
+            </button>
+          ))}
+        </div>
+      ))}
       <p id="frame-size-hint" className="editor-hint">
         Make it the size of your camera in OBS. The numbers to enter in OBS are shown next to the
         Webcam frame link.

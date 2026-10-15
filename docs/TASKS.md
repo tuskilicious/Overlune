@@ -819,6 +819,7 @@ Planned with the owner 2026-10-13. Overlune for vertical streams (TikTok Live, Y
   - Accept: as T10.5; every look now has vertical.
 - [ ] **T10.9 Alerts, chat, webcam frame and the guide for vertical.** Alerts placed for a tall canvas, chat sizes and webcam frame presets for one; the setup guide's vertical part (OBS 32.1+ vertical canvases, Aitum Vertical, Streamlabs) and the two new scenes.
   - Accept: e2e for each; the guide's tests pass; the owner checks the steps in OBS with a test alert.
+  - Built 2026-10-15, ticked after the owner's OBS check with a test alert: `/o/alerts?canvas=vertical` is a 1080×1920 canvas with the box across the safe zone's width from y 260 (the test label above the comments); a vertical frame link is the frame at its own size (its placement is on the landscape canvas); chat presets (side box 400×600, vertical 880×500 and 880×800) and vertical frame presets (880×495, 880×880, 1080×608); the vertical links add Chat, Alerts and the frame with their sizes; the guide's "Streaming vertical?" part (OBS 32.1+, Aitum Vertical, Streamlabs Dual Output). Live and the camera scenes still size their alerts by their boxes.
 - [ ] **T10.10 OBS test and release 2.1.0.** Every vertical overlay, Just Chatting and Reaction through `docs/OBS-TESTING.md` on a real vertical canvas, and the safe zone checked on a phone in a private TikTok or YouTube live test (DESIGN.md numbers corrected if needed), then a release.
   - Accept: the OBS test is logged; 2.1.0 published.
 
