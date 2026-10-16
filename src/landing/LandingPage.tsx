@@ -188,6 +188,7 @@ const tour: [ThemeId, KitScene][] = [
   ["eclipse", "starting"],
   ["rain-city", "brb"],
   ["paper-cut", "ending"],
+  ["aurora-tundra", "starting"],
 ];
 
 /** The hero picture: a live scene in a stream frame, two alerts in the same look, and the scene names. It tours

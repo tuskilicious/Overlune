@@ -1,7 +1,7 @@
 """Synthesizes Overlune's own alert sounds (T6.142): Phosphor, Daylight, Abyss, Sakura, Skate Deck, Session, Shonen
-Quest, Eclipse, Rain City and Paper Cut. Our own work,
+Quest, Eclipse, Rain City, Paper Cut and Aurora Tundra. Our own work,
 no samples (CC0, docs/ASSETS.md). Mono, 44.1 kHz. Needs numpy and ffmpeg (not project dependencies; run by hand).
-Each is normalized to -12 LUFS integrated (ffmpeg loudnorm, measured with silence padding so short sounds gate
+Each is normalized to -12 LUFS integrated (-13 for Aurora Tundra; ffmpeg loudnorm, measured with silence padding so short sounds gate
 correctly) with true peak <= -1 dBTP, then encoded as Ogg Vorbis.
 Usage: python tests/make-sounds.py public/sounds <path to ffmpeg> [look id ...]   (a fixed seed, so the same files come out)
 """
@@ -188,6 +188,17 @@ def paper_cut():
     return fade(place(0.62, (0.0, tap(1.0)), (0.17, tap(0.75))), 6)
 
 
+def aurora_tundra():
+    # A clear ice chime: a soft fundamental with brief, inharmonic crystalline partials. No samples or noise bed.
+    x = t(0.88)
+    partials = [(1.0, 1.0, 0.15), (2.756, 0.22, 0.07), (4.18, 0.08, 0.04)]
+    chime = sum(a * np.sin(2 * np.pi * 1318.51 * ratio * x) * env(len(x), 0.004, tau)
+                for ratio, a, tau in partials)
+    # The lower note disappears quietly under the strike instead of leaving a sustained pad.
+    chime += 0.16 * np.sin(2 * np.pi * 659.25 * x) * env(len(x), 0.007, 0.11)
+    return fade(chime, 6)
+
+
 def write_wav(path, sig):
     sig = sig / np.max(np.abs(sig)) * 0.5
     with wave.open(str(path), "wb") as w:
@@ -207,18 +218,19 @@ def loudness(path):
     return float(j["input_i"]), float(j["input_tp"])
 
 
-for name, make in [("phosphor", phosphor), ("daylight", daylight), ("abyss", abyss), ("sakura", sakura), ("skate-deck", skate), ("session", session), ("shonen", shonen), ("quest", quest), ("eclipse", eclipse), ("rain-city", rain_city), ("paper-cut", paper_cut)]:
+for name, make in [("phosphor", phosphor), ("daylight", daylight), ("abyss", abyss), ("sakura", sakura), ("skate-deck", skate), ("session", session), ("shonen", shonen), ("quest", quest), ("eclipse", eclipse), ("rain-city", rain_city), ("paper-cut", paper_cut), ("aurora-tundra", aurora_tundra)]:
     if len(sys.argv) > 3 and name not in sys.argv[3:]:
         continue
     raw = OUT / f"{name}.raw.wav"
     write_wav(raw, make())
-    # Gain to -12 LUFS, with a peak limiter (as broadcast audio does) so sharp attacks (the pluck, the pop) can reach
+    target_lufs = -13 if name == "aurora-tundra" else -12
+    # Gain to the target LUFS, with a peak limiter (as broadcast audio does) so sharp attacks (the pluck, the pop) can reach
     # it without going over -1 dBTP; a second pass trims what the limiter and the encoder moved.
     ogg = OUT / f"{name}.ogg"
     gain = 0.0
     for _ in range(3):
         lufs, _peak = loudness(ogg if gain else raw)
-        gain += -12 - lufs
+        gain += target_lufs - lufs
         subprocess.run(
             [FFMPEG, "-hide_banner", "-y", "-loglevel", "error", "-i", str(raw), "-af",
              f"volume={gain:.2f}dB,alimiter=limit=0.79:attack=1:release=60:level=false",

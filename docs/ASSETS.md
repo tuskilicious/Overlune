@@ -4,6 +4,8 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 
 | Asset | Type | Used in | Source URL | License | Attribution required? | Added |
 |---|---|---|---|---|---|---|
+| `public/images/themes/aurora-tundra-crescent.svg`: original two-circle frost crescent with crystalline facets | SVG / CSS mask | Aurora Tundra scenes, alerts and Twitch panels (T11.6) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-16 |
+| `public/sounds/aurora-tundra.ogg`: original synthesized ice chime, no samples; 0.88 seconds, -13.2 LUFS integrated, -1.7 dBTP | sound | Aurora Tundra alerts (T11.6) | Own work (Overlune), `tests/make-sounds.py` | Own work; released under CC0 1.0 | No | 2026-10-16 |
 | `public/images/themes/paper-cut-crescent.svg`: original true crescent (two circles, tilted) | SVG / CSS mask | Paper Cut's window through the plum sheet, its shadow, alerts and Twitch panels (T11.5) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-16 |
 | `public/sounds/paper-cut.ogg`: two soft paper taps (band-limited noise with a low 180 Hz body), synthesized by `tests/make-sounds.py` without samples; 0.62 seconds, -13.9 LUFS integrated, -1.0 dBTP | sound | Paper Cut alerts (T11.5) | Own work (Overlune) | Own work; released under CC0 1.0 | No | 2026-10-16 |
 | `public/images/themes/rain-city-sign.svg`: original crescent tube sign (a true two-circle crescent, tilted) with a faint body fill and halo stroke | SVG / CSS mask | Rain City scenes, reflection, alerts and Twitch panels (T11.4) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-15 |
@@ -46,7 +48,7 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 | Audiowide (`@fontsource/audiowide` 5.3.0, weight 400) | font | Advanced font picker; Vaporwave Sunset (T6.5) | https://fontsource.org/fonts/audiowide | SIL OFL 1.1 | No | 2026-10-01 |
 | Space Grotesk (`@fontsource/space-grotesk` 5.3.0, weights 400/600/700) | font | Advanced font picker; Vaporwave Sunset (T6.5); Daylight headings (T6.89) | https://fontsource.org/fonts/space-grotesk | SIL OFL 1.1 | No | 2026-10-01 |
 | Unbounded (`@fontsource/unbounded` 5.3.0, weights 400/500/700) | font | Advanced font picker; Abyss headings (T6.109) | https://fontsource.org/fonts/unbounded | SIL OFL 1.1 | No | 2026-10-07 |
-| Manrope (`@fontsource/manrope` 5.3.0, weights 400/600/700) | font | Advanced font picker; Abyss body text (T6.109); Eclipse headings (T11.3) | https://fontsource.org/fonts/manrope | SIL OFL 1.1 | No | 2026-10-07 |
+| Manrope (`@fontsource/manrope` 5.3.0, weights 400/600/700) | font | Advanced font picker; Abyss body text (T6.109); Eclipse headings (T11.3); Aurora Tundra body text (T11.6) | https://fontsource.org/fonts/manrope | SIL OFL 1.1 | No | 2026-10-07 |
 | Archivo Black (`@fontsource/archivo-black` 5.3.0, weight 400) | font | Advanced font picker; Session headings (T6.110) | https://fontsource.org/fonts/archivo-black | SIL OFL 1.1 | No | 2026-10-07 |
 | Archivo (`@fontsource/archivo` 5.3.0, weights 400/600/700) | font | Advanced font picker; Session body text (T6.110); Rain City body text (T11.4) | https://fontsource.org/fonts/archivo | SIL OFL 1.1 | No | 2026-10-07 |
 | `public/images/landing/aurora.webp` (a frame of the landing page's aurora shader, `src/landing/HeroSky.tsx`, captured in Unicorn Studio's editor) | image | Landing hero sky: the reduced-motion and no-WebGL version (T6.151) | Rendered for Overlune from its own shader | Own work (MIT, same as the code) | No | 2026-10-09 |
@@ -57,7 +59,7 @@ Every font, sound, image and icon shipped with Overlune must be listed here befo
 | Bungee (`@fontsource/bungee` 5.3.0, weight 400) | font | Advanced font picker; Skate Deck headings (T6.126) | https://fontsource.org/fonts/bungee | SIL OFL 1.1 | No | 2026-10-07 |
 | JetBrains Mono (`@fontsource/jetbrains-mono` 5.3.0, weights 400/700) | font | Advanced font picker; Phosphor headings and body text (T6.127) | https://fontsource.org/fonts/jetbrains-mono | SIL OFL 1.1 | No | 2026-10-07 |
 | Cinzel (`@fontsource/cinzel` 5.3.0, weights 600/700) | font | Advanced font picker; Quest headings (T6.128) | https://fontsource.org/fonts/cinzel | SIL OFL 1.1 | No | 2026-10-07 |
-| Alegreya (`@fontsource/alegreya` 5.3.0, weights 400/700) | font | Advanced font picker; Quest body text (T6.128) | https://fontsource.org/fonts/alegreya | SIL OFL 1.1 | No | 2026-10-07 |
+| Alegreya (`@fontsource/alegreya` 5.3.0, weights 400/700) | font | Advanced font picker; Quest body text (T6.128); Aurora Tundra headings (T11.6) | https://fontsource.org/fonts/alegreya | SIL OFL 1.1 | No | 2026-10-07 |
 | `public/images/themes/forest-treeline.svg` (generated pine silhouettes) | image | Forest Night treeline (T6.112) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-07 |
 | `public/images/themes/paper-grain.svg` (SVG fractal noise filter) | image | Cozy Café paper grain (T6.112); Paper Cut sheets (T11.5) | Drawn for Overlune | Own work (MIT, same as the code) | No | 2026-10-07 |
 | `public/sounds/vaporwave-sunset.ogg` (Kenney Digital Audio 1.0, `threeTone1.ogg`, unchanged) | sound | Vaporwave Sunset alert sound | https://kenney.nl/assets/digital-audio | CC0 1.0 | No (credit to Kenney appreciated) | 2026-10-01 |
