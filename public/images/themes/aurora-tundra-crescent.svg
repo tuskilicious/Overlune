@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <!-- Original Overlune frost crescent, MIT. Outer circle (200,200,r170) less inner circle (262,200,r152).
+       Both tips are the circles' intersections. Facets change the frost's density, never the moon's silhouette. -->
+  <defs>
+    <clipPath id="frost">
+      <path d="M277.742 48.814A170 170 0 1 0 277.742 351.186A152 152 0 1 1 277.742 48.814Z"/>
+    </clipPath>
+  </defs>
+  <path fill="white" opacity=".78" d="M277.742 48.814A170 170 0 1 0 277.742 351.186A152 152 0 1 1 277.742 48.814Z"/>
+  <g clip-path="url(#frost)" fill="white">
+    <path opacity=".8" d="M18 156 116 94 74 235Z"/>
+    <path opacity=".55" d="M64 234 141 176 177 300 114 338Z"/>
+    <path opacity=".7" d="M113 44 252 40 117 133Z"/>
+    <path opacity=".4" d="M111 333 178 297 281 356Z"/>
+  </g>
+</svg>

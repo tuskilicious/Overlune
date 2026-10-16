@@ -1,0 +1,358 @@
+/* Aurora Tundra A, Ice shelf: an open polar sky and one frost crescent above layered shelf edges.
+   The aurora is one moving layer behind the ice. Lite drops it; Still and reduced motion also skip entrances.
+   All selectors belong to this look. The ice's gradients and shadows are painted once, never animated. */
+.scene[data-theme="aurora-tundra"] {
+  position: relative;
+  isolation: isolate;
+  --at-ice-height: 310px;
+  background:
+    radial-gradient(
+      ellipse 560px 340px at 83% 66%,
+      color-mix(in srgb, var(--accent) 9%, transparent),
+      transparent
+    ),
+    linear-gradient(
+      165deg,
+      var(--bg) 22%,
+      color-mix(in srgb, var(--surface) 64%, var(--bg)) 72%,
+      var(--surface)
+    );
+}
+
+/* A true two-circle crescent: a still, faceted frost face with matching tips. */
+.scene[data-theme="aurora-tundra"]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  right: 88px;
+  top: 270px;
+  width: 560px;
+  height: 560px;
+  background: linear-gradient(130deg, var(--primary) 10%, var(--accent) 58%, var(--primary));
+  mask: url("/images/themes/aurora-tundra-crescent.svg") center / contain no-repeat;
+  animation: aurora-tundra-frost 1100ms ease-out both;
+}
+
+/* The shelf's upper lip and deep face. Angled planes give the ice thickness rather than a flat footer band. */
+.scene[data-theme="aurora-tundra"]::after {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  pointer-events: none;
+  inset: auto 0 0;
+  height: var(--at-ice-height);
+  clip-path: polygon(0 12%, 16% 0, 40% 12%, 65% 4%, 83% 17%, 100% 0, 100% 100%, 0 100%);
+  background:
+    linear-gradient(
+      172deg,
+      color-mix(in srgb, var(--accent) 28%, var(--surface)) 0 11%,
+      transparent 11.5%
+    ),
+    linear-gradient(
+      18deg,
+      transparent 38%,
+      color-mix(in srgb, var(--accent) 9%, transparent) 38% 39%,
+      transparent 39.5%
+    ),
+    linear-gradient(
+      155deg,
+      transparent 42%,
+      color-mix(in srgb, var(--primary) 10%, transparent) 42% 58%,
+      transparent 58%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent) 16%, var(--surface)),
+      var(--surface) 48%,
+      var(--bg)
+    );
+}
+
+/* The high aurora never crosses the headline or camera. One whole compositor layer, transform and opacity only. */
+.scene[data-theme="aurora-tundra"] .scene-main::before {
+  content: "";
+  position: absolute;
+  z-index: -4;
+  pointer-events: none;
+  top: -140px;
+  right: 140px;
+  width: 860px;
+  height: 860px;
+  background: linear-gradient(
+    112deg,
+    transparent 15%,
+    color-mix(in srgb, var(--accent) 14%, transparent) 37%,
+    transparent 54%,
+    color-mix(in srgb, var(--primary) 5%, transparent) 60%,
+    transparent 72%
+  );
+  clip-path: polygon(34% 0, 87% 0, 51% 72%, 0 100%);
+  animation: aurora-tundra-sky 24s ease-in-out infinite;
+}
+
+/* A second shelf edge recedes behind the foreground lip. */
+.scene[data-theme="aurora-tundra"] .scene-main::after {
+  content: "";
+  position: absolute;
+  z-index: -3;
+  pointer-events: none;
+  inset: auto 0 0;
+  height: calc(var(--at-ice-height) + 36px);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primary) 32%, var(--surface)) 0 12px,
+    var(--surface) 12px
+  );
+  clip-path: polygon(0 20%, 20% 0, 43% 20%, 68% 8%, 89% 18%, 100% 7%, 100% 100%, 0 100%);
+}
+
+@keyframes aurora-tundra-frost {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes aurora-tundra-sky {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: translate(0, 0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-48px, 12px);
+  }
+}
+
+:is(html[data-lite], html[data-rm], .editor-lite, .editor-shot)
+  .scene[data-theme="aurora-tundra"]
+  .scene-main::before {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene[data-theme="aurora-tundra"] .scene-main::before {
+    display: none;
+  }
+}
+
+.scene[data-theme="aurora-tundra"] .scene-main {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto minmax(0, 0.75fr) auto;
+  gap: 0;
+}
+
+.scene[data-theme="aurora-tundra"] .scene-title {
+  grid-area: 3 / 1;
+  max-width: 1120px;
+  font-size: 184px;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+}
+
+.scene[data-theme="aurora-tundra"] .scene-title::before {
+  content: "Polar station";
+  display: block;
+  width: fit-content;
+  height: auto;
+  margin: 0 0 32px;
+  padding: 10px 0 10px 20px;
+  background: none;
+  border-left: 2px solid var(--accent);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 23px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.scene[data-theme="aurora-tundra"] .scene-title-end {
+  display: block;
+}
+
+.scene[data-theme="aurora-tundra"] .scene-subtitle {
+  grid-area: 4 / 1;
+  max-width: 34ch;
+  margin-top: 30px;
+  font-size: 36px;
+}
+
+.scene[data-theme="aurora-tundra"] .scene-side {
+  grid-area: 6 / 1;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 64px;
+  width: 100%;
+  min-width: 0;
+}
+
+.scene[data-theme="aurora-tundra"] .countdown {
+  flex: none;
+  align-items: flex-start;
+  padding: 18px 0 0;
+  border: 0;
+  border-top: 2px solid var(--accent);
+  background: none;
+  box-shadow: none;
+  text-align: left;
+}
+.scene[data-theme="aurora-tundra"] .countdown-time {
+  font-size: 96px;
+  font-family: var(--font-heading);
+}
+.scene[data-theme="aurora-tundra"] .countdown-at {
+  font-size: 24px;
+}
+.scene[data-theme="aurora-tundra"] .countdown-edge {
+  display: none;
+}
+.scene[data-theme="aurora-tundra"] .scene-socials {
+  width: 680px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 32px;
+  margin-left: auto;
+}
+.scene[data-theme="aurora-tundra"] .scene-icon {
+  width: 56px;
+  height: 56px;
+  padding: 14px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 0;
+}
+.scene[data-theme="aurora-tundra"] .scene-handle {
+  font-size: 30px;
+}
+.scene[data-theme="aurora-tundra"] .scene-ticker {
+  background: var(--surface);
+  border-top: 2px solid var(--accent);
+}
+
+/* Portrait words use the existing safe zone; only the ice and crescent sit below it. */
+.scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"][data-canvas="portrait"] {
+  --at-ice-height: 590px;
+}
+.scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"][data-canvas="portrait"]::before {
+  top: auto;
+  bottom: 170px;
+  right: 30px;
+  width: 560px;
+  height: 560px;
+}
+.scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"][data-canvas="portrait"] .scene-main {
+  box-sizing: border-box;
+  padding-bottom: 2px;
+}
+.scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"][data-canvas="portrait"]
+  .scene-main::before {
+  top: -180px;
+  right: 0;
+  height: 540px;
+  width: 680px;
+}
+.scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"][data-canvas="portrait"] .scene-title {
+  max-width: 100%;
+  font-size: 164px;
+}
+.scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"][data-canvas="portrait"]
+  .scene-title::before {
+  margin-bottom: 24px;
+  font-size: 22px;
+}
+.scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"][data-canvas="portrait"]
+  .scene-subtitle {
+  margin: 24px 0 0;
+}
+.scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"][data-canvas="portrait"] .scene-side {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 26px;
+  margin-top: 32px;
+}
+.scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"][data-canvas="portrait"] .scene-socials {
+  width: 100%;
+  margin: 0;
+}
+.scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"][data-canvas="portrait"]
+  .countdown-time {
+  font-size: 88px;
+}
+
+/* Camera scenes keep one small still frost mark, with no ice or aurora over a live picture. */
+.scene.cam-scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"] {
+  background: var(--bg);
+}
+.scene.cam-scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"]::before {
+  width: 48px;
+  height: 48px;
+  top: 8px;
+  right: 112px;
+  bottom: auto;
+  animation: none;
+}
+.scene.cam-scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"]::after,
+.scene.cam-scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"] .scene-main::before,
+.scene.cam-scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"] .scene-main::after {
+  display: none;
+}
+
+/* Camera headers have their own measured box; the expedition tag belongs to the full text scenes only. */
+.scene.cam-scene[data-theme="aurora-tundra"][data-bg="aurora-tundra"] .scene-title::before {
+  content: none;
+}
+
+.chat[data-theme="aurora-tundra"] .chat-msg {
+  border-top: 2px solid var(--accent);
+}
+.chat[data-theme="aurora-tundra"] .chat-msg + .chat-msg {
+  border-top: 2px solid var(--accent);
+}
+.alerts[data-theme="aurora-tundra"] .alert-box {
+  padding-left: 148px;
+  border-top: 2px solid var(--accent);
+}
+.alerts[data-theme="aurora-tundra"] .alert-box::before {
+  inset: 32px auto auto 28px;
+  width: 96px;
+  height: 96px;
+  background: var(--accent);
+  mask: url("/images/themes/aurora-tundra-crescent.svg") center / contain no-repeat;
+}
+.alerts[data-theme="aurora-tundra"] .alert-box::after {
+  display: none;
+}
+.alerts[data-theme="aurora-tundra"] .alert-burst {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--accent) 16%, transparent),
+    transparent
+  );
+}
+.frame[data-theme="aurora-tundra"] .frame-edge {
+  border-color: var(--surface);
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+.frame[data-theme="aurora-tundra"] .frame-edge::after {
+  background: none;
+  border: 1px solid var(--accent);
+  animation: none;
+}
+.channel-panel[data-theme="aurora-tundra"] {
+  border-top: 2px solid var(--accent);
+}
+.channel-panel[data-theme="aurora-tundra"] .channel-panel-bar {
+  width: 44px;
+  height: 44px;
+  border-radius: 0;
+  mask: url("/images/themes/aurora-tundra-crescent.svg") center / contain no-repeat;
+}
+.channel-panel[data-theme="aurora-tundra"] .channel-panel-title {
+  min-width: 0;
+}
