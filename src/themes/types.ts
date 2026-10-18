@@ -21,6 +21,7 @@ export const themeIds = [
   "eclipse",
   "rain-city",
   "paper-cut",
+  "aurora-tundra",
 ] as const;
 /** Bundled @fontsource families (OFL, docs/ASSETS.md). Loaded by src/themes/fonts.ts. Only add to the end. */
 export const fontIds = [
@@ -73,7 +74,8 @@ export type BgEffect =
   | "quest"
   | "eclipse"
   | "rain-city"
-  | "paper-cut";
+  | "paper-cut"
+  | "aurora-tundra";
 export type AnimId = "slide-fade" | "bounce" | "steps" | "wipe";
 export type AlertAnimId = "slide-fade" | "glitch" | "bounce" | "steps" | "wipe";
 export type BadgeStyle = "pill";

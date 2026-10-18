@@ -51,7 +51,7 @@ The wordmark is artwork. Don't retype "Overlune" in a font to stand in for it.
 Friendly, plain and confident, like a streamer friend who knows OBS.
 - Lead with what people get: "Free stream overlays that look pro."
 - Say "free" and "no account" plainly. Never "premium", "unlock" or anything that hints at a paywall.
-- Short sentences, real numbers ("19 looks", always the current count: `tests/unit/themes/look-count.test.ts` checks it), no hype words, and no promised setup times.
+- Short sentences, real numbers ("20 looks", always the current count: `tests/unit/themes/look-count.test.ts` checks it), no hype words, and no promised setup times.
 
 Taglines:
 - Primary: **Free stream overlays that look pro.**

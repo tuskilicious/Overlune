@@ -1,4 +1,5 @@
 import { abyss } from "./abyss";
+import { auroraTundra } from "./aurora-tundra";
 import { arcade8bit } from "./arcade-8bit";
 import { boldEsports } from "./bold-esports";
 import { cleanSlate } from "./clean-slate";
@@ -21,6 +22,7 @@ import type { Theme, ThemeId } from "./types";
 import "./eclipse.css";
 import "./rain-city.css";
 import "./paper-cut.css";
+import "./aurora-tundra.css";
 
 export const themes: Record<ThemeId, Theme> = {
   "clean-slate": cleanSlate,
@@ -42,4 +44,5 @@ export const themes: Record<ThemeId, Theme> = {
   eclipse,
   "rain-city": rainCity,
   "paper-cut": paperCut,
+  "aurora-tundra": auroraTundra,
 };

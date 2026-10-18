@@ -22,4 +22,5 @@ export const blurbs: Record<ThemeId, string> = {
   eclipse: "A gold corona over a quiet observatory rail.",
   "rain-city": "A crescent sign over a wet street, last train home.",
   "paper-cut": "A crescent window cut through layered plum and white paper.",
+  "aurora-tundra": "A frost crescent above a layered polar ice shelf.",
 };
