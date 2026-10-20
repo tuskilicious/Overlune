@@ -95,6 +95,7 @@ const guideIndex = [
   ["rehearse-heading", "Before your first stream"],
   ["customize-heading", "Move things around"],
   ["black-heading", "Fixes"],
+  ["vertical-heading", "Streaming vertical"],
   ["streamlabs-heading", "Streamlabs"],
 ] as const;
 const guideIds = guideIndex.map(([id]) => id);

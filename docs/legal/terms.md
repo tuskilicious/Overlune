@@ -2,7 +2,7 @@
 
 > **Self-written, not legal advice.** Overlune is a free, non-commercial hobby project. This document was written by the maintainer, has not been reviewed by a lawyer, and does not guarantee compliance with any law.
 
-_Last updated: 2026-10-14_
+_Last updated: 2026-10-20_
 
 These terms cover your use of the Overlune website and overlays at overlune.in ("Overlune"). By using Overlune, you agree to them.
 
@@ -43,4 +43,4 @@ We may change or stop Overlune, or update these terms, at any time. When the ter
 These terms are governed by the laws of **India**.
 
 ## 11. Contact
-support@overlune.in
+overlune@proton.me

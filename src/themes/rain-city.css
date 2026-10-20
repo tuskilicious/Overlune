@@ -255,6 +255,22 @@
   border-radius: 4px;
 }
 
+/* Separators sit between the tiles, as on a real board: no tile, narrow, in the sign's cyan. */
+.scene[data-theme="rain-city"] .countdown-ch[data-sep] {
+  min-width: 0;
+  padding: 0.08em 0 0.02em;
+  background: none;
+  border: 0;
+  color: var(--accent);
+}
+
+/* The d, h and m of a long countdown: small and low, like the units on a board. */
+.scene[data-theme="rain-city"] .countdown-ch[data-sep="unit"] {
+  align-self: flex-end;
+  margin-inline-end: 0.15em;
+  font-size: 0.42em;
+}
+
 .scene[data-theme="rain-city"] .countdown-at {
   font-size: 24px;
   color: var(--text-muted);

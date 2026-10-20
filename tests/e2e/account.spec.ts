@@ -23,7 +23,7 @@ async function api(page: Page, signedIn: boolean) {
     const path = new URL(req.url()).pathname;
     calls.push(`${req.method()} ${path}`);
     if (path === "/api/me" && req.method() === "GET")
-      return route.fulfill(signedIn ? json(200, ME) : json(401, { error: "signed out" }));
+      return route.fulfill(signedIn ? json(200, ME) : { status: 204 });
     if (path === "/api/auth/twitch") return route.fulfill({ status: 200, body: "Twitch" });
     signedIn = false;
     return route.fulfill({ status: 204 });

@@ -16,8 +16,9 @@ import { env, ORIGIN, rows, signIn, twitch, withFakeTwitch } from "./twitch-fake
 /**
  * Access-control tests (T7.5, CLAUDE.md §4): every API route, attacked the way someone would. Signed out, with a
  * forged, malformed, expired or deleted account's cookie, as user A against user B, from another site, with guessed
- * and malformed addresses, with the wrong method. Every attempt answers 401, 403 or 404, the same way whether or not
- * the target exists, and changes nothing that isn't the caller's own.
+ * and malformed addresses, with the wrong method. Every attempt answers 401, 403 or 404 (or, for GET /api/me, which
+ * only asks who's signed in, an empty 204), the same way whether or not the target exists, and changes nothing that
+ * isn't the caller's own.
  *
  * A new route can't merge without its entry here: the first test fails for any file in functions/api/ that isn't in
  * `routes`.
@@ -163,7 +164,7 @@ describe("cookies that aren't a live session", () => {
 
   for (const route of routes.filter((r) => r.access === "self"))
     for (const method of Object.keys(route.methods))
-      it(`${method} ${route.path}: a 401, the same for every one of them, and nothing changes`, async () => {
+      it(`${method} ${route.path}: signed out, the same for every one of them, and nothing changes`, async () => {
         const tokens = await badTokens();
         const before = await snapshot();
         const answers = await Promise.all(
@@ -172,7 +173,10 @@ describe("cookies that aren't a live session", () => {
           ),
         );
         for (const res of answers) expect(res).toEqual(answers[0]);
-        expect(answers[0]!.status).toBe(401);
+        // "Who am I?" signed out is an empty 204; anything that needs an account is a 401.
+        if (method === "GET" && route.path === "/api/me")
+          expect(answers[0]).toMatchObject({ status: 204, body: "", cookie: null });
+        else expect(answers[0]!.status).toBe(401);
         expect(await snapshot()).toBe(before);
       });
 
@@ -203,7 +207,7 @@ describe("user A against user B", () => {
 
   it("A signing out everywhere ends only A's sessions", async () => {
     expect((await api("POST", "/api/auth/signout-everywhere", { token: a })).status).toBe(204);
-    expect((await api("GET", "/api/me", { token: a })).status).toBe(401);
+    expect((await api("GET", "/api/me", { token: a })).status).toBe(204);
     expect((await api("GET", "/api/me", { token: b })).status).toBe(200);
   });
 

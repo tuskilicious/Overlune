@@ -248,3 +248,21 @@ test("Rain City downloads matching panels, banner and saved OBS collection links
   expect(links).toHaveLength(7);
   for (const url of links) expect((await saved(page, new URL(url).hash)).theme).toBe("rain-city");
 });
+
+test("Rain City's departure board tiles the digits only; colons and units sit between the tiles", async ({
+  page,
+}) => {
+  await page.goto(link("starting", { starting: { endsAt: Date.now() + 2 * 3600_000, tz: "UTC" } }));
+  const seps = page.locator(".countdown-ch[data-sep]");
+  await expect(seps).toHaveCount(2); // H:MM:SS
+  await expect(seps.first()).toHaveText(":");
+  await expect(seps.first()).toHaveCSS("background-image", "none");
+  await expect(page.locator(".countdown-ch:not([data-sep])").first()).not.toHaveCSS(
+    "background-image",
+    "none",
+  );
+  await page.goto(
+    link("starting", { starting: { endsAt: Date.now() + 50 * 3600_000, tz: "UTC" } }),
+  );
+  await expect(page.locator('.countdown-ch[data-sep="unit"]')).toHaveCount(3); // d, h, m
+});
