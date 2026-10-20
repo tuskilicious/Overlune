@@ -1,6 +1,14 @@
 import { Suspense, useEffect } from "react";
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigationType,
+} from "react-router";
 import { lazyPage } from "./lib/lazy-page";
+import { lookPages } from "./lib/look-pages";
 import { pages } from "./lib/page-meta";
 import Alerts from "./overlays/alerts/Alerts";
 import Chat from "./overlays/chat/Chat";
@@ -20,6 +28,7 @@ const EditorPage = lazyPage(() => import("./editor/EditorPage"));
 const SetupGuide = lazyPage(() => import("./editor/SetupGuide"));
 const LegalPage = lazyPage(() => import("./editor/LegalPage"));
 const NotFoundPage = lazyPage(() => import("./editor/NotFoundPage"));
+const LookPage = lazyPage(() => import("./editor/LookPage"));
 
 /** "/" is always the landing page (T6.34, T6.67); returning visitors get a "Continue your overlay" button there.
  *  The editor used to live here, so its old bookmarks ("/#1.…", a saved overlay) still open /editor with their
@@ -37,12 +46,26 @@ function PageMeta() {
   useEffect(() => {
     const overlay = pathname.startsWith("/o/");
     // Overlays aren't listed in `pages`: OBS never shows their title.
-    document.title = pages[pathname]?.title ?? (overlay ? "Overlune" : "Page not found · Overlune");
+    document.title =
+      (pages[pathname] ?? lookPages[pathname])?.title ??
+      (overlay ? "Overlune" : "Page not found · Overlune");
     const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!canonical) return;
     if (overlay) canonical.remove();
     else canonical.href = `https://overlune.in${pathname}`;
   }, [pathname]);
+  return null;
+}
+
+/** A link to another page opens it at the top, as loading it would; the router kept the last page's scroll, so a
+ *  footer link opened /privacy near its end. Back and Forward, and links to a part of a page (/#looks), keep theirs. */
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+  const navigation = useNavigationType();
+  // After the last page's own cleanup, so its smooth scrolling (Lenis, on the home page) has stopped first.
+  useEffect(() => {
+    if (navigation === "PUSH" && !hash) scrollTo(0, 0);
+  }, [pathname, hash, navigation]);
   return null;
 }
 
@@ -56,6 +79,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <PageMeta />
+      <ScrollToTop />
       <Suspense fallback={null}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -63,6 +87,7 @@ export default function App() {
           <Route path="/guide" element={<SetupGuide />} />
           <Route path="/privacy" element={<LegalPage page="privacy" />} />
           <Route path="/terms" element={<LegalPage page="terms" />} />
+          <Route path="/looks/:id" element={<LookPage />} />
           <Route
             path="/o/starting"
             element={

@@ -342,6 +342,129 @@
   font-weight: 700; /* its look is .btn-shimmer (site-buttons.css) */
 }
 
+/* A look's page (T15.3): the name and button over its two pictures, the 16:9 one and the vertical one side by side
+   at the same height (256fr 81fr: 16/9 against 9/16), then the kit and the look's type and colors. */
+.guide .look {
+  box-sizing: border-box;
+  width: min(72rem, 100%);
+  max-width: none;
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+}
+
+.look-head {
+  text-align: center;
+  padding: 24px 0 40px;
+  background: radial-gradient(50% 60% at 50% 40%, rgb(74 42 227 / 0.22), transparent 70%);
+}
+
+.look-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.look-head h1 {
+  margin: 12px 0 8px;
+  font-family: var(--font-heading);
+  font-size: clamp(40px, 7vw, 72px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.look-head p {
+  margin: 0 auto;
+  max-width: 40ch;
+  color: var(--text-muted);
+  font-size: 18px;
+  text-wrap: pretty;
+}
+
+.look-stills {
+  display: grid;
+  grid-template-columns: 256fr 81fr;
+  gap: 16px;
+  align-items: start;
+  margin: 0 0 48px;
+}
+
+.look-stills figure {
+  margin: 0;
+}
+
+.look-stills img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.look-stills figcaption {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.look section {
+  max-width: 760px;
+}
+
+.look-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.look-swatches li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.look-swatch {
+  width: 24px;
+  height: 24px;
+  border: var(--border);
+  border-radius: 50%;
+}
+
+.look-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: var(--border);
+}
+
+.look-pager a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Phones: the vertical picture under the 16:9 one, small enough that the page scrolls past it. */
+@media (max-width: 600px) {
+  .look-stills {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .look-stills figure:last-child {
+    width: min(60%, 240px);
+    margin-inline: auto;
+  }
+}
+
 /* The index (T6.118): the guide's parts as a row of chips that jump there. */
 .guide-index ol {
   margin: 16px 0 24px;

@@ -505,7 +505,12 @@ test("the looks list drives one big preview by hover, focus and scroll, with a p
   await expect(preview).toHaveAttribute("data-theme", "neon-grid");
   await expect(page.getByRole("link", { name: "Use Neon Grid" })).toHaveAttribute(
     "href",
-    "/editor",
+    "/editor?look=neon-grid",
+  );
+  // Each row opens its look's own page (T15.3).
+  await expect(row("Neon Grid").locator(".landing-look-row")).toHaveAttribute(
+    "href",
+    "/looks/neon-grid",
   );
 
   await page.setViewportSize({ width: 800, height: 900 });
