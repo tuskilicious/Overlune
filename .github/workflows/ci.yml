@@ -25,10 +25,29 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      # The build's public settings come from wrangler.jsonc, as in Cloudflare's own build (T15.2): production for
+      # main, the preview (staging) environment for pull requests.
+      - name: Build settings from wrangler.jsonc
+        run: node scripts/build-env.mjs ${{ github.event_name == 'push' && 'production' || 'preview' }} >> "$GITHUB_ENV"
       - run: npm run build
+        env:
+          # The Sentry release name's commit (vite.config.ts reads Cloudflare's variable name).
+          CF_PAGES_COMMIT_SHA: ${{ github.sha }}
+          # Source maps go to Sentry only for a production build that this workflow deploys.
+          SENTRY_AUTH_TOKEN: ${{ github.event_name == 'push' && vars.DEPLOY_FROM_ACTIONS == 'true' && secrets.SENTRY_AUTH_TOKEN || '' }}
       - run: npm audit --audit-level=high
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      # Phase 15: the public pages as real HTML (scripts/prerender.mjs checks its own output and fails the build if a
+      # page didn't render, an overlay would get the home page, or a localhost address is left in).
+      - run: npm run prerender
+      - name: Keep the site for the deploy job
+        if: vars.DEPLOY_FROM_ACTIONS == 'true' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site
+          path: dist/
+          retention-days: 3
       - name: Upload Playwright results (screenshots, diffs, new baselines)
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -48,3 +67,32 @@ jobs:
       - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Deploys from here instead of Cloudflare's own build (Phase 15, STACK.md "Hosting"): only a site that passed every
+  # check goes out. Off until the owner sets the repository variable DEPLOY_FROM_ACTIONS to "true", which follows
+  # turning off the Pages project's automatic deployments; until then Cloudflare keeps deploying as before. Main goes
+  # to production (overlune.in), a pull request from this repository to a preview at <branch>.overlune.pages.dev.
+  deploy:
+    needs: [checks, gitleaks]
+    if: vars.DEPLOY_FROM_ACTIONS == 'true' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    steps:
+      # The Functions (functions/) and their bindings (wrangler.jsonc) deploy with the site.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: site
+          path: dist/
+      - name: Deploy to Cloudflare Pages
+        run: npx wrangler pages deploy dist --project-name=overlune --branch="$BRANCH" --commit-hash="$GITHUB_SHA"
+        env:
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+          # A token limited to Account › Cloudflare Pages › Edit on this one account (Cloudflare can't narrow a Pages
+          # token to a single project): no DNS, Workers, D1 or billing. Kept only as this repository's secret.
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
