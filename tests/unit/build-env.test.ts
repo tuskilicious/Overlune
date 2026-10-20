@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 // @ts-expect-error: a plain .mjs build script, without type declarations.
 import { buildEnv } from "../../scripts/build-env.mjs";
 
-// GitHub Actions builds with the same public settings Cloudflare's build reads from wrangler.jsonc (T15.2).
+// GitHub Actions builds with the public settings in wrangler.jsonc (T15.2): production's and the Previews' (T12.1).
 describe("buildEnv", () => {
   it("gives each environment's VITE_ variables from the real wrangler.jsonc", () => {
     const production: string[] = buildEnv("production");
@@ -19,17 +19,16 @@ describe("buildEnv", () => {
   it("reads comments, URLs and trailing commas as Wrangler does", () => {
     const text = `// a comment
 {
-  "env": {
-    "production": {
-      // another
-      "vars": { "VITE_A": "https://x.example//y", "AUTH_ORIGIN": "https://z", },
-    },
-  },
+  // another
+  "vars": { "VITE_A": "https://x.example//y", "AUTH_ORIGIN": "https://z", },
+  "previews": { "vars": { "VITE_B": "b" } },
 }`;
     expect(buildEnv("production", text)).toEqual(["VITE_A=https://x.example//y"]);
+    expect(buildEnv("preview", text)).toEqual(["VITE_B=b"]);
   });
 
   it("refuses an environment that isn't there", () => {
-    expect(() => buildEnv("staging")).toThrow("no env.staging.vars");
+    expect(() => buildEnv("staging")).toThrow("no vars for staging");
+    expect(() => buildEnv("preview", '{ "vars": {} }')).toThrow("no vars for preview");
   });
 });

@@ -25,8 +25,8 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
-      # The build's public settings come from wrangler.jsonc, as in Cloudflare's own build (T15.2): production for
-      # main, the preview (staging) environment for pull requests.
+      # The build's public settings come from wrangler.jsonc (T15.2): production's for main, the Previews' (staging)
+      # for pull requests.
       - name: Build settings from wrangler.jsonc
         run: node scripts/build-env.mjs ${{ github.event_name == 'push' && 'production' || 'preview' }} >> "$GITHUB_ENV"
       - run: npm run build
@@ -68,16 +68,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Deploys from here instead of Cloudflare's own build (Phase 15, STACK.md "Hosting"): only a site that passed every
-  # check goes out. Off until the owner sets the repository variable DEPLOY_FROM_ACTIONS to "true", which follows
-  # turning off the Pages project's automatic deployments; until then Cloudflare keeps deploying as before. Main goes
-  # to production (overlune.in), a pull request from this repository to a preview at <branch>.overlune.pages.dev.
+  # Deploys only a site that passed every check (Phase 15, STACK.md "Hosting"), to the Worker (T12.1): main to
+  # production, a pull request from this repository to its own Preview at <branch>-overlune.<subdomain>.workers.dev,
+  # with the staging database and Sentry (wrangler.jsonc, `previews`). Off unless the repository variable
+  # DEPLOY_FROM_ACTIONS is "true".
   deploy:
     needs: [checks, gitleaks]
     if: vars.DEPLOY_FROM_ACTIONS == 'true' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     steps:
-      # The Functions (functions/) and their bindings (wrangler.jsonc) deploy with the site.
+      # The API (functions/index.ts) and its bindings (wrangler.jsonc) deploy with the site.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -88,11 +88,19 @@ jobs:
         with:
           name: site
           path: dist/
-      - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy dist --project-name=overlune --branch="$BRANCH" --commit-hash="$GITHUB_SHA"
+      - name: Deploy to the Worker
+        run: |
+          if [ "$EVENT" = push ]; then
+            npx wrangler deploy --message "$GITHUB_SHA"
+          else
+            # The branch as a Preview name: lower case, letters, digits and dashes (feat/look-pages -> feat-look-pages).
+            name=$(printf '%s' "$BRANCH" | tr 'A-Z' 'a-z' | sed 's/[^a-z0-9]/-/g; s/--*/-/g; s/^-//; s/-$//' | cut -c1-40)
+            npx wrangler preview --name "$name" --message "$GITHUB_SHA"
+          fi
         env:
+          EVENT: ${{ github.event_name }}
           BRANCH: ${{ github.head_ref || github.ref_name }}
-          # A token limited to Account › Cloudflare Pages › Edit on this one account (Cloudflare can't narrow a Pages
-          # token to a single project): no DNS, Workers, D1 or billing. Kept only as this repository's secret.
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+          # A token for this account's Workers only (Workers Scripts and Workers Routes, Edit): no DNS, D1 or billing.
+          # Kept only as this repository's secret.
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}

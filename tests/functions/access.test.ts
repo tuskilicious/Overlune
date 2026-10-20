@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import type { PagesFunction } from "@cloudflare/workers-types";
-import { onRequest as fallback } from "../../functions/api/[[path]]";
+import { route, routes as workerRoutes } from "../../functions/index";
 import { accountsGate, apiHeaders, securityHeaders } from "../../functions/api/_middleware";
 import { onRequestGet as health } from "../../functions/api/health";
 import { onRequestDelete as deleteMe, onRequestGet as getMe } from "../../functions/api/me";
@@ -20,8 +20,8 @@ import { env, ORIGIN, rows, signIn, twitch, withFakeTwitch } from "./twitch-fake
  * only asks who's signed in, an empty 204), the same way whether or not the target exists, and changes nothing that
  * isn't the caller's own.
  *
- * A new route can't merge without its entry here: the first test fails for any file in functions/api/ that isn't in
- * `routes`.
+ * A new route can't merge without its entry here: the first tests fail for any file in functions/api/ that isn't in
+ * `routes`, and for any difference between `routes` and the Worker's own route table (functions/index.ts).
  */
 
 type Handler = PagesFunction<Env>;
@@ -73,8 +73,8 @@ const files = Object.keys(import.meta.glob("../../functions/api/**/*.ts")).map((
 );
 
 /**
- * A request through the API as Pages runs it: the middleware (minus Sentry, which only reports), then the route for
- * that path and method, or the catch-all 404.
+ * A request through the API as the Worker runs it: the middleware (minus Sentry, which only reports, and the abuse
+ * limits, tested on their own), then the Worker's own choice of route for that path and method, or the 404.
  */
 async function api(
   method: string,
@@ -88,9 +88,7 @@ async function api(
       ...(token ? { Cookie: `${SESSION_COOKIE}=${token}` } : {}),
     },
   });
-  const route = routes.find((r) => r.path === new URL(request.url).pathname);
-  const handler = route?.methods[method as keyof (typeof routes)[number]["methods"]] ?? fallback;
-  const chain: Handler[] = [securityHeaders, accountsGate, handler];
+  const chain: Handler[] = [securityHeaders, accountsGate, route(request)];
   const run = (i: number): Promise<Response> =>
     Promise.resolve(
       chain[i]!({
@@ -136,6 +134,10 @@ describe("the route registry", () => {
     expect(files.filter((f) => !special.includes(f)).sort()).toEqual(
       routes.map((r) => r.file).sort(),
     );
+  });
+
+  it("is exactly the Worker's route table: the same paths, methods and handlers (T12.1)", () => {
+    expect(Object.fromEntries(routes.map((r) => [r.path, r.methods]))).toEqual(workerRoutes);
   });
 });
 

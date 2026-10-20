@@ -1,66 +1,60 @@
-// Cloudflare Pages config (T7.2). Once this file exists it is the source of truth for the project: the dashboard can
-// no longer edit these fields, and `vars` here replace the dashboard's plain variables, at build time too. Secrets
-// (TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, SENTRY_AUTH_TOKEN) stay in the dashboard and are never written here.
-// Pages environments don't inherit: preview and production each list everything. Top level is local development.
+// Cloudflare Workers config (T12.1; Pages from T7.2 until then). One Worker serves the built site (dist/) as static
+// assets and runs the API (functions/index.ts) for /api/* only, so every other path costs no Worker request.
+//
+// - The top level is production, at overlune.in.
+// - `previews` is every pull request's Preview (`wrangler preview`): the staging database and the staging Sentry.
+//   Sign-in comes back only to the "staging" Preview, the one address the staging Twitch app lists.
+// - Local development (`wrangler dev`) takes the top level, with its vars overridden by the git-ignored .dev.vars
+//   (README) and a local database. Never run it with --remote: that would be production's database.
+//
+// Secrets (TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET) are set with `wrangler secret put` and `wrangler preview secret put`,
+// never written here.
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "overlune",
-  "pages_build_output_dir": "./dist",
+  "main": "functions/index.ts",
   "compatibility_date": "2026-09-30",
   // @sentry/cloudflare needs AsyncLocalStorage.
   "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    // Unknown paths get the prerendered 404.html with a real 404 status (Phase 15).
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*"],
+  },
+  // overlune.tanishqbharti.workers.dev, for checking production before overlune.in moves (T12.1); `_headers` keeps
+  // it out of search results.
+  "workers_dev": true,
+  "preview_urls": true,
   "vars": {
-    "NODE_VERSION": "24",
-    "VITE_SENTRY_ENVIRONMENT": "development",
-    "AUTH_ORIGIN": "http://localhost:8788",
+    "VITE_SENTRY_DSN": "https://26398e09d381b7786ca7ea853b4a063f@o4512174345224192.ingest.de.sentry.io/4512174371766352",
+    "VITE_SENTRY_ENVIRONMENT": "production",
+    "AUTH_ORIGIN": "https://overlune.in",
+    // Opened at the launch check (T7.9). "false" closes sign-in again: account routes 404, no data is lost.
     "ACCOUNTS_OPEN": "true",
   },
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "overlune-staging",
-      "database_id": "e345b820-48d2-4d1b-a637-1f86e914069e",
+      "database_name": "overlune-production",
+      "database_id": "76314ef1-fc0c-421f-a9f8-f10dc4df272a",
       "migrations_dir": "migrations",
     },
   ],
-  "env": {
-    // Every PR's preview deploy: the staging database and the staging Sentry environment.
-    "preview": {
-      "vars": {
-        "NODE_VERSION": "24",
-        "VITE_SENTRY_DSN": "https://26398e09d381b7786ca7ea853b4a063f@o4512174345224192.ingest.de.sentry.io/4512174371766352",
-        "VITE_SENTRY_ENVIRONMENT": "staging",
-        // Sign-in comes back to the staging alias (the "staging" branch): its Twitch app lists only that address.
-        "AUTH_ORIGIN": "https://staging.overlune.pages.dev",
-        "ACCOUNTS_OPEN": "true",
-      },
-      "d1_databases": [
-        {
-          "binding": "DB",
-          "database_name": "overlune-staging",
-          "database_id": "e345b820-48d2-4d1b-a637-1f86e914069e",
-          "migrations_dir": "migrations",
-        },
-      ],
+  "previews": {
+    "vars": {
+      "VITE_SENTRY_DSN": "https://26398e09d381b7786ca7ea853b4a063f@o4512174345224192.ingest.de.sentry.io/4512174371766352",
+      "VITE_SENTRY_ENVIRONMENT": "staging",
+      "AUTH_ORIGIN": "https://staging-overlune.tanishqbharti.workers.dev",
+      "ACCOUNTS_OPEN": "true",
     },
-    // main, at overlune.in.
-    "production": {
-      "vars": {
-        "NODE_VERSION": "24",
-        "VITE_SENTRY_DSN": "https://26398e09d381b7786ca7ea853b4a063f@o4512174345224192.ingest.de.sentry.io/4512174371766352",
-        "VITE_SENTRY_ENVIRONMENT": "production",
-        "AUTH_ORIGIN": "https://overlune.in",
-        // Opened at the launch check (T7.9). "false" closes sign-in again: account routes 404, no data is lost.
-        "ACCOUNTS_OPEN": "true",
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "overlune-staging",
+        "database_id": "e345b820-48d2-4d1b-a637-1f86e914069e",
+        "migrations_dir": "migrations",
       },
-      "d1_databases": [
-        {
-          "binding": "DB",
-          "database_name": "overlune-production",
-          "database_id": "76314ef1-fc0c-421f-a9f8-f10dc4df272a",
-          "migrations_dir": "migrations",
-        },
-      ],
-    },
+    ],
   },
 }
