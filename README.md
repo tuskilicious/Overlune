@@ -102,14 +102,14 @@ Also test every overlay inside OBS. See `docs/OBS-TESTING.md`.
 Screenshot tests (`*.visual.spec.ts`) only run on Linux, because fonts render differently on Windows and macOS. CI is the source of truth. When a screenshot test fails in CI, download the `playwright-results` artifact from the run to see the expected, actual and diff images. If the change was intended, copy the actual image over the baseline in `tests/e2e/*.visual.spec.ts-snapshots/` and commit it. A new screenshot test fails once in CI and writes its baseline into the same artifact.
 
 ## Deploy
-Cloudflare Pages:
-- Every PR gets a preview deploy (staging).
-- Merging to `main` deploys production.
+Cloudflare Pages, deployed by GitHub Actions (since 2026-10-20, Phase 15):
+- CI builds the site, runs every check, prerenders the public pages (`npm run prerender`) and only then deploys with `wrangler pages deploy`. A pull request from this repository gets a preview at `<branch>.overlune.pages.dev` (staging); merging to `main` deploys production.
+- The Pages project's own automatic deployments are off. The deploy job runs while the repository variable `DEPLOY_FROM_ACTIONS` is `true`; setting it to `false` and turning Pages' automatic deployments back on returns to Cloudflare's build.
 - Security headers live in `public/_headers`; the API sets its own (`functions/api/_middleware.ts`).
 - `wrangler.jsonc` holds the project's bindings and plain variables, for preview and production. Secrets stay in the dashboard.
 - Database migrations don't run on deploy. Apply each new one with `npx wrangler d1 migrations apply overlune-staging --remote`, then `npx wrangler d1 migrations apply overlune-production --remote --env production` once its PR is approved.
 
-GitHub Actions (`.github/workflows/ci.yml`) runs on every PR and push to `main`: lint, typecheck, unit tests, build, `npm audit`, Playwright tests and a gitleaks scan.
+GitHub Actions (`.github/workflows/ci.yml`) runs on every PR and push to `main`: lint, typecheck, unit tests, build, `npm audit`, Playwright tests, the prerender, a gitleaks scan, and the deploy. Its secrets: `CLOUDFLARE_PAGES_TOKEN` (Cloudflare Pages · Edit on this account only) and `SENTRY_AUTH_TOKEN` (source maps for production); its variables: `CLOUDFLARE_ACCOUNT_ID` and `DEPLOY_FROM_ACTIONS`.
 
 ### Cloudflare Pages settings
 Pages settings: build command `npm run build`, output `dist`, Node from `.nvmrc`. Since T7.2 the plain variables below are set in `wrangler.jsonc`, which the dashboard then only shows:
