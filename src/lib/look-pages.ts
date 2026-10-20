@@ -1,10 +1,7 @@
 import { themes } from "../themes";
 import { blurbs } from "../themes/blurbs";
 import { themeIds, type ThemeId } from "../themes/types";
-import type { Page } from "./page-meta";
-
-/** A look's own page (T15.3), e.g. /looks/rain-city. Every look in the registry gets one. */
-export const lookPath = (id: ThemeId) => `/looks/${id}`;
+import { lookPath, type Page } from "./page-meta";
 
 /** Its Starting Soon on both canvases, pictured from the real overlay at build time (scripts/prerender.mjs). */
 export const stills = (id: ThemeId) => ({

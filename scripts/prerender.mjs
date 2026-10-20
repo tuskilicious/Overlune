@@ -47,7 +47,7 @@ const vite = await createServer({
   // lz-string is CommonJS: bundled first, so the link code can import it by name as the app does.
   ssr: { noExternal: ["lz-string"], optimizeDeps: { include: ["lz-string"] } },
 });
-const [{ themeIds }, { lookPages, lookPath, stills }, { pageHtml }, { encode }, { sampleScene }] =
+const [{ themeIds }, { lookPages, stills }, { lookPath, pageHtml }, { encode }, { sampleScene }] =
   await Promise.all(
     [
       "/src/themes/types.ts",

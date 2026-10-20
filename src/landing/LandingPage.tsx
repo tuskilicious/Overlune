@@ -21,7 +21,7 @@ import SiteNav from "../components/SiteNav";
 import { chatSamples } from "../editor/chat-samples";
 import Preview from "../editor/Preview";
 import { sampleScene } from "../editor/scene-samples";
-import { lookPath } from "../lib/look-pages";
+import { lookPath } from "../lib/page-meta";
 import { loadSaved } from "../settings/storage";
 import AlertView from "../overlays/alerts/AlertView";
 import ChatView from "../overlays/chat/ChatView";

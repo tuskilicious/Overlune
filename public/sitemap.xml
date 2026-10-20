@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- The site's pages (2026-10-20). Overlays (/o/) are left out on purpose: see robots.txt. -->
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://overlune.in/</loc></url>
-  <url><loc>https://overlune.in/editor</loc></url>
-  <url><loc>https://overlune.in/guide</loc></url>
-  <url><loc>https://overlune.in/privacy</loc></url>
-  <url><loc>https://overlune.in/terms</loc></url>
-</urlset>

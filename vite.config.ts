@@ -4,15 +4,23 @@ import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
-import { pageHtml, pages } from "./src/lib/page-meta.ts";
+import { pageHtml, pages, sitemap } from "./src/lib/page-meta.ts";
 
 // Link previews (T6.87): a copy of index.html per site page with its own title and tags. Cloudflare Pages serves
 // guide.html at /guide, so addresses don't change. index.html itself gets "/"'s tags, so they never drift from
-// page-meta.ts (T6.138).
+// page-meta.ts (T6.138). sitemap.xml is written here too, from the same list plus the looks (T15.4); the dev server
+// answers it the same way.
+const today = () => new Date().toISOString().slice(0, 10);
 const pagePreviews: Plugin = {
   name: "overlune-page-previews",
   enforce: "post", // after Vite has written index.html into the bundle
   transformIndexHtml: (html) => pageHtml(html, "/"),
+  configureServer(server) {
+    server.middlewares.use("/sitemap.xml", (_req, res) => {
+      res.setHeader("Content-Type", "application/xml");
+      res.end(sitemap(today()));
+    });
+  },
   generateBundle(_, bundle) {
     const index = bundle["index.html"];
     if (index?.type !== "asset") throw new Error("index.html missing from the build");
@@ -22,6 +30,7 @@ const pagePreviews: Plugin = {
         fileName: `${path.slice(1)}.html`,
         source: pageHtml(String(index.source), path),
       });
+    this.emitFile({ type: "asset", fileName: "sitemap.xml", source: sitemap(today()) });
   },
 };
 
