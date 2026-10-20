@@ -30,6 +30,23 @@
     <meta name="twitter:card" content="summary_large_image" />
     <!-- The page's own address on overlune.in; App.tsx keeps it right as the route changes (T6.68). -->
     <link rel="canonical" href="https://overlune.in/" />
+    <!-- What Overlune is, for search engines (2026-10-20). A data block, not a script: it never runs, and the CSP
+         doesn't apply to it. The home page adds its FAQ the same way, from the questions it shows. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Overlune",
+        "url": "https://overlune.in/",
+        "description": "Free stream overlays that look pro. Pick a look, add your text, and paste one link per overlay into OBS Studio or Streamlabs Desktop: scenes, chat, alerts and a webcam frame, all matching.",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Web, OBS Studio, Streamlabs Desktop",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "image": "https://overlune.in/images/brand/og-image.png",
+        "license": "https://github.com/tuskilicious/Overlune/blob/main/LICENSE"
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

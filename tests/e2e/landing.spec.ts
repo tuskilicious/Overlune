@@ -427,6 +427,10 @@ test("the landing page says what works where (T6.69, T6.79)", async ({ page }) =
     "Make it yours",
     "Extras for your channel",
     "Your links never break",
+    "Is it really free?",
+    "What do you keep about me?",
+    "Which platforms do chat and alerts work with?",
+    "Will it slow down my stream?",
   ]);
   // The answers open in place (T6.124).
   const answer = know.getByText("Paste a link once.");
@@ -647,4 +651,38 @@ test("wide windows scroll with the ruler; phones keep the browser's scrollbar", 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(ruler).toHaveCount(0);
   await expect(page.locator("html")).not.toHaveAttribute("data-ruler");
+});
+
+test("search engines get what Overlune is, the FAQ as shown, a sitemap and robots rules", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/");
+  // One in the page's static HTML, the FAQ once the page has drawn.
+  await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(2);
+  const blocks = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((els) => els.map((el) => JSON.parse(el.textContent ?? "")));
+  const app = blocks.find((b) => b["@type"] === "SoftwareApplication");
+  expect(app).toMatchObject({
+    name: "Overlune",
+    isAccessibleForFree: true,
+    offers: { price: "0" },
+  });
+  // The FAQ data is exactly the questions and answers on the page, nothing more.
+  const faq = blocks.find((b) => b["@type"] === "FAQPage");
+  const know = page.getByRole("region", { name: "Good to know" });
+  const shown = await know.locator("summary").allTextContents();
+  expect(faq.mainEntity.map((q: { name: string }) => q.name)).toEqual(shown.map((t) => t.trim()));
+  for (const q of faq.mainEntity as { name: string; acceptedAnswer: { text: string } }[]) {
+    await know.getByText(q.name, { exact: true }).click();
+    await expect(know.getByText(q.acceptedAnswer.text, { exact: true })).toBeVisible();
+  }
+  const robots = await (await request.get("/robots.txt")).text();
+  expect(robots).toContain("Disallow: /o/");
+  expect(robots).toContain("Sitemap: https://overlune.in/sitemap.xml");
+  const sitemap = await (await request.get("/sitemap.xml")).text();
+  for (const path of ["/", "/editor", "/guide", "/privacy", "/terms"])
+    expect(sitemap).toContain(`<loc>https://overlune.in${path}</loc>`);
+  expect(sitemap).not.toMatch(/<loc>[^<]*\/o\//);
 });
