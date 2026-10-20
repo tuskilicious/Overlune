@@ -100,7 +100,7 @@ jobs:
         env:
           EVENT: ${{ github.event_name }}
           BRANCH: ${{ github.head_ref || github.ref_name }}
-          # A token for this account's Workers only (Workers Scripts and Workers Routes, Edit): no DNS, D1 or billing.
-          # Kept only as this repository's secret.
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
+          # The deploy token from Phase 15, given Workers Scripts and (overlune.in) Workers Routes, Edit, for T12.1; its
+          # name is from when it only deployed Pages. No DNS, D1 or billing. Kept only as this repository's secret.
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
