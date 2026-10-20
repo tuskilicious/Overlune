@@ -188,3 +188,14 @@ for (const [width, mode] of [
       ).toEqual([]);
     }
   });
+
+test("a footer link opens its page at the top, not where the last page was scrolled to", async ({
+  page,
+}) => {
+  await page.goto("/guide");
+  await page.getByRole("contentinfo").scrollIntoViewIfNeeded();
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
+  await page.getByRole("contentinfo").getByRole("link", { name: "Privacy" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Overlune Privacy Policy");
+  await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
+});

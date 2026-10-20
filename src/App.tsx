@@ -1,5 +1,12 @@
 import { Suspense, useEffect } from "react";
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigationType,
+} from "react-router";
 import { lazyPage } from "./lib/lazy-page";
 import { pages } from "./lib/page-meta";
 import Alerts from "./overlays/alerts/Alerts";
@@ -46,6 +53,18 @@ function PageMeta() {
   return null;
 }
 
+/** A link to another page opens it at the top, as loading it would; the router kept the last page's scroll, so a
+ *  footer link opened /privacy near its end. Back and Forward, and links to a part of a page (/#looks), keep theirs. */
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+  const navigation = useNavigationType();
+  // After the last page's own cleanup, so its smooth scrolling (Lenis, on the home page) has stopped first.
+  useEffect(() => {
+    if (navigation === "PUSH" && !hash) scrollTo(0, 0);
+  }, [pathname, hash, navigation]);
+  return null;
+}
+
 // The test page exists in development and staging only (CLAUDE.md §7: no debug routes in production).
 // Read from import.meta.env (same fallback as lib/sentry.ts) so the build folds it and drops the page from production.
 const showSentryTest =
@@ -56,6 +75,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <PageMeta />
+      <ScrollToTop />
       <Suspense fallback={null}>
         <Routes>
           <Route path="/" element={<Home />} />
