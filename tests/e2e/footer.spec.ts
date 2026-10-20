@@ -21,9 +21,9 @@ for (const path of ["/", "/guide", "/nope"]) {
       "href",
       "https://github.com/sponsors/tuskilicious",
     );
-    await expect(footer.getByRole("link", { name: "support@overlune.in" })).toHaveAttribute(
+    await expect(footer.getByRole("link", { name: "overlune@proton.me" })).toHaveAttribute(
       "href",
-      "mailto:support@overlune.in",
+      "mailto:overlune@proton.me",
     );
   });
 }

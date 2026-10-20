@@ -2,7 +2,7 @@
 
 > **Self-written, not legal advice.** Overlune is a free, non-commercial hobby project. This document was written by the maintainer, has not been reviewed by a lawyer, and does not guarantee compliance with any law.
 
-_Last updated: 2026-10-14_
+_Last updated: 2026-10-20_
 
 Overlune is a free, open-source stream overlay maker at overlune.in. This page describes, in plain language, what the app actually does with data.
 
@@ -91,4 +91,4 @@ If you don't sign in, we hold no personal data about you to look up, correct or 
 If this policy changes, we will update the date at the top. The full history of this file is public in the project's GitHub repository.
 
 ## Contact
-support@overlune.in
+overlune@proton.me

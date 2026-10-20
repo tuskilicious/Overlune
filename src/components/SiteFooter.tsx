@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import "./site-footer.css";
 
-export const contactEmail = "support@overlune.in";
+export const contactEmail = "overlune@proton.me";
 /** The public repo (T6.77): the code, and the place to report a problem. */
 export const repoUrl = "https://github.com/tuskilicious/Overlune";
 /** Optional support (T6.80). Overlune never handles money; GitHub Sponsors does, and it unlocks nothing. */
