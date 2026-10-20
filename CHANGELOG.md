@@ -2,6 +2,28 @@
 
 What changed in each Overlune release. Overlay links from every release keep working: the link format only ever gains optional settings.
 
+## 2.2.0 (2026-10-20)
+
+Four new looks, each with its own crescent moon, and a page for every look. Every existing link still works. There is nothing to re-paste.
+
+### New looks
+- **Eclipse:** a gold corona over a quiet observatory rail.
+- **Rain City:** a crescent sign over a wet street, last train home.
+- **Paper Cut:** a crescent window cut through layered plum and white paper.
+- **Aurora Tundra:** a frost crescent above a layered polar ice shelf.
+- Each one comes with all six scenes, chat, alerts with its own sound, the webcam frame and Live, horizontal and vertical. That makes 20 looks.
+
+### A page for every look
+- **See a look before you pick it:** overlune.in/looks/rain-city and the rest show the look's Starting Soon in 16:9 and vertical, what comes with it, and its fonts and colors (with their codes, to match your panels and emotes).
+- **"Use" picks the look:** the button on a look's page, and the one under the home page's looks, open the editor with that look picked. A saved overlay keeps its text and layout.
+- **The home page's looks** each open their own page.
+
+### Site
+- **Shows up faster:** the home page, the setup guide, privacy, terms and the look pages arrive ready to read, before the app loads. Search engines can read them too, and a sitemap lists every page.
+- **Pages a link opens start at the top,** not where the last page was scrolled to.
+- **New support email:** overlune@proton.me.
+- **Fixes:** Rain City's countdown units sit between its tiles, the editor's preview controls stay on one row, and the browser no longer logs an error for every signed-out visitor.
+
 ## 2.1.0 (2026-10-15)
 
 Every existing link still works. Your overlays now fit a vertical stream too, with two new scenes and a smoother time in OBS. There is nothing to re-paste for your current setup.

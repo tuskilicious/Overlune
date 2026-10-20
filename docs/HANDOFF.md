@@ -1,4 +1,4 @@
-# Handoff: where the work stands (2026-10-16)
+# Handoff: where the work stands (2026-10-20)
 
 For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md` first: its rules always win. Keep this file current: update it at the end of a working session.
 
@@ -7,15 +7,15 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 
 - **Stack:** React + Vite on Cloudflare Pages, with Pages Functions + D1 for optional Twitch sign-in (v2).
 - **Settings:** they live in the overlay link's fragment (`#1.<lz-string>`, zod schema, additive-only: old links must keep working).
-- **Looks:** 19 on main, including Eclipse A (#259), Rain City B (#260) and Paper Cut B (#261). Aurora Tundra A is the twentieth look on `feat/aurora-tundra` (PR #262), with the owner's OBS pass and merge approval recorded. Each has Starting Soon, BRB, Ending, Offline, Just Chatting and Reaction scenes, plus chat, alerts, a webcam frame and Live (chat, alerts and frame in one source).
+- **Looks:** 20, the newest Eclipse, Rain City, Paper Cut and Aurora Tundra (Phase 11). Each has its own page at `/looks/<id>` and Starting Soon, BRB, Ending, Offline, Just Chatting and Reaction scenes, plus chat, alerts, a webcam frame and Live (chat, alerts and frame in one source).
 - **Canvas editor:** Phase 9; moves every part of a scene.
-- **Release:** 2.1.0 (T10.10), released 2026-10-15. PR #255 merged after owner approval and all three checks passed; annotated tag `v2.1.0` and the GitHub release are published. At release, Cloudflare Pages deployed main successfully and overlune.in served `overlune@2.1.0+07d573d`, matching the merge commit. Phase 11's catalog release remains T11.7.
+- **Release:** 2.2.0 (T11.7) prepared 2026-10-20: Phase 11's four looks plus Phase 15 (prerendered pages, look pages, sitemap). 2.1.0 was released 2026-10-15 (tag `v2.1.0`).
 - **Vertical:** Phase 10 complete; `?canvas=vertical`, 1080×1920.
 
 ## How the owner works (follow this)
 - **One task, one branch, one PR.** Plan, build, run `npm run lint`, `npm run typecheck` and `npm test`, plus the Playwright e2e suite (`npx playwright test`), then commit, push and open a PR.
 - **Shared work:** the owner works with Claude Code too. Check for changes from the other agent before committing, stage only the current task's files, and leave this handoff current.
-- **Merging:** the owner says "merge". Then wait for all three CI checks (`checks`, `gitleaks`, Cloudflare Pages) to pass before `gh pr merge N --merge`.
+- **Merging:** the owner says "merge". Then wait for all three CI checks (`checks`, `gitleaks`, `deploy`) to pass before `gh pr merge N --merge`. `deploy` publishes the PR's preview from Actions; there is no separate Cloudflare Pages check any more.
 - **Stacked PRs:** retarget to main (`gh pr edit N --base main`) before merging, and don't delete a base branch while a child PR still points at it.
 - **Overlay tasks stay unticked** in `docs/TASKS.md` until the owner reports their OBS check passed. Never log an OBS pass the owner didn't state.
 - **Git safety:**
@@ -46,35 +46,28 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
   - Long text wraps or shrinks.
   - Clean up every timer and listener.
 
-## State as of 2026-10-16
+## State as of 2026-10-20
 
-### Earlier merges
-- #243: phone fixes.
-- #244: the editor's Horizontal / Vertical switch (T10.4).
-- #245: vertical art fixed for all 16 looks (T10.5–T10.8).
-- #246: Star on GitHub in the nav.
-- #247: overlay playbook performance fixes. Entrances lost their blur, Vaporwave's sun stripes no longer slide, Session's grain lost its blend, and scenes replay their entrance on OBS `obsSourceActiveChanged`.
-- #250: canvas placement clamps to the frame, plus "Show safe areas and thirds".
-
-### Current task
-T11.6 Aurora Tundra A, Ice shelf, is built on `feat/aurora-tundra` (Codex, 2026-10-16), with lint, typecheck, all 450 unit/API tests, the production build and a clean full Playwright run passing (615 tests; one Linux-only screenshot test skipped on Windows). The owner reported the requested horizontal and vertical OBS checks passed and authorized merge with "pass and merge" on 2026-10-16. T11.6 is ticked and the pass is logged in OBS-TESTING.md; OBS version and CPU not recorded, Streamlabs not tested. All three checks passed on the implementation commit; the sign-off commit must pass them too before merging PR #262. Main was pulled first; Paper Cut #261 is merged. T11.5's checkbox remains unticked in TASKS.md; do not invent its OBS pass. Rain City (#260) is merged and T11.4 ticked; the checkpoint after T11.4 is logged in TASKS.md. Lesson from Rain City: the owner judges looks hard ("it looks ass", "the moon looks off"). Build each look rich from the start (the kit's furniture, real depth, no big empty areas) and draw the crescent as a true two-circle crescent, never the board's sketch path.
-
-### Done with the owner's OBS check (2026-10-15)
-T10.2–T10.10 are ticked: the owner reported the vertical OBS check and the phone safe-zone check passed. The phone check was a private TikTok or YouTube live with no words under the apps' buttons or comments. Both are logged in `docs/OBS-TESTING.md`; OBS version and CPU not recorded. DESIGN.md's safe-zone numbers are unchanged.
-
-T11.3 is ticked: the owner reported Eclipse's requested horizontal and vertical OBS checks passed on the PR #259 preview and approved merge. Logged as an owner-reported pass in `docs/OBS-TESTING.md`; OBS version and CPU not recorded, Streamlabs not tested.
+### Shipped since 2.1.0 (all merged, released as 2.2.0 by T11.7)
+- **Phase 11, four new looks:** Eclipse (#259), Rain City (#260), Paper Cut (#261), Aurora Tundra (#262). T11.1 to T11.7 are ticked; each look has an owner-reported horizontal and vertical OBS pass in `docs/OBS-TESTING.md` (Paper Cut's confirmed 2026-10-20).
+- **Production polish (#263, #264):** Rain City's countdown separators lost their tiles (`data-sep` in `Countdown.tsx`; after Rain City's OBS pass, covered by e2e only); the support email is overlune@proton.me (owner-requested, legal pages dated 2026-10-20); signed-out `/api/me` answers an empty 204, not a 401; structured data, four more "Good to know" questions, `robots.txt`.
+- **Phase 15, found in search (#265 to #269):**
+  - `scripts/prerender.mjs` runs after `vite build` (CI only, needs Playwright's Chromium). It saves `/`, `/guide`, `/privacy`, `/terms`, the 404 page and every look's page as ready HTML. Inline styles move into `dist/assets/prerender/*.css` (the CSP is `style-src 'self'`), `app.html` is the untouched shell, and `_redirects` sends `/o/*` to it.
+  - **Look pages** (`/looks/<id>`, `src/editor/LookPage.tsx`, meta in `src/lib/look-pages.ts`): every look in the registry gets one, with pictures of its real Starting Soon overlay on both canvases, taken by the prerender with a fixed clock (byte-identical between builds). "Use <look>" opens `/editor?look=<id>`, which picks the look on top of the saved overlay and then drops `?look`.
+  - **Sitemap:** `sitemap()` in `src/lib/page-meta.ts`, written by the build and served by the dev server; a unit test checks it against `App.tsx`'s routes and every look.
+  - **Links open pages at the top** (`ScrollToTop` in `App.tsx`; Back, Forward and `#` links keep their place).
+- **Deploys run from GitHub Actions** (live 2026-10-20): `ci.yml`'s `deploy` job runs `wrangler pages deploy` after `checks` pass, for PR previews (`<branch>.overlune.pages.dev`) and main. Cloudflare's own builds are off. Secrets: `CLOUDFLARE_PAGES_TOKEN`, `SENTRY_AUTH_TOKEN`; variables: `CLOUDFLARE_ACCOUNT_ID`, `DEPLOY_FROM_ACTIONS`.
 
 ### Waiting on the owner
-- **T11.7 catalog release.** After PR #262 merges, compare all four new kits in both orientations and at small size before the catalog review. Prepare a separate release PR; the owner must approve it before merging and tagging. T11.5's unchecked task and missing OBS log need existing owner evidence or a reported pass before the release gate can close.
-- **Vaporwave's sun stripes** now hold still (performance). If the owner wants motion back, rebuild the stripes so they move with transform only.
+- **2.2.0 release PR:** merge after the owner's approval and all three checks; then tag `v2.2.0`, publish the GitHub release, and confirm overlune.in serves the new build.
+- **Search Console:** the owner added overlune.in and submitted `https://overlune.in/sitemap.xml` on 2026-10-20; its first read was still pending.
+- **Two portrait notes from the T11.7 review,** left as passed: Aurora Tundra's crescent tip sits about 5px under the YouTube handle (a long handle or a third social could meet it), and Eclipse's crescent runs off the top edge (under the apps' header on a phone). Any fix is an overlay change and needs an OBS check.
+- **Vaporwave's sun stripes** hold still (performance). If the owner wants motion back, rebuild them to move with transform only.
 
-### Next tasks (in order)
-1. **Phase 11: four new looks.**
-   - The looks: Eclipse, Rain City, Paper Cut and Aurora Tundra, each with "the lune" (a crescent moon in that look's own material).
-   - They follow DESIGN.md's bar for a new look, the owner's kits (`docs/KIT-REFERENCE.md`) and the overlay playbook.
-   - They're vertical-ready from the start.
-   - T11.1–T11.5's PRs are merged. T11.6 is built, locally verified and owner-approved for merge; wait for the sign-off commit's three checks before merging PR #262. After merge, compare all four new kits in both orientations and at small size, then do T11.7's catalog review and release. Each new look follows the existing kits' pattern: one `src/themes/<id>.css` scoped by `data-theme`, registration in types.ts, index.ts, blurbs, the editor's moods and the landing tour, a fixture, a spec, the sound in `tests/make-sounds.py`, ASSETS and README. The chosen directions are in DESIGN.md and the offline comparison board is `docs/phase-11-directions.html`.
-2. Phases 12–14 (saved overlays, connections, dock + Android app) are planned in TASKS.md; not started.
+### Next tasks
+1. **Phase 12, saved overlays** (planned, needs three owner decisions first): where the Durable Object runs (a small separate Worker, recommended, or moving the site to Workers), edits reaching OBS on an "Update OBS" button or by autosave, and 10 saved overlays per account or another limit.
+2. Phases 13 and 14 (connections, the dock and the Android app) are planned in TASKS.md; not started.
+3. Codex's Clean Slate refresh continues on its own branch (`codex/refresh-clean-slate`) in its own folder.
 
 ## Where things live (vertical and canvas)
 - **`src/overlays/measure.ts`:**
@@ -106,7 +99,8 @@ T11.3 is ticked: the owner reported Eclipse's requested horizontal and vertical 
   - When one fails after an intended change, download the run's `playwright-results` artifact.
   - Copy the actual image over `tests/e2e/*.visual.spec.ts-snapshots/…`, as the README says.
 - **Layout-measuring tests** must wait for `document.fonts.ready` and settled or reduced motion.
-- **Known console messages:** "Cannot read properties of null (reading 'style')" recurred during the 2.1.0 full run (2026-10-15), with a stack pointing to `RulerStrip` in `src/landing/LandingPage.tsx:456` (`tape.current!.style`). ResizeObserver loop messages also appeared. The full run passed (517 tests; one Linux-only screenshot test skipped on Windows); investigate separately from the release paperwork.
+- **Known console messages:** the `RulerStrip` null-style error from the 2.1.0 run is fixed (#263, a guard for a late frame). "ResizeObserver loop completed with undelivered notifications" still shows in the dev server's log during full e2e runs (2026-10-20, 622 passed); harmless so far.
+- **Prerender locally:** `npm run build && npm run prerender` (about 90 seconds: 40 look pictures), then `npx wrangler pages dev dist --port 8788 --ip 127.0.0.1` to try Pages' routing. Stop old `wrangler pages dev` processes first, or the port hangs.
 - **Other habits:**
   - Restart the dev server after switching branches (Vite can serve stale CSS).
   - Use `gh run download` for artifacts, not PowerShell redirection.
