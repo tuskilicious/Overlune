@@ -215,9 +215,12 @@ describe("the account (T7.4)", () => {
     });
   });
 
-  it("answers 401 when signed out, or with a forged or malformed cookie", async () => {
-    for (const token of [null, "A".repeat(43), "not a token"])
-      expect((await me(token)).status).toBe(401);
+  it("answers an empty 204 when signed out, or with a forged or malformed cookie", async () => {
+    for (const token of [null, "A".repeat(43), "not a token"]) {
+      const res = await me(token);
+      expect(res.status).toBe(204);
+      expect(await res.text()).toBe("");
+    }
   });
 
   it("deletes every row of that account, and nobody else's, only from Overlune's own pages", async () => {
@@ -233,7 +236,7 @@ describe("the account (T7.4)", () => {
     expect(await rows("users")).toEqual([expect.objectContaining({ twitch_id: "777" })]);
     const sessions = await rows("sessions");
     expect(sessions.map((s) => s.token_hash)).toEqual([await hashToken(theirs)]);
-    expect((await me(mine)).status).toBe(401);
+    expect((await me(mine)).status).toBe(204);
     expect((await me(theirs)).status).toBe(200);
   });
 
