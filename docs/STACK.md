@@ -37,6 +37,7 @@ Do not swap or add major dependencies without approval. Pin exact versions in `p
 - **Cloudflare Pages** (free). We chose it over GitHub Pages because GitHub Pages cannot set the security headers CLAUDE.md §7 requires.
 - Production is the `main` branch. Staging is the automatic preview deploy for each branch or PR.
 - Headers: `public/_headers`. SPA fallback: built in (Pages serves `index.html` for unknown paths when there is no `404.html`), so no `_redirects`.
+- **Decided 2026-10-20 (Phase 15, T15.1), not yet in effect:** builds and deploys move to GitHub Actions so the public pages can be prerendered (`scripts/prerender.mjs`, Chromium from Playwright, which CI already installs) and only builds that pass the tests go live. The same Pages project stays, with its automatic production and preview deployments turned off, deployed by `wrangler pages deploy` with a token that can only deploy this project, kept as a CI secret. Once prerendering is live, `index.html` is the prerendered home page, so `404.html` answers unknown paths and `_redirects` sends `/o/*` to the untouched app shell (`/o/* /app 200`). Until T15.2 ships, the setup above is what runs.
 - **Antideploy:** a second copy ran at overlune.antideploy.app from 2026-10-01; the owner scrapped it on 2026-10-07. Cloudflare Pages is the only host, so the security headers in `public/_headers` are the only place the CSP lives.
 
 ## Backend (v2, approved 2026-10-09)
