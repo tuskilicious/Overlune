@@ -8,6 +8,7 @@ import {
   useNavigationType,
 } from "react-router";
 import { lazyPage } from "./lib/lazy-page";
+import { lookPages } from "./lib/look-pages";
 import { pages } from "./lib/page-meta";
 import Alerts from "./overlays/alerts/Alerts";
 import Chat from "./overlays/chat/Chat";
@@ -27,6 +28,7 @@ const EditorPage = lazyPage(() => import("./editor/EditorPage"));
 const SetupGuide = lazyPage(() => import("./editor/SetupGuide"));
 const LegalPage = lazyPage(() => import("./editor/LegalPage"));
 const NotFoundPage = lazyPage(() => import("./editor/NotFoundPage"));
+const LookPage = lazyPage(() => import("./editor/LookPage"));
 
 /** "/" is always the landing page (T6.34, T6.67); returning visitors get a "Continue your overlay" button there.
  *  The editor used to live here, so its old bookmarks ("/#1.…", a saved overlay) still open /editor with their
@@ -44,7 +46,9 @@ function PageMeta() {
   useEffect(() => {
     const overlay = pathname.startsWith("/o/");
     // Overlays aren't listed in `pages`: OBS never shows their title.
-    document.title = pages[pathname]?.title ?? (overlay ? "Overlune" : "Page not found · Overlune");
+    document.title =
+      (pages[pathname] ?? lookPages[pathname])?.title ??
+      (overlay ? "Overlune" : "Page not found · Overlune");
     const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!canonical) return;
     if (overlay) canonical.remove();
@@ -83,6 +87,7 @@ export default function App() {
           <Route path="/guide" element={<SetupGuide />} />
           <Route path="/privacy" element={<LegalPage page="privacy" />} />
           <Route path="/terms" element={<LegalPage page="terms" />} />
+          <Route path="/looks/:id" element={<LookPage />} />
           <Route
             path="/o/starting"
             element={

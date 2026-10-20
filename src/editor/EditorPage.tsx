@@ -403,7 +403,7 @@ function LookPicker({
 }
 
 /** Where the editor starts: a link in the address wins, then this browser's autosave, then defaults. */
-function initialState(): { settings: Settings; status: string } {
+function startingPoint(): { settings: Settings; status: string } {
   const fromUrl = decodeLink(location.hash);
   if (fromUrl) return { settings: fromUrl.settings, status: loadedMessage(fromUrl.ok) };
   const saved = loadSaved();
@@ -415,6 +415,13 @@ function initialState(): { settings: Settings; status: string } {
         : "Welcome back. Some saved settings couldn’t be read, so defaults are showing for those.",
     };
   return { settings: freshSettings(), status: "" };
+}
+
+/** A look's page (T15.3) opens the editor with that look picked, on top of the starting point: /editor?look=rain-city. */
+function initialState(): { settings: Settings; status: string; look?: ThemeId } {
+  const start = startingPoint();
+  const look = themeIds.find((id) => id === new URLSearchParams(location.search).get("look"));
+  return look ? { ...start, settings: { ...start.settings, theme: look }, look } : start;
 }
 
 export default function EditorPage() {
@@ -439,14 +446,18 @@ export default function EditorPage() {
   const [railCollapsed, setRailCollapsed] = useState(readRail);
   /** The editor shows instead of the welcome gallery (T6.16). Decided once, so setting everything back to the
    *  defaults never swaps the editor out from under the streamer. Picking Clean Slate changes no setting. */
-  const [started, setStarted] = useState(
-    () => pickedThisVisit || JSON.stringify(initial.settings) !== freshJson,
-  );
+  const [started, setStarted] = useState(() => {
+    if (initial.look) pickedThisVisit = true;
+    return pickedThisVisit || JSON.stringify(initial.settings) !== freshJson;
+  });
 
   // The address bar always holds the current settings, so bookmarking the editor saves the work.
   // replaceState: no history entry per keystroke. Sentry strips the fragment (lib/sentry-scrub.ts).
   useEffect(() => {
-    history.replaceState(history.state, "", `#${encode(settings)}`);
+    const url = new URL(location.href);
+    url.searchParams.delete("look"); // picked once; a reload mustn't pick it again over a later choice
+    url.hash = encode(settings);
+    history.replaceState(history.state, "", url);
     save(settings);
   }, [settings]);
 

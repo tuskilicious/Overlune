@@ -480,6 +480,7 @@
   color: var(--color-moon);
   font: inherit;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   transition:
     background-color 300ms ease-out,

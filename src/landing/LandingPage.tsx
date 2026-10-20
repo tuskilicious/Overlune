@@ -21,6 +21,7 @@ import SiteNav from "../components/SiteNav";
 import { chatSamples } from "../editor/chat-samples";
 import Preview from "../editor/Preview";
 import { sampleScene } from "../editor/scene-samples";
+import { lookPath } from "../lib/look-pages";
 import { loadSaved } from "../settings/storage";
 import AlertView from "../overlays/alerts/AlertView";
 import ChatView from "../overlays/chat/ChatView";
@@ -869,16 +870,16 @@ function LooksShowcase() {
         <ol ref={list} className="landing-look-list" aria-label="The looks">
           {themeIds.map((id) => (
             <li key={id} data-look-row={id} aria-current={active === id || undefined}>
-              <button
-                type="button"
+              {/* Pointing or focusing previews the look; the row opens its own page (T15.3). */}
+              <Link
+                to={lookPath(id)}
                 className="landing-look-row"
                 onPointerEnter={() => setActive(id)}
                 onFocus={() => setActive(id)}
-                onClick={() => setActive(id)}
               >
                 <span className="font-heading text-2xl font-bold">{themes[id].name}</span>
                 <span className="text-moon/75">{blurbs[id]}</span>
-              </button>
+              </Link>
               <button
                 type="button"
                 className="landing-look-expand"
@@ -920,7 +921,7 @@ function LooksShowcase() {
               <Icon name="expand" /> Full screen
             </button>
           </div>
-          <Link to="/editor" className={`${button} btn-shimmer btn-light mt-8`}>
+          <Link to={`/editor?look=${active}`} className={`${button} btn-shimmer btn-light mt-8`}>
             Use {themes[active].name}
           </Link>
         </div>
