@@ -457,9 +457,13 @@ function RulerStrip() {
       frame = 0;
       const max = html.scrollHeight - innerHeight;
       const share = max > 0 ? Math.min(1, scrollY / max) : 0;
-      tape.current!.style.transform = `translateY(${-scrollY}px)`;
-      mark.current!.style.transform = `translateY(${16 + share * (innerHeight - 32)}px)`;
-      mark.current!.toggleAttribute("data-low", share < 0.5);
+      // A late frame can land after the ruler has left the page (a test run logged "reading 'style'" of null).
+      const t = tape.current;
+      const m = mark.current;
+      if (!t || !m) return;
+      t.style.transform = `translateY(${-scrollY}px)`;
+      m.style.transform = `translateY(${16 + share * (innerHeight - 32)}px)`;
+      m.toggleAttribute("data-low", share < 0.5);
       setPct(Math.round(share * 100));
     };
     const later = () => {

@@ -28,8 +28,9 @@ export default function Account() {
     fetch("/api/me")
       .then(async (res) => {
         if (!live) return;
-        if (res.ok && isJson(res)) setState({ kind: "in", me: (await res.json()) as Me });
-        else if (res.status === 401 && isJson(res)) setState({ kind: "out" });
+        // Signed out is an empty 204 from the route itself; with accounts closed, the API answers 404 instead.
+        if (res.status === 204) setState({ kind: "out" });
+        else if (res.ok && isJson(res)) setState({ kind: "in", me: (await res.json()) as Me });
         else setState({ kind: "closed" });
       })
       .catch(() => live && setState({ kind: "closed" }));
@@ -58,8 +59,11 @@ export default function Account() {
           <svg viewBox="0 0 24 24" aria-hidden focusable="false">
             <path d={siTwitch.path} />
           </svg>
-          {/* Phones show "Sign in" by the Twitch mark; the whole name stays for screen readers. */}
-          Sign in<span className="editor-account-long"> with Twitch</span>
+          {/* Phones show "Sign in" by the Twitch mark; the whole name stays for screen readers. One element, so
+              the button's flex gap doesn't open up between "in" and "with". */}
+          <span>
+            Sign in<span className="editor-account-long"> with Twitch</span>
+          </span>
         </a>
       ) : (
         <details className="editor-account-menu">

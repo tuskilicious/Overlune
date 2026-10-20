@@ -30,9 +30,14 @@ export default function Countdown({ starting }: { starting: Settings["starting"]
         <>
           <div className="countdown-time">
             {/* One span per character, keyed by its value: only the digits that change remount and flip in
-                (T6.117). */}
+                (T6.117). Separators (":", the d/h/m units, spaces) are marked, so a look can style digits alone,
+                as Rain City's split-flap tiles do. */}
             {[...formatCountdown(secs)].map((ch, i) => (
-              <span key={`${i}${ch}`} className="countdown-ch">
+              <span
+                key={`${i}${ch}`}
+                className="countdown-ch"
+                data-sep={/\d/.test(ch) ? undefined : /[a-z]/i.test(ch) ? "unit" : ""}
+              >
                 {ch}
               </span>
             ))}
