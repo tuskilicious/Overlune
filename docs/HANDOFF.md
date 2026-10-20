@@ -65,7 +65,7 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 - **Vaporwave's sun stripes** hold still (performance). If the owner wants motion back, rebuild them to move with transform only.
 
 ### Next tasks
-1. **Phase 12, saved overlays** (planned, needs three owner decisions first): where the Durable Object runs (a small separate Worker, recommended, or moving the site to Workers), edits reaching OBS on an "Update OBS" button or by autosave, and 10 saved overlays per account or another limit.
+1. **Phase 12, saved overlays,** planned in TASKS.md (owner decisions 2026-10-20): move the site from Pages to Workers first (T12.1), then saved overlays with a 10-per-account limit, live updates through a Durable Object on an "Update OBS" button, saved-overlay links, the editor, the privacy policy, and an OBS test and release.
 2. Phases 13 and 14 (connections, the dock and the Android app) are planned in TASKS.md; not started.
 3. Codex's Clean Slate refresh continues on its own branch (`codex/refresh-clean-slate`) in its own folder.
 
