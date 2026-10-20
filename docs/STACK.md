@@ -107,6 +107,7 @@ overlune/
 ├─ functions/          Pages Functions (v2), only under /api: api/ (routes, _middleware.ts), lib/ (db.ts: the one data
 │                       layer; env.ts), its own tsconfig.json
 ├─ migrations/         D1 schema changes, numbered SQL (0001_init.sql, …)
+├─ scripts/            build steps that run after `vite build`: prerender.mjs (Phase 15)
 ├─ public/
 │  ├─ _headers
 │  └─ sounds/           licensed alert sounds (recorded in ASSETS.md)
