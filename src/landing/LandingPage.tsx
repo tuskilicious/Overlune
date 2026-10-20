@@ -547,7 +547,36 @@ const goodToKnow = [
     "Your links never break",
     "Paste a link once. When a look gets an update, your overlays pick it up on their own.",
   ],
+  // The questions streamers ask before trusting a free tool (2026-10-20). These also become the page's FAQ for search
+  // engines (`faqData` below), so they say exactly what the privacy policy and the platform table say.
+  [
+    "Is it really free?",
+    "Yes, all of it: every look, scene, overlay and alert. There's no paid tier, no watermark and no ads. Overlune is an open-source hobby project; you can chip in on GitHub Sponsors, and that unlocks nothing.",
+  ],
+  [
+    "What do you keep about me?",
+    "Nothing, unless you sign in. Your settings live in your links and your browser, not on our servers. Signing in with Twitch is optional; then we keep who you are on Twitch and when you signed in, and you can delete it any time. The privacy policy has the details.",
+  ],
+  [
+    "Which platforms do chat and alerts work with?",
+    "Twitch: your chat, plus raid, sub, gift sub and bits alerts, read without signing in to your account. Follow alerts, YouTube and Kick are planned. Scenes and the webcam frame work wherever you stream.",
+  ],
+  [
+    "Will it slow down my stream?",
+    "Overlays are light web pages with simple motion, and they pause while OBS has them hidden. For an older PC, Lite motion stops the moving backgrounds, and Still stops all motion.",
+  ],
 ] as const;
+
+/** The FAQ for search engines (schema.org FAQPage): the same questions and answers the page shows. */
+const faqData = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: goodToKnow.map(([question, answer]) => ({
+    "@type": "Question",
+    name: question,
+    acceptedAnswer: { "@type": "Answer", text: answer },
+  })),
+});
 
 type Support = "Yes" | "Not yet" | "No";
 
@@ -1368,6 +1397,9 @@ export default function LandingPage() {
             >
               Good to know
             </h2>
+            {/* The same questions as structured data, for search engines: a data block, never run. Built from the
+                fixed list above, never from what a visitor typed. */}
+            <script type="application/ld+json">{faqData}</script>
             {/* Questions that open in place, with round toggles, after the reference's FAQ (T6.124). */}
             <div className="divide-y divide-moon/10 border-y border-moon/10">
               {goodToKnow.map(([term, text]) => (

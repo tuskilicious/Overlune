@@ -1,0 +1,7 @@
+# Overlune: everything on the site may be crawled except the overlays themselves (/o/, whose settings live in
+# each streamer's private link) and the account API.
+User-agent: *
+Disallow: /o/
+Disallow: /api/
+
+Sitemap: https://overlune.in/sitemap.xml
