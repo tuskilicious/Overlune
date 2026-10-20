@@ -687,7 +687,9 @@ test("search engines get what Overlune is, the FAQ as shown, a sitemap and robot
   expect(robots).toContain("Disallow: /o/");
   expect(robots).toContain("Sitemap: https://overlune.in/sitemap.xml");
   const sitemap = await (await request.get("/sitemap.xml")).text();
-  for (const path of ["/", "/editor", "/guide", "/privacy", "/terms"])
+  // Generated from the pages and the looks (T15.4), dated today.
+  for (const path of ["/", "/editor", "/guide", "/privacy", "/terms", "/looks/rain-city"])
     expect(sitemap).toContain(`<loc>https://overlune.in${path}</loc>`);
+  expect(sitemap).toContain(`<lastmod>${new Date().toISOString().slice(0, 10)}</lastmod>`);
   expect(sitemap).not.toMatch(/<loc>[^<]*\/o\//);
 });

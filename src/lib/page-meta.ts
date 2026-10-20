@@ -1,4 +1,4 @@
-import { themeIds } from "../themes/types.ts";
+import { themeIds, type ThemeId } from "../themes/types.ts";
 
 export interface Page {
   title: string;
@@ -34,6 +34,21 @@ export const pages: Record<string, Page> = {
     description: "The terms for using Overlune, a free and open-source stream overlay maker.",
   },
 };
+
+/** A look's own page (T15.3), e.g. /looks/rain-city. Every look in the registry gets one (look-pages.ts). */
+export const lookPath = (id: ThemeId) => `/looks/${id}`;
+
+/** sitemap.xml (T15.4), written by the build: every site page and every look's page, each last changed on `lastmod`,
+ *  the build's date. Overlays (/o/) stay out, as robots.txt asks. */
+export function sitemap(lastmod: string): string {
+  const urls = [...Object.keys(pages), ...themeIds.map(lookPath)].map(
+    (path) => `  <url><loc>https://overlune.in${path}</loc><lastmod>${lastmod}</lastmod></url>\n`,
+  );
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.join("")}</urlset>
+`;
+}
 
 const escape = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
