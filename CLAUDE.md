@@ -12,7 +12,7 @@ Project rules for Claude Code. Follow these on every task. If a rule conflicts w
 
 ## Overlune-specific rules
 - **v1 is a static site:** no backend, no database, no accounts, no payments, no AI. Adding any of these needs approval first. Sections 4, 5 and 8 become mandatory the moment one is added.
-- **v2 is approved (2026-10-09) on Cloudflare only:** Pages Functions, D1, Durable Objects and R2, with sign-in through Twitch (`docs/STACK.md`, `docs/TASKS.md` Phase 7). Still no payments and no AI.
+- **v2 is approved (2026-10-09) on Cloudflare only:** Pages Functions, D1, Durable Objects and R2, with sign-in through Twitch (`docs/STACK.md`, `docs/TASKS.md` Phase 7). Moving the site and its API from Pages to Workers is approved (2026-10-20, Phase 12, T12.1). Still no payments and no AI.
 - **Test every overlay inside OBS** (OBS uses its own Chromium) before a task is done. Follow `docs/OBS-TESTING.md`.
 - **The overlay URL format is a public contract.** Streamers paste a link once and never touch it again. Every payload carries a schema version. Never break an old link: add a migration plus a test instead.
 - **Never put login tokens or secrets in an overlay URL.** Streamers show their screens.
