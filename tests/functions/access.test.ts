@@ -1,17 +1,29 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import type { PagesFunction } from "@cloudflare/workers-types";
-import { route, routes as workerRoutes } from "../../functions/index";
-import { accountsGate, apiHeaders, securityHeaders } from "../../functions/api/_middleware";
+import { routes as workerRoutes } from "../../functions/index";
+import { apiHeaders } from "../../functions/api/_middleware";
 import { onRequestGet as health } from "../../functions/api/health";
 import { onRequestDelete as deleteMe, onRequestGet as getMe } from "../../functions/api/me";
 import { onRequestPost as signout } from "../../functions/api/auth/signout";
 import { onRequestPost as signoutEverywhere } from "../../functions/api/auth/signout-everywhere";
 import { onRequestGet as start } from "../../functions/api/auth/twitch/index";
 import { onRequestGet as callback } from "../../functions/api/auth/twitch/callback";
-import type { Env } from "../../functions/lib/env";
+import {
+  onRequestGet as listOverlays,
+  onRequestPost as createOverlay,
+} from "../../functions/api/overlays";
+import {
+  onRequestDelete as deleteOverlay,
+  onRequestGet as getOverlay,
+  onRequestPatch as updateOverlay,
+} from "../../functions/api/overlay";
+import { onRequestPost as publishOverlay } from "../../functions/api/overlay-publish";
+import type { Handler } from "../../functions/lib/env";
 import { deleteUser } from "../../functions/lib/db";
-import { hashToken, newSessionToken, SESSION_COOKIE } from "../../functions/lib/session";
-import { env, ORIGIN, rows, signIn, twitch, withFakeTwitch } from "./twitch-fake";
+import { newOverlayId } from "../../functions/lib/overlays";
+import { hashToken, newSessionToken } from "../../functions/lib/session";
+import { encode } from "../../src/settings/url";
+import { defaultSettings } from "../../src/settings/schema";
+import { answer, api, env, ORIGIN, rows, signIn, twitch, withFakeTwitch } from "./twitch-fake";
 
 /**
  * Access-control tests (T7.5, CLAUDE.md §4): every API route, attacked the way someone would. Signed out, with a
@@ -24,19 +36,20 @@ import { env, ORIGIN, rows, signIn, twitch, withFakeTwitch } from "./twitch-fake
  * `routes`, and for any difference between `routes` and the Worker's own route table (functions/index.ts).
  */
 
-type Handler = PagesFunction<Env>;
 type Access =
   /** Anyone: no account data. */
   | "public"
   /** Only the signed-in user, about themselves. */
   | "self"
   /** Ends the caller's own session; signed out it only clears their own cookie, which touches no data. */
-  | "own-session";
+  | "own-session"
+  /** Only the signed-in owner of the saved overlay in the path (T12.2). */
+  | "owner";
 
 const routes: {
   file: string;
   path: string;
-  methods: Partial<Record<"GET" | "POST" | "DELETE", Handler>>;
+  methods: Partial<Record<"GET" | "POST" | "PATCH" | "DELETE", Handler>>;
   access: Access;
 }[] = [
   { file: "health.ts", path: "/api/health", methods: { GET: health }, access: "public" },
@@ -65,6 +78,24 @@ const routes: {
     methods: { POST: signoutEverywhere },
     access: "self",
   },
+  {
+    file: "overlays.ts",
+    path: "/api/overlays",
+    methods: { GET: listOverlays, POST: createOverlay },
+    access: "self",
+  },
+  {
+    file: "overlay.ts",
+    path: "/api/overlays/:id",
+    methods: { GET: getOverlay, PATCH: updateOverlay, DELETE: deleteOverlay },
+    access: "owner",
+  },
+  {
+    file: "overlay-publish.ts",
+    path: "/api/overlays/:id/publish",
+    methods: { POST: publishOverlay },
+    access: "owner",
+  },
 ];
 
 /** Every Function file under functions/api/, found at build time, without importing them. */
@@ -72,53 +103,25 @@ const files = Object.keys(import.meta.glob("../../functions/api/**/*.ts")).map((
   f.replace("../../functions/api/", ""),
 );
 
-/**
- * A request through the API as the Worker runs it: the middleware (minus Sentry, which only reports, and the abuse
- * limits, tested on their own), then the Worker's own choice of route for that path and method, or the 404.
- */
-async function api(
-  method: string,
-  path: string,
-  { token, origin = ORIGIN }: { token?: string | null; origin?: string | null } = {},
-): Promise<Response> {
-  const request = new Request(`${ORIGIN}${path}`, {
-    method,
-    headers: {
-      ...(origin ? { Origin: origin } : {}),
-      ...(token ? { Cookie: `${SESSION_COOKIE}=${token}` } : {}),
-    },
-  });
-  const chain: Handler[] = [securityHeaders, accountsGate, route(request)];
-  const run = (i: number): Promise<Response> =>
-    Promise.resolve(
-      chain[i]!({
-        request,
-        env: { ...env, ACCOUNTS_OPEN: "true" },
-        next: () => run(i + 1),
-        params: {},
-        data: {},
-      } as unknown as Parameters<Handler>[0]) as unknown as Response,
-    );
-  return run(0);
-}
-
-/** Everything an attacker could compare between two answers. */
-const answer = async (res: Response) => ({
-  status: res.status,
-  body: await res.text(),
-  type: res.headers.get("Content-Type"),
-  cookie: res.headers.get("Set-Cookie"),
-});
-
 /** Every account row, to prove an attempt changed nothing. */
-const snapshot = async () => JSON.stringify([await rows("users"), await rows("sessions")]);
+const snapshot = async () =>
+  JSON.stringify([await rows("users"), await rows("sessions"), await rows("overlays")]);
+
+/** Settings in the link's form: what a saved overlay holds. */
+const settings = encode(defaultSettings);
+/** A path with its `:id` filled in. */
+const at = (path: string, id: string) => path.replace(":id", id);
 
 withFakeTwitch();
 
 let a: string;
 let b: string;
 let bId: string;
+/** A saved overlay of A's and one of B's. */
+let aOverlay: string;
+let bOverlay: string;
 beforeEach(async () => {
+  await env.DB.prepare("DELETE FROM overlays").run();
   await env.DB.prepare("DELETE FROM sessions").run();
   await env.DB.prepare("DELETE FROM users").run();
   twitch.sub = twitch.helixId = "111";
@@ -126,6 +129,14 @@ beforeEach(async () => {
   twitch.sub = twitch.helixId = "222";
   b = await signIn();
   bId = (await rows("users")).find((u) => u.twitch_id === "222")!.id as string;
+  const save = async (token: string, name: string) =>
+    (
+      (await (await api("POST", "/api/overlays", { token, body: { name, settings } })).json()) as {
+        id: string;
+      }
+    ).id;
+  aOverlay = await save(a, "A's starting scene");
+  bOverlay = await save(b, "B's starting scene");
 });
 
 describe("the route registry", () => {
@@ -164,14 +175,19 @@ describe("cookies that aren't a live session", () => {
     };
   }
 
-  for (const route of routes.filter((r) => r.access === "self"))
+  for (const route of routes.filter((r) => r.access === "self" || r.access === "owner"))
     for (const method of Object.keys(route.methods))
       it(`${method} ${route.path}: signed out, the same for every one of them, and nothing changes`, async () => {
         const tokens = await badTokens();
         const before = await snapshot();
         const answers = await Promise.all(
           Object.values(tokens).map(async (token) =>
-            answer(await api(method, route.path, { token })),
+            answer(
+              await api(method, at(route.path, aOverlay), {
+                token,
+                body: method === "GET" || method === "DELETE" ? undefined : { name: "x", settings },
+              }),
+            ),
           ),
         );
         for (const res of answers) expect(res).toEqual(answers[0]);
@@ -213,11 +229,63 @@ describe("user A against user B", () => {
     expect((await api("GET", "/api/me", { token: b })).status).toBe(200);
   });
 
-  it("A deleting their account removes only A", async () => {
+  it("A deleting their account removes only A, saved overlays included", async () => {
     expect((await api("DELETE", "/api/me", { token: a })).status).toBe(204);
     expect((await rows("users")).map((u) => u.twitch_id)).toEqual(["222"]);
     expect((await rows("sessions")).map((s) => s.token_hash)).toEqual([await hashToken(b)]);
+    expect((await rows("overlays")).map((o) => o.id)).toEqual([bOverlay]);
     expect((await api("GET", "/api/me", { token: b })).status).toBe(200);
+  });
+
+  it("A's list of saved overlays is only ever A's", async () => {
+    const list = await (await api("GET", "/api/overlays", { token: a })).text();
+    expect(list).toContain(aOverlay);
+    expect(list).not.toContain(bOverlay);
+    expect(list).not.toContain(bId);
+  });
+
+  it("A can't read, rename, save over, publish or delete B's overlay: the same 404 as an id that doesn't exist, and nothing changes", async () => {
+    const before = await snapshot();
+    const tries: [string, string, unknown][] = [
+      ["GET", "/api/overlays/:id", undefined],
+      ["PATCH", "/api/overlays/:id", { name: "mine now" }],
+      ["PATCH", "/api/overlays/:id", { settings }],
+      ["POST", "/api/overlays/:id/publish", undefined],
+      ["DELETE", "/api/overlays/:id", undefined],
+    ];
+    for (const [method, path, body] of tries) {
+      const theirs = await answer(await api(method, at(path, bOverlay), { token: a, body }));
+      const madeUp = await answer(await api(method, at(path, newOverlayId()), { token: a, body }));
+      expect(theirs, `${method} ${path}`).toEqual(madeUp);
+      expect(theirs).toMatchObject({ status: 404, body: '{"error":"not found"}' });
+    }
+    expect(await snapshot()).toBe(before);
+  });
+
+  it("guessing ids finds nothing: well-formed, malformed, B's account id, or tricks in the path", async () => {
+    const before = await snapshot();
+    const notFound = await answer(
+      await api("GET", at("/api/overlays/:id", newOverlayId()), { token: a }),
+    );
+    for (const id of [
+      newOverlayId(),
+      bOverlay.toLowerCase(),
+      `${bOverlay}x`,
+      bOverlay.slice(1),
+      bId,
+      "1",
+      "%2e%2e",
+      encodeURIComponent(`${bOverlay}' OR '1'='1`),
+      `${bOverlay}%00`,
+      "a".repeat(3000),
+    ])
+      for (const path of ["/api/overlays/:id", "/api/overlays/:id/publish"])
+        for (const method of path.endsWith("publish") ? ["POST"] : ["GET", "DELETE"])
+          expect(
+            await answer(await api(method, at(path, id), { token: a })),
+            `${method} ${at(path, id).slice(0, 80)}`,
+          ).toEqual(notFound);
+    expect(await snapshot()).toBe(before);
   });
 });
 
@@ -255,6 +323,13 @@ describe("guessed and malformed addresses", () => {
       ["GET", "/api/auth/signout-everywhere"],
       ["DELETE", "/api/health"],
       ["POST", "/api/auth/twitch"],
+      ["PUT", "/api/overlays"],
+      ["DELETE", "/api/overlays"],
+      ["PATCH", "/api/overlays"],
+      ["POST", `/api/overlays/${aOverlay}`],
+      ["PUT", `/api/overlays/${aOverlay}`],
+      ["GET", `/api/overlays/${aOverlay}/publish`],
+      ["DELETE", `/api/overlays/${aOverlay}/publish`],
     ];
     for (const [method, path] of wrong)
       expect(await answer(await api(method!, path!, { token: a }))).toEqual(notFound);
@@ -266,11 +341,18 @@ describe("other sites", () => {
     ["DELETE", "/api/me"],
     ["POST", "/api/auth/signout"],
     ["POST", "/api/auth/signout-everywhere"],
+    ["POST", "/api/overlays"],
+    ["PATCH", "/api/overlays/:id"],
+    ["DELETE", "/api/overlays/:id"],
+    ["POST", "/api/overlays/:id/publish"],
   ] as const)
     it(`can't ${method} ${path} with a signed-in cookie: a 403, and nothing changes`, async () => {
       const before = await snapshot();
+      const body = method === "POST" || method === "PATCH" ? { name: "x", settings } : undefined;
       for (const origin of [null, "https://evil.example", "null", `${ORIGIN}.evil.example`])
-        expect((await api(method, path, { token: a, origin })).status).toBe(403);
+        expect((await api(method, at(path, aOverlay), { token: a, origin, body })).status).toBe(
+          403,
+        );
       expect(await snapshot()).toBe(before);
     });
 });
@@ -283,6 +365,8 @@ describe("every answer", () => {
       ["GET", "/api/me", null],
       ["GET", "/api/nope", null],
       ["DELETE", "/api/me", "x"],
+      ["GET", "/api/overlays", a],
+      ["GET", "/api/overlays/x", a],
     ] as const) {
       const res = await api(method, path, { token, origin: null });
       for (const [name, value] of Object.entries(apiHeaders))

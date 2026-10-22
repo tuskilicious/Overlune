@@ -1,6 +1,5 @@
-import type { PagesFunction } from "@cloudflare/workers-types";
 import { createSession, upsertUser } from "../../../lib/db";
-import { redirect, type Env } from "../../../lib/env";
+import { redirect, type Handler } from "../../../lib/env";
 import {
   cookie,
   hashToken,
@@ -18,7 +17,7 @@ import { finishSignIn } from "../../../lib/twitch";
  * happens, so a callback can't be replayed. Any failure (a tampered state, a missing cookie, a bad token, the streamer
  * saying no) just goes back to the editor signed out, with no detail for an attacker.
  */
-export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequestGet: Handler = async ({ request, env }) => {
   const clear = cookie(SIGNIN_COOKIE, "", 0);
   const failed = () => redirect("/editor?signin=failed", [clear]);
   const [state, nonce, ...rest] = (readCookie(request, SIGNIN_COOKIE) ?? "").split(".");

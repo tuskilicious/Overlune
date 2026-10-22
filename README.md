@@ -71,6 +71,7 @@ The API (v2, `functions/`) also reads these, server only:
 |---|---|---|
 | `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET` | Worker secrets: `npx wrangler secret put <NAME>` for production (the Overlune Twitch app), `npx wrangler preview secret put <NAME>` for Previews (Overlune Staging) | Sign in with Twitch (T7.3). Locally, in `.dev.vars`, which git ignores |
 | `AUTH_ORIGIN` | `wrangler.jsonc` | Where Sign in with Twitch comes back to: `https://overlune.in`, `https://staging-overlune.overlune.workers.dev` (the Preview of a branch named `staging`) or, in `.dev.vars`, `http://localhost:8787`. Each Twitch app lists `<AUTH_ORIGIN>/api/auth/twitch/callback` |
+| `SAVED_OVERLAYS_OPEN` | `wrangler.jsonc` | `true` opens saved overlays (T12.2): on for Previews, off in production until the privacy policy covers them (T12.6), when their routes answer 404. Locally, in `.dev.vars` |
 | `DB` | `wrangler.jsonc` (a binding, not a secret) | The D1 database: `overlune-production` for production, `overlune-staging` for Previews, and a local copy for `wrangler dev` |
 
 ## Optional tooling
@@ -88,7 +89,7 @@ The site and its API (`/api/*`, the Worker in `functions/index.ts`) run together
 npx wrangler d1 migrations apply DB --local     # once, and after each new migration
 npm run build && npx wrangler dev               # the site and /api at http://localhost:8787
 ```
-`wrangler.jsonc`'s top level is production, so local runs need a `.dev.vars` file (git ignores it) with `VITE_SENTRY_DSN=` (empty: Sentry off), `VITE_SENTRY_ENVIRONMENT=development` and `AUTH_ORIGIN=http://localhost:8787`, plus the staging Twitch app's `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` to try sign-in. Never run `wrangler dev --remote`: it would use production's database.
+`wrangler.jsonc`'s top level is production, so local runs need a `.dev.vars` file (git ignores it) with `VITE_SENTRY_DSN=` (empty: Sentry off), `VITE_SENTRY_ENVIRONMENT=development`, `AUTH_ORIGIN=http://localhost:8787` and `SAVED_OVERLAYS_OPEN=true`, plus the staging Twitch app's `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` to try sign-in. Never run `wrangler dev --remote`: it would use production's database.
 
 ## Test
 ```bash

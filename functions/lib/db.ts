@@ -100,7 +100,133 @@ export async function profile(db: D1Database, userId: string): Promise<Profile |
  *  data join this list. */
 export async function deleteUser(db: D1Database, userId: string): Promise<void> {
   await db.batch([
+    db.prepare("DELETE FROM overlays WHERE owner_id = ?").bind(userId),
     db.prepare("DELETE FROM sessions WHERE user_id = ?").bind(userId),
     db.prepare("DELETE FROM users WHERE id = ?").bind(userId),
   ]);
+}
+
+/** A saved overlay in a list (T12.2): no settings, which only the one being opened needs. */
+export interface OverlaySummary {
+  id: string;
+  name: string;
+  updatedAt: number;
+  publishedAt: number | null;
+  version: number;
+}
+
+/** One saved overlay: its draft (what the editor shows) and what OBS shows (`published`, from "Update OBS"). */
+export interface Overlay extends OverlaySummary {
+  draft: string;
+  published: string | null;
+}
+
+type OverlayRow = {
+  id: string;
+  name: string;
+  draft: string;
+  published: string | null;
+  published_at: number | null;
+  version: number;
+  updated_at: number;
+};
+
+const summary = (r: Omit<OverlayRow, "draft" | "published">): OverlaySummary => ({
+  id: r.id,
+  name: r.name,
+  updatedAt: r.updated_at,
+  publishedAt: r.published_at,
+  version: r.version,
+});
+
+/** This user's saved overlays, most recently changed first. */
+export async function listOverlays(db: D1Database, userId: string): Promise<OverlaySummary[]> {
+  const { results } = await db
+    .prepare(
+      "SELECT id, name, published_at, version, updated_at FROM overlays WHERE owner_id = ? ORDER BY updated_at DESC, id",
+    )
+    .bind(userId)
+    .all<Omit<OverlayRow, "draft" | "published">>();
+  return results.map(summary);
+}
+
+/** Saves a new overlay, in one statement, only while this user has fewer than `limit`: null when they don't. */
+export async function createOverlay(
+  db: D1Database,
+  userId: string,
+  overlay: { id: string; name: string; settings: string },
+  limit: number,
+  now: number,
+): Promise<OverlaySummary | null> {
+  const row = await db
+    .prepare(
+      `INSERT INTO overlays (id, owner_id, name, draft, published, published_at, version, created_at, updated_at)
+       SELECT ?, ?, ?, ?, NULL, NULL, 0, ?, ?
+       WHERE (SELECT count(*) FROM overlays WHERE owner_id = ?) < ?
+       RETURNING id, name, published_at, version, updated_at`,
+    )
+    .bind(overlay.id, userId, overlay.name, overlay.settings, now, now, userId, limit)
+    .first<Omit<OverlayRow, "draft" | "published">>();
+  return row ? summary(row) : null;
+}
+
+/** One of this user's overlays; null when there's no such overlay or it isn't theirs, which look the same. */
+export async function getOverlay(
+  db: D1Database,
+  userId: string,
+  id: string,
+): Promise<Overlay | null> {
+  const row = await db
+    .prepare(
+      "SELECT id, name, draft, published, published_at, version, updated_at FROM overlays WHERE id = ? AND owner_id = ?",
+    )
+    .bind(id, userId)
+    .first<OverlayRow>();
+  return row ? { ...summary(row), draft: row.draft, published: row.published } : null;
+}
+
+/** Renames an overlay or saves its draft, or both. Null when it isn't this user's. */
+export async function updateOverlay(
+  db: D1Database,
+  userId: string,
+  id: string,
+  change: { name?: string; settings?: string },
+  now: number,
+): Promise<OverlaySummary | null> {
+  const row = await db
+    .prepare(
+      `UPDATE overlays SET name = coalesce(?, name), draft = coalesce(?, draft), updated_at = ?
+       WHERE id = ? AND owner_id = ?
+       RETURNING id, name, published_at, version, updated_at`,
+    )
+    .bind(change.name ?? null, change.settings ?? null, now, id, userId)
+    .first<Omit<OverlayRow, "draft" | "published">>();
+  return row ? summary(row) : null;
+}
+
+/** "Update OBS": the draft becomes what OBS shows, under a new version. Null when it isn't this user's. */
+export async function publishOverlay(
+  db: D1Database,
+  userId: string,
+  id: string,
+  now: number,
+): Promise<OverlaySummary | null> {
+  const row = await db
+    .prepare(
+      `UPDATE overlays SET published = draft, published_at = ?, version = version + 1
+       WHERE id = ? AND owner_id = ?
+       RETURNING id, name, published_at, version, updated_at`,
+    )
+    .bind(now, id, userId)
+    .first<Omit<OverlayRow, "draft" | "published">>();
+  return row ? summary(row) : null;
+}
+
+/** Deletes an overlay. False when it isn't this user's. */
+export async function deleteOverlay(db: D1Database, userId: string, id: string): Promise<boolean> {
+  const { meta } = await db
+    .prepare("DELETE FROM overlays WHERE id = ? AND owner_id = ?")
+    .bind(id, userId)
+    .run();
+  return meta.changes > 0;
 }
