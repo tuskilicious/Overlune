@@ -5,7 +5,7 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 ## The project in one paragraph
 **Overlune** (overlune.in, repo `tuskilicious/Overlune`) is a free, open-source stream overlay maker.
 
-- **Stack:** React + Vite on Cloudflare Pages, with Pages Functions + D1 for optional Twitch sign-in (v2).
+- **Stack:** React + Vite on one Cloudflare Worker (since 2026-10-22, T12.1; Pages before): static assets for the site, the API in `functions/index.ts` for `/api/*`, D1 for optional Twitch sign-in (v2).
 - **Settings:** they live in the overlay link's fragment (`#1.<lz-string>`, zod schema, additive-only: old links must keep working).
 - **Looks:** 20, the newest Eclipse, Rain City, Paper Cut and Aurora Tundra (Phase 11). Each has its own page at `/looks/<id>` and Starting Soon, BRB, Ending, Offline, Just Chatting and Reaction scenes, plus chat, alerts, a webcam frame and Live (chat, alerts and frame in one source).
 - **Canvas editor:** Phase 9; moves every part of a scene.
@@ -15,7 +15,7 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 ## How the owner works (follow this)
 - **One task, one branch, one PR.** Plan, build, run `npm run lint`, `npm run typecheck` and `npm test`, plus the Playwright e2e suite (`npx playwright test`), then commit, push and open a PR.
 - **Shared work:** the owner works with Claude Code too. Check for changes from the other agent before committing, stage only the current task's files, and leave this handoff current.
-- **Merging:** the owner says "merge". Then wait for all three CI checks (`checks`, `gitleaks`, `deploy`) to pass before `gh pr merge N --merge`. `deploy` publishes the PR's preview from Actions; there is no separate Cloudflare Pages check any more.
+- **Merging:** the owner says "merge". Then wait for all three CI checks (`checks`, `gitleaks`, `deploy`) to pass before `gh pr merge N --merge`. `deploy` publishes the PR's Workers Preview (`<branch>-overlune.overlune.workers.dev`) or, on main, production.
 - **Stacked PRs:** retarget to main (`gh pr edit N --base main`) before merging, and don't delete a base branch while a child PR still points at it.
 - **Overlay tasks stay unticked** in `docs/TASKS.md` until the owner reports their OBS check passed. Never log an OBS pass the owner didn't state.
 - **Git safety:**
@@ -65,7 +65,7 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
 - **Vaporwave's sun stripes** hold still (performance). If the owner wants motion back, rebuild them to move with transform only.
 
 ### Next tasks
-1. **Phase 12, saved overlays,** planned in TASKS.md (owner decisions 2026-10-20): move the site from Pages to Workers first (T12.1), then saved overlays with a 10-per-account limit, live updates through a Durable Object on an "Update OBS" button, saved-overlay links, the editor, the privacy policy, and an OBS test and release.
+1. **Phase 12, saved overlays,** planned in TASKS.md (owner decisions 2026-10-20). T12.1, the move to Workers, is done (2026-10-22). Next is T12.2, then saved overlays with a 10-per-account limit, live updates through a Durable Object on an "Update OBS" button, saved-overlay links, the editor, the privacy policy, and an OBS test and release.
 2. Phases 13 and 14 (connections, the dock and the Android app) are planned in TASKS.md; not started.
 3. Codex's Clean Slate refresh continues on its own branch (`codex/refresh-clean-slate`) in its own folder.
 
@@ -100,7 +100,7 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
   - Copy the actual image over `tests/e2e/*.visual.spec.ts-snapshots/…`, as the README says.
 - **Layout-measuring tests** must wait for `document.fonts.ready` and settled or reduced motion.
 - **Known console messages:** the `RulerStrip` null-style error from the 2.1.0 run is fixed (#263, a guard for a late frame). "ResizeObserver loop completed with undelivered notifications" still shows in the dev server's log during full e2e runs (2026-10-20, 622 passed); harmless so far.
-- **Prerender locally:** `npm run build && npm run prerender` (about 90 seconds: 40 look pictures), then `npx wrangler pages dev dist --port 8788 --ip 127.0.0.1` to try Pages' routing. Stop old `wrangler pages dev` processes first, or the port hangs.
+- **Run the real thing locally:** `npm run build && npm run prerender` (about 90 seconds: 40 look pictures), `npx wrangler d1 migrations apply DB --local`, then `npx wrangler dev --port 8787 --ip 127.0.0.1` with a `.dev.vars` (README, "Run"). Never `--remote`: that's production's database. Stop old `wrangler dev` processes first, or the port hangs.
 - **Other habits:**
   - Restart the dev server after switching branches (Vite can serve stale CSS).
   - Use `gh run download` for artifacts, not PowerShell redirection.
