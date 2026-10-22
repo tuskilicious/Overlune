@@ -70,7 +70,7 @@ The API (v2, `functions/`) also reads these, server only:
 | Name | Where | Purpose |
 |---|---|---|
 | `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET` | Worker secrets: `npx wrangler secret put <NAME>` for production (the Overlune Twitch app), `npx wrangler preview secret put <NAME>` for Previews (Overlune Staging) | Sign in with Twitch (T7.3). Locally, in `.dev.vars`, which git ignores |
-| `AUTH_ORIGIN` | `wrangler.jsonc` | Where Sign in with Twitch comes back to: `https://overlune.in`, `https://staging-overlune.tanishqbharti.workers.dev` (the Preview of a branch named `staging`) or, in `.dev.vars`, `http://localhost:8787`. Each Twitch app lists `<AUTH_ORIGIN>/api/auth/twitch/callback` |
+| `AUTH_ORIGIN` | `wrangler.jsonc` | Where Sign in with Twitch comes back to: `https://overlune.in`, `https://staging-overlune.overlune.workers.dev` (the Preview of a branch named `staging`) or, in `.dev.vars`, `http://localhost:8787`. Each Twitch app lists `<AUTH_ORIGIN>/api/auth/twitch/callback` |
 | `DB` | `wrangler.jsonc` (a binding, not a secret) | The D1 database: `overlune-production` for production, `overlune-staging` for Previews, and a local copy for `wrangler dev` |
 
 ## Optional tooling
@@ -104,7 +104,7 @@ Screenshot tests (`*.visual.spec.ts`) only run on Linux, because fonts render di
 
 ## Deploy
 One Cloudflare Worker (since T12.1; Cloudflare Pages before), deployed by GitHub Actions:
-- CI builds the site, runs every check, prerenders the public pages (`npm run prerender`) and only then deploys. A pull request from this repository gets its own Preview at `<branch>-overlune.tanishqbharti.workers.dev`, with the staging database and Sentry (`wrangler preview`); merging to `main` deploys production (`wrangler deploy`). The deploy job runs while the repository variable `DEPLOY_FROM_ACTIONS` is `true`.
+- CI builds the site, runs every check, prerenders the public pages (`npm run prerender`) and only then deploys. A pull request from this repository gets its own Preview at `<branch>-overlune.overlune.workers.dev`, with the staging database and Sentry (`wrangler preview`); merging to `main` deploys production (`wrangler deploy`). The deploy job runs while the repository variable `DEPLOY_FROM_ACTIONS` is `true`.
 - `wrangler.jsonc` holds the Worker's settings: production at the top level, Previews under `previews`. The Worker runs only for `/api/*`; everything else is a static file from `dist/`, with `public/_headers` and `public/_redirects`. The API sets its own security headers (`functions/api/_middleware.ts`).
 - Database migrations don't run on deploy. Apply each new one to staging with `npx wrangler d1 migrations apply overlune-staging --remote --config wrangler.preview-migrations.jsonc`, then to production with `npx wrangler d1 migrations apply overlune-production --remote` once its PR is approved.
 

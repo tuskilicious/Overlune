@@ -22,7 +22,7 @@
     "not_found_handling": "404-page",
     "run_worker_first": ["/api/*"],
   },
-  // overlune.tanishqbharti.workers.dev, for checking production before overlune.in moves (T12.1); `_headers` keeps
+  // overlune.overlune.workers.dev, for checking production before overlune.in moves (T12.1); `_headers` keeps
   // it out of search results.
   "workers_dev": true,
   "preview_urls": true,
@@ -45,7 +45,7 @@
     "vars": {
       "VITE_SENTRY_DSN": "https://26398e09d381b7786ca7ea853b4a063f@o4512174345224192.ingest.de.sentry.io/4512174371766352",
       "VITE_SENTRY_ENVIRONMENT": "staging",
-      "AUTH_ORIGIN": "https://staging-overlune.tanishqbharti.workers.dev",
+      "AUTH_ORIGIN": "https://staging-overlune.overlune.workers.dev",
       "ACCOUNTS_OPEN": "true",
     },
     "d1_databases": [
