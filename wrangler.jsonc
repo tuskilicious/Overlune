@@ -22,8 +22,11 @@
     "not_found_handling": "404-page",
     "run_worker_first": ["/api/*"],
   },
-  // overlune.overlune.workers.dev, for checking production before overlune.in moves (T12.1); `_headers` keeps
-  // it out of search results.
+  // overlune.in runs the Worker (T12.1, step 2). A route, not a custom domain, so the switch had no gap: the domain's
+  // DNS record (still pointing at the Pages project, which stays as the way back) is never used while the route
+  // stands. www.overlune.in keeps its zone redirect to overlune.in.
+  "routes": [{ "pattern": "overlune.in/*", "zone_id": "e00b2a6e813148dac2213384bb365745" }],
+  // overlune.overlune.workers.dev too, kept out of search results by `_headers`.
   "workers_dev": true,
   "preview_urls": true,
   "vars": {
