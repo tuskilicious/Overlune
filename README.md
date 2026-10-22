@@ -60,18 +60,18 @@ All are optional for local development. Without `VITE_SENTRY_DSN`, Sentry stays 
 |---|---|---|
 | `VITE_SENTRY_DSN` | client (public) | Sentry error tracking |
 | `VITE_SENTRY_ENVIRONMENT` | client (public) | `development`, `staging` or `production` |
-| `VITE_SENTRY_RELEASE` | client (public) | Release name for Sentry events. Optional: by default the build uses `overlune@<package.json version>`, plus the commit on Cloudflare Pages (e.g. `overlune@1.0.0+319afe4`). |
-| `SENTRY_AUTH_TOKEN` | build only (Cloudflare Pages **production**, as an encrypted secret) | Uploads source maps to Sentry during the production build, then deletes them so they're never served. Without it, no maps are built. Never in client code (see `docs/SENTRY.md`) |
+| `VITE_SENTRY_RELEASE` | client (public) | Release name for Sentry events. Optional: by default the build uses `overlune@<package.json version>`, plus the commit when CI builds it (e.g. `overlune@1.0.0+319afe4`). |
+| `SENTRY_AUTH_TOKEN` | build only (a GitHub Actions secret, used for **production** builds) | Uploads source maps to Sentry during the production build, then deletes them so they're never served. Without it, no maps are built. Never in client code (see `docs/SENTRY.md`) |
 
-Deploys use the Cloudflare Pages Git integration, so no Cloudflare token is needed.
+Deploys run from GitHub Actions with a token for this account's Workers only (see Deploy).
 
 The API (v2, `functions/`) also reads these, server only:
 
 | Name | Where | Purpose |
 |---|---|---|
-| `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET` | Cloudflare Pages, as encrypted secrets (production: the Overlune Twitch app; preview: Overlune Staging) | Sign in with Twitch (T7.3). Locally, in `.dev.vars`, which git ignores |
-| `AUTH_ORIGIN` | `wrangler.jsonc` | Where Sign in with Twitch comes back to: `https://overlune.in`, `https://staging.overlune.pages.dev` (the `staging` branch) or `http://localhost:8788`. Each Twitch app lists `<AUTH_ORIGIN>/api/auth/twitch/callback` |
-| `DB` | `wrangler.jsonc` (a binding, not a secret) | The D1 database: `overlune-staging` for local and previews, `overlune-production` for `main` |
+| `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET` | Worker secrets: `npx wrangler secret put <NAME>` for production (the Overlune Twitch app), `npx wrangler preview secret put <NAME>` for Previews (Overlune Staging) | Sign in with Twitch (T7.3). Locally, in `.dev.vars`, which git ignores |
+| `AUTH_ORIGIN` | `wrangler.jsonc` | Where Sign in with Twitch comes back to: `https://overlune.in`, `https://staging-overlune.overlune.workers.dev` (the Preview of a branch named `staging`) or, in `.dev.vars`, `http://localhost:8787`. Each Twitch app lists `<AUTH_ORIGIN>/api/auth/twitch/callback` |
+| `DB` | `wrangler.jsonc` (a binding, not a secret) | The D1 database: `overlune-production` for production, `overlune-staging` for Previews, and a local copy for `wrangler dev` |
 
 ## Optional tooling
 - **21st.dev plugin for Claude Code.** A design reference for the editor and landing page only, never overlays (`docs/DESIGN.md`, "Outside components"). It reads `API_KEY_21ST`: set it in the plugin's own settings or in `.env.local`, which git ignores. It isn't an app variable (no `VITE_` prefix), so the build never puts it in client code. Never add it to CI, Cloudflare Pages or a URL, and don't use install commands that put the key in a URL. Hosted AI generation stays off: v1 has no AI (`CLAUDE.md`).
@@ -83,11 +83,12 @@ npm run build        # production build into dist/
 npm run preview      # serve the production build locally
 ```
 
-The API (`/api/*`, Pages Functions) runs under Wrangler, against a local D1:
+The site and its API (`/api/*`, the Worker in `functions/index.ts`) run together under Wrangler, against a local D1:
 ```bash
-npx wrangler d1 migrations apply overlune-staging --local   # once, and after each new migration
-npm run build && npx wrangler pages dev                     # the site and /api at http://localhost:8788
+npx wrangler d1 migrations apply DB --local     # once, and after each new migration
+npm run build && npx wrangler dev               # the site and /api at http://localhost:8787
 ```
+`wrangler.jsonc`'s top level is production, so local runs need a `.dev.vars` file (git ignores it) with `VITE_SENTRY_DSN=` (empty: Sentry off), `VITE_SENTRY_ENVIRONMENT=development` and `AUTH_ORIGIN=http://localhost:8787`, plus the staging Twitch app's `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` to try sign-in. Never run `wrangler dev --remote`: it would use production's database.
 
 ## Test
 ```bash
@@ -102,22 +103,12 @@ Also test every overlay inside OBS. See `docs/OBS-TESTING.md`.
 Screenshot tests (`*.visual.spec.ts`) only run on Linux, because fonts render differently on Windows and macOS. CI is the source of truth. When a screenshot test fails in CI, download the `playwright-results` artifact from the run to see the expected, actual and diff images. If the change was intended, copy the actual image over the baseline in `tests/e2e/*.visual.spec.ts-snapshots/` and commit it. A new screenshot test fails once in CI and writes its baseline into the same artifact.
 
 ## Deploy
-Cloudflare Pages, deployed by GitHub Actions (since 2026-10-20, Phase 15):
-- CI builds the site, runs every check, prerenders the public pages (`npm run prerender`) and only then deploys with `wrangler pages deploy`. A pull request from this repository gets a preview at `<branch>.overlune.pages.dev` (staging); merging to `main` deploys production.
-- The Pages project's own automatic deployments are off. The deploy job runs while the repository variable `DEPLOY_FROM_ACTIONS` is `true`; setting it to `false` and turning Pages' automatic deployments back on returns to Cloudflare's build.
-- Security headers live in `public/_headers`; the API sets its own (`functions/api/_middleware.ts`).
-- `wrangler.jsonc` holds the project's bindings and plain variables, for preview and production. Secrets stay in the dashboard.
-- Database migrations don't run on deploy. Apply each new one with `npx wrangler d1 migrations apply overlune-staging --remote`, then `npx wrangler d1 migrations apply overlune-production --remote --env production` once its PR is approved.
+One Cloudflare Worker (since T12.1; Cloudflare Pages before), deployed by GitHub Actions:
+- CI builds the site, runs every check, prerenders the public pages (`npm run prerender`) and only then deploys. A pull request from this repository gets its own Preview at `<branch>-overlune.overlune.workers.dev`, with the staging database and Sentry (`wrangler preview`); merging to `main` deploys production (`wrangler deploy`). The deploy job runs while the repository variable `DEPLOY_FROM_ACTIONS` is `true`.
+- `wrangler.jsonc` holds the Worker's settings: production at the top level, Previews under `previews`. The Worker runs only for `/api/*`; everything else is a static file from `dist/`, with `public/_headers` and `public/_redirects`. The API sets its own security headers (`functions/api/_middleware.ts`).
+- Database migrations don't run on deploy. Apply each new one to staging with `npx wrangler d1 migrations apply overlune-staging --remote --config wrangler.preview-migrations.jsonc`, then to production with `npx wrangler d1 migrations apply overlune-production --remote` once its PR is approved.
 
-GitHub Actions (`.github/workflows/ci.yml`) runs on every PR and push to `main`: lint, typecheck, unit tests, build, `npm audit`, Playwright tests, the prerender, a gitleaks scan, and the deploy. Its secrets: `CLOUDFLARE_PAGES_TOKEN` (Cloudflare Pages · Edit on this account only) and `SENTRY_AUTH_TOKEN` (source maps for production); its variables: `CLOUDFLARE_ACCOUNT_ID` and `DEPLOY_FROM_ACTIONS`.
-
-### Cloudflare Pages settings
-Pages settings: build command `npm run build`, output `dist`, Node from `.nvmrc`. Since T7.2 the plain variables below are set in `wrangler.jsonc`, which the dashboard then only shows:
-
-| Variable | Production | Preview |
-|---|---|---|
-| `VITE_SENTRY_DSN` | the Sentry DSN | the Sentry DSN |
-| `VITE_SENTRY_ENVIRONMENT` | `production` | `staging` |
+GitHub Actions (`.github/workflows/ci.yml`) runs on every PR and push to `main`: lint, typecheck, unit tests, build, `npm audit`, Playwright tests, the prerender, a gitleaks scan, and the deploy. Its secrets: `CLOUDFLARE_PAGES_TOKEN` (the deploy token, named in the Pages days: this account's Workers Scripts and overlune.in's Workers Routes, Edit, plus Cloudflare Pages, Edit until that project is deleted) and `SENTRY_AUTH_TOKEN` (source maps for production); its variables: `CLOUDFLARE_ACCOUNT_ID` and `DEPLOY_FROM_ACTIONS`.
 
 ## Contributing notes
 - **Overlay links are a public contract.** Streamers paste a link once and never touch it again. Every link carries a schema version. Never break an old link: add a migration plus a saved link in `tests/fixtures/links/` (see its README).
@@ -137,7 +128,7 @@ Pages settings: build command `npm run build`, output `dist`, Node from `.nvmrc`
 - Rules for Claude Code: `CLAUDE.md`
 
 ## Contact
-support@overlune.in
+overlune@proton.me
 
 ## License
 MIT License. See [`LICENSE`](LICENSE). Overlune is provided "as is", without warranty of any kind. Fonts, sounds and art keep their own licenses, listed in `docs/ASSETS.md`.

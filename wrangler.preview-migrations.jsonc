@@ -1,0 +1,16 @@
+// Applies database migrations to the Previews' staging database (T12.1), which wrangler.jsonc only names under
+// `previews`, where `wrangler d1 migrations apply` doesn't look. Never deployed; only for:
+//   npx wrangler d1 migrations apply overlune-staging --remote --config wrangler.preview-migrations.jsonc
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "overlune-preview-migrations",
+  "compatibility_date": "2026-09-30",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "overlune-staging",
+      "database_id": "e345b820-48d2-4d1b-a637-1f86e914069e",
+      "migrations_dir": "migrations",
+    },
+  ],
+}
