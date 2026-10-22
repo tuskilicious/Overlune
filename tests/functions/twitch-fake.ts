@@ -1,5 +1,7 @@
 import { afterAll, beforeAll, beforeEach, expect, vi } from "vitest";
-import type { Env } from "../../functions/lib/env";
+import { route } from "../../functions/index";
+import { accountsGate, securityHeaders } from "../../functions/api/_middleware";
+import type { Env, Handler } from "../../functions/lib/env";
 import { onRequestGet as start } from "../../functions/api/auth/twitch/index";
 import { onRequestGet as callback } from "../../functions/api/auth/twitch/callback";
 import { onRequestPost as signout } from "../../functions/api/auth/signout";
@@ -180,3 +182,55 @@ export const post = (fn: typeof signout, token: string | null, origin: string | 
       },
     }),
   });
+
+/**
+ * A request through the API as the Worker runs it (shared since T12.2): the middleware (minus Sentry, which only
+ * reports, and the abuse limits, tested on their own), then the Worker's own choice of route for that path and method,
+ * or the 404. Accounts and saved overlays are switched on unless `open` says otherwise. A `body` goes as JSON.
+ */
+export async function api(
+  method: string,
+  path: string,
+  {
+    token,
+    origin = ORIGIN,
+    body,
+    open = { ACCOUNTS_OPEN: "true", SAVED_OVERLAYS_OPEN: "true" },
+  }: {
+    token?: string | null;
+    origin?: string | null;
+    body?: unknown;
+    open?: Partial<Record<"ACCOUNTS_OPEN" | "SAVED_OVERLAYS_OPEN", string>>;
+  } = {},
+): Promise<Response> {
+  const request = new Request(`${ORIGIN}${path}`, {
+    method,
+    headers: {
+      ...(origin ? { Origin: origin } : {}),
+      ...(token ? { Cookie: `${SESSION_COOKIE}=${token}` } : {}),
+      ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+    },
+    ...(body === undefined ? {} : { body: typeof body === "string" ? body : JSON.stringify(body) }),
+  });
+  const { handler, params } = route(request);
+  const chain: Handler[] = [securityHeaders, accountsGate, handler];
+  const run = (i: number): Promise<Response> =>
+    Promise.resolve(
+      chain[i]!({
+        request,
+        // Only `open` decides the switches, whatever a local .dev.vars says.
+        env: { ...env, ACCOUNTS_OPEN: undefined, SAVED_OVERLAYS_OPEN: undefined, ...open },
+        params,
+        next: () => run(i + 1),
+      }),
+    );
+  return run(0);
+}
+
+/** Everything an attacker could compare between two answers. */
+export const answer = async (res: Response) => ({
+  status: res.status,
+  body: await res.text(),
+  type: res.headers.get("Content-Type"),
+  cookie: res.headers.get("Set-Cookie"),
+});

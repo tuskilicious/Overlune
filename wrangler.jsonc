@@ -35,6 +35,8 @@
     "AUTH_ORIGIN": "https://overlune.in",
     // Opened at the launch check (T7.9). "false" closes sign-in again: account routes 404, no data is lost.
     "ACCOUNTS_OPEN": "true",
+    // Saved overlays (T12.2) stay closed until the privacy policy covers them (T12.6): their routes 404.
+    "SAVED_OVERLAYS_OPEN": "false",
   },
   "d1_databases": [
     {
@@ -50,6 +52,7 @@
       "VITE_SENTRY_ENVIRONMENT": "staging",
       "AUTH_ORIGIN": "https://staging-overlune.overlune.workers.dev",
       "ACCOUNTS_OPEN": "true",
+      "SAVED_OVERLAYS_OPEN": "true",
     },
     "d1_databases": [
       {

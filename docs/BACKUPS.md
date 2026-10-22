@@ -1,6 +1,6 @@
 # Backups and restore
 
-Overlune's only server data is the production D1 database `overlune-production`: accounts (`users`) and sign-ins (`sessions`). Two layers protect it (CLAUDE.md §4):
+Overlune's only server data is the production D1 database `overlune-production`: accounts (`users`), sign-ins (`sessions`) and saved overlays (`overlays`, since T12.2). Two layers protect it (CLAUDE.md §4):
 
 | Layer | What | Covers |
 |---|---|---|
@@ -14,9 +14,9 @@ Overlune's only server data is the production D1 database `overlune-production`:
 ## Restore with Time Travel (first choice, within 7 days)
 
 1. Pick the moment before the damage, in UTC, and check it:
-   `npx wrangler d1 time-travel info overlune-production --env production --timestamp=2026-10-13T00:00:00Z`
+   `npx wrangler d1 time-travel info overlune-production --timestamp=2026-10-13T00:00:00Z`
 2. Restore. This overwrites the database in place, and prints a bookmark that undoes the restore:
-   `npx wrangler d1 time-travel restore overlune-production --env production --timestamp=2026-10-13T00:00:00Z`
+   `npx wrangler d1 time-travel restore overlune-production --timestamp=2026-10-13T00:00:00Z`
 3. Check `https://overlune.in/api/health` (it reports the schema version) and sign in.
 
 ## Restore from the nightly copy
@@ -28,8 +28,8 @@ Overlune's only server data is the production D1 database `overlune-production`:
 3. Load it into an **empty** database (the dump creates its tables, so it fails on one that already has them):
    `npx wrangler d1 create overlune-restore`, then
    `npx wrangler d1 execute overlune-restore --remote --file dump.sql`
-4. Compare row counts with the copy (`SELECT count(*) FROM users`, and the same for `sessions`, `app_meta`, `d1_migrations`).
-5. To make it production: put the new database's id in `wrangler.jsonc` (`env.production.d1_databases`), merge, and check `/api/health`.
+4. Compare row counts with the copy (`SELECT count(*) FROM users`, and the same for `sessions`, `overlays`, `app_meta`, `d1_migrations`).
+5. To make it production: put the new database's id in `wrangler.jsonc` (the top level's `d1_databases`; production since the move to Workers, T12.1), merge, and check `/api/health`.
 6. Delete `dump.sql`: it holds account data in plain text.
 
 ## Restore drills

@@ -1,7 +1,7 @@
 /**
- * Abuse limits in the Functions (T7.6). Pages can't use the Workers rate limiting binding, and a counter in D1 would
- * spend a write on every request (a flood could use up the free plan's writes), so this counts in memory, per Worker
- * instance: approximate, and free. The main shield is the Cloudflare WAF rate-limiting rule on overlune.in, in front
+ * Abuse limits in the API (T7.6). A counter in D1 would spend a write on every request (a flood could use up the free
+ * plan's writes), so this counts in memory, per Worker instance: approximate, and free. (Since T12.1 the API is a
+ * Worker, so the Workers rate limiting binding is an option too.) The main shield is the Cloudflare WAF rate-limiting rule on overlune.in, in front
  * of every Function (STACK.md). Counts are kept only in memory for a minute; IPs are never stored or logged.
  */
 
@@ -20,8 +20,10 @@ export const RULES = {
   api: { limit: 120, seconds: 60 },
 } satisfies Record<string, Rule>;
 
-/** Requests may carry at most this much body. No route reads one yet. */
+/** Requests may carry at most this much body. */
 export const MAX_BODY_BYTES = 16 * 1024;
+/** Except a saved overlay's (T12.2): its name and its settings, in the link's own form (functions/lib/overlays.ts). */
+export const MAX_OVERLAY_BODY_BYTES = 48 * 1024;
 
 const windows = new Map<string, { window: number; count: number }>();
 

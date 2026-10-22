@@ -23,7 +23,7 @@ describe("GET /api/health", () => {
     const res = await call(health, { env: proxy.env });
     expect(res.status).toBe(200);
     expect(res.headers.get("Content-Type")).toBe("application/json; charset=utf-8");
-    expect(await res.json()).toEqual({ ok: true, schema: "2" });
+    expect(await res.json()).toEqual({ ok: true, schema: "3" });
   });
 });
 

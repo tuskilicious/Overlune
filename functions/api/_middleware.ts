@@ -1,6 +1,5 @@
-import type { PagesFunction } from "@cloudflare/workers-types";
-import { json, type Env } from "../lib/env";
-import { MAX_BODY_BYTES, RULES, take } from "../lib/limits";
+import { json, type Handler } from "../lib/env";
+import { MAX_BODY_BYTES, MAX_OVERLAY_BODY_BYTES, RULES, take } from "../lib/limits";
 import { hashToken, sessionToken } from "../lib/session";
 
 /** Security headers for every API answer (T7.2). public/_headers only covers static files, never the API's answers. JSON
@@ -13,24 +12,33 @@ export const apiHeaders: Record<string, string> = {
   "Cache-Control": "no-store",
 };
 
-export const securityHeaders: PagesFunction<Env> = async ({ next }) => {
+export const securityHeaders: Handler = async ({ next }) => {
   const response = await next();
   const secured = new Response(response.body, response);
   for (const [name, value] of Object.entries(apiHeaders)) secured.headers.set(name, value);
   return secured;
 };
 
+/** Saved overlays' routes (T12.2). */
+const overlaysPath = (path: string) =>
+  path === "/api/overlays" || path.startsWith("/api/overlays/");
+/** Routes that act for a signed-in account. */
+const accountPath = (path: string) =>
+  path === "/api/me" || path.startsWith("/api/auth/") || overlaysPath(path);
+
 /** Abuse limits (T7.6): a body too big is a 413; too many requests, a 429 with Retry-After. Sign-in routes count per
- *  IP, account routes per session, everything else per IP (functions/lib/limits.ts has the numbers). */
-export const abuseLimits: PagesFunction<Env> = async ({ request, next }) => {
-  if (Number(request.headers.get("Content-Length") ?? 0) > MAX_BODY_BYTES)
-    return json({ error: "too large" }, 413);
+ *  IP, account routes per session, everything else per IP (functions/lib/limits.ts has the numbers). Saved overlays
+ *  carry their settings, so their limit is larger. */
+export const abuseLimits: Handler = async ({ request, next }) => {
   const path = new URL(request.url).pathname;
+  const max = overlaysPath(path) ? MAX_OVERLAY_BODY_BYTES : MAX_BODY_BYTES;
+  if (Number(request.headers.get("Content-Length") ?? 0) > max)
+    return json({ error: "too large" }, 413);
   const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
   const token = sessionToken(request);
   const [key, rule] = path.startsWith("/api/auth/twitch")
     ? [`signin:${ip}`, RULES.signin]
-    : token && (path === "/api/me" || path.startsWith("/api/auth/"))
+    : token && accountPath(path)
       ? [`account:${await hashToken(token)}`, RULES.account]
       : [`api:${ip}`, RULES.api];
   const verdict = take(key, rule);
@@ -40,10 +48,13 @@ export const abuseLimits: PagesFunction<Env> = async ({ request, next }) => {
   return res;
 };
 
-/** Accounts stay closed where ACCOUNTS_OPEN isn't "true" (production, until T7.9): their routes answer like any
- *  unknown path, and the editor then shows no account controls. */
-export const accountsGate: PagesFunction<Env> = ({ request, env, next }) => {
+/** Accounts stay closed where ACCOUNTS_OPEN isn't "true" (production, until T7.9), and saved overlays where
+ *  SAVED_OVERLAYS_OPEN isn't (production, until T12.6): their routes answer like any unknown path, and the editor
+ *  then shows no controls for them. */
+export const accountsGate: Handler = ({ request, env, next }) => {
   const path = new URL(request.url).pathname;
-  const account = path === "/api/me" || path.startsWith("/api/auth/");
-  return account && env.ACCOUNTS_OPEN !== "true" ? json({ error: "not found" }, 404) : next();
+  const closed =
+    (accountPath(path) && env.ACCOUNTS_OPEN !== "true") ||
+    (overlaysPath(path) && env.SAVED_OVERLAYS_OPEN !== "true");
+  return closed ? json({ error: "not found" }, 404) : next();
 };
