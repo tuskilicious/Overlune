@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, expect, vi } from "vitest";
-import { route } from "../../functions/index";
+import { route } from "../../functions/router";
 import { accountsGate, securityHeaders } from "../../functions/api/_middleware";
 import type { Env, Handler } from "../../functions/lib/env";
 import { onRequestGet as start } from "../../functions/api/auth/twitch/index";
@@ -18,6 +18,16 @@ export const ACCESS_TOKEN = "twitch-access-token-never-stored";
 export const REFRESH_TOKEN = "twitch-refresh-token-never-stored";
 
 export let proxy: Awaited<ReturnType<typeof localD1>>;
+
+/** What the routes asked of saved overlays' live channels (T12.3), in order. Node can't run the channel itself; the
+ *  real one is tested in workerd by live.test.ts. */
+export const liveCalls: { id: string; call: "publish" | "deleted"; args: unknown[] }[] = [];
+const fakeLive = {
+  getByName: (id: string) => ({
+    publish: async (...args: unknown[]) => void liveCalls.push({ id, call: "publish", args }),
+    deleted: async () => void liveCalls.push({ id, call: "deleted", args: [] }),
+  }),
+} as unknown as Env["LIVE"];
 export let env: Env;
 export let key: CryptoKeyPair;
 export let otherKey: CryptoKeyPair;
@@ -102,6 +112,7 @@ export function withFakeTwitch() {
     await migrate(proxy.env.DB);
     env = {
       ...proxy.env,
+      LIVE: fakeLive,
       AUTH_ORIGIN: ORIGIN,
       TWITCH_CLIENT_ID: CLIENT_ID,
       TWITCH_CLIENT_SECRET: "secret-456",
@@ -127,6 +138,7 @@ export function withFakeTwitch() {
     await proxy?.dispose();
   });
   beforeEach(() => {
+    liveCalls.length = 0;
     twitch = { sub: "123456", signWith: key.privateKey, aud: CLIENT_ID, helixId: "123456" };
   });
 }

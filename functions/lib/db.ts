@@ -204,22 +204,45 @@ export async function updateOverlay(
   return row ? summary(row) : null;
 }
 
-/** "Update OBS": the draft becomes what OBS shows, under a new version. Null when it isn't this user's. */
+/** "Update OBS": the draft becomes what OBS shows, under a new version. Null when it isn't this user's. Also gives
+ *  the settings it published, for the live channel (T12.3). */
 export async function publishOverlay(
   db: D1Database,
   userId: string,
   id: string,
   now: number,
-): Promise<OverlaySummary | null> {
+): Promise<{ summary: OverlaySummary; settings: string } | null> {
   const row = await db
     .prepare(
       `UPDATE overlays SET published = draft, published_at = ?, version = version + 1
        WHERE id = ? AND owner_id = ?
-       RETURNING id, name, published_at, version, updated_at`,
+       RETURNING id, name, published, published_at, version, updated_at`,
     )
     .bind(now, id, userId)
-    .first<Omit<OverlayRow, "draft" | "published">>();
-  return row ? summary(row) : null;
+    .first<Omit<OverlayRow, "draft"> & { published: string }>();
+  return row ? { summary: summary(row), settings: row.published } : null;
+}
+
+/** What an overlay's links show (T12.3): only its published copy and version, for anyone with its id, which only its
+ *  owner's links carry. The one read here that isn't scoped to a signed-in user: an overlay in OBS has no session, and
+ *  its link already holds a copy of the same settings. Null when there's no such overlay. */
+export async function publishedOverlay(
+  db: D1Database,
+  id: string,
+): Promise<{ published: string | null; version: number } | null> {
+  return db
+    .prepare("SELECT published, version FROM overlays WHERE id = ?")
+    .bind(id)
+    .first<{ published: string | null; version: number }>();
+}
+
+/** The ids of this user's overlays, to close their live channels when the account goes. */
+export async function overlayIds(db: D1Database, userId: string): Promise<string[]> {
+  const { results } = await db
+    .prepare("SELECT id FROM overlays WHERE owner_id = ?")
+    .bind(userId)
+    .all<{ id: string }>();
+  return results.map((r) => r.id);
 }
 
 /** Deletes an overlay. False when it isn't this user's. */

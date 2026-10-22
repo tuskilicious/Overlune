@@ -1,7 +1,7 @@
 import { decompressFromEncodedURIComponent } from "lz-string";
 import { z } from "zod";
 import { settingsV1 } from "../../src/settings/schema";
-import { json } from "./env";
+import { json, type Env } from "./env";
 import { MAX_OVERLAY_BODY_BYTES } from "./limits";
 
 /**
@@ -123,3 +123,12 @@ export async function parseBody<T>(request: Request, schema: z.ZodType<T>): Prom
   const parsed = schema.safeParse(data);
   return parsed.success ? parsed.data : json({ error: "invalid body" }, 400);
 }
+
+/** What the live channel sends (T12.3): each publish's version and settings in the link's form, or that the overlay
+ *  was deleted, after which a copy keeps what it shows and closes (src/lib/live.ts). */
+export const liveMessage = (version: number, settings: string) =>
+  JSON.stringify({ version, settings });
+export const LIVE_DELETED = JSON.stringify({ deleted: true });
+
+/** The overlay's live channel (T12.3, functions/live.ts). */
+export const liveChannel = (env: Env, id: string) => env.LIVE.getByName(id);

@@ -38,6 +38,10 @@
     // Saved overlays (T12.2) stay closed until the privacy policy covers them (T12.6): their routes 404.
     "SAVED_OVERLAYS_OPEN": "false",
   },
+  // Saved overlays' live channels (T12.3): one object per overlay (functions/live.ts). SQLite-backed, which the free plan
+  // needs; it stores nothing, only holds the connections. Each Preview gets its own namespace.
+  "durable_objects": { "bindings": [{ "name": "LIVE", "class_name": "OverlayLive" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["OverlayLive"] }],
   "d1_databases": [
     {
       "binding": "DB",
@@ -54,6 +58,7 @@
       "ACCOUNTS_OPEN": "true",
       "SAVED_OVERLAYS_OPEN": "true",
     },
+    "durable_objects": { "bindings": [{ "name": "LIVE", "class_name": "OverlayLive" }] },
     "d1_databases": [
       {
         "binding": "DB",

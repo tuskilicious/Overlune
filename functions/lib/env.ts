@@ -1,8 +1,11 @@
-import type { D1Database } from "@cloudflare/workers-types";
+import type { D1Database, DurableObjectNamespace } from "@cloudflare/workers-types";
+import type { OverlayLive } from "../live";
 
 /** What the Functions get from wrangler.jsonc and the dashboard's secrets. */
 export interface Env {
   DB: D1Database;
+  /** Saved overlays' live channels (T12.3), one object per overlay. */
+  LIVE: DurableObjectNamespace<OverlayLive>;
   VITE_SENTRY_DSN?: string;
   VITE_SENTRY_ENVIRONMENT?: string;
   /** "true" where accounts are open (local and previews). Production stays closed until the privacy policy and terms

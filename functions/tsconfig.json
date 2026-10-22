@@ -15,5 +15,5 @@
     "allowImportingTsExtensions": true,
     "types": ["@cloudflare/workers-types", "vite/client"]
   },
-  "include": [".", "../tests/functions", "../src/lib/sentry-scrub.ts"]
+  "include": [".", "../tests/functions", "../src/lib/sentry-scrub.ts", "../src/node-fs.d.ts"]
 }
