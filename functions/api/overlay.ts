@@ -1,6 +1,6 @@
 import { deleteOverlay, getOverlay, updateOverlay } from "../lib/db";
 import { json, type Handler } from "../lib/env";
-import { checkSettings, isOverlayId, parseBody, updateBody } from "../lib/overlays";
+import { checkSettings, isOverlayId, liveChannel, parseBody, updateBody } from "../lib/overlays";
 import { currentUserId, now, sameOrigin } from "../lib/session";
 
 const notFound = () => json({ error: "not found" }, 404);
@@ -35,12 +35,13 @@ export const onRequestPatch: Handler = async ({ request, env, params }) => {
   return saved ? json(saved) : notFound();
 };
 
-/** DELETE /api/overlays/:id: deletes it. */
+/** DELETE /api/overlays/:id: deletes it, and its open copies stop listening (T12.3). */
 export const onRequestDelete: Handler = async ({ request, env, params }) => {
   if (!sameOrigin(request)) return json({ error: "forbidden" }, 403);
   const userId = await currentUserId(request, env);
   if (!userId) return json({ error: "signed out" }, 401);
-  return isOverlayId(params.id!) && (await deleteOverlay(env.DB, userId, params.id!))
-    ? new Response(null, { status: 204 })
-    : notFound();
+  if (!isOverlayId(params.id!) || !(await deleteOverlay(env.DB, userId, params.id!)))
+    return notFound();
+  await liveChannel(env, params.id!).deleted();
+  return new Response(null, { status: 204 });
 };

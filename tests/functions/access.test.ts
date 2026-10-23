@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { routes as workerRoutes } from "../../functions/index";
+import { routes as workerRoutes } from "../../functions/router";
 import { apiHeaders } from "../../functions/api/_middleware";
 import { onRequestGet as health } from "../../functions/api/health";
 import { onRequestDelete as deleteMe, onRequestGet as getMe } from "../../functions/api/me";
@@ -17,6 +17,7 @@ import {
   onRequestPatch as updateOverlay,
 } from "../../functions/api/overlay";
 import { onRequestPost as publishOverlay } from "../../functions/api/overlay-publish";
+import { onRequestGet as live } from "../../functions/api/live";
 import type { Handler } from "../../functions/lib/env";
 import { deleteUser } from "../../functions/lib/db";
 import { newOverlayId } from "../../functions/lib/overlays";
@@ -96,6 +97,8 @@ const routes: {
     methods: { POST: publishOverlay },
     access: "owner",
   },
+  // Read-only, by an id only the owner's links carry: what's published, never the draft (live.test.ts).
+  { file: "live.ts", path: "/api/live/:id", methods: { GET: live }, access: "public" },
 ];
 
 /** Every Function file under functions/api/, found at build time, without importing them. */
@@ -367,6 +370,7 @@ describe("every answer", () => {
       ["DELETE", "/api/me", "x"],
       ["GET", "/api/overlays", a],
       ["GET", "/api/overlays/x", a],
+      ["GET", "/api/live/x", null],
     ] as const) {
       const res = await api(method, path, { token, origin: null });
       for (const [name, value] of Object.entries(apiHeaders))

@@ -3,7 +3,7 @@ import { compressToEncodedURIComponent } from "lz-string";
 import { MAX_SETTINGS_CHARS, OVERLAY_LIMIT } from "../../functions/lib/overlays";
 import { defaultSettings } from "../../src/settings/schema";
 import { encode } from "../../src/settings/url";
-import { api, env, rows, signIn, twitch, withFakeTwitch } from "./twitch-fake";
+import { api, env, liveCalls, rows, signIn, twitch, withFakeTwitch } from "./twitch-fake";
 
 // Saved overlays (T12.2): what the API keeps, what it refuses, and the limit. Who may touch whose overlay is in
 // access.test.ts.
@@ -89,6 +89,22 @@ describe("saving, opening and updating OBS", () => {
     expect((await api("DELETE", `/api/overlays/${id}`, { token })).status).toBe(204);
     expect((await api("GET", `/api/overlays/${id}`, { token })).status).toBe(404);
     expect(await rows("overlays")).toEqual([]);
+  });
+});
+
+describe("the live channel (T12.3)", () => {
+  it("gets each publish with its version and settings, and hears when the overlay or its account goes", async () => {
+    const { id } = await json(await create({ name: "Live", settings }));
+    const other = (await json(await create({ name: "Other", settings }))).id;
+    await api("POST", `/api/overlays/${id}/publish`, { token });
+    expect(liveCalls).toEqual([{ id, call: "publish", args: [1, settings] }]);
+    // Saving a draft never reaches it: only "Update OBS" does.
+    await api("PATCH", `/api/overlays/${id}`, { token, body: { name: "Renamed" } });
+    expect(liveCalls).toHaveLength(1);
+    await api("DELETE", `/api/overlays/${id}`, { token });
+    expect(liveCalls.at(-1)).toEqual({ id, call: "deleted", args: [] });
+    await api("DELETE", "/api/me", { token });
+    expect(liveCalls.at(-1)).toEqual({ id: other, call: "deleted", args: [] });
   });
 });
 

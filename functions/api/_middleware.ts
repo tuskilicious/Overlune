@@ -14,14 +14,16 @@ export const apiHeaders: Record<string, string> = {
 
 export const securityHeaders: Handler = async ({ next }) => {
   const response = await next();
+  // A live channel's WebSocket (T12.3) must go back as it is: copying the response would drop the socket.
+  if (response.status === 101) return response;
   const secured = new Response(response.body, response);
   for (const [name, value] of Object.entries(apiHeaders)) secured.headers.set(name, value);
   return secured;
 };
 
-/** Saved overlays' routes (T12.2). */
+/** Saved overlays' routes (T12.2) and their live channels (T12.3). */
 const overlaysPath = (path: string) =>
-  path === "/api/overlays" || path.startsWith("/api/overlays/");
+  path === "/api/overlays" || path.startsWith("/api/overlays/") || path.startsWith("/api/live/");
 /** Routes that act for a signed-in account. */
 const accountPath = (path: string) =>
   path === "/api/me" || path.startsWith("/api/auth/") || overlaysPath(path);
