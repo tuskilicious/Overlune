@@ -1,5 +1,5 @@
 import { framePosition, type Settings } from "../settings/schema";
-import { encode } from "../settings/url";
+import { encode, overlayLink } from "../settings/url";
 
 /** OBS's default Browser source CSS: a transparent page with no margin. */
 const OBS_CSS = "body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; }";
@@ -47,7 +47,7 @@ export function sceneCollection(
     muted: false,
     volume: 1,
     settings: {
-      url: `${origin}/o/${b.route}#${hash}`,
+      url: overlayLink(origin, b.route, hash),
       width: b.width,
       height: b.height,
       fps: 30,

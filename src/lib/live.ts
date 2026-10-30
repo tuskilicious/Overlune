@@ -23,7 +23,9 @@ const isDeleted = (d: unknown) =>
  * Follows a saved overlay's live channel (T12.3): each "Update OBS" arrives as the published settings in the link's
  * form, and only a newer version than the last counts. A dropped connection comes back after a growing wait, 1 s up to
  * 30 s, spread out so a restart doesn't bring every OBS back at once; a working one resets it. When the overlay is
- * deleted the connection closes for good and the overlay keeps what it shows. Returns a function that stops it.
+ * deleted the connection closes for good and the overlay keeps what it shows. A connection that never opened asks the
+ * channel's address plainly (T12.4): a 404 means the overlay is gone, so it stops instead of trying forever. Returns a
+ * function that stops it.
  */
 export function followLive(
   id: string,
@@ -31,15 +33,18 @@ export function followLive(
   {
     origin,
     WebSocketImpl = WebSocket,
+    fetchImpl = (url: string) => fetch(url),
     random = Math.random,
   }: {
     /** The site the overlay runs on (location.origin): the channel is on the same one. */
     origin: string;
     WebSocketImpl?: typeof WebSocket;
+    fetchImpl?: (url: string) => Promise<{ status: number }>;
     random?: () => number;
   },
 ): () => void {
-  const url = `${origin.replace(/^http/, "ws")}/api/live/${encodeURIComponent(id)}`;
+  const address = `${origin}/api/live/${encodeURIComponent(id)}`;
+  const url = address.replace(/^http/, "ws");
   let stopped = false;
   let newest = -1;
   let tries = 0;
@@ -57,7 +62,9 @@ export function followLive(
   const connect = () => {
     const ws = new WebSocketImpl(url);
     socket = ws;
+    let opened = false;
     ws.addEventListener("open", () => {
+      opened = true;
       tries = 0;
       ping = setInterval(() => ws.send("ping"), PING_MS);
     });
@@ -77,8 +84,16 @@ export function followLive(
     ws.addEventListener("close", () => {
       if (ping) clearInterval(ping);
       if (stopped) return;
-      const wait = Math.min(MAX_WAIT_MS, 1000 * 2 ** tries++) * (0.5 + random() / 2);
-      retry = setTimeout(connect, wait);
+      const later = () => {
+        if (stopped) return;
+        const wait = Math.min(MAX_WAIT_MS, 1000 * 2 ** tries++) * (0.5 + random() / 2);
+        retry = setTimeout(connect, wait);
+      };
+      if (opened) return later();
+      fetchImpl(address).then(
+        (res) => (res.status === 404 ? stop() : later()),
+        later, // the site itself is out of reach: try again later
+      );
     });
   };
 

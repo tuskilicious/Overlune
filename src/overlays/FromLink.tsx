@@ -1,11 +1,15 @@
 import { Fragment, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from "react";
 import { useLocation } from "react-router";
+import { followLive } from "../lib/live";
 import type { Settings } from "../settings/schema";
-import { decode } from "../settings/url";
+import { decode, liveId } from "../settings/url";
 import { CanvasContext, linkCanvas } from "./measure";
 import OverlayError from "./OverlayError";
 
-/** Overlay route: reads settings from the link. A damaged link still renders (bad fields fall back) with the error card. */
+/** Overlay route: reads settings from the link. A damaged link still renders (bad fields fall back) with the error card.
+ *  A saved overlay's link (`live=<id>`, T12.4) shows its settings at once, then follows its live channel: each "Update
+ *  OBS" replaces them in place. If the channel is out of reach or the overlay is gone, the last ones stay, with no error
+ *  on stream. */
 export default function FromLink({
   replay = false,
   children,
@@ -16,7 +20,22 @@ export default function FromLink({
   children: (settings: Settings, error: ReactNode) => ReactNode;
 }) {
   const { hash, search } = useLocation();
-  const { settings, ok } = useMemo(() => decode(hash), [hash]);
+  const snapshot = useMemo(() => decode(hash), [hash]);
+  const live = useMemo(() => liveId(search), [search]);
+  const [published, setPublished] = useState<Settings | null>(null);
+  useEffect(() => {
+    if (!live) return;
+    return followLive(
+      live,
+      (encoded) => {
+        const update = decode(encoded);
+        if (update.ok) setPublished(update.settings);
+      },
+      { origin: location.origin },
+    );
+  }, [live]);
+  const settings = published ?? snapshot.settings;
+  const ok = published !== null || snapshot.ok;
   // "Less motion" in the link works like ?rm=1 (main.tsx), before the first paint (T6.74); "Lite" stops only the
   // looping backgrounds (T6.119, index.css).
   useLayoutEffect(() => {

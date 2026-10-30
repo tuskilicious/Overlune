@@ -1,7 +1,7 @@
 import { useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router";
 import { framePosition, type Settings } from "../settings/schema";
-import { encode } from "../settings/url";
+import { encode, overlayLink } from "../settings/url";
 import { sceneCollection } from "./scene-collection";
 import Icon from "../components/Icon";
 import type { CanvasId } from "../overlays/measure";
@@ -208,8 +208,7 @@ export default function ObsLinks({
   /** Each link as last copied this visit; kept in memory only (no tracking, no storage). */
   const [copied, setCopied] = useState<Record<string, string>>({});
   // `?canvas=vertical` before the # (STACK.md): the same save, its portrait layout.
-  const linkFor = (id: string) =>
-    `${location.origin}/o/${id}${portrait ? "?canvas=vertical" : ""}#${hash}`;
+  const linkFor = (id: string) => overlayLink(location.origin, id, hash, { portrait });
   const needed = links.filter((l) => !l.optional);
   const done = needed.filter((l) => copied[l.id] === linkFor(l.id)).length;
 
