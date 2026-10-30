@@ -80,4 +80,17 @@ describe("OBS scene collection (T6.90)", () => {
     const ids = c.sources.map((s) => s.uuid);
     expect(new Set(ids).size).toBe(ids.length);
   });
+
+  it("for a saved overlay (T12.5), every link carries its id and what OBS shows", () => {
+    const published = "1.published";
+    const saved = sceneCollection(settings, "https://overlune.in", undefined, {
+      id: "Hw5ucSZNL_kWDPlm8McCsA",
+      published,
+    });
+    const urls = saved.sources
+      .filter((s) => s.id === "browser_source")
+      .map((b) => (b.settings as { url: string }).url);
+    expect(urls).toHaveLength(7);
+    for (const url of urls) expect(url).toMatch(/\?live=Hw5ucSZNL_kWDPlm8McCsA#1\.published$/);
+  });
 });

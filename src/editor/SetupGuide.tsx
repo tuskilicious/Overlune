@@ -289,6 +289,25 @@ export default function SetupGuide() {
             </p>
           </section>
 
+          {/* Saved overlays (T12.5): optional, for streamers who sign in. */}
+          <section aria-labelledby="saved-guide-heading">
+            <h2 id="saved-guide-heading">Change your overlay without pasting new links</h2>
+            <p>
+              Usually a link holds your whole overlay, so after a change you paste the new link into
+              OBS. If you sign in with Twitch, you can save the overlay to your account instead:
+              type a name under <strong>Your saved overlays</strong> and press{" "}
+              <strong>Save to my account</strong>, then copy its links into OBS once.
+            </p>
+            <p>
+              After that, change anything in the editor and press <strong>Update OBS</strong>. Your
+              overlays in OBS change within a few seconds, even mid-stream. Until you press it, the
+              editor says <strong>Changes not in OBS yet</strong>. You can keep up to 10 saved
+              overlays, and open, rename or delete them from the same list. A deleted overlay’s
+              links keep showing what they last showed. You never need an account: links without one
+              work as they always have.
+            </p>
+          </section>
+
           <section aria-labelledby="rehearse-heading">
             <h2 id="rehearse-heading">Before your first stream</h2>
             <p>A five-minute run-through, so nothing surprises you live:</p>

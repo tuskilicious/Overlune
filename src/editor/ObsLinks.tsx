@@ -5,6 +5,7 @@ import { encode, overlayLink } from "../settings/url";
 import { sceneCollection } from "./scene-collection";
 import Icon from "../components/Icon";
 import type { CanvasId } from "../overlays/measure";
+import type { SavedOverlay } from "./SavedOverlays";
 
 /** The full-screen scenes, with the Browser Source size to enter in OBS. `short` labels the editor's scene picker,
  *  where the full names wrap; Offline is an extra, so it doesn't count toward "You're set" (T6.147). */
@@ -129,8 +130,12 @@ export function LinkRow({
 }
 
 /** Saves the OBS scene collection (T6.90) as a file. */
-function downloadCollection(settings: Settings) {
-  const json = JSON.stringify(sceneCollection(settings, location.origin), null, 2);
+function downloadCollection(settings: Settings, saved: SavedOverlay | null) {
+  const json = JSON.stringify(
+    sceneCollection(settings, location.origin, undefined, saved),
+    null,
+    2,
+  );
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([json], { type: "application/json" }));
   a.download = "overlune-scenes.json";
@@ -143,13 +148,19 @@ export default function ObsLinks({
   settings,
   canvasId = "landscape",
   heading,
+  saved = null,
+  children,
 }: {
   settings: Settings;
   /** The canvas picked over the preview (T10.4): Vertical gives the portrait links, with their sizes. */
   canvasId?: CanvasId;
   heading: ReactNode;
+  /** A saved overlay being edited (T12.5): its links carry its id and what OBS shows, and follow its Update OBS. */
+  saved?: SavedOverlay | null;
+  /** Saved overlays' controls, above the links. */
+  children?: ReactNode;
 }) {
-  const hash = encode(settings);
+  const hash = saved?.published ?? encode(settings);
   const portrait = canvasId === "portrait";
   // Every overlay that gets a link: the scenes, chat (sized in the editor), alerts and the webcam frame (T6.88).
   // The scenes and Live take the canvas size picked above the preview (T9.8).
@@ -208,9 +219,16 @@ export default function ObsLinks({
   /** Each link as last copied this visit; kept in memory only (no tracking, no storage). */
   const [copied, setCopied] = useState<Record<string, string>>({});
   // `?canvas=vertical` before the # (STACK.md): the same save, its portrait layout.
-  const linkFor = (id: string) => overlayLink(location.origin, id, hash, { portrait });
+  const linkFor = (id: string) =>
+    overlayLink(location.origin, id, hash, { portrait, live: saved?.id });
+  /** A saved overlay's link follows it, so one copied before an Update OBS is still current: only its address before
+   *  the # counts. */
+  const copiedOf = (id: string) => {
+    const link = linkFor(id);
+    return saved && copied[id]?.split("#")[0] === link.split("#")[0] ? link : copied[id];
+  };
   const needed = links.filter((l) => !l.optional);
-  const done = needed.filter((l) => copied[l.id] === linkFor(l.id)).length;
+  const done = needed.filter((l) => copiedOf(l.id) === linkFor(l.id)).length;
 
   // "Copy all links" (T6.70): one text block with each overlay's name, size and link, to keep in a note while
   // setting up OBS. If the clipboard is blocked, the block shows in a box, selected, to copy by hand.
@@ -274,6 +292,7 @@ export default function ObsLinks({
           </div>
         </div>
       </details>
+      {children}
       {portrait && (
         <p className="editor-vertical-note">
           <strong>Vertical links</strong> are for a vertical canvas, such as OBS 32.1’s vertical
@@ -289,7 +308,7 @@ export default function ObsLinks({
           <p>
             One file makes all your Overlune scenes in OBS, with your links and sizes already in.
           </p>
-          <button type="button" onClick={() => downloadCollection(settings)}>
+          <button type="button" onClick={() => downloadCollection(settings, saved)}>
             Download OBS scene collection
           </button>
           <ol>
@@ -342,7 +361,7 @@ export default function ObsLinks({
             key={l.id}
             {...l}
             link={linkFor(l.id)}
-            copiedLink={copied[l.id]}
+            copiedLink={copiedOf(l.id)}
             onCopied={(link) => setCopied((c) => ({ ...c, [l.id]: link }))}
           />
         ))}

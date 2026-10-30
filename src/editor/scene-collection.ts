@@ -20,8 +20,10 @@ export function sceneCollection(
   settings: Settings,
   origin: string,
   uuid: () => string = () => crypto.randomUUID(),
+  /** A saved overlay (T12.5): every source carries its id and what OBS shows, and follows its Update OBS. */
+  saved: { id: string; published: string | null } | null = null,
 ) {
-  const hash = encode(settings);
+  const hash = saved?.published ?? encode(settings);
   const { chat, frame } = settings;
   // The scenes take the canvas size picked in the editor (T9.8).
   const { width, height } = settings.layouts.landscape?.size ?? { width: 1920, height: 1080 };
@@ -47,7 +49,7 @@ export function sceneCollection(
     muted: false,
     volume: 1,
     settings: {
-      url: overlayLink(origin, b.route, hash),
+      url: overlayLink(origin, b.route, hash, { live: saved?.id }),
       width: b.width,
       height: b.height,
       fps: 30,
