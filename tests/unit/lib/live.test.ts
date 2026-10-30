@@ -30,10 +30,17 @@ class FakeSocket {
 const latest = () => FakeSocket.all.at(-1)!;
 let got: [string, number][];
 let stop: () => void;
+/** What the channel's plain address answers, asked after a connection that never opened (T12.4). */
+let status: number;
+let asked: string[];
 const follow = (random = () => 1) =>
   (stop = followLive("abc_123", (s, v) => got.push([s, v]), {
     origin: "https://overlune.in",
     WebSocketImpl: FakeSocket as unknown as typeof WebSocket,
+    fetchImpl: async (url) => {
+      asked.push(url);
+      return { status };
+    },
     random,
   }));
 
@@ -41,6 +48,8 @@ beforeEach(() => {
   vi.useFakeTimers();
   FakeSocket.all = [];
   got = [];
+  status = 200;
+  asked = [];
 });
 afterEach(() => {
   stop?.();
@@ -80,29 +89,42 @@ describe("followLive", () => {
     expect(ws.sent).toHaveLength(2);
   });
 
-  it("reconnects after longer and longer waits, up to the most, and starts over once it works", () => {
+  it("reconnects after longer and longer waits, up to the most, and starts over once it works", async () => {
     follow();
     const waits = [1000, 2000, 4000, 8000, 16000, MAX_WAIT_MS, MAX_WAIT_MS];
     for (const wait of waits) {
       const count = FakeSocket.all.length;
       latest().emit("close");
-      vi.advanceTimersByTime(wait - 1);
+      await vi.advanceTimersByTimeAsync(wait - 1);
       expect(FakeSocket.all, `before ${wait} ms`).toHaveLength(count);
-      vi.advanceTimersByTime(1);
+      await vi.advanceTimersByTimeAsync(1);
       expect(FakeSocket.all, `at ${wait} ms`).toHaveLength(count + 1);
     }
     latest().emit("open");
     latest().emit("close");
-    vi.advanceTimersByTime(1000);
+    await vi.advanceTimersByTimeAsync(1000);
     expect(FakeSocket.all).toHaveLength(waits.length + 2);
   });
 
-  it("spreads the waits out, at least half of each", () => {
+  it("spreads the waits out, at least half of each", async () => {
     follow(() => 0);
     latest().emit("close");
-    vi.advanceTimersByTime(499);
+    await vi.advanceTimersByTimeAsync(499);
     expect(FakeSocket.all).toHaveLength(1);
-    vi.advanceTimersByTime(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(FakeSocket.all).toHaveLength(2);
+  });
+
+  it("stops for good when a connection that never opened finds the overlay gone (404), and asks only then", async () => {
+    follow();
+    latest().emit("open");
+    latest().emit("close");
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(asked).toEqual([]);
+    status = 404;
+    latest().emit("close");
+    await vi.advanceTimersByTimeAsync(MAX_WAIT_MS * 4);
+    expect(asked).toEqual(["https://overlune.in/api/live/abc_123"]);
     expect(FakeSocket.all).toHaveLength(2);
   });
 

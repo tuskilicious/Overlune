@@ -83,3 +83,27 @@ function at(data: unknown, path: readonly PropertyKey[]): unknown {
   }
   return value;
 }
+
+/**
+ * An overlay's link (public contract, docs/STACK.md "URL settings format"): `/o/<overlay>`, then `canvas=vertical` for
+ * the portrait layout and `live=<id>` for a saved overlay that follows "Update OBS" (T12.4), then `#` and the settings,
+ * which a saved overlay's link also carries as a snapshot to show at once, or for good if its live updates are gone.
+ */
+export function overlayLink(
+  origin: string,
+  overlay: string,
+  hash: string,
+  { portrait = false, live }: { portrait?: boolean; live?: string } = {},
+): string {
+  const query = new URLSearchParams();
+  if (portrait) query.set("canvas", "vertical");
+  if (live) query.set("live", live);
+  const q = query.toString();
+  return `${origin}/o/${overlay}${q ? `?${q}` : ""}#${hash}`;
+}
+
+/** A saved overlay's id from a link's query (T12.4), if it's a well-formed one; anything else is ignored. */
+export function liveId(search: string): string | null {
+  const id = new URLSearchParams(search).get("live");
+  return id && /^[A-Za-z0-9_-]{22}$/.test(id) ? id : null;
+}

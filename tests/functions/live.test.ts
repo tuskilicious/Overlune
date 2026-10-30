@@ -227,5 +227,7 @@ describe("an overlay's live connection", () => {
     }
     const plain = await fetch(new URL(`/api/live/${await overlay(published)}`, base));
     expect(plain.status).toBe(426);
+    // Asked plainly about one that's gone, it says so, so a client stops trying (T12.4).
+    expect((await fetch(new URL(`/api/live/${newOverlayId()}`, base))).status).toBe(404);
   });
 });

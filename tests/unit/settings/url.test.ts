@@ -7,7 +7,7 @@ import {
   framePosition,
   type Settings,
 } from "../../../src/settings/schema";
-import { decode, decodeLink, encode } from "../../../src/settings/url";
+import { decode, decodeLink, encode, liveId, overlayLink } from "../../../src/settings/url";
 
 const raw = (data: unknown) => `#1.${compressToEncodedURIComponent(JSON.stringify(data))}`;
 
@@ -442,4 +442,34 @@ describe("webcam frame (T6.88)", () => {
       expect(settings.frame).toEqual({ width: 640, height: 360, label: "Ronni", x: null, y: null });
     },
   );
+});
+
+describe("overlay links (public contract, T12.4)", () => {
+  it("builds today's links exactly as before", () => {
+    expect(overlayLink("https://overlune.in", "starting", "1.abc")).toBe(
+      "https://overlune.in/o/starting#1.abc",
+    );
+    expect(overlayLink("https://overlune.in", "brb", "1.abc", { portrait: true })).toBe(
+      "https://overlune.in/o/brb?canvas=vertical#1.abc",
+    );
+  });
+
+  it("adds a saved overlay's id after the canvas, and reads it back only when well formed", () => {
+    const id = "Hw5ucSZNL_kWDPlm8McCsA";
+    const link = overlayLink("https://overlune.in", "starting", "1.abc", {
+      portrait: true,
+      live: id,
+    });
+    expect(link).toBe(`https://overlune.in/o/starting?canvas=vertical&live=${id}#1.abc`);
+    expect(liveId(new URL(link).search)).toBe(id);
+    for (const bad of [
+      "",
+      "?live=",
+      "?live=short",
+      `?live=${id}x`,
+      `?live=${id.slice(1)}!`,
+      "?canvas=vertical",
+    ])
+      expect(liveId(bad), bad).toBeNull();
+  });
 });
