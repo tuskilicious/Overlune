@@ -2,7 +2,7 @@
 
 > **Self-written, not legal advice.** Overlune is a free, non-commercial hobby project. This document was written by the maintainer, has not been reviewed by a lawyer, and does not guarantee compliance with any law.
 
-_Last updated: 2026-10-20_
+_Last updated: 2026-10-30_
 
 These terms cover your use of the Overlune website and overlays at overlune.in ("Overlune"). By using Overlune, you agree to them.
 
@@ -18,8 +18,9 @@ Overlune is a free tool for making stream overlays. Accounts are optional, and O
 - Everything in Overlune works without an account. If you want one, you sign in with Twitch; there is no other way to sign in.
 - You must be 13 or older to sign in.
 - Keep your Twitch account secure: anyone who can sign in to it can use your Overlune account.
-- You can delete your account at any time from the account menu in the editor. The privacy policy says what we store and how long backups keep it.
-- We may suspend or delete an account that is used to break these terms, for example to abuse the site.
+- Signed in, you can save up to 10 overlays to your account and send changes to OBS with "Update OBS". Anyone with one of a saved overlay's links can see what you last sent to it, so treat those links like any Overlune link.
+- You can delete a saved overlay, or your whole account, at any time from the editor. The privacy policy says what we store and how long backups keep it.
+- We may suspend or delete an account, or its saved overlays, if they are used to break these terms, for example to abuse the site.
 
 ## 4. Acceptable use
 Don't use Overlune to break the law, to harass others, or to disrupt the site or its hosting (for example, by automated mass requests). Overlune limits how often its server can be called.
