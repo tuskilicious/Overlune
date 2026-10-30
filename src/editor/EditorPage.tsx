@@ -32,6 +32,7 @@ import SiteNav from "../components/SiteNav";
 import "./editor.css";
 import Icon from "../components/Icon";
 import Account from "./Account";
+import SavedOverlays, { type SavedOverlay } from "./SavedOverlays";
 import { focusSoon, type SectionProps } from "./sections/fields";
 import SceneText from "./sections/SceneText";
 import Socials from "./sections/Socials";
@@ -558,6 +559,14 @@ export default function EditorPage() {
   };
 
   const update = (patch: Partial<Settings>) => setSettings((s) => ({ ...s, ...patch }));
+
+  /** The saved overlay being edited (T12.5), if any: the links are its own, and "Update OBS" sends it changes. */
+  const [savedOverlay, setSavedOverlay] = useState<SavedOverlay | null>(null);
+  const openSaved = (to: Settings) => {
+    setSettings(to);
+    setLogoInput(to.logo);
+    setBotsInput(to.chat.bots.join("\n"));
+  };
 
   /** The canvas (T9.4): on for the scene in the preview, which then holds a layout. */
   const [canvasOn, setCanvasOn] = useState(false);
@@ -1319,7 +1328,19 @@ export default function EditorPage() {
               </section>
               <AlertTester settings={settings} />
             </div>
-            <ObsLinks settings={settings} canvasId={canvasId} heading={stepHeading(steps[2][1])} />
+            <ObsLinks
+              settings={settings}
+              canvasId={canvasId}
+              heading={stepHeading(steps[2][1])}
+              saved={savedOverlay}
+            >
+              <SavedOverlays
+                settings={settings}
+                current={savedOverlay}
+                setCurrent={setSavedOverlay}
+                onOpen={openSaved}
+              />
+            </ObsLinks>
           </div>
         </>
       )}
