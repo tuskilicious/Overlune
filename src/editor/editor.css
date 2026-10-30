@@ -1224,6 +1224,82 @@
   padding-left: 22px;
 }
 
+/* Saved overlays (T12.5): the same quiet box, above the links, for signed-in streamers only. */
+.editor-my-overlays {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0;
+  padding: 16px 20px;
+  border: var(--border);
+  border-radius: var(--radius);
+}
+
+.editor-my-overlays h3,
+.editor-my-overlays p {
+  margin: 0;
+}
+
+.editor-my-overlays h3 {
+  font-size: 17px;
+}
+
+.editor-my-overlays-new,
+.editor-my-overlays-update,
+.editor-my-overlays-list li,
+.editor-my-overlays-list form,
+.editor-my-overlays-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.editor-my-overlays-new p {
+  flex-basis: 100%;
+}
+
+.editor-my-overlays-current {
+  display: grid;
+  gap: 10px;
+}
+
+.editor-my-overlays-behind {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.editor-my-overlays-count {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.editor-my-overlays-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.editor-my-overlays-list li {
+  padding: 8px 0;
+  border-top: var(--border);
+}
+
+.editor-my-overlays-name {
+  flex: 1 1 100%;
+  overflow-wrap: anywhere;
+}
+
+.editor-my-overlays-status {
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.editor-my-overlays-status:empty {
+  display: none;
+}
+
 .editor-optional {
   color: var(--text-muted);
   font-weight: 400;
