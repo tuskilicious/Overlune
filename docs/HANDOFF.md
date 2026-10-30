@@ -56,7 +56,7 @@ For any agent picking up Overlune (Codex, Claude Code, others). Read `CLAUDE.md`
   - **Look pages** (`/looks/<id>`, `src/editor/LookPage.tsx`, meta in `src/lib/look-pages.ts`): every look in the registry gets one, with pictures of its real Starting Soon overlay on both canvases, taken by the prerender with a fixed clock (byte-identical between builds). "Use <look>" opens `/editor?look=<id>`, which picks the look on top of the saved overlay and then drops `?look`.
   - **Sitemap:** `sitemap()` in `src/lib/page-meta.ts`, written by the build and served by the dev server; a unit test checks it against `App.tsx`'s routes and every look.
   - **Links open pages at the top** (`ScrollToTop` in `App.tsx`; Back, Forward and `#` links keep their place).
-- **Deploys run from GitHub Actions** (live 2026-10-20): `ci.yml`'s `deploy` job runs `wrangler pages deploy` after `checks` pass, for PR previews (`<branch>.overlune.pages.dev`) and main. Cloudflare's own builds are off. Secrets: `CLOUDFLARE_PAGES_TOKEN`, `SENTRY_AUTH_TOKEN`; variables: `CLOUDFLARE_ACCOUNT_ID`, `DEPLOY_FROM_ACTIONS`.
+- **Deploys run from GitHub Actions** (live 2026-10-20): `ci.yml`'s `deploy` job runs after `checks` pass: `wrangler deploy` on main, `wrangler preview` (Workers Previews, staging database) for PRs. The old Pages project was deleted on 2026-10-30. Secrets: `CLOUDFLARE_PAGES_TOKEN`, `SENTRY_AUTH_TOKEN`; variables: `CLOUDFLARE_ACCOUNT_ID`, `DEPLOY_FROM_ACTIONS`.
 
 ### Waiting on the owner
 - **2.2.0 release PR:** merge after the owner's approval and all three checks; then tag `v2.2.0`, publish the GitHub release, and confirm overlune.in serves the new build.
