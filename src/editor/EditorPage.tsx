@@ -988,14 +988,23 @@ export default function EditorPage() {
           </p>
           <ul className="editor-welcome-looks">
             {themeIds.map((id) => (
-              <li key={id}>
+              <li key={id} className="editor-look-item">
                 {/* After 21st.dev's "Gallery Hover Carousel" (behavior only, T6.154): under the pointer or keyboard
-                    focus the picture rises to make room for a line about the look. The name stays the button's name;
-                    the line is its description. */}
+                    focus the picture rises to make room for a line about the look. The picture sits outside the
+                    button, which holds only the name and covers the card (editor.css), so the scene's own text is
+                    never part of the button's words (WCAG 2.5.3, label in name); the line is its description. */}
+                <span className="editor-look-pic">
+                  <ThemeShot id={id} />
+                  <span className="editor-look-reveal">
+                    <span id={`look-blurb-${id}`}>{blurbs[id]}</span>
+                    <span aria-hidden className="editor-look-go">
+                      Start with it <Icon name="next" />
+                    </span>
+                  </span>
+                </span>
                 <button
                   type="button"
-                  className="editor-card editor-look-card"
-                  aria-labelledby={`look-name-${id}`}
+                  className="editor-look-card"
                   aria-describedby={`look-blurb-${id}`}
                   onClick={() => {
                     update({ theme: id });
@@ -1008,16 +1017,7 @@ export default function EditorPage() {
                     });
                   }}
                 >
-                  <span className="editor-look-pic">
-                    <ThemeShot id={id} />
-                    <span className="editor-look-reveal">
-                      <span id={`look-blurb-${id}`}>{blurbs[id]}</span>
-                      <span aria-hidden className="editor-look-go">
-                        Start with it <Icon name="next" />
-                      </span>
-                    </span>
-                  </span>
-                  <span id={`look-name-${id}`}>{themes[id].name}</span>
+                  {themes[id].name}
                 </button>
               </li>
             ))}

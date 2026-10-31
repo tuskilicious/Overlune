@@ -737,12 +737,6 @@
   gap: 6px;
 }
 
-.editor-welcome .editor-card {
-  font-family: var(--font-heading);
-  font-size: 18px;
-  font-weight: 700;
-}
-
 /* The welcome gallery's cards (T6.154), after 21st.dev's "Gallery Hover Carousel" (behavior only): under the
    pointer or keyboard focus the picture rises and a panel with a line about the look slides up into its lower part.
    Transform only. Touch screens skip it (they pick on tap), and reduced motion swaps at once (index.css). */
@@ -783,13 +777,11 @@
 }
 
 @media (hover: hover) {
-  .editor-look-card:hover .editor-look-pic .editor-shot,
-  .editor-look-card:focus-visible .editor-look-pic .editor-shot {
+  .editor-look-item:is(:hover, :has(:focus-visible)) .editor-shot {
     transform: translateY(-22%);
   }
 
-  .editor-look-card:hover .editor-look-reveal,
-  .editor-look-card:focus-visible .editor-look-reveal {
+  .editor-look-item:is(:hover, :has(:focus-visible)) .editor-look-reveal {
     transform: none;
   }
 }
@@ -871,18 +863,59 @@
 
 /* Its look cards are cards (T8.4): a Deep Space surface with a faint edge, and under the pointer or keyboard focus a
    Lune Violet edge with the home page's soft violet glow. Only these cards glow in the editor. */
-.editor .editor-welcome .editor-card {
+.editor-look-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   padding: 8px;
-  border-color: color-mix(in srgb, var(--text) 8%, transparent);
-  border-width: 1px;
+  border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
+  border-radius: var(--radius);
   background: var(--surface);
   transition:
     border-color 200ms ease,
     box-shadow 200ms ease;
 }
 
-.editor .editor-welcome .editor-card:hover,
-.editor .editor-welcome .editor-card:focus-visible {
+/* The button holds only the name; its ::after covers the whole card, so a click anywhere picks the look. */
+.editor .editor-look-card {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.editor .editor-look-card::after {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  content: "";
+}
+
+.editor .editor-look-card:focus-visible {
+  outline: none;
+}
+
+/* The whole card presses, not the button: a transform on the button would shrink its ::after to the name mid-click. */
+.editor .editor-look-card:active {
+  transform: none;
+}
+
+.editor-look-item:has(.editor-look-card:active) {
+  transform: translateY(1px);
+}
+
+.editor .editor-look-card:focus-visible::after {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.editor-look-item:is(:hover, :has(:focus-visible)) {
   border-color: var(--accent);
   box-shadow: 0 12px 40px -12px rgb(164 94 252 / 0.6);
 }

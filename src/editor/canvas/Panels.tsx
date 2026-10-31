@@ -163,7 +163,7 @@ export function Layers({
               <button
                 type="button"
                 aria-pressed={el.hidden}
-                aria-label={`Hide ${name}`}
+                aria-label={`Hide ${name}: ${el.hidden ? "Hidden" : "Shown"}`}
                 title="Hide"
                 onClick={() => change(el.id, { hidden: !el.hidden })}
               >
@@ -172,7 +172,7 @@ export function Layers({
               <button
                 type="button"
                 aria-pressed={el.locked}
-                aria-label={`Lock ${name}`}
+                aria-label={`Lock ${name}: ${el.locked ? "Locked" : "Free"}`}
                 title="Lock"
                 onClick={() => change(el.id, { locked: !el.locked })}
               >

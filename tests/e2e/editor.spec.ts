@@ -280,6 +280,21 @@ test.describe("first visit (T6.16, T6.17)", () => {
     await expect(preview(page).locator(".scene-socials")).toHaveCount(0);
   });
 
+  test("a click on a card's picture picks the look, and only the name is the button's words", async ({
+    page,
+  }) => {
+    // The picture sits outside the button (WCAG 2.5.3); the button covers the card, even while pressed.
+    const card = page.getByRole("button", { name: "Cozy Café", exact: true });
+    await expect(card).toHaveText("Cozy Café");
+    const pic = (await page
+      .locator(".editor-look-item")
+      .nth(2)
+      .locator(".editor-look-pic")
+      .boundingBox())!;
+    await page.mouse.click(pic.x + 30, pic.y + 30);
+    await expect(page.getByRole("region", { name: "Pick a look to start" })).toHaveCount(0);
+  });
+
   test("on a 1366×768 laptop the whole scene preview is in view after picking a look (T6.49)", async ({
     page,
   }) => {
@@ -384,7 +399,7 @@ test("copied links are marked, and the last copy says what's next (T6.24)", asyn
 }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   const links = page.getByRole("region", { name: "Links to paste into OBS" });
-  await links.getByRole("button", { name: "Copy Starting Soon link" }).click();
+  await links.getByRole("button", { name: "Copy link: Starting Soon" }).click();
   // The mark beside the link (the button's own "Copied" face comes and goes, T6.154).
   await expect(links.locator(".editor-link").first().locator(".editor-link-done")).toContainText(
     "Copied",
@@ -398,7 +413,7 @@ test("copied links are marked, and the last copy says what's next (T6.24)", asyn
   );
 
   for (const name of ["Starting Soon", "Be Right Back", "Stream Ending", "Chat", "Alerts"])
-    await links.getByRole("button", { name: `Copy ${name} link` }).click();
+    await links.getByRole("button", { name: `Copy link: ${name}` }).click();
   await expect(links.getByText("You’re set: all 5 links copied.")).toBeVisible();
   await expect(links.getByRole("link", { name: "setup guide", exact: true })).toHaveAttribute(
     "href",
@@ -596,9 +611,9 @@ test("editor redesign: nudges, frame sizes and what's filled in (T6.118)", async
   await page.getByRole("button", { name: "In 15 min" }).click();
   const field = page.getByLabel("Countdown ends at");
   const at = await field.inputValue();
-  await page.getByRole("button", { name: "Countdown 1 minute later" }).click();
+  await page.getByRole("button", { name: "Countdown +1 min" }).click();
   await expect(field).not.toHaveValue(at);
-  await page.getByRole("button", { name: "Countdown 1 minute earlier" }).click();
+  await page.getByRole("button", { name: "Countdown −1 min" }).click();
   await expect(field).toHaveValue(at);
 
   const size = page.getByRole("button", { name: "800 × 450" });
@@ -807,7 +822,7 @@ test("an old link loads back into the editor", async ({ page, context }) => {
   await page.getByRole("radio", { name: "Be Right Back" }).check();
   await page.getByLabel("Title", { exact: true }).fill("Grabbing snacks");
   await page.getByLabel("Link to your logo image").fill("https://example.com/logo.png");
-  await page.getByRole("button", { name: "Copy Be Right Back link" }).click();
+  await page.getByRole("button", { name: "Copy link: Be Right Back" }).click();
   const link = await page.evaluate(() => navigator.clipboard.readText());
 
   await page.evaluate(() => localStorage.clear()); // a different browser, no autosave
@@ -920,7 +935,7 @@ test("Advanced starts closed, and overrides reach the preview and the OBS link",
   await expect(title).toHaveCSS("color", "rgb(255, 43, 214)");
   await expect(title).toHaveCSS("font-family", /^"?Orbitron/);
 
-  await page.getByRole("button", { name: "Copy Starting Soon link" }).click();
+  await page.getByRole("button", { name: "Copy link: Starting Soon" }).click();
   await page.goto(await page.evaluate(() => navigator.clipboard.readText()));
   await expect(page.getByRole("heading", { name: "Starting soon" })).toHaveCSS(
     "color",
@@ -950,7 +965,7 @@ test("a copied link opens the overlay with the editor's settings", async ({ page
   await page.getByRole("radio", { name: "Be Right Back" }).check();
   await page.getByLabel("Title", { exact: true }).fill("Grabbing snacks");
 
-  await page.getByRole("button", { name: "Copy Be Right Back link" }).click();
+  await page.getByRole("button", { name: "Copy link: Be Right Back" }).click();
   await expect(page.getByRole("status").filter({ hasText: "Copied." })).toBeVisible();
   const link = await page.evaluate(() => navigator.clipboard.readText());
   expect(link).toMatch(/\/o\/brb#1\./);
@@ -1401,7 +1416,7 @@ for (const width of [900, 1100, 1440]) {
         r.y + r.height > side.y;
       expect(overlaps).toBe(false);
     }
-    await page.getByRole("button", { name: "Copy Alerts link" }).click(); // reachable, not covered
+    await page.getByRole("button", { name: "Copy link: Alerts" }).click(); // reachable, not covered
   });
 }
 
@@ -1478,7 +1493,7 @@ test("Still goes into every overlay link and turns the motion off (T6.74)", asyn
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.getByRole("radio", { name: "Still" }).check();
   await expect(page.locator(".editor-side")).toHaveClass(/editor-shot/); // the preview holds still too
-  await page.getByRole("button", { name: "Copy Starting Soon link" }).click();
+  await page.getByRole("button", { name: "Copy link: Starting Soon" }).click();
   const link = await page.evaluate(() => navigator.clipboard.readText());
   await page.goto(link);
   await expect(page.locator(".scene")).toBeVisible();
@@ -1493,7 +1508,7 @@ test("the alert time goes into the Alerts link, and the hint says where position
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.getByLabel("Show each alert for").selectOption("10");
   await expect(page.getByText("move and resize the Alerts source in OBS")).toBeVisible();
-  await page.getByRole("button", { name: "Copy Alerts link" }).click();
+  await page.getByRole("button", { name: "Copy link: Alerts" }).click();
   const link = await page.evaluate(() => navigator.clipboard.readText());
   await page.goto(link);
   await expect(page.locator(".alerts")).toHaveAttribute("style", /--alert-ms: 10000ms/);
