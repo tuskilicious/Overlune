@@ -853,29 +853,100 @@
   }
 }
 
-/* Motes rising out of the ridges: a tile one tile taller than the card slides up one tile, so the loop never jumps. */
+/* Motes rising out of the ridges: a tile one tile taller than the card slides up one tile, so the loop never jumps.
+   Each mote's violet glow is in its own gradient: a drop-shadow filter on this big moving layer cost Firefox a repaint
+   of the whole layer every frame. */
 .landing-motes {
   --tile: 520px;
   position: absolute;
   inset: 0 0 calc(var(--tile) * -1);
   background-image:
-    radial-gradient(circle at 12% 18%, rgb(24 210 245 / 0.7) 0 1.5px, transparent 2.5px),
-    radial-gradient(circle at 31% 64%, rgb(244 241 255 / 0.6) 0 1px, transparent 2px),
-    radial-gradient(circle at 47% 32%, rgb(164 94 252 / 0.8) 0 2px, transparent 3px),
-    radial-gradient(circle at 63% 81%, rgb(24 210 245 / 0.6) 0 1px, transparent 2px),
-    radial-gradient(circle at 78% 46%, rgb(244 241 255 / 0.55) 0 1.5px, transparent 2.5px),
-    radial-gradient(circle at 91% 12%, rgb(164 94 252 / 0.7) 0 1.5px, transparent 2.5px),
-    radial-gradient(circle at 22% 90%, rgb(164 94 252 / 0.6) 0 1px, transparent 2px),
-    radial-gradient(circle at 56% 6%, rgb(24 210 245 / 0.5) 0 1px, transparent 2px),
-    radial-gradient(circle at 5% 42%, rgb(244 241 255 / 0.7) 0 2px, transparent 3px),
-    radial-gradient(circle at 38% 12%, rgb(164 94 252 / 0.75) 0 1.5px, transparent 2.5px),
-    radial-gradient(circle at 71% 22%, rgb(24 210 245 / 0.65) 0 2px, transparent 3px),
-    radial-gradient(circle at 85% 70%, rgb(164 94 252 / 0.7) 0 2px, transparent 3px),
-    radial-gradient(circle at 44% 56%, rgb(244 241 255 / 0.5) 0 1px, transparent 2px),
-    radial-gradient(circle at 97% 88%, rgb(24 210 245 / 0.55) 0 1.5px, transparent 2.5px);
+    radial-gradient(
+      circle at 12% 18%,
+      rgb(24 210 245 / 0.7) 0 1.5px,
+      rgb(164 94 252 / 0.22) 2.5px,
+      transparent 5.5px
+    ),
+    radial-gradient(
+      circle at 31% 64%,
+      rgb(244 241 255 / 0.6) 0 1px,
+      rgb(164 94 252 / 0.22) 2px,
+      transparent 5px
+    ),
+    radial-gradient(
+      circle at 47% 32%,
+      rgb(164 94 252 / 0.8) 0 2px,
+      rgb(164 94 252 / 0.22) 3px,
+      transparent 6px
+    ),
+    radial-gradient(
+      circle at 63% 81%,
+      rgb(24 210 245 / 0.6) 0 1px,
+      rgb(164 94 252 / 0.22) 2px,
+      transparent 5px
+    ),
+    radial-gradient(
+      circle at 78% 46%,
+      rgb(244 241 255 / 0.55) 0 1.5px,
+      rgb(164 94 252 / 0.22) 2.5px,
+      transparent 5.5px
+    ),
+    radial-gradient(
+      circle at 91% 12%,
+      rgb(164 94 252 / 0.7) 0 1.5px,
+      rgb(164 94 252 / 0.22) 2.5px,
+      transparent 5.5px
+    ),
+    radial-gradient(
+      circle at 22% 90%,
+      rgb(164 94 252 / 0.6) 0 1px,
+      rgb(164 94 252 / 0.22) 2px,
+      transparent 5px
+    ),
+    radial-gradient(
+      circle at 56% 6%,
+      rgb(24 210 245 / 0.5) 0 1px,
+      rgb(164 94 252 / 0.22) 2px,
+      transparent 5px
+    ),
+    radial-gradient(
+      circle at 5% 42%,
+      rgb(244 241 255 / 0.7) 0 2px,
+      rgb(164 94 252 / 0.22) 3px,
+      transparent 6px
+    ),
+    radial-gradient(
+      circle at 38% 12%,
+      rgb(164 94 252 / 0.75) 0 1.5px,
+      rgb(164 94 252 / 0.22) 2.5px,
+      transparent 5.5px
+    ),
+    radial-gradient(
+      circle at 71% 22%,
+      rgb(24 210 245 / 0.65) 0 2px,
+      rgb(164 94 252 / 0.22) 3px,
+      transparent 6px
+    ),
+    radial-gradient(
+      circle at 85% 70%,
+      rgb(164 94 252 / 0.7) 0 2px,
+      rgb(164 94 252 / 0.22) 3px,
+      transparent 6px
+    ),
+    radial-gradient(
+      circle at 44% 56%,
+      rgb(244 241 255 / 0.5) 0 1px,
+      rgb(164 94 252 / 0.22) 2px,
+      transparent 5px
+    ),
+    radial-gradient(
+      circle at 97% 88%,
+      rgb(24 210 245 / 0.55) 0 1.5px,
+      rgb(164 94 252 / 0.22) 2.5px,
+      transparent 5.5px
+    );
   background-size: 100% var(--tile);
   mask-image: linear-gradient(transparent 5%, #000 60%);
-  filter: drop-shadow(0 0 4px rgb(164 94 252 / 0.6));
   animation: motes-rise 26s linear infinite;
 }
 
@@ -1077,6 +1148,15 @@ html[data-ruler]::-webkit-scrollbar {
   background: color-mix(in srgb, var(--color-night) 35%, transparent);
   backdrop-filter: blur(8px);
   mask-image: linear-gradient(to left, black 40%, transparent);
+}
+
+/* Firefox re-blurs what scrolls under a backdrop-filter every frame, which made the home page lag there; it gets a
+   deeper tint instead. (-moz-appearance is supported only by Firefox.) */
+@supports (-moz-appearance: none) {
+  .landing-ruler::before {
+    background: color-mix(in srgb, var(--color-night) 70%, transparent);
+    backdrop-filter: none;
+  }
 }
 
 .landing-ruler-tape {
