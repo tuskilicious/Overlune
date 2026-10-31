@@ -157,14 +157,14 @@ export default function SceneText({
                       {/* A minute either way, like the kits' countdown controls (T6.118). */}
                       {(
                         [
-                          ["−1 min", "1 minute earlier", -1],
-                          ["+1 min", "1 minute later", 1],
+                          ["−1 min", -1],
+                          ["+1 min", 1],
                         ] as const
-                      ).map(([label, name, step]) => (
+                      ).map(([label, step]) => (
                         <button
                           key={step}
                           type="button"
-                          aria-label={`Countdown ${name}`}
+                          aria-label={`Countdown ${label}`}
                           onClick={() =>
                             updateScene("starting", {
                               endsAt: (starting.endsAt ?? 0) + step * 60_000,

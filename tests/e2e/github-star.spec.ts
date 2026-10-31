@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
 for (const path of ["/", "/editor", "/guide"])
   test(`the nav links to the repo to star it on ${path}`, async ({ page }) => {
     await page.goto(path);
-    await expect(page.getByRole("link", { name: "Star Overlune on GitHub" })).toHaveAttribute(
+    await expect(page.getByRole("link", { name: "Star on GitHub", exact: true })).toHaveAttribute(
       "href",
       "https://github.com/tuskilicious/Overlune",
     );
@@ -16,7 +16,7 @@ test.describe("in a narrower window", () => {
 
   test("only the star shows, at the toggle's size", async ({ page }) => {
     await page.goto("/");
-    const star = page.getByRole("link", { name: "Star Overlune on GitHub" });
+    const star = page.getByRole("link", { name: "Star on GitHub", exact: true });
     await expect(star.getByText("Star on GitHub")).toBeHidden();
     expect((await star.boundingBox())!.height).toBe(40);
   });
@@ -27,7 +27,7 @@ test.describe("on a phone", () => {
 
   test("the bar leaves it out; the footer's GitHub link stays", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("link", { name: "Star Overlune on GitHub" })).toBeHidden();
+    await expect(page.getByRole("link", { name: "Star on GitHub", exact: true })).toBeHidden();
     await expect(page.getByRole("link", { name: "Open source on GitHub" })).toBeAttached();
   });
 });

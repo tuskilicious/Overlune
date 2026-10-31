@@ -97,7 +97,7 @@ export function LinkRow({
         className="editor-copy"
         data-state={status === "Copied." ? "copied" : status ? "error" : "idle"}
         onClick={copy}
-        aria-label={`Copy ${name} link`}
+        aria-label={`Copy link: ${name}`}
       >
         <span className="editor-copy-face" data-face="idle">
           <Icon name="copy" /> Copy link
