@@ -126,3 +126,15 @@ We measure these without tracking users:
 - **Zero broken old links.** Enforced by the old-link tests in CI.
 - **Overlay performance:** each overlay under 5% CPU in OBS on a mid-range PC (checked per `docs/OBS-TESTING.md`).
 - **Qualitative:** GitHub stars, issues and feedback, and "my chat is blank" support requests going down over time.
+
+## Desktop app (asked for by the owner 2026-11-03; plan awaiting approval, `docs/TASKS.md` Phase 16)
+Streamers install Overlune and go live from it, with no OBS: it captures the game, camera and mic, mixes the scenes, and streams. Today's PRD lists a desktop app as out of scope; approving this plan changes that.
+- **The website stays.** Streamers paste a link once and never touch it again, so every overlay link keeps working on overlune.in, and the site remains how people find and try Overlune. The app adds a way to go live; it doesn't turn the site off.
+- **One editor.** The app reuses the editor, looks and overlays from this repo, so a look works the same in the app and in OBS.
+- **The engine is OBS's own, libobs (proposed).** It already does game capture, browser sources, hardware encoding and streaming; writing those ourselves would take far longer and be less reliable. Its license is GPL, so the app is open source under the GPL in its own repo, and this repo stays MIT. Check the license file upstream before relying on this.
+- **Windows first.** Mac after the Windows app has real users.
+- **Secrets.** The stream key stays in the system's credential store, never in a link, a log or Overlune's servers. Twitch sign-in keeps its client secret on the server (CLAUDE.md section 5).
+- **Still free,** with no payments and no AI. No Meld code or assets: ideas only.
+- **Open for the owner:** paying for code signing (without it, Windows warns people before installing).
+- **Out of scope for the first version:** multi-streaming, multi-track recording, plugins, Mac, Linux.
+- **Done when:** a new streamer on a low-end Windows PC can install the app, pick a look and go live on Twitch with game, camera, chat and alerts, for an hour without dropped frames from the app; every old link still works.

@@ -940,3 +940,16 @@ Planned 2026-10-20 at the owner's request, after an outside review asked for cra
 - [x] **T15.4 Sitemap from the registry.** `sitemap.xml` generated at build from the public routes and the look pages, replacing the hand-written one; `lastmod` from the build date.
   - Accept: a test fails if a public route or a look is missing from it.
   - Built 2026-10-20. `sitemap()` in `src/lib/page-meta.ts` lists the site pages (`pages`) and every look's page (`themeIds`), each with the build's date as `lastmod`; the build writes it to `dist/sitemap.xml` (the plugin in `vite.config.ts` that writes the pages' shells) and the dev server answers `/sitemap.xml` from the same function. `lookPath` moved into `page-meta.ts` so the build can read it (the theme files import CSS, which the Vite config can't load). `public/sitemap.xml` is gone. The unit test reads the routes `App.tsx` declares, leaves out the overlays, the not-found page and the staging-only test page, expands `/looks/:id` to every look, and fails unless the sitemap lists exactly those. 25 addresses today: 5 pages and 20 looks.
+
+## Phase 16: Desktop app (proposed 2026-11-03, awaiting the owner's approval)
+Why and what: `docs/PRD.md` "Desktop app". Nothing here starts until the owner approves it. Saved overlays' release (T12.7) comes first. Each task after the spike is split further when it starts.
+- [ ] **T16.1 Spike: one scene live from a small app.** In a throwaway repo: a window that uses libobs to show a game capture and one Overlune overlay as a browser source, encode with the graphics card, and stream to a private Twitch test. Compare two shells for the interface: Tauri and Electron. (WebView2, which Tauri uses, has no off-screen rendering, so the overlays would use libobs's own browser source either way.)
+  - Accept: a written result with CPU, memory, install size and dropped frames on a low-end Windows PC; the shell chosen; the license terms read from OBS's own license file; a go or no-go for the owner.
+- [ ] **T16.2 Decide and record.** After T16.1: the owner's go or no-go, the new repo and its GPL license, code signing, and the changes to `docs/STACK.md` and CLAUDE.md (desktop rules: stream key storage, updates, crash reports).
+  - Accept: the decisions are written down, and the desktop app's line in the PRD's out-of-scope list points here.
+- [ ] **T16.3 App shell and the shared editor.** The installer, auto-update, and this repo's editor and looks inside the app.
+- [ ] **T16.4 Sources and scenes.** Game, screen, camera and mic; each Overlune scene with its overlays; switching scenes.
+- [ ] **T16.5 Go live.** Twitch sign-in, the stream key in the system's credential store, the encoder chosen for the PC, a stream health display, recording to a file.
+- [ ] **T16.6 Audio.** A mixer with meters, mute and noise suppression.
+- [ ] **T16.7 Beta and release.** Real streamers on low-end PCs; the privacy policy and terms updated with the owner's approval; the download on overlune.in.
+  - Accept: the PRD's "Done when", plus the pre-launch checklist.
