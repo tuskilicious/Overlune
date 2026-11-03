@@ -487,6 +487,9 @@ test("the looks list drives one big preview by hover, focus and scroll, with a p
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
+  // Still: smooth scrolling and the pinned hero keep moving the page after a scroll on a busy machine, which hands the
+  // preview to whichever row ends up in the middle, after the hover or focus this test checks.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const preview = page.locator(".landing-look-preview .scene");
   const row = (name: string) => page.locator("[data-look-row]").filter({ hasText: name });
